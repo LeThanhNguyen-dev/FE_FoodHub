@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>FoodHub Admin - Tạo Nhân Viên</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="keywords">
+  <meta content="" name="description">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+  <!-- Icon Font Stylesheet -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #FEA116;
+      --light: #F1F8FF;
+      --dark: #0F172B;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --info: #3B82F6;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--light);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      background: var(--dark);
+      transition: all 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar .brand {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar .brand h3 {
+      color: var(--primary);
+      margin: 0;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .sidebar .brand small {
+      color: #fff;
+      font-style: italic;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+      flex: 1;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: all 0.3s;
+      border-radius: 0;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(254, 161, 22, 0.1);
+      color: var(--primary);
+    }
+
+    .nav-link i {
+      width: 20px;
+      margin-right: 1rem;
+      text-align: center;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+
+    .main-content.expanded {
+      margin-left: 70px;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), #ff8c00);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 15px 15px 0 0;
+    }
+
+    .form-control, .form-select {
+      border-radius: 10px;
+      border: 2px solid #eee;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--danger);
+    }
+
+    .form-control.is-invalid:focus {
+      box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+    }
+
+    .form-select.is-invalid {
+      border-color: var(--danger);
+    }
+
+    .form-select.is-invalid:focus {
+      box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+    }
+
+    .invalid-feedback {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      background: #e8960f;
+      transform: scale(1.05);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      background: #5c636a;
+      transform: scale(1.05);
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      min-width: 300px;
+      animation: slideInRight 0.3s ease-out;
+      border-radius: 15px;
+      border: none;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .logout-section {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: auto;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      width: 100%;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, #c82333, #a71e2a);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+      color: white;
+    }
+
+    .password-field {
+      position: relative;
+    }
+
+    .password-field .form-control {
+      padding-right: 3rem;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6c757d;
+      z-index: 10;
+      font-size: 1rem;
+      transition: color 0.3s;
+    }
+
+    .password-toggle:hover {
+      color: var(--primary);
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px white inset !important;
+      -webkit-text-fill-color: #333 !important;
+      background-color: white !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+      border: 2px solid #eee !important;
+      border-radius: 10px !important;
+    }
+
+    input:-webkit-autofill::first-line {
+      font-family: 'Nunito', sans-serif !important;
+      font-size: 1rem !important;
+    }
+
+    input[autocomplete="new-password"]::-webkit-credentials-auto-fill-button,
+    input::-webkit-credentials-auto-fill-button {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      position: absolute !important;
+      right: -9999px !important;
+    }
+
+    .modal-content {
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, var(--primary), #ff8c00);
+      color: white;
+      border-radius: 15px 15px 0 0;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Hidden inputs to trick autofill -->
+<div style="display: none;">
+  <input type="text" name="fake_username">
+  <input type="password" name="fake_password">
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+  <div class="brand text-center">
+    <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
+    <small class="d-block">Admin Panel</small>
+  </div>
+
+  <nav class="sidebar-nav flex-fill">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="adminDashboard.html" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="staffList.html" class="nav-link active">
+          <i class="fas fa-users"></i>
+          <span>Quản lý người dùng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="adminDashboardStaff.html" class="nav-link">
+          <i class="fas fa-user-tie"></i>
+          <span>Quản lý nhân viên</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="adminDashboardMenu.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Quản lý món ăn</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Quản lý tài chính</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Đơn hàng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-chart-bar"></i>
+          <span>Báo cáo</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="logout-section">
+    <button class="logout-btn" onclick="handleLogout()">
+      <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmCreateModal" tabindex="-1" aria-labelledby="confirmCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmCreateModalLabel">Xác nhận tạo nhân viên</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Bạn có chắc chắn muốn tạo nhân viên mới này?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary" id="confirmCreateBtn">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-user-plus me-2"></i>Tạo Nhân Viên Mới</h5>
+      </div>
+      <div class="card-body">
+        <form id="createEmployeeForm" class="row g-3" autocomplete="off">
+          <div class="col-md-6">
+            <label for="username" class="form-label">Tên đăng nhập</label>
+            <input type="text" class="form-control" id="username" name="username"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <div class="invalid-feedback" id="username-error"></div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <div class="invalid-feedback" id="email-error"></div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="password" class="form-label">Mật khẩu</label>
+            <div class="password-field">
+              <input type="password" class="form-control" id="password" name="password"
+                     autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <i class="fas fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+            </div>
+            <div class="invalid-feedback" id="password-error"></div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Số điện thoại</label>
+            <input type="tel" class="form-control" id="phone" name="phone"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <div class="invalid-feedback" id="phone-error"></div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="address" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="address" name="address"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <div class="invalid-feedback" id="address-error"></div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="roleName" class="form-label">Vai trò</label>
+            <select class="form-select" id="roleName" name="roleName" required>
+              <option value="" disabled selected>Chọn vai trò</option>
+              <option value="Manager">Manager</option>
+              <option value="Chef">Chef</option>
+              <option value="Waiter">Waiter</option>
+              <option value="Cashier">Cashier</option>
+            </select>
+            <div class="invalid-feedback" id="roleName-error"></div>
+          </div>
+
+          <div class="col-12 text-end">
+            <button type="button" class="btn btn-secondary me-2" onclick="goBack()">Hủy</button>
+            <button type="button" class="btn btn-primary" onclick="validateAndShowConfirm()">Tạo nhân viên</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const apiBaseUrl = 'http://localhost:8080/foodhub/users';
+  const maxRetries = 2;
+
+  // Hàm gọi API với retry
+  async function fetchWithRetry(url, options, retries = maxRetries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        console.log(`Thử lần ${attempt}: Gửi yêu cầu API: ${url}`, options);
+        const response = await axios.request({ ...options, url, timeout: 5000 });
+        console.log(`Phản hồi từ API (lần ${attempt}):`, response.data);
+        return response;
+      } catch (error) {
+        console.error(`Lỗi lần ${attempt}:`, error);
+        if (attempt === retries) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+  }
+
+  // Xóa lỗi và viền đỏ
+  function clearErrors() {
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+      input.classList.remove('is-invalid');
+      const errorDiv = document.getElementById(`${input.id}-error`);
+      if (errorDiv) errorDiv.textContent = '';
+    });
+  }
+
+  // Hiển thị thông báo
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+    notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
+  }
+
+  // Disable autocomplete và thêm tên ngẫu nhiên cho input
+  function disableAutocomplete() {
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
+    inputs.forEach(input => {
+      input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
+      input.setAttribute('data-form-type', 'other');
+      if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
+        input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
+      }
+    });
+  }
+
+  // Validate form và hiển thị modal
+  function validateAndShowConfirm() {
+    clearErrors();
+    const formData = {
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      address: document.getElementById('address').value.trim(),
+      roleName: document.getElementById('roleName').value
+    };
+
+    let hasError = false;
+
+    // Validate username
+    if (!formData.username || formData.username.length < 5 || formData.username.length > 255) {
+      document.getElementById('username').classList.add('is-invalid');
+      document.getElementById('username-error').textContent = !formData.username ? 'Tên đăng nhập không được để trống' : 'Tên đăng nhập phải từ 5 đến 255 ký tự';
+      hasError = true;
+    }
+
+    // Validate password
+    if (!formData.password || formData.password.length < 8 || formData.password.length > 255) {
+      document.getElementById('password').classList.add('is-invalid');
+      document.getElementById('password-error').textContent = !formData.password ? 'Mật khẩu không được để trống' : 'Mật khẩu phải từ 8 đến 255 ký tự';
+      hasError = true;
+    }
+
+    // Validate email
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      document.getElementById('email').classList.add('is-invalid');
+      document.getElementById('email-error').textContent = !formData.email ? 'Email không được để trống' : 'Email không hợp lệ';
+      hasError = true;
+    }
+
+    // Validate phone
+    if (!formData.phone || !/^[0-9]{10}$/.test(formData.phone)) {
+      document.getElementById('phone').classList.add('is-invalid');
+      document.getElementById('phone-error').textContent = !formData.phone ? 'Số điện thoại không được để trống' : 'Số điện thoại phải có đúng 10 chữ số';
+      hasError = true;
+    }
+
+    // Validate address
+    if (!formData.address) {
+      document.getElementById('address').classList.add('is-invalid');
+      document.getElementById('address-error').textContent = 'Địa chỉ không được để trống';
+      hasError = true;
+    }
+
+    // Validate role
+    if (!formData.roleName || !['Manager', 'Chef', 'Waiter', 'Cashier'].includes(formData.roleName)) {
+      document.getElementById('roleName').classList.add('is-invalid');
+      document.getElementById('roleName-error').textContent = 'Vui lòng chọn vai trò';
+      hasError = true;
+    }
+
+    if (!hasError) {
+      const modal = new bootstrap.Modal(document.getElementById('confirmCreateModal'));
+      modal.show();
+    }
+  }
+
+  // Tạo nhân viên
+  async function createEmployee(data) {
+    try {
+      const response = await fetchWithRetry(apiBaseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: JSON.stringify(data)
+      });
+      if (response.data && response.data.code === 0) {
+        showNotification('Tạo nhân viên thành công!', 'success');
+        setTimeout(() => goBack(), 1500);
+      } else {
+        throw new Error(response.data.message || 'Lỗi khi tạo nhân viên!');
+      }
+    } catch (error) {
+      clearErrors();
+      if (error.response && error.response.data && error.response.data.code === 1001) {
+        // Handle USER_EXISTED error
+        document.getElementById('username').classList.add('is-invalid');
+        document.getElementById('username-error').textContent = 'Tên đăng nhập đã tồn tại';
+        showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
+      } else if (error.response && error.response.status === 400 && error.response.data && error.response.data.errors) {
+        // Handle validation errors
+        const errors = error.response.data.errors;
+        errors.forEach(err => {
+          const field = err.field;
+          const message = err.defaultMessage || err.message || 'Lỗi không xác định';
+          const input = document.getElementById(field);
+          const errorDiv = document.getElementById(`${field}-error`);
+          if (input && errorDiv) {
+            input.classList.add('is-invalid');
+            errorDiv.textContent = message;
+          }
+        });
+        showNotification('Vui lòng kiểm tra các lỗi trong form!', 'error');
+      } else {
+        // Handle other errors (e.g., 404, 500, etc.)
+        showNotification(error.response?.data?.message || 'Có lỗi xảy ra khi tạo nhân viên!', 'error');
+      }
+    }
+  }
+
+  // Quay lại danh sách
+  function goBack() {
+    window.location.href = 'staffList.html';
+  }
+
+  // Đăng xuất
+  function handleLogout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+      document.body.style.opacity = '0.5';
+      document.body.style.transition = 'opacity 0.5s';
+      setTimeout(() => {
+        alert('Đã đăng xuất thành công!');
+        window.location.href = '/login.html';
+      }, 1000);
+    }
+  }
+
+  // Toggle Sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('expanded');
+  }
+
+  // Toggle mật khẩu hiển thị/ẩn
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePassword');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.classList.remove('fa-eye');
+      toggleIcon.classList.add('fa-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.classList.remove('fa-eye-slash');
+      toggleIcon.classList.add('fa-eye');
+    }
+  }
+
+  // Khởi tạo
+  document.addEventListener('DOMContentLoaded', () => {
+    disableAutocomplete();
+    document.querySelectorAll('input').forEach(input => {
+      if (input.type !== 'hidden') {
+        input.value = '';
+      }
+    });
+
+    // Xử lý sự kiện xác nhận trong modal
+    document.getElementById('confirmCreateBtn').addEventListener('click', () => {
+      const formData = {
+        username: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        roleName: document.getElementById('roleName').value
+      };
+      createEmployee(formData);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('confirmCreateModal'));
+      modal.hide();
+    });
+
+    // Prevent autofill on focus
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.setAttribute('autocomplete', this.type === 'password' ? 'new-password' : 'off');
+        if (this.id === 'password' || this.id === 'username' || this.id === 'email') {
+          this.setAttribute('name', `${this.id}_${Math.random().toString(36).substring(2, 15)}`);
+        }
+      });
+    });
+  });
+
+  // Additional security to prevent autofill
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      disableAutocomplete();
+      const passwordField = document.getElementById('password');
+      if (passwordField) {
+        passwordField.value = '';
+      }
+    }, 100);
+  });
+</script>
+</body>
+</html>

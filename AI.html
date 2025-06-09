@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini Chatbox - AI.html</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f6f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-container {
+            width: 500px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .user {
+            background-color: #e1f5fe;
+            text-align: right;
+        }
+
+        .bot {
+            background-color: #f1f8e9;
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #1976d2;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0d47a1;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="messages" id="messages"></div>
+    <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') sendMessage()" />
+    <button onclick="sendMessage()">Gửi</button>
+</div>
+
+<script>
+    async function sendMessage() {
+        const input = document.getElementById("userInput");
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendMessage("Bạn", message, "user");
+        input.value = "";
+
+        try {
+            const response = await fetch("api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            appendMessage("Gemini", data.reply, "bot");
+
+        } catch (err) {
+            appendMessage("Lỗi", "Không thể kết nối đến máy chủ.", "bot");
+        }
+    }
+
+    function appendMessage(sender, text, type) {
+        const msgDiv = document.getElementById("messages");
+        const div = document.createElement("div");
+        div.className = `message ${type}`;
+        div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        msgDiv.appendChild(div);
+        msgDiv.scrollTop = msgDiv.scrollHeight;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>FoodHub Admin - Chỉnh sửa người dùng</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FEA116;
+            --light: #F1F8FF;
+            --dark: #0F172B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--light);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: var(--dark);
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar .brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .brand h3 {
+            color: var(--primary);
+            margin: 0;
+            font-family: 'Pacifico', cursive;
+        }
+
+        .sidebar .brand small {
+            color: #fff;
+            font-style: italic;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(254, 161, 22, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 1rem;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), #ff8c00);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #eee;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #e8960f;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #5c636a;
+            transform: scale(1.05);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease-out;
+            border-radius: 15px;
+            border: none;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .logout-section {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+
+        /* Enhanced autofill prevention */
+        .password-field {
+            position: relative;
+        }
+
+        .password-field .form-control {
+            padding-right: 3rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        /* Override Chrome autofill styles */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px white inset !important;
+            -webkit-text-fill-color: #333 !important;
+            background-color: white !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+            border: 2px solid #eee !important;
+            border-radius: 10px !important;
+        }
+
+        input:-webkit-autofill::first-line {
+            font-family: 'Nunito', sans-serif !important;
+            font-size: 1rem !important;
+        }
+
+        /* Hide autofill button */
+        input[autocomplete="new-password"]::-webkit-credentials-auto-fill-button,
+        input::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            right: -9999px !important;
+        }
+
+        /* Modal styling for consistency */
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), #ff8c00);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Hidden inputs to trick autofill -->
+<div style="display: none;">
+    <input type="text" name="fake_username">
+    <input type="password" name="fake_password">
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+    <div class="brand text-center">
+        <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
+        <small class="d-block">Admin Panel</small>
+    </div>
+
+    <nav class="sidebar-nav flex-fill">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="adminDashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="staffList.html" class="nav-link active">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="adminDashboardStaff.html" class="nav-link">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Quản lý nhân viên</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="adminDashboardMenu.html" class="nav-link">
+                    <i class="fas fa-utensils"></i>
+                    <span>Quản lý món ăn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Quản lý tài chính</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Đơn hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="logout-section">
+        <button class="logout-btn" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+        </button>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmUpdateModalLabel">Xác nhận cập nhật</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn lưu các thay đổi cho người dùng này?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmUpdateBtn">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin người dùng</h5>
+            </div>
+            <div class="card-body">
+                <form id="editUserForm" class="row g-3" autocomplete="off">
+                    <input type="hidden" id="userId" name="id">
+
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="roleName" class="form-label">Vai trò</label>
+                        <select class="form-select" id="roleName" name="roleName" required>
+                            <option value="ADMIN">ADMIN</option>
+                            <option value="MANAGER">MANAGER</option>
+                            <option value="CASHIER">CASHIER</option>
+                            <option value="CHEF">CHEF</option>
+                            <option value="WAITER">WAITER</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="address" class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" id="address" name="address"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Số điện thoại</label>
+                        <input type="tel" class="form-control" id="phone" name="phone"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Mật khẩu mới (để trống nếu không thay đổi)</label>
+                        <div class="password-field">
+                            <input type="password" class="form-control" id="password" name="password"
+                                   autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                   placeholder="Nhập mật khẩu mới...">
+                            <i class="fas fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" onclick="goBack()">Hủy</button>
+                        <button type="button" class="btn btn-primary" onclick="showConfirmModal()">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const apiBaseUrl = 'http://localhost:8080/foodhub/users';
+    const maxRetries = 2;
+
+    // Lấy tham số id từ URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Hàm gọi API với retry
+    async function fetchWithRetry(url, options, retries = maxRetries) {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                console.log(`Thử lần ${attempt}: Gửi yêu cầu API: ${url}`, options);
+                const response = await axios.request({ ...options, url, timeout: 5000 });
+                console.log(`Phản hồi từ API (lần ${attempt}):`, response.data);
+                return response;
+            } catch (error) {
+                console.error(`Lỗi lần ${attempt}:`, error);
+                if (attempt === retries) throw error;
+                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
+        }
+    }
+
+    // Lấy thông tin người dùng
+    async function fetchUserDetails(id) {
+        try {
+            const response = await fetchWithRetry(`${apiBaseUrl}/${id}`, { method: 'GET' });
+            if (response.data && response.data.result) {
+                const user = response.data.result;
+                document.getElementById('userId').value = user.id;
+                document.getElementById('username').value = user.username || '';
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('roleName').value = user.roleName.name || 'ADMIN';
+                document.getElementById('status').value = user.status || 'ACTIVE';
+                document.getElementById('address').value = user.address || '';
+                document.getElementById('phone').value = user.phone || '';
+                document.getElementById('password').value = '';
+
+                // Disable autocomplete sau khi load data
+                disableAutocomplete();
+            } else {
+                throw new Error('Không thể tải thông tin người dùng!');
+            }
+        } catch (error) {
+            showNotification(error.message || 'Có lỗi xảy ra khi tải thông tin người dùng!', 'error');
+        }
+    }
+
+    // Disable autocomplete và thêm tên ngẫu nhiên cho input
+    function disableAutocomplete() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
+        inputs.forEach(input => {
+            input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
+            input.setAttribute('data-form-type', 'other');
+            // Thêm tên ngẫu nhiên để ngăn autofill
+            if (input.id === 'password') {
+                input.setAttribute('name', `password_${Math.random().toString(36).substring(2, 15)}`);
+            } else if (input.id === 'username') {
+                input.setAttribute('name', `username_${Math.random().toString(36).substring(2, 15)}`);
+            } else if (input.id === 'email') {
+                input.setAttribute('name', `email_${Math.random().toString(36).substring(2, 15)}`);
+            }
+        });
+    }
+
+    // Cập nhật thông tin người dùng
+    async function updateUser(id, data) {
+        try {
+            // Nếu password trống, không gửi password trong request
+            if (!data.password || data.password.trim() === '') {
+                delete data.password;
+            }
+
+            const response = await fetchWithRetry(`${apiBaseUrl}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                data: JSON.stringify(data)
+            });
+            if (response.data && response.data.code === 1000) {
+                showNotification('Cập nhật thông tin người dùng thành công!', 'success');
+                setTimeout(() => goBack(), 1500);
+            } else {
+                throw new Error(response.data.message || 'Lỗi khi cập nhật thông tin người dùng!');
+            }
+        } catch (error) {
+            showNotification(error.message || 'Có lỗi xảy ra khi cập nhật thông tin người dùng!', 'error');
+        }
+    }
+
+    // Hiển thị thông báo
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    // Quay lại danh sách
+    function goBack() {
+        window.location.href = 'staffList.html';
+    }
+
+    // Đăng xuất
+    function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+            document.body.style.opacity = '0.5';
+            document.body.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+                alert('Đã đăng xuất thành công!');
+                window.location.href = '/login.html';
+            }, 1000);
+        }
+    }
+
+    // Toggle Sidebar
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+
+    // Toggle mật khẩu hiển thị/ẩn
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePassword');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Hiển thị modal xác nhận
+    function showConfirmModal() {
+        const modal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
+        modal.show();
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', () => {
+        const id = getQueryParam('id');
+        if (!id) {
+            showNotification('Không tìm thấy ID người dùng!', 'error');
+            setTimeout(() => goBack(), 2000);
+            return;
+        }
+
+        // Disable autocomplete ngay từ đầu
+        disableAutocomplete();
+
+        // Clear all inputs trước khi load data
+        document.querySelectorAll('input').forEach(input => {
+            if (input.type !== 'hidden') {
+                input.value = '';
+            }
+        });
+
+        fetchUserDetails(id);
+
+        // Xử lý sự kiện xác nhận trong modal
+        document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                roleName: document.getElementById('roleName').value,
+                status: document.getElementById('status').value,
+                address: document.getElementById('address').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: document.getElementById('password').value.trim()
+            };
+            updateUser(id, formData);
+            // Ẩn modal sau khi xác nhận
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
+            modal.hide();
+        });
+
+        // Prevent autofill on focus
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
+                if (this.id === 'password' || this.id === 'username' || this.id === 'email') {
+                    this.setAttribute('name', `${this.id}_${Math.random().toString(36).substring(2, 15)}`);
+                }
+            });
+        });
+    });
+
+    // Additional security to prevent autofill
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            disableAutocomplete();
+            // Clear password field sau khi page load hoàn toàn
+            const passwordField = document.getElementById('password');
+            if (passwordField) {
+                passwordField.value = '';
+            }
+        }, 100);
+    });
+</script>
+</body>
+</html>

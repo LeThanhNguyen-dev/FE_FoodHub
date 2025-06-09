@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa món ăn</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/foodhub/css/edit-dish-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/foodhub/js/edit-dish-scripts.js" defer></script>
+</head>
+<body>
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Đang tải thông tin món ăn...</div>
+</div>
+
+<div class="container">
+    <header class="header">
+        <h1><i class="fas fa-utensils"></i> Chỉnh sửa món ăn</h1>
+        <a href="/foodhub/menu-manager/menu.html" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </header>
+
+    <!-- Thông tin hiện tại -->
+    <div class="info-card" id="currentInfoCard" style="display: none;">
+        <h3><i class="fas fa-info-circle"></i> Thông tin hiện tại</h3>
+        <div id="currentInfoDisplay"></div>
+    </div>
+
+    <div class="form-card">
+        <form id="editDishForm">
+            <input type="hidden" id="dishId">
+            <div class="form-group">
+                <label for="dishName">Tên món ăn <span class="required">*</span></label>
+                <input type="text" id="dishName" placeholder="Nhập tên món ăn" required>
+                <span class="error-message" id="nameError"></span>
+            </div>
+            <div class="form-group">
+                <label for="dishPrice">Giá (VND) <span class="required">*</span></label>
+                <input type="number" id="dishPrice" step="0.01" placeholder="Nhập giá món ăn" required>
+                <span class="error-message" id="priceError"></span>
+            </div>
+            <div class="form-group">
+                <label for="dishDescription">Mô tả</label>
+                <textarea id="dishDescription" rows="3" placeholder="Nhập mô tả món ăn (không bắt buộc)"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="dishImage">Ảnh món ăn</label>
+                <input type="file" id="dishImage" accept="image/*">
+                <small>Chọn ảnh mới nếu muốn thay đổi (tối đa 5MB)</small>
+                <div id="imageContainer">
+                    <img id="imagePreview" src="#" alt="Preview ảnh" style="display: none;">
+                    <div id="currentImageInfo" class="image-info" style="display: none;">
+                        <small><i class="fas fa-image"></i> Ảnh hiện tại</small>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="dishCategories">Danh mục <span class="required">*</span></label>
+                <select id="dishCategories" multiple required>
+                    <!-- Danh mục sẽ được load động -->
+                </select>
+                <span class="error-message" id="categoryError"></span>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu thay đổi
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fas fa-undo"></i> Khôi phục
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal xác nhận -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <div class="modal-body">
+            Bạn có chắc chắn muốn lưu các thay đổi này?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+            <button type="button" class="btn btn-primary" id="confirmSaveBtn">Xác nhận</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

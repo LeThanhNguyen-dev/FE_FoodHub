@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <title>FoodHub Admin - Quản lý nhân viên</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="" name="keywords">
+  <meta content="" name="description">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+  <!-- Icon Font Stylesheet -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #FEA116;
+      --light: #F1F8FF;
+      --dark: #0F172B;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --info: #3B82F6;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--light);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      background: var(--dark);
+      transition: all 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar .brand {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar .brand h3 {
+      color: var(--primary);
+      margin: 0;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .sidebar .brand small {
+      color: #fff;
+      font-style: italic;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+      flex: 1;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: all 0.3s;
+      border-radius: 0;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(254, 161, 22, 0.1);
+      color: var(--primary);
+    }
+
+    .nav-link i {
+      width: 20px;
+      margin-right: 1rem;
+      text-align: center;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      transition: all 0.3s;
+      min-height: 100vh;
+    }
+
+    .main-content.expanded {
+      margin-left: 70px;
+    }
+
+    .top-bar {
+      background: #fff;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toggle-sidebar {
+      background: none;
+      border: none;
+      color: var(--dark);
+      font-size: 1.2rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), #ff8c00);
+      color: white;
+      padding: 1.5rem;
+      border: none;
+    }
+
+    .card-header h5 {
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      background: #e8960f;
+      transform: scale(1.05);
+    }
+
+    .btn-success {
+      background: var(--success);
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-success:hover {
+      background: #0d9668;
+      transform: scale(1.05);
+    }
+
+    .table {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    .table th {
+      background: linear-gradient(135deg, var(--dark), #1e293b);
+      color: white;
+      font-weight: 600;
+      border: none;
+      padding: 1rem;
+    }
+
+    .table td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-color: #eee;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: rgba(254, 161, 22, 0.05);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      min-width: 90px;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .status-active {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      border-color: #10B981;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-active:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .status-inactive {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      color: white;
+      border-color: #EF4444;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .status-inactive:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .action-buttons .btn {
+      margin: 0 2px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .action-buttons .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .form-control, .form-select {
+      border-radius: 10px;
+      border: 2px solid #eee;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
+    }
+
+    .pagination .page-link {
+      border-radius: 8px;
+      margin: 0 2px;
+      border: none;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .pagination .page-item.active .page-link {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      min-width: 300px;
+      animation: slideInRight 0.3s ease-out;
+      border-radius: 15px;
+      border: none;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .spinner-border {
+      color: var(--primary) !important;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .logout-section {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: auto;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      width: 100%;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, #c82333, #a71e2a);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .status-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        min-width: 80px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .action-buttons .btn {
+        margin: 0;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+  <div class="brand text-center">
+    <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
+    <small class="d-block">Admin Panel</small>
+  </div>
+
+  <nav class="sidebar-nav flex-fill">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="/foodhub/adminDashboard/adminDashboard.html" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link ">
+          <i class="fas fa-users"></i>
+          <span>Quản lý khách hàng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="adminDashboardStaff.html" class="nav-link active">
+          <i class="fas fa-user-tie"></i>
+          <span>Quản lý nhân viên</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="adminDashboardMenu.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Quản lý món ăn</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Quản lý tài chính</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Đơn hàng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-chart-bar"></i>
+          <span>Báo cáo</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="logout-section">
+    <button class="logout-btn" onclick="handleLogout()">
+      <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="d-flex align-items-center">
+      <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h4 class="mb-0"><i class="fas fa-users me-2"></i>Quản lý nhân viên</h4>
+    </div>
+    <div class="d-flex align-items-center">
+      <button class="btn btn-success me-3" onclick="addNewEmployee()">
+        <i class="fas fa-plus me-2"></i>Thêm nhân viên</button>
+      <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="fas fa-user-circle me-2"></i>Admin</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+          <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Management Content -->
+  <div class="container-fluid p-4">
+    <!-- Filter Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5><i class="fas fa-filter me-2"></i>Bộ lọc và Tìm kiếm</h5>
+      </div>
+      <div class="card-body">
+        <form id="filterForm" class="row g-3">
+          <div class="col-md-3">
+            <label for="roleFilter" class="form-label fw-bold">Vai trò</label>
+            <select id="roleFilter" class="form-select">
+              <option value="">Tất cả</option>
+              <option value="MANAGER">MANAGER</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="CASHIER">CASHIER</option>
+              <option value="WAITER">WAITER</option>
+              <option value="CHEF">CHEF</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="keyword" class="form-label fw-bold">Tìm kiếm</label>
+            <input type="text" id="keyword" class="form-control" placeholder="Nhập tên nhân viên...">
+          </div>
+          <div class="col-md-3">
+            <label for="sortBy" class="form-label fw-bold">Sắp xếp</label>
+            <select id="sortBy" class="form-select">
+              <option value="username_asc">Tên A-Z</option>
+              <option value="username_desc">Tên Z-A</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-search me-2"></i>Tìm kiếm
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Employee Table Card -->
+    <div class="card">
+      <div class="card-header">
+        <h5><i class="fas fa-list me-2"></i>Danh sách nhân viên</h5>
+      </div>
+      <div class="card-body">
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+          <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+          </div>
+          <p class="mt-3 text-muted">Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Employee Table -->
+        <div id="employeeTable" class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+              <th>Tên nhân viên</th>
+              <th>Email</th>
+              <th>Số điện thoại</th>
+              <th>Vai trò</th>
+              <th style="width: 130px;">Trạng thái</th>
+              <th style="width: 150px;">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+            <!-- Data will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <i class="fas fa-users"></i>
+          <h5>Không có nhân viên nào</h5>
+          <p class="text-muted">Thử thay đổi bộ lọc để xem thêm nhân viên hoặc thêm nhân viên mới</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center" id="pagination"></ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const apiEmployeeUrl = 'http://localhost:8080/foodhub/users/employees';
+  let currentPage = 0;
+  const pageSize = 10;
+  const maxRetries = 2;
+
+  // Hiển thị loading
+  function showLoading() {
+    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('employeeTableBody').innerHTML = '';
+  }
+
+  // Hiển thị lỗi
+  function showError(message) {
+    document.getElementById('employeeTableBody').innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <i class="fas fa-exclamation-triangle text-warning fa-2x mb-2"></i>
+                    <div>${message}</div>
+                </td>
+            </tr>
+        `;
+  }
+
+  // Hiển thị thông báo
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+    notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
+  }
+
+  // Ẩn loading
+  function hideLoading() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+  }
+
+  // Hàm gọi API với retry
+  async function fetchWithRetry(url, options, retries = maxRetries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        console.log(`Thử lần ${attempt}: Gửi yêu cầu API: ${url}`, options);
+        const response = await axios.request({ ...options, url, timeout: 5000 });
+        console.log(`Phản hồi từ API (lần ${attempt}):`, response.data);
+        return response;
+      } catch (error) {
+        console.error(`Lỗi lần ${attempt}:`, error);
+        if (attempt === retries) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+  }
+
+  // Tải danh sách nhân viên
+  async function fetchEmployees() {
+    showLoading();
+
+    const roleFilter = document.getElementById('roleFilter').value;
+    const keyword = document.getElementById('keyword').value.trim();
+    const sortValue = document.getElementById('sortBy').value;
+
+    let sortBy = 'username';
+    let sortDirection = 'asc';
+    if (sortValue) {
+      const parts = sortValue.split('_');
+      sortBy = parts[0];
+      sortDirection = parts[1] || 'asc';
+    }
+
+    const params = {
+      method: 'GET',
+      params: {
+        page: currentPage,
+        size: pageSize,
+        role: roleFilter || undefined,
+        keyword: keyword || undefined,
+        sortDirection: sortDirection
+      }
+    };
+
+    try {
+      const response = await fetchWithRetry(apiEmployeeUrl, params);
+      hideLoading();
+
+      if (!response.data) {
+        throw new Error('Phản hồi API không hợp lệ: Không có dữ liệu');
+      }
+
+      if (response.data.code === 0) {
+        const data = response.data.result;
+        if (!data || !data.content) {
+          throw new Error('Dữ liệu không hợp lệ: content không tồn tại');
+        }
+        renderEmployeeTable(data.content);
+        renderPagination(data.totalPages, data.number);
+      } else {
+        const errorMessage = response.data.message || `Lỗi từ API: Code ${response.data.code}`;
+        showNotification(errorMessage, 'error');
+        showError(errorMessage);
+      }
+    } catch (error) {
+      hideLoading();
+      const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra khi tải dữ liệu! Vui lòng kiểm tra backend.';
+      showNotification(errorMessage||error)
+      showError(errorMessage);
+    }
+  }
+
+  // Vô hiệu hóa nhân viên
+  async function deactivateEmployee(id) {
+    if (!id) {
+      showNotification('Không tìm thấy ID nhân viên!', 'error');
+      return;
+    }
+    if (!confirm('Bạn có chắc chắn muốn vô hiệu hóa nhân viên này?')) return;
+
+    try {
+      const response = await fetchWithRetry(`${apiEmployeeUrl}/${id}`, { method: 'DELETE' });
+      if (response.data.code === 1000) {
+        showNotification('Vô hiệu hóa nhân viên thành công!', 'success');
+        fetchEmployees(); // Tải lại danh sách
+      } else {
+        throw new Error(response.data.message || 'Lỗi khi vô hiệu hóa nhân viên');
+      }
+    } catch (error) {
+      showNotification(error.message || 'Có lỗi xảy ra khi vô hiệu hóa nhân viên!', 'error');
+    }
+  }
+
+  // Khôi phục nhân viên
+  async function restoreEmployee(id) {
+    if (!id) {
+      showNotification('Không tìm thấy ID nhân viên!', 'error');
+      return;
+    }
+    if (!confirm('Bạn có chắc chắn muốn khôi phục nhân viên này?')) return;
+
+    try {
+      const response = await fetchWithRetry(`${apiEmployeeUrl}/${id}/restore`, { method: 'PUT' });
+      if (response.data.code === 1000) {
+        showNotification('Khôi phục nhân viên thành công!', 'success');
+        fetchEmployees(); // Tải lại danh sách
+      } else {
+        throw new Error(response.data.message || 'Lỗi khi khôi phục nhân viên');
+      }
+    } catch (error) {
+      showNotification(error.message || 'Có lỗi xảy ra khi khôi phục nhân viên!', 'error');
+    }
+  }
+
+  // Hiển thị bảng nhân viên
+  function renderEmployeeTable(items) {
+    const tbody = document.getElementById('employeeTableBody');
+
+    if (!items || items.length === 0) {
+      document.getElementById('emptyState').style.display = 'block';
+      tbody.innerHTML = '';
+      return;
+    }
+
+    document.getElementById('emptyState').style.display = 'none';
+    tbody.innerHTML = '';
+
+    items.forEach(item => {
+      const isActive = item.status === 'ACTIVE' || !item.status; // Mặc định ACTIVE nếu không có status
+      const statusClass = isActive ? 'status-active' : 'status-inactive';
+      const statusText = isActive ? 'Hoạt động' : 'Không hoạt động';
+      const actionButton = item.id ? (
+              isActive
+                      ? `<button class="btn btn-outline-danger btn-sm" onclick="deactivateEmployee(${item.id})" title="Vô hiệu hóa">
+                         <i class="fas fa-trash"></i>
+                       </button>`
+                      : `<button class="btn btn-outline-success btn-sm" onclick="restoreEmployee(${item.id})" title="Kích hoạt">
+                         <i class="fas fa-undo"></i>
+                       </button>`
+      ) : (
+              isActive
+                      ? `<button class="btn btn-outline-danger btn-sm" disabled title="Vô hiệu hóa">
+                         <i class="fas fa-trash"></i>
+                       </button>`
+                      : `<button class="btn btn-outline-success btn-sm" disabled title="Kích hoạt">
+                         <i class="fas fa-undo"></i>
+                       </button>`
+      );
+
+      const editButton = item.id
+              ? `<button class="btn btn-outline-primary btn-sm me-1" onclick="editEmployee(${item.id})" title="Chỉnh sửa">
+                     <i class="fas fa-edit"></i>
+                   </button>`
+              : `<button class="btn btn-outline-primary btn-sm me-1" disabled title="Chỉnh sửa">
+                     <i class="fas fa-edit"></i>
+                   </button>`;
+
+      const row = `
+                <tr>
+                    <td>
+                        <div class="fw-bold">${item.username || 'N/A'}</div>
+                    </td>
+                    <td>
+                        <div class="text-muted">${item.email || 'N/A'}</div>
+                    </td>
+                    <td>
+                        <div>${item.phone || 'Chưa có'}</div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-uppercase">${item.roleName?.name || 'N/A'}</div>
+                    </td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            ${editButton}
+                            ${actionButton}
+                        </div>
+                    </td>
+                </tr>
+            `;
+      tbody.insertAdjacentHTML('beforeend', row);
+    });
+  }
+
+  // Phân trang
+  function renderPagination(totalPages, currentPageIndex) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if (!totalPages || totalPages <= 1) return;
+
+    const prevDisabled = currentPageIndex === 0 ? 'disabled' : '';
+    pagination.innerHTML += `
+            <li class="page-item ${prevDisabled}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>`;
+
+    const startPage = Math.max(0, currentPageIndex - 2);
+    const endPage = Math.min(totalPages - 1, currentPageIndex + 2);
+
+    if (startPage > 0) {
+      pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(0); return false;">1</a>
+                </li>`;
+      if (startPage > 1) {
+        pagination.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      const active = currentPageIndex === i ? 'active' : '';
+      pagination.innerHTML += `
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i + 1}</a>
+                </li>`;
+    }
+
+    if (endPage < totalPages - 1) {
+      if (endPage < totalPages - 2) {
+        pagination.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+      pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${totalPages - 1}); return false;">${totalPages}</a>
+                </li>`;
+    }
+
+    const nextDisabled = currentPageIndex === totalPages - 1 ? 'disabled' : '';
+    pagination.innerHTML += `
+            <li class="page-item ${nextDisabled}">
+                <a class="page-link" href="#" onclick="changePage(${currentPageIndex + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>`;
+  }
+
+  // Thay đổi trang
+  function changePage(page) {
+    if (page < 0) return;
+    currentPage = page;
+    fetchEmployees();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Chỉnh sửa nhân viên
+  function editEmployee(id) {
+    if (!id) {
+      showNotification('Không tìm thấy ID nhân viên!', 'error');
+      return;
+    }
+    window.location.href = `/foodhub/Staff-manager/edit-staff.html?id=${id}`;
+  }
+
+  // Thêm nhân viên
+  function addNewEmployee() {
+    window.location.href = '/foodhub/Staff-manager/create-staff.html';
+  }
+
+  // Đăng xuất
+  function handleLogout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+      document.body.style.opacity = '0.5';
+      document.body.style.transition = 'opacity 0.5s';
+      setTimeout(() => {
+        alert('Đã đăng xuất thành công!');
+        window.location.href = '/login.html';
+      }, 1000);
+    }
+  }
+
+  // Toggle Sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('expanded');
+  }
+
+  // Event listeners
+  document.getElementById('filterForm').addEventListener('submit', e => {
+    e.preventDefault();
+    currentPage = 0;
+    fetchEmployees();
+  });
+
+  // Khởi tạo
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchEmployees();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <title>FoodHub Admin - Đăng nhập & Giới thiệu</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #FEA116;
+            --light: #F1F8FF;
+            --dark: #0F172B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e6e6ff, #d1d1ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .main-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-section {
+            background: white;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            font-family: 'Pacifico', cursive;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            color: var(--dark);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 6px rgba(254, 161, 22, 0.3);
+            outline: none;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary), #ff8c00);
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #e8960f, #ff8c00);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(254, 161, 22, 0.4);
+        }
+
+        .social-login {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .social-login p {
+            color: var(--dark);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            text-decoration: none;
+            color: white;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .google-btn { background: #db4437; }
+        .facebook-btn { background: #4267b2; }
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .register-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #e8960f;
+        }
+
+        .intro-content {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .intro-content h3 {
+            font-family: 'Pacifico', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .intro-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .section { padding: 1.5rem; }
+            .intro-image { max-width: 80%; }
+            .header h2 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Login Section -->
+    <div class="section login-section">
+        <div class="header">
+            <h2><i class="fa fa-utensils me-2"></i>FoodHub Admin</h2>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <div class="position-relative">
+                    <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" required>
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                <div class="error-message" id="usernameError">Vui lòng nhập tên đăng nhập hợp lệ</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="position-relative">
+                    <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" required>
+                    <i class="fas fa-lock input-icon"></i>
+                </div>
+                <div class="error-message" id="passwordError">Vui lòng nhập mật khẩu</div>
+            </div>
+
+            <button type="submit" class="btn login-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập ngay
+            </button>
+        </form>
+
+        <div class="social-login">
+            <p>Đăng nhập với tài khoản khác</p>
+            <a href="#" class="social-btn google-btn"><i class="fab fa-google"></i> Google</a>
+            <a href="#" class="social-btn facebook-btn"><i class="fab fa-facebook"></i> Facebook</a>
+        </div>
+
+        <div class="register-link">
+            <p>Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
+        </div>
+    </div>
+
+    <!-- Introduction Section -->
+    <div class="section intro-section">
+        <div class="intro-content">
+            <h3>Chào mừng đến với FoodHub</h3>
+            <p>Quản lý nhà hàng của bạn một cách hiệu quả với FoodHub Admin. Theo dõi đơn hàng, quản lý thực đơn và tối ưu hóa doanh thu ngay hôm nay!</p>
+            <img src="https://via.placeholder.com/300x400" alt="Người quản lý nhà hàng" class="intro-image">
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const usernameError = document.getElementById('usernameError');
+        const passwordError = document.getElementById('passwordError');
+
+        // Reset error messages
+        usernameError.style.display = 'none';
+        passwordError.style.display = 'none';
+
+        let hasError = false;
+
+        if (!username) {
+            usernameError.style.display = 'block';
+            hasError = true;
+        }
+
+        if (!password) {
+            passwordError.style.display = 'block';
+            hasError = true;
+        }
+
+        if (!hasError) {
+            const loginBtn = document.querySelector('.login-btn');
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang đăng nhập...';
+            loginBtn.disabled = true;
+
+            // Mô phỏng kiểm tra role (thay bằng API thực tế)
+            const mockUsers = {
+                'admin': { password: 'admin123', role: 'admin' },
+                'staff': { password: 'staff123', role: 'staff' },
+                'user': { password: 'user123', role: 'user' }
+            };
+
+            setTimeout(() => {
+                if (mockUsers[username] && mockUsers[username].password === password) {
+                    const role = mockUsers[username].role;
+                    let redirectUrl = '';
+                    switch (role) {
+                        case 'admin':
+                            redirectUrl = 'adminDashboard.html';
+                            break;
+                        case 'staff':
+                            redirectUrl = 'staffDashboard.html';
+                            break;
+                        case 'user':
+                            redirectUrl = 'userDashboard.html';
+                            break;
+                    }
+                    alert(`Đăng nhập thành công! Chuyển hướng đến ${role} dashboard.`);
+                    window.location.href = redirectUrl; // Kích hoạt redirect
+                } else {
+                    alert('Tên đăng nhập hoặc mật khẩu không đúng!');
+                }
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Đăng nhập ngay';
+                loginBtn.disabled = false;
+            }, 1500);
+        }
+    });
+</script>
+</body>
+</html>

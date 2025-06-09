@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm món ăn mới</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/foodhub/css/add-dish-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/foodhub/js/add-dish-scripts.js" defer></script>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1><i class="fas fa-utensils"></i> Thêm món ăn mới</h1>
+        <a href="/foodhub/menu-manager/menu.html" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </header>
+
+    <div class="form-card">
+        <form id="addDishForm">
+            <div class="form-group">
+                <label for="dishName">Tên món ăn <span class="required">*</span></label>
+                <input type="text" id="dishName" placeholder="Nhập tên món ăn" required>
+                <span class="error-message" id="nameError">Tên món ăn không được để trống!</span>
+            </div>
+            <div class="form-group">
+                <label for="dishPrice">Giá (VND) <span class="required">*</span></label>
+                <input type="number" id="dishPrice" step="0.01" placeholder="Nhập giá món ăn" required>
+                <span class="error-message" id="priceError">Giá phải lớn hơn 1000 và không được để trống!</span>
+            </div>
+            <div class="form-group">
+                <label for="dishDescription">Mô tả</label>
+                <textarea id="dishDescription" rows="3" placeholder="Nhập mô tả món ăn (không bắt buộc)"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="dishImage">Ảnh món ăn</label>
+                <input type="file" id="dishImage" accept="image/*">
+                <small>Chọn ảnh (tối đa 5MB)</small>
+                <div id="imageContainer">
+                    <img id="imagePreview" src="#" alt="Preview ảnh" style="display: none;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="dishCategories">Danh mục <span class="required">*</span></label>
+                <select id="dishCategories" multiple required>
+                    <!-- Danh mục sẽ được load động -->
+                </select>
+                <small>Giữ Ctrl và click để chọn nhiều danh mục</small>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tạo món ăn
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

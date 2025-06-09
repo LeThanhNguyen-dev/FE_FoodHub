@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌈 Rainbow Cashier Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style> :root { --primary: #FEA116; --light: #F1F8FF; --dark: #0F172B; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; --info: #3B82F6; } * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Nunito', sans-serif; background-color: var(--light); overflow-x: hidden; } .sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 280px; background: var(--dark); transition: all 0.3s; z-index: 1000; overflow-y: auto; display: flex; flex-direction: column; } .sidebar.collapsed { width: 70px; } .sidebar .brand { padding: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); } .sidebar .brand h3 { color: var(--primary); margin: 0; font-family: 'Pacifico', cursive; font-size: 1.5rem; } .sidebar .brand small { color: #fff; font-style: italic; display: block; margin-top: 0.5rem; } .sidebar.collapsed .brand small { display: none; } .sidebar-nav { padding: 1rem 0; flex: 1; } .nav-item { margin-bottom: 0.5rem; } .nav-link { display: flex; align-items: center; padding: 1rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: all 0.3s; border-radius: 0; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-size: 1rem; } .nav-link:hover, .nav-link.active { background: rgba(254, 161, 22, 0.1); color: var(--primary); } .nav-link i { width: 20px; margin-right: 1rem; text-align: center; } .sidebar.collapsed .nav-link span { display: none; } .main-content { margin-left: 280px; transition: all 0.3s; min-height: 100vh; } .main-content.expanded { margin-left: 70px; } .top-bar { background: #fff; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; } .toggle-sidebar { background: none; border: none; color: var(--dark); font-size: 1.2rem; cursor: pointer; padding: 0.5rem; border-radius: 5px; transition: all 0.3s; } .toggle-sidebar:hover { background: rgba(0, 0, 0, 0.1); } .user-info { display: flex; align-items: center; gap: 1rem; color: var(--dark); font-weight: 600; } .content-wrapper { padding: 2rem; } .section { display: none; background: white; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); } .section.active { display: block; } .section h2 { color: var(--dark); margin-bottom: 1.5rem; font-weight: 700; } .carousel { position: relative; background: white; border-radius: 15px; overflow: hidden; margin-bottom: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); } .carousel-item { display: none; position: relative; } .carousel-item.active { display: block; } .carousel-item img { width: 100%; height: 450px; object-fit: cover; } .carousel-text { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0, 0, 0, 0.8)); color: white; padding: 2rem; font-size: 1.5rem; font-weight: 700; } .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(254, 161, 22, 0.9); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s; } .carousel-arrow:hover { background: var(--primary); transform: translateY(-50%) scale(1.1); } .carousel-arrow.prev { left: 20px; } .carousel-arrow.next { right: 20px; } .carousel-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; } .nav-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); cursor: pointer; transition: all 0.3s; } .nav-dot.active { background: var(--primary); } .form-container { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); } .form-header h1 { color: var(--dark); margin-bottom: 0.5rem; font-weight: 700; } .form-header p { color: #666; margin-bottom: 2rem; } .form-group { margin-bottom: 1.5rem; } .form-group label { display: block; margin-bottom: 0.5rem; color: var(--dark); font-weight: 600; } .input-wrapper { position: relative; } .form-input, input[type="number"], input[type="date"], select { width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem; transition: all 0.3s; background: white; } .form-input:focus, input[type="number"]:focus, input[type="date"]:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(254, 161, 22, 0.1); } .quick-select { margin-top: 2rem; } .quick-select h3 { color: var(--dark); margin-bottom: 1rem; font-weight: 600; } .quick-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; } .quick-btn { padding: 0.75rem 1rem; background: var(--light); border: 2px solid var(--primary); color: var(--primary); border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600; } .quick-btn:hover { background: var(--primary); color: white; } .submit-btn, button[type="button"] { background: linear-gradient(135deg, var(--primary), #ff8c00); border: none; padding: 1rem 2rem; color: white; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; width: 100%; margin-top: 1rem; } .submit-btn:hover, button[type="button"]:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(254, 161, 22, 0.4); } .success, .error { padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-weight: 600; display: none; } .success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid var(--success); } .error { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); } table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); } table th { background: var(--primary); color: white; padding: 1rem; text-align: left; font-weight: 600; } table td { padding: 1rem; border-bottom: 1px solid #eee; } table tr:hover { background: rgba(254, 161, 22, 0.05); } .logout-section { padding: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto; } .logout-btn { background: linear-gradient(135deg, #dc3545, #c82333); border: none; color: white; padding: 0.75rem 1rem; border-radius: 10px; width: 100%; font-weight: 600; transition: all 0.3s; cursor: pointer; position: relative; overflow: hidden; } .logout-btn:hover { background: linear-gradient(135deg, #c82333, #a71e2a); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4); } @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .sidebar.show { transform: translateX(0); } .main-content { margin-left: 0; } .content-wrapper { padding: 1rem; } .carousel-item img { height: 300px; } .carousel-text { font-size: 1.2rem; padding: 1rem; } .quick-buttons { grid-template-columns: repeat(2, 1fr); } } </style></head>
+
+<body>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="brand">
+    <h3>🛒 Cashier</h3>
+    <small>Management System</small>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-item">
+      <button class="nav-link active" onclick="showSection('home')" id="homeBtn">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </button>
+    </div>
+    <div class="nav-item">
+      <button class="nav-link" onclick="showSection('payment')" id="paymentBtn">
+        <i class="fas fa-credit-card"></i>
+        <span>Process Payment</span>
+      </button>
+    </div>
+    <div class="nav-item">
+      <button class="nav-link" onclick="showSection('cancel')" id="cancelBtn">
+        <i class="fas fa-times-circle"></i>
+        <span>Cancel/Refund</span>
+      </button>
+    </div>
+    <div class="nav-item">
+      <button class="nav-link" onclick="showSection('transactions')" id="transactionsBtn">
+        <i class="fas fa-chart-line"></i>
+        <span>Transactions</span>
+      </button>
+    </div>
+    <div class="nav-item">
+      <button class="nav-link" onclick="showSection('revenue')" id="revenueBtn">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Revenue</span>
+      </button>
+    </div>
+    <div class="nav-item">
+      <button class="nav-link" onclick="showSection('pending')" id="pendingBtn">
+        <i class="fas fa-hourglass-half"></i>
+        <span>Pending Orders</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="logout-section">
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="user-info">
+      <span>👤 Cashier: Huỳnh Tiến Dê</span>
+      <span>|</span>
+      <span id="current-time"></span>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Messages -->
+    <div id="message" class="success"></div>
+    <div id="error" class="error"></div>
+
+    <!-- Home Section -->
+    <div class="section active" id="homeSection">
+      <h2>📈 Dashboard</h2>
+      <div class="carousel">
+        <div class="carousel-item active">
+          <img src="images/ce055aeb-fcec-4f69-8a18-8aa169b95a86.jpg" alt="Phở Bò Thơm Ngon" onerror="this.src='https://via.placeholder.com/900x450/FF006E/FFFFFF?text=Phở+Bò+Thơm+Ngon'">
+          <div class="carousel-text">🍜 Phở Bò Thơm Ngon</div>
+        </div>
+        <div class="carousel-item">
+          <img src="https://via.placeholder.com/900x450/FF7900/FFFFFF?text=Cơm+Tấm+Sườn+Nướng" alt="Cơm Tấm Sườn Nướng">
+          <div class="carousel-text">🍖 Cơm Tấm Sườn Nướng</div>
+        </div>
+        <div class="carousel-item">
+          <img src="https://via.placeholder.com/900x450/00FF64/FFFFFF?text=Bánh+Mì+VN" alt="Bánh Mì VN">
+          <div class="carousel-text">🥖 Bánh Mì Việt Nam</div>
+        </div>
+        <div class="carousel-item">
+          <img src="https://via.placeholder.com/900x450/0096FF/FFFFFF?text=Bún+Bò+Huế" alt="Bún Bò Huế">
+          <div class="carousel-text">🌶️ Bún Bò Huế</div>
+        </div>
+        <button class="carousel-arrow prev" onclick="prevSlide()">‹</button>
+        <button class="carousel-arrow next" onclick="nextSlide()">›</button>
+        <div class="carousel-nav">
+          <div class="nav-dot active" onclick="currentSlide(1)"></div>
+          <div class="nav-dot" onclick="currentSlide(2)"></div>
+          <div class="nav-dot" onclick="currentSlide(3)"></div>
+          <div class="nav-dot" onclick="currentSlide(4)"></div>
+        </div>
+      </div>
+      <div class="dashboard-stats">
+        <button type="button" class="submit-btn" onclick="refreshDashboard()">🔄 Refresh Dashboard</button>
+        <div id="dashboardResult"></div>
+      </div>
+    </div>
+
+    <!-- Payment Section -->
+    <div class="section" id="paymentSection">
+      <h2>💳 Process Payment</h2>
+      <form id="paymentForm">
+        <div class="form-group">
+          <label>🆔 Order ID:</label>
+          <input type="number" id="paymentOrderId" required placeholder="Enter order ID">
+        </div>
+        <div class="form-group">
+          <label>💰 Payment Method:</label>
+          <select id="paymentMethod" required>
+            <option value="CASH">💵 CASH</option>
+            <option value="VNPAY">📱 VNPAY</option>
+          </select>
+        </div>
+        <button type="button" onclick="processPayment()">✨ Process Payment</button>
+      </form>
+      <div id="paymentResult"></div>
+    </div>
+
+    <!-- Cancel/Refund Section -->
+    <div class="section" id="cancelSection">
+      <h2>❌ Cancel or Refund Order</h2>
+      <form id="cancelForm">
+        <div class="form-group">
+          <label>🆔 Order ID:</label>
+          <input type="number" id="cancelOrderId" required placeholder="Enter order ID to cancel">
+        </div>
+        <button type="button" onclick="cancelOrRefund()">🔄 Cancel/Refund</button>
+      </form>
+    </div>
+
+    <!-- Transactions Section -->
+    <div class="section" id="transactionsSection">
+      <h2>📊 Transactions by Date</h2>
+      <div class="form-container">
+        <div class="form-header">
+          <h1>📅 Filter Transactions</h1>
+          <p>Chọn khoảng ngày để tra cứu giao dịch</p>
+        </div>
+        <form id="transactionsForm">
+          <div class="form-group">
+            <label>🔍 Search by Order ID:</label>
+            <input type="number" id="searchOrderId" placeholder="Enter order ID">
+          </div>
+          <div class="form-group">
+            <label for="transactionsStartDateInput">📅 Ngày Bắt Đầu</label>
+            <div class="input-wrapper">
+              <input type="date" id="transactionsStartDateInput" name="startDate" class="form-input" required>
+              <span class="icon">📅</span>
+            </div>
+            <div class="error-message" id="transactionsStartDateError"></div>
+          </div>
+          <div class="form-group">
+            <label for="transactionsEndDateInput">📅 Ngày Kết Thúc</label>
+            <div class="input-wrapper">
+              <input type="date" id="transactionsEndDateInput" name="endDate" class="form-input" required>
+              <span class="icon">📅</span>
+            </div>
+            <div class="error-message" id="transactionsEndDateError"></div>
+          </div>
+          <div class="quick-select">
+            <h3>🚀 Chọn Nhanh Ngày</h3>
+            <div class="quick-buttons">
+              <button type="button" class="quick-btn" data-range="today">Hôm nay</button>
+              <button type="button" class="quick-btn" data-range="yesterday">Hôm qua</button>
+              <button type="button" class="quick-btn" data-range="lastWeek">Tuần trước</button>
+              <button type="button" class="quick-btn" data-range="lastMonth">Tháng trước</button>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">✨ Xem Giao Dịch</button>
+          <button type="button" class="submit-btn" onclick="exportTransactions()">📤 Export to CSV</button>
+        </form>
+      </div>
+      <div id="transactionsResult">
+        <table id="transactionsTable" style="display: none;">
+          <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Transaction ID</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody id="transactionsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Revenue Section -->
+    <div class="section" id="revenueSection">
+      <h2>💰 Total Revenue by Date</h2>
+      <div class="form-container">
+        <div class="form-header">
+          <h1>📅 Select Date Range</h1>
+          <p>Chọn khoảng ngày để xem doanh thu</p>
+        </div>
+        <form id="revenueForm">
+          <div Tiw7="form-group">
+            <label for="revenueStartDateInput">📅 Ngày Bắt Đầu:</label>
+            <div class="input-wrapper">
+              <input type="date" id="revenueStartDateInput" name="startDate" class="form-input" required>
+              <span class="icon">📅</span>
+            </div>
+            <div class="error-message" id="revenueStartDateError"></div>
+          </div>
+          <div class="form-group">
+            <label for="revenueEndDateInput">📅 Ngày Kết Thúc:</label>
+            <div class="input-wrapper">
+              <input type="date" id="revenueEndDateInput" name="endDate" class="form-input" required>
+              <span class="icon">📅</span>
+            </div>
+            <div class="error-message" id="revenueEndDateError"></div>
+          </div>
+          <div class="quick-select">
+            <h3>🚀 Chọn Nhanh Ngày</h3>
+            <div class="quick-buttons">
+              <button type="button" class="quick-btn" data-range="today">Hôm nay</button>
+              <button type="button" class="quick-btn" data-range="yesterday">Hôm qua</button>
+              <button type="button" class="quick-btn" data-range="lastWeek">Tuần trước</button>
+              <button type="button" class="quick-btn" data-range="lastMonth">Tháng trước</button>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">✨ Xem Doanh Thu</button>
+        </form>
+      </div>
+      <div id="revenueResult"></div>
+    </div>
+
+    <!-- Pending Orders Section -->
+    <div class="section" id="pendingSection">
+      <h2>⏳ Pending Orders</h2>
+      <button type="button" class="submit-btn" onclick="refreshPendingOrders()">🔄 Refresh Pending Orders</button>
+      <div id="pendingResult">
+        <table id="pendingTable" style="display: none;">
+          <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody id="pendingBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Update time
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleTimeString('vi-VN');
+  }
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  const API_BASE_URL = "http://localhost:8080/foodhub/api/cashier";
+
+  // Toggle Sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    sidebar.classList.toggle('show');
+    mainContent.classList.toggle('expanded');
+  }
+
+  // Show/Hide Messages
+  function showMessage(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.innerText = message;
+    element.style.display = 'block';
+    setTimeout(() => {
+      element.style.display = 'none';
+      element.innerText = '';
+    }, 5000);
+  }
+
+  // Clear Messages
+  function clearMessages() {
+    document.getElementById("message").style.display = 'none';
+    document.getElementById("error").style.display = 'none';
+    document.getElementById("message").innerText = "";
+    document.getElementById("error").innerText = "";
+  }
+
+  // Carousel Logic
+  let currentSlideIndex = 0;
+  const slides = document.querySelectorAll('.carousel-item');
+  const dots = document.querySelectorAll('.nav-dot');
+  const totalSlides = slides.length;
+
+  function showSlide(index) {
+    slides.forEach((slide) => slide.classList.remove('active'));
+    dots.forEach((dot) => dot.classList.remove('active'));
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+  }
+
+  function nextSlide() {
+    currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+    showSlide(currentSlideIndex);
+  }
+
+  function prevSlide() {
+    currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+    showSlide(currentSlideIndex);
+  }
+
+  function currentSlide(n) {
+    currentSlideIndex = n - 1;
+    showSlide(currentSlideIndex);
+  }
+
+  let autoSlideInterval = setInterval(nextSlide, 5000);
+  const carousel = document.querySelector('.carousel');
+  carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+  carousel.addEventListener('mouseleave', () => autoSlideInterval = setInterval(nextSlide, 5000));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') prevSlide();
+    else if (e.key === 'ArrowRight') nextSlide();
+  });
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+  carousel.addEventListener('touchstart', (e) => touchStartX = e.changedTouches[0].screenX);
+  carousel.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    if (touchEndX < touchStartX - 50) nextSlide();
+    if (touchEndX > touchStartX + 50) prevSlide();
+  }
+
+  // Show Section
+  function showSection(sectionId) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => section.classList.remove('active'));
+    const buttons = document.querySelectorAll('.nav-link');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.getElementById(`${sectionId}Section`).classList.add('active');
+    document.getElementById(`${sectionId}Btn`).classList.add('active');
+    clearMessages();
+    if (sectionId === 'home') refreshDashboard();
+    if (sectionId === 'pending') refreshPendingOrders();
+  }
+
+  // Logout
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      // Giả định có endpoint logout, thay bằng URL thực tế nếu có
+      fetch(`${API_BASE_URL}/logout`, { method: 'POST' })
+              .then(() => {
+                window.location.href = '/login.html'; // Chuyển hướng về trang login
+              })
+              .catch(() => {
+                window.location.href = '/login.html'; // Chuyển hướng dù lỗi
+              });
+    }
+  }
+
+  // Refresh Dashboard
+  async function refreshDashboard() {
+    clearMessages();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startIso = today.toISOString();
+    today.setHours(23, 59, 59, 999);
+    const endIso = today.toISOString();
+
+    try {
+      const [revenueRes, transactionsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/revenue-stats?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}`),
+        fetch(`${API_BASE_URL}/transactions?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}`)
+      ]);
+
+      const stats = await revenueRes.json();
+      const transactions = await transactionsRes.json();
+
+      const pendingCount = transactions.filter(tx => tx.status === 'PENDING').length;
+      const paidCount = transactions.filter(tx => tx.status === 'PAID').length;
+
+      document.getElementById('dashboardResult').innerHTML = `
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <h4>Today's Revenue</h4>
+            <div class="value">${Number(stats.totalRevenue).toLocaleString()}₫</div>
+          </div>
+          <div class="stat-card">
+            <h4>Pending Orders</h4>
+            <div class="value">${pendingCount}</div>
+          </div>
+          <div class="stat-card">
+            <h4>Paid Orders</h4>
+            <div class="value">${paidCount}</div>
+          </div>
+        </div>
+      `;
+      showMessage('message', '🎉 Dashboard updated successfully!');
+    } catch (error) {
+      showMessage('error', '❌ Failed to load dashboard: ' + error.message);
+    }
+  }
+
+  // Process Payment
+  async function processPayment() {
+    clearMessages();
+    const orderId = document.getElementById("paymentOrderId").value;
+    const paymentMethod = document.getElementById("paymentMethod").value;
+    const button = event.target;
+
+    const originalText = button.innerHTML;
+    button.innerHTML = originalText + '<span class="loading"></span>';
+    button.disabled = true;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: parseInt(orderId), paymentMethod })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        showMessage('message', '🎉 Payment successful!');
+        document.getElementById("paymentResult").innerHTML = `
+          <h3>✅ Payment Result:</h3>
+          <p><strong>Order ID:</strong> ${data.orderId}</p>
+          <p><strong>Amount:</strong> ${data.amount.toLocaleString()}₫</p>
+          <p><strong>Status:</strong> ${data.status}</p>
+        `;
+        await refreshTransactions();
+        refreshDashboard();
+      } else {
+        throw new Error(data.message || data.error || 'Payment failed');
+      }
+    } catch (error) {
+      showMessage('error', `❌ ${error.message}`);
+    } finally {
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }
+  }
+
+  // Cancel/Refund
+  async function cancelOrRefund() {
+    clearMessages();
+    const orderId = document.getElementById("cancelOrderId").value;
+    const button = event.target;
+
+    const originalText = button.innerHTML;
+    button.innerHTML = originalText + '<span class="loading"></span>';
+    button.disabled = true;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/cancel-or-refund/${orderId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await response.text();
+      if (response.ok) {
+        showMessage('message', '✅ ' + data);
+        await refreshTransactions();
+        refreshDashboard();
+      } else {
+        throw new Error(data || 'Cancel/Refund failed');
+      }
+    } catch (error) {
+      showMessage('error', `❌ ${error.message}`);
+    } finally {
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }
+  }
+
+  // Show/Hide Error
+  function showError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+  }
+
+  function hideError(elementId) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.style.display = 'none';
+  }
+
+  // Refresh Transactions
+  async function refreshTransactions() {
+    clearMessages();
+    const searchOrderId = document.getElementById('searchOrderId').value;
+    const startDateInput = document.getElementById('transactionsStartDateInput').value;
+    const endDateInput = document.getElementById('transactionsEndDateInput').value;
+    const start = new Date(startDateInput);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDateInput);
+    end.setHours(23, 59, 59, 999);
+    const startIso = start.toISOString();
+    const endIso = end.toISOString();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/transactions?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}`);
+      let transactions = await response.json();
+      if (searchOrderId) {
+        transactions = transactions.filter(tx => tx.orderId == searchOrderId);
+      }
+      const tbody = document.getElementById("transactionsBody");
+      tbody.innerHTML = "";
+      transactions.forEach(tx => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${tx.orderId || 'N/A'}</td>
+          <td>${tx.amount ? tx.amount.toLocaleString() : '0'}₫</td>
+          <td>${tx.paymentMethod || 'N/A'}</td>
+          <td><span style="color: ${tx.status === 'PAID' ? '#2ed573' : tx.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${tx.status || 'N/A'}</span></td>
+          <td>${tx.transactionId || 'N/A'}</td>
+          <td>${tx.createdAt ? new Date(tx.createdAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
+          <td>${tx.updatedAt ? new Date(tx.updatedAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
+          <td>
+            <button class="action-btn" onclick="selectOrder(${tx.orderId}, 'payment')">Process</button>
+            <button class="action-btn" onclick="selectOrder(${tx.orderId}, 'cancel')">Cancel</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+      document.getElementById("transactionsTable").style.display = transactions.length ? "table" : "none";
+      showMessage('message', '🎉 Transactions loaded successfully!');
+    } catch (error) {
+      showMessage('error', `❌ ${error.message}`);
+    }
+  }
+
+  // Export Transactions to CSV
+  function exportTransactions() {
+    const tbody = document.getElementById("transactionsBody");
+    const rows = tbody.querySelectorAll('tr');
+    let csvContent = "Order ID,Amount,Payment Method,Status,Transaction ID,Created At,Updated At\n";
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const rowData = [
+        cells[0].innerText,
+        cells[1].innerText,
+        cells[2].innerText,
+        cells[3].innerText,
+        cells[4].innerText,
+        cells[5].innerText,
+        cells[6].innerText
+      ];
+      csvContent += rowData.join(',') + '\n';
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'transactions.csv';
+    link.click();
+  }
+
+  // Select Order
+  function selectOrder(orderId, section) {
+    if (section === 'payment') {
+      document.getElementById('paymentOrderId').value = orderId;
+    } else if (section === 'cancel') {
+      document.getElementById('cancelOrderId').value = orderId;
+    }
+    showSection(section);
+  }
+
+  // Refresh Pending Orders
+  async function refreshPendingOrders() {
+    clearMessages();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startIso = today.toISOString();
+    today.setHours(23, 59, 59, 999);
+    const endIso = today.toISOString();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/transactions?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}`);
+      const transactions = await response.json();
+      const pendingTransactions = transactions.filter(tx => tx.status === 'PENDING');
+      const tbody = document.getElementById("pendingBody");
+      tbody.innerHTML = "";
+      pendingTransactions.forEach(tx => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${tx.orderId || 'N/A'}</td>
+          <td>${tx.amount ? tx.amount.toLocaleString() : '0'}₫</td>
+          <td>${tx.paymentMethod || 'N/A'}</td>
+          <td>${tx.status || 'N/A'}</td>
+          <td>${tx.createdAt ? new Date(tx.createdAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
+          <td>
+            <button class="action-btn" onclick="selectOrder(${tx.orderId}, 'payment')">Process</button>
+            <button class="action-btn" onclick="selectOrder(${tx.orderId}, 'cancel')">Cancel</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+      document.getElementById("pendingTable").style.display = pendingTransactions.length ? "table" : "none";
+      showMessage('message', '🎉 Pending orders loaded successfully!');
+    } catch (error) {
+      showMessage('error', `❌ ${error.message}`);
+    }
+  }
+
+  // Transactions Form Submit
+  document.getElementById('transactionsForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const button = e.submitter;
+    const originalText = button.innerHTML;
+    button.innerHTML = originalText + '<span class="loading"></span>';
+    button.disabled = true;
+
+    const startDateInput = document.getElementById('transactionsStartDateInput').value;
+    const endDateInput = document.getElementById('transactionsEndDateInput').value;
+    const startDate = new Date(startDateInput);
+    const endDate = new Date(endDateInput);
+    if (endDate < startDate) {
+      showError('transactionsEndDateError', 'Ngày kết thúc phải sau ngày bắt đầu');
+      button.innerHTML = originalText;
+      button.disabled = false;
+      return;
+    } else {
+      hideError('transactionsEndDateError');
+    }
+
+    await refreshTransactions();
+    button.innerHTML = originalText;
+    button.disabled = false;
+  });
+
+  // Revenue Form Submit
+  document.getElementById('revenueForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const button = e.submitter;
+    const originalText = button.innerHTML;
+    button.innerHTML = originalText + '<span class="loading"></span>';
+    button.disabled = true;
+
+    const startDateInput = document.getElementById('revenueStartDateInput').value;
+    const endDateInput = document.getElementById('revenueEndDateInput').value;
+    const startDate = new Date(startDateInput);
+    const endDate = new Date(endDateInput);
+    if (endDate < startDate) {
+      showError('revenueEndDateError', 'Ngày kết thúc phải sau ngày bắt đầu');
+      button.innerHTML = originalText;
+      button.disabled = false;
+      return;
+    } else {
+      hideError('revenueEndDateError');
+    }
+
+    const start = new Date(startDateInput);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDateInput);
+    end.setHours(23, 59, 59, 999);
+    const startIso = start.toISOString();
+    const endIso = end.toISOString();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/revenue-stats?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}`);
+      const stats = await response.json();
+      if (response.ok) {
+        document.getElementById("revenueResult").innerHTML = `
+          <div class="revenue-stats">
+            <div class="stat-card">
+              <h4>Total Revenue</h4>
+              <div class="value">${Number(stats.totalRevenue).toLocaleString()}₫</div>
+            </div>
+            <div class="stat-card">
+              <h4>CASH Revenue</h4>
+              <div class="value">${Number(stats.cashRevenue).toLocaleString()}₫</div>
+            </div>
+            <div class="stat-card">
+              <h4>VNPAY Revenue</h4>
+              <div class="value">${Number(stats.vnpayRevenue).toLocaleString()}₫</div>
+            </div>
+            <div class="stat-card">
+              <h4>Pending</h4>
+              <div class="value">${Number(stats.pendingRevenue).toLocaleString()}₫</div>
+            </div>
+            <div class="stat-card">
+              <h4>Paid</h4>
+              <div class="value">${Number(stats.paidRevenue).toLocaleString()}₫</div>
+            </div>
+            <div class="stat-card">
+              <h4>Cancelled</h4>
+              <div class="value">${Number(stats.cancelledRevenue).toLocaleString()}₫</div>
+            </div>
+          </div>
+          <p>📅 From: ${startDateInput} To: ${endDateInput}</p>
+        `;
+        showMessage('message', '💰 Revenue stats loaded successfully!');
+      } else {
+        throw new Error(`Failed to fetch revenue stats: ${await response.text()}`);
+      }
+    } catch (error) {
+      showMessage('error', `❌ ${error.message}`);
+    } finally {
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }
+  });
+
+  // DOM Loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    showSection('home');
+
+    const today = new Date();
+    const transactionsStartDateInput = document.getElementById('transactionsStartDateInput');
+    const transactionsEndDateInput = document.getElementById('transactionsEndDateInput');
+    transactionsStartDateInput.min = '2020-01-01';
+    transactionsEndDateInput.min = '2020-01-01';
+    transactionsStartDateInput.value = today.toISOString().split('T')[0];
+    transactionsEndDateInput.value = today.toISOString().split('T')[0];
+
+    const revenueStartDateInput = document.getElementById('revenueStartDateInput');
+    const revenueEndDateInput = document.getElementById('revenueEndDateInput');
+    revenueStartDateInput.min = '2020-01-01';
+    revenueEndDateInput.min = '2020-01-01';
+    revenueStartDateInput.value = today.toISOString().split('T')[0];
+    revenueEndDateInput.value = today.toISOString().split('T')[0];
+
+    document.querySelectorAll('.quick-btn[data-range]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const range = this.dataset.range;
+        const today = new Date();
+        const form = this.closest('form');
+        const startDateInput = form.querySelector('[name="startDate"]');
+        const endDateInput = form.querySelector('[name="endDate"]');
+
+        if (range === 'today') {
+          startDateInput.value = today.toISOString().split('T')[0];
+          endDateInput.value = today.toISOString().split('T')[0];
+        } else if (range === 'yesterday') {
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+          startDateInput.value = yesterday.toISOString().split('T')[0];
+          endDateInput.value = today.toISOString().split('T')[0];
+        } else if (range === 'lastWeek') {
+          const lastWeekStart = new Date(today);
+          lastWeekStart.setDate(today.getDate() - 7);
+          startDateInput.value = lastWeekStart.toISOString().split('T')[0];
+          endDateInput.value = today.toISOString().split('T')[0];
+        } else if (range === 'lastMonth') {
+          const lastMonthStart = new Date(today);
+          lastMonthStart.setDate(today.getDate() - 30);
+          startDateInput.value = lastMonthStart.toISOString().split('T')[0];
+          endDateInput.value = today.toISOString().split('T')[0];
+        }
+
+        form.querySelectorAll('.quick-btn[data-range]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>

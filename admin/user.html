@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <title>FoodHub Admin - Quản lý khách hàng</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #FEA116;
+            --light: #F1F8FF;
+            --dark: #0F172B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--light);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: var(--dark);
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar .brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .brand h3 {
+            color: var(--primary);
+            margin: 0;
+            font-family: 'Pacifico', cursive;
+        }
+
+        .sidebar .brand small {
+            color: #fff;
+            font-style: italic;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(254, 161, 22, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 1rem;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        .top-bar {
+            background: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-manage {
+            background: var(--primary);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-manage:hover {
+            background: #e8960f;
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .table tbody tr:hover {
+            background: var(--light);
+        }
+
+        .btn-edit,
+        .btn-deactivate {
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-deactivate {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-deactivate:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .modal-footer .btn {
+            border-radius: 10px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .logout-section {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+
+        .logout-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .logout-btn:hover::before {
+            left: 100%;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--danger);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .table-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+    <div class="brand text-center">
+        <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
+        <small class="d-block">Admin Panel</small>
+    </div>
+
+    <nav class="sidebar-nav flex-fill">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="adminDashboard.html" class="nav-link" onclick="showDashboard()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="showCustomerManagement()">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý khách hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="adminDashboardStaff.html" class="nav-link" onclick="showStaffManagement()">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Quản lý nhân viên</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showMenuManagement()">
+                    <i class="fas fa-utensils"></i>
+                    <span>Quản lý món ăn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showFinanceManagement()">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Quản lý tài chính</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showOrders()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Đơn hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showReports()">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="logout-section">
+        <button class="logout-btn" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+        </button>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="d-flex align-items-center">
+            <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h4 class="mb-0" id="pageTitle">Quản lý khách hàng</h4>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle me-2"></i>Admin
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Content -->
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5><i class="fas fa-users me-2 text-primary"></i>Danh sách khách hàng</h5>
+            <button class="btn btn-manage" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openUserForm()">
+                <i class="fas fa-plus me-2"></i>Thêm khách hàng
+            </button>
+        </div>
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <table class="table" id="userTable" style="display: none;">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên người dùng</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Địa chỉ</th>
+                <th>Số điện thoại</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Thêm/Chỉnh sửa khách hàng</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <input type="hidden" id="userId">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Tên người dùng</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" id="password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label">Vai trò</label>
+                            <select class="form-control" id="roleName" required>
+                                <option value="USER">Khách hàng</option>
+                                <option value="ADMIN">Quản trị viên</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Trạng thái</label>
+                            <select class="form-control" id="status" required>
+                                <option value="ACTIVE">Hoạt động</option>
+                                <option value="INACTIVE">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="address">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="phone">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="isAuthUser">
+                            <label class="form-check-label" for="isAuthUser">Người dùng xác thực</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="oauthProvider" class="form-label">Nhà cung cấp OAuth</label>
+                            <input type="text" class="form-control" id="oauthProvider">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-manage" onclick="saveUser()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let currentUserId = null;
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+
+    function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+            document.body.style.opacity = '0.5';
+            document.body.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+                alert('Đã đăng xuất thành công!');
+                document.body.style.opacity = '1';
+                localStorage.removeItem('token');
+                // Redirect to login page
+                // window.location.href = '/login';
+            }, 1000);
+        }
+    }
+
+    function showCustomerManagement() {
+        setActiveNav(document.querySelector('[onclick="showCustomerManagement()"]'));
+        loadUsers();
+    }
+
+    function setActiveNav(element) {
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    async function loadUsers() {
+        const tbody = document.getElementById('userTableBody');
+        const table = document.getElementById('userTable');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+
+        tbody.innerHTML = '';
+        table.style.display = 'none';
+        loadingSpinner.style.display = 'flex';
+        errorMessage.style.display = 'none';
+
+        try {
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Accept': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` }) // Add token if available
+            };
+            const response = await fetch('/foodhub/api/users', { headers }); // Adjust context path if needed
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API error:', response.status, errorText);
+                throw new Error(`Không thể tải danh sách khách hàng: ${response.status} ${errorText}`);
+            }
+            const users = await response.json();
+            console.log('Fetched users:', users);
+
+            if (!Array.isArray(users)) {
+                throw new Error('Dữ liệu trả về không phải là mảng');
+            }
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.username || ''}</td>
+                        <td>${user.email || ''}</td>
+                        <td>${user.roleName || ''}</td>
+                        <td>${user.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}</td>
+                        <td>${user.address || ''}</td>
+                        <td>${user.phone || ''}</td>
+                        <td>
+                            <button class="btn btn-edit me-2" onclick="openUserForm(${user.id})">
+                                <i class="fas fa-edit"></i> Sửa
+                            </button>
+                            <button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">
+                                <i class="fas fa-ban"></i> Vô hiệu hóa
+                            </button>
+                        </td>
+                    `;
+                tbody.appendChild(row);
+            });
+
+            table.style.display = 'table';
+        } catch (error) {
+            console.error('Load users error:', error);
+            errorMessage.textContent = 'Lỗi: ' + error.message;
+            errorMessage.style.display = 'block';
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
+    }
+
+    async function openUserForm(id = null) {
+        currentUserId = id;
+        document.getElementById('userModalLabel').textContent = id ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng';
+        document.getElementById('userForm').reset();
+        document.getElementById('userId').value = '';
+        document.getElementById('password').required = !id;
+
+        if (id) {
+            await fetchUser(id);
+        } else {
+            document.getElementById('status').value = 'ACTIVE';
+            document.getElementById('roleName').value = 'USER';
+            document.getElementById('isAuthUser').checked = false;
+        }
+    }
+
+    async function fetchUser(id) {
+        try {
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Accept': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            };
+            const response = await fetch(`/foodhub/api/users/${id}`, { headers });
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Fetch user error:', response.status, errorText);
+                throw new Error('Không thể tải thông tin khách hàng');
+            }
+            const user = await response.json();
+            console.log('Fetched user:', user);
+
+            document.getElementById('userId').value = user.id;
+            document.getElementById('username').value = user.username || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('roleName').value = user.roleName || 'USER';
+            document.getElementById('status').value = user.status || 'ACTIVE';
+            document.getElementById('address').value = user.address || '';
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('isAuthUser').checked = user.isAuthUser || false;
+            document.getElementById('oauthProvider').value = user.oauthProvider || '';
+        } catch (error) {
+            console.error('Fetch user error:', error);
+            alert('Lỗi: ' + error.message);
+        }
+    }
+
+    async function saveUser() {
+        const id = document.getElementById('userId').value;
+        const userData = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value || undefined,
+            roleName: document.getElementById('roleName').value,
+            status: document.getElementById('status').value,
+            address: document.getElementById('address').value || null,
+            phone: document.getElementById('phone').value || null,
+            isAuthUser: document.getElementById('isAuthUser').checked,
+            oauthProvider: document.getElementById('oauthProvider').value || null
+        };
+
+        try {
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            };
+            const url = id ? `/foodhub/api/users/${id}` : '/foodhub/api/users';
+            const method = id ? 'PUT' : 'POST';
+            const response = await fetch(url, {
+                method,
+                headers,
+                body: JSON.stringify(userData)
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Save user error:', response.status, errorText);
+                throw new Error(id ? 'Không thể cập nhật khách hàng' : 'Không thể tạo khách hàng');
+            }
+            const userModal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+            userModal.hide();
+            loadUsers();
+            alert(id ? 'Cập nhật khách hàng thành công!' : 'Thêm khách hàng thành công!');
+        } catch (error) {
+            console.error('Save user error:', error);
+            alert('Lỗi: ' + error.message);
+        }
+    }
+
+    async function deactivateUser(id) {
+        if (confirm('Bạn có chắc chắn muốn vô hiệu hóa khách hàng này?')) {
+            try {
+                const token = localStorage.getItem('token');
+                const headers = {
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                };
+                const response = await fetch(`/foodhub/api/users/${id}/deactivate`, {
+                    method: 'PUT',
+                    headers
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Deactivate user error:', response.status, errorText);
+                    throw new Error('Không thể vô hiệu hóa khách hàng');
+                }
+                loadUsers();
+                alert('Vô hiệu hóa khách hàng thành công!');
+            } catch (error) {
+                console.error('Deactivate user error:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+    }
+
+    // Load users on page load
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <style>
+        body { font-family: Arial; max-width: 400px; margin: auto; padding-top: 100px; }
+        label, input { display: block; width: 100%; margin-bottom: 10px; }
+        button { width: 100%; padding: 10px; }
+        .error { color: red; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+<h2>Đăng nhập vào hệ thống</h2>
+
+<div id="errorMsg" class="error"></div>
+
+<form id="loginForm">
+    <label for="username">Tên đăng nhập:</label>
+    <input type="text" id="username" name="username" required />
+
+    <label for="password">Mật khẩu:</label>
+    <input type="password" id="password" name="password" required />
+
+    <button type="submit">Đăng nhập</button>
+</form>
+<script src="js/fetch-api.js"></script>
+<script>
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            return null;
+        }
+    }
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        try {
+            const data = await apiFetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const token = data.result.token;
+            localStorage.setItem('accessToken', token);
+            const payload = parseJwt(token);
+            const scopes = payload?.scope?.split(" ");
+
+            if (scopes.includes("ROLE_ADMIN")) {
+                window.location.href = 'adminDashboard/adminDashboard.html';
+            } else if (scopes.includes("ROLE_WAITER")) {
+                window.location.href = 'waiter.html';
+            } else {
+                window.location.href = 'adminDashboard/adminDashboard.html'; // mặc định fallback
+            }
+        } catch (err) {
+            document.getElementById('errorMsg').innerText = err.message;
+        }
+    });
+</script>
+</body>
+</html>

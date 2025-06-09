@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý đơn hàng</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="css/order-style.css" rel="stylesheet">
+</head>
+<body>
+<!-- Orders Management Template -->
+<template id="ordersPageTemplate">
+  <div class="orders-container">
+    <!-- Enhanced Header Section -->
+    <div class="orders-header">
+      <div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+        <h3>
+          <i class="fas fa-clipboard-list"></i>
+          Tất cả đơn hàng
+        </h3>
+        <div class="orders-actions">
+          <button class="btn-orders-action btn-success" onclick="takeNewOrder()">
+            <i class="fas fa-plus"></i>
+            Nhận đơn mới
+          </button>
+          <button class="btn-orders-action btn-outline-primary" onclick="refreshOrders()">
+            <i class="fas fa-sync-alt"></i>
+            Làm mới
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Sort Section -->
+    <div class="orders-filter-section card mb-3">
+      <div class="card-body">
+        <div class="row g-3">
+          <!-- Status Filter -->
+          <div class="col-md-3">
+            <label class="form-label">
+              <i class="fas fa-filter me-1"></i>
+              Trạng thái
+            </label>
+            <select class="form-select" id="statusFilter" onchange="applyFilters()">
+              <option value="">Tất cả trạng thái</option>
+              <option value="PENDING">Chờ xử lý</option>
+              <option value="CONFIRMED">Đã xác nhận</option>
+              <option value="READY">Sẵn sàng</option>
+              <option value="COMPLETED">Hoàn thành</option>
+              <option value="CANCELLED">Đã hủy</option>
+            </select>
+          </div>
+
+          <!-- Table Filter -->
+          <div class="col-md-3">
+            <label class="form-label">
+              <i class="fas fa-chair me-1"></i>
+              Bàn
+            </label>
+            <input type="text" class="form-control" id="tableNumberFilter"
+                   placeholder="Chọn bàn" onchange="applyFilters()">
+          </div>
+
+          <!-- Min Price Filter -->
+          <div class="col-md-3">
+            <label class="form-label">
+              <i class="fas fa-money-bill me-1"></i>
+              Giá tối thiểu (VNĐ)
+            </label>
+            <input type="number" class="form-control" id="minPriceFilter"
+                   placeholder="0" onchange="applyFilters()">
+          </div>
+
+          <!-- Max Price Filter -->
+          <div class="col-md-3">
+            <label class="form-label">
+              <i class="fas fa-money-bill me-1"></i>
+              Giá tối đa (VNĐ)
+            </label>
+            <input type="number" class="form-control" id="maxPriceFilter"
+                   placeholder="1000000" onchange="applyFilters()">
+          </div>
+
+          <!-- Sort Field -->
+          <div class="col-md-4">
+            <label class="form-label">
+              <i class="fas fa-sort me-1"></i>
+              Sắp xếp theo
+            </label>
+            <select class="form-select" id="sortByFilter" onchange="applyFilters()">
+              <option value="createdAt">Thời gian tạo</option>
+              <option value="totalAmount">Tổng tiền</option>
+              <option value="id">Mã đơn hàng</option>
+              <option value="status">Trạng thái</option>
+            </select>
+          </div>
+
+          <!-- Sort Direction -->
+          <div class="col-md-4">
+            <label class="form-label">
+              <i class="fas fa-sort-amount-down me-1"></i>
+              Thứ tự
+            </label>
+            <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
+              <option value="DESC">Giảm dần</option>
+              <option value="ASC">Tăng dần</option>
+            </select>
+          </div>
+
+          <!-- Page Size -->
+          <div class="col-md-4">
+            <label class="form-label">
+              <i class="fas fa-list me-1"></i>
+              Số đơn/trang
+            </label>
+            <select class="form-select" id="pageSizeFilter" onchange="applyFilters()">
+              <option value="5">5 đơn</option>
+              <option value="10" selected>10 đơn</option>
+              <option value="20">20 đơn</option>
+              <option value="50">50 đơn</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="d-flex gap-2 justify-content-end">
+              <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                <i class="fas fa-times me-1"></i>
+                Xóa bộ lọc
+              </button>
+              <button class="btn btn-primary" onclick="applyFilters()">
+                <i class="fas fa-search me-1"></i>
+                Áp dụng
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="orders-summary mb-3">
+      <div class="alert alert-info d-flex align-items-center">
+        <i class="fas fa-info-circle me-2"></i>
+        <span id="ordersSummary">Đang tải...</span>
+      </div>
+    </div>
+
+    <!-- Enhanced Orders Table -->
+    <div class="orders-table-card card">
+      <div class="card-body">
+        <div class="orders-table-wrapper">
+          <table class="orders-table table">
+            <thead>
+            <tr>
+              <th><i class="fas fa-hashtag me-2"></i>Mã đơn</th>
+              <th><i class="fas fa-chair me-2"></i>Bàn</th>
+              <th><i class="fas fa-clock me-2"></i>Thời gian</th>
+              <th><i class="fas fa-money-bill me-2"></i>Tổng tiền</th>
+              <th><i class="fas fa-info-circle me-2"></i>Trạng thái</th>
+              <th><i class="fas fa-utensils me-2"></i>Loại</th>
+              <th><i class="fas fa-cogs me-2"></i>Hành động</th>
+            </tr>
+            </thead>
+            <tbody id="orderTableBody">
+            <!-- Loading state -->
+            <tr>
+              <td colspan="7">
+                <div class="orders-loading">
+                  <div class="spinner"></div>
+                  <p>Đang tải danh sách đơn hàng...</p>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Pagination -->
+    <div class="pagination-container mt-3">
+      <div class="d-flex justify-content-center">
+        <div class="pagination-controls">
+          <nav aria-label="Phân trang đơn hàng">
+            <ul class="pagination mb-0" id="paginationList">
+              <!-- Pagination buttons will be generated here -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Quick Jump (only show when total pages > 10) -->
+      <div class="pagination-jump mt-2" id="paginationJump" style="display: none;">
+        <div class="d-flex justify-content-center align-items-center gap-2">
+          <span class="text-muted">Chuyển đến trang:</span>
+          <input type="number" class="form-control form-control-sm" id="jumpToPage"
+                 style="width: 80px;" min="1" max="1" placeholder="1">
+          <button class="btn btn-sm btn-outline-primary" onclick="jumpToPage()">
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Loading State Template -->
+<template id="loadingTemplate">
+  <tr>
+    <td colspan="7">
+      <div class="orders-loading">
+        <div class="spinner"></div>
+        <p>Đang tải danh sách đơn hàng...</p>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<!-- Empty State Template -->
+<template id="emptyStateTemplate">
+  <tr>
+    <td colspan="7">
+      <div class="empty-orders-state">
+        <i class="fas fa-clipboard-list"></i>
+        <h4>Không tìm thấy đơn hàng nào</h4>
+        <p>Thử thay đổi bộ lọc để xem thêm kết quả.</p>
+        <button class="btn-orders-action btn-outline-secondary" onclick="clearFilters()">
+          <i class="fas fa-times me-2"></i>Xóa bộ lọc
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<!-- Error State Template -->
+<template id="errorStateTemplate">
+  <tr>
+    <td colspan="7">
+      <div class="empty-orders-state">
+        <i class="fas fa-exclamation-triangle" style="color: var(--bs-danger);"></i>
+        <h4 style="color: var(--bs-danger);">Không thể tải danh sách đơn hàng</h4>
+        <p id="errorMessage">Có lỗi xảy ra khi tải dữ liệu</p>
+        <button class="btn-orders-action btn-outline-primary" onclick="refreshOrders()">
+          <i class="fas fa-sync-alt me-2"></i>Thử lại
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<!-- Order Row Template -->
+<template id="orderRowTemplate">
+  <tr class="order-row" onclick="viewOrderDetails({orderId})">
+    <td>
+      <strong>#{orderId}</strong>
+    </td>
+    <td>
+                <span class="table-number-badge">
+                    <i class="fas fa-chair me-1"></i>
+                    {tableInfo}
+                </span>
+    </td>
+    <td>
+      <div class="order-time">
+        <i class="fas fa-clock"></i>
+        {formattedTime}
+      </div>
+    </td>
+    <td>
+      <div class="order-amount">
+        <i class="fas fa-money-bill"></i>
+        {formattedAmount}
+      </div>
+    </td>
+    <td>
+                <span class="status-badge-enhanced {statusClass}">
+                    {statusIcon}
+                    {statusText}
+                </span>
+    </td>
+    <td>
+                <span class="order-type-badge {orderTypeClass}">
+                    {orderTypeIcon}
+                    {orderTypeText}
+                </span>
+    </td>
+    <td>
+      <div class="action-btn-group">
+        <button class="action-btn btn-info"
+                onclick="event.stopPropagation(); viewOrderDetails({orderId})"
+                title="Xem chi tiết">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<!-- Order Details Modal Template -->
+<template id="orderDetailsModalTemplate">
+  <div class="modal-overlay" onclick="closeOrderDetails()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Chi tiết đơn hàng #{orderId}</h3>
+        <button class="btn-close" onclick="closeOrderDetails()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="order-summary">
+          <div class="info-row">
+            <span>Trạng thái:</span>
+            <span class="badge {statusClass}">{statusText}</span>
+          </div>
+          <div class="info-row">
+            <span>Loại đơn:</span>
+            <span>{orderTypeText}</span>
+          </div>
+          <div class="info-row">
+            <span>Thời gian:</span>
+            <span>{formattedDate}</span>
+          </div>
+          <div class="info-row">
+            <span>Bàn:</span>
+            <span>{tableInfo}</span>
+          </div>
+          <div class="info-row">
+            <span>Nhân viên:</span>
+            <span>{username}</span>
+          </div>
+          {noteSection}
+        </div>
+
+        <div class="order-items-section">
+          <h4>Danh sách món ăn:</h4>
+          <div class="order-items-list">
+            {orderItemsHtml}
+          </div>
+        </div>
+
+        <div class="order-total">
+          <strong>Tổng tiền: {formattedAmount}</strong>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="updateOrderStatus({orderId})">
+          Cập nhật trạng thái
+        </button>
+        <button class="btn btn-secondary" onclick="closeOrderDetails()">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Order Item Template -->
+<template id="orderItemTemplate">
+  <div class="order-item">
+    <div class="item-info">
+      <strong>{itemName}</strong>
+      <span class="item-details">SL: {quantity} × {formattedPrice}</span>
+    </div>
+    <div class="item-status">
+      <span class="badge {statusClass}">{statusText}</span>
+    </div>
+  </div>
+</template>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

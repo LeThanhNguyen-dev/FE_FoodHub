@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý bàn</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid p-4">
+    <!-- Header Section -->
+    <div class="welcome-section">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div class="header-info">
+                <h2 class="mb-2"><i class="fas fa-chair me-3"></i>Quản lý bàn</h2>
+                <p class="mb-0 opacity-75">Theo dõi và quản lý trạng thái các bàn trong nhà hàng</p>
+            </div>
+            <button class="btn btn-light btn-action refresh-btn" onclick="refreshTables()"
+                    style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3);">
+                <i class="fas fa-sync-alt me-2"></i><span class="btn-text">Làm mới</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Table Status Summary Cards -->
+    <div class="dashboard-cards">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-check-circle me-2"></i>Bàn trống</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="stats-number text-success" id="availableTables">0</div>
+                <p class="text-muted mb-0">Sẵn sàng phục vụ</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-users me-2"></i>Bàn có khách</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="stats-number text-primary" id="occupiedTables">0</div>
+                <p class="text-muted mb-0">Đang phục vụ</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clock me-2"></i>Bàn đặt trước</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="stats-number text-warning" id="reservedTables">0</div>
+                <p class="text-muted mb-0">Chờ khách đến</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-2"></i>Tổng số bàn</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="stats-number" id="totalTables">0</div>
+                <p class="text-muted mb-0">Tổng cộng</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables by Area -->
+    <div id="tablesContainer" class="orders-section">
+        <!-- Tables will be loaded here -->
+    </div>
+</div>
+</body>
+</html>

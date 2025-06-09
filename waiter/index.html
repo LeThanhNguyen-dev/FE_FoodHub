@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>FoodHub Waiter - Bảng điều khiển phục vụ</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
+            rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+    <div class="brand">
+        <h3>
+            <i class="fa fa-utensils"></i>
+            <span class="brand-text">FoodHub</span>
+        </h3>
+        <small>Waiter Panel</small>
+    </div>
+
+    <nav class="sidebar-nav flex-fill">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="showDashboard()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showOrders()">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span class="nav-text">Đơn hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showTables()">
+                    <i class="fas fa-chair"></i>
+                    <span class="nav-text">Quản lý bàn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showMenu()">
+                    <i class="fas fa-book-open"></i>
+                    <span class="nav-text">Thực đơn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showCustomers()">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">Khách hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showReports()">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">Báo cáo ca làm</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="logout-section">
+        <button class="logout-btn" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="btn-text">Kết thúc ca làm</span>
+        </button>
+    </div>
+</div>
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="d-flex align-items-center">
+            <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h4 class="mb-0" id="pageTitle">Dashboard - Ca làm việc</h4>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="notification-bell">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle me-2"></i>Nguyễn Văn A
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-clock me-2"></i>Lịch làm việc</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i
+                            class="fas fa-sign-out-alt me-2"></i>Kết thúc ca</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboardContent">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-3">Chào buổi sáng, Nguyễn Văn A!</h2>
+                    <p class="mb-2"><i class="fas fa-clock me-2"></i>Ca làm: 08:00 - 16:00</p>
+                    <p class="mb-0"><i class="fas fa-calendar me-2"></i>Hôm nay: Thứ Hai, 02/06/2025</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-user-tie" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <!-- Urgent Orders Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Đơn hàng cấp bách</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle management-icon"
+                       style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"></i>
+                    <div class="stats-number urgent-number">3</div>
+                    <p class="text-muted mb-3">Cần xử lý ngay</p>
+                    <button class="btn btn-action btn-urgent" onclick="showUrgentOrders()">
+                        <i class="fas fa-bolt me-2"></i>Xử lý ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Orders Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clipboard-list me-2"></i>Đơn hàng đang xử lý</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list"
+                       style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
+                    <div class="stats-number">12</div>
+                    <p class="text-muted mb-3">Đơn đang phục vụ</p>
+                    <button class="btn btn-action" onclick="showOrders()">
+                        <i class="fas fa-list me-2"></i>Xem chi tiết
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tables Management Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chair me-2"></i>Quản lý bàn</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-chair"
+                       style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
+                    <div class="stats-number">8/15</div>
+                    <p class="text-muted mb-3">Bàn đang phục vụ</p>
+                    <button class="btn btn-action" onclick="showTables()">
+                        <i class="fas fa-eye me-2"></i>Xem bàn
+                    </button>
+                </div>
+            </div>
+
+            <!-- Daily Sales Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-money-bill-wave me-2"></i>Doanh thu ca làm</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-money-bill-wave"
+                       style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
+                    <div class="stats-number" style="color: var(--success);">₫850K</div>
+                    <p class="text-muted mb-3">Từ 15 đơn hàng</p>
+                    <button class="btn btn-action" onclick="showReports()">
+                        <i class="fas fa-chart-bar me-2"></i>Xem báo cáo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="orders-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5><i class="fas fa-clock me-2 text-primary"></i>Đơn hàng gần đây</h5>
+                <button class="btn btn-outline-primary btn-sm" onclick="refreshOrders()">
+                    <i class="fas fa-sync-alt me-1"></i>Làm mới
+                </button>
+            </div>
+
+            <div class="order-item order-urgent">
+                <div class="order-info">
+                    <div class="order-number">#ORD-001</div>
+                    <div class="mb-2">
+                        <span class="table-number">Bàn 5</span>
+                        <span class="urgent-badge">URGENT - 15 phút</span>
+                    </div>
+                    <div class="order-time">2 x Phở Bò, 1 x Cơm Tấm - 14:25</div>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <span class="status-badge status-ready">Sẵn sàng phục vụ</span>
+                    <button class="btn btn-sm btn-success" onclick="serveOrder('ORD-001')">
+                        <i class="fas fa-check me-1"></i>Phục vụ
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-item">
+                <div class="order-info">
+                    <div class="order-number">#ORD-002</div>
+                    <div class="mb-2">
+                        <span class="table-number">Bàn 3</span>
+                    </div>
+                    <div class="order-time">1 x Bún Chả, 2 x Trà đá - 14:30</div>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <span class="status-badge status-preparing">Đang chuẩn bị</span>
+                    <button class="btn btn-sm btn-info" onclick="checkOrderStatus('ORD-002')">
+                        <i class="fas fa-eye me-1"></i>Theo dõi
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-item">
+                <div class="order-info">
+                    <div class="order-number">#ORD-003</div>
+                    <div class="mb-2">
+                        <span class="table-number">Bàn 7</span>
+                    </div>
+                    <div class="order-time">3 x Bánh mì, 1 x Cà phê - 14:35</div>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <span class="status-badge status-pending">Chờ xử lý</span>
+                    <button class="btn btn-sm btn-warning" onclick="processOrder('ORD-003')">
+                        <i class="fas fa-play me-1"></i>Xử lý
+                    </button>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="takeNewOrder()">
+                    <i class="fas fa-plus me-2"></i>Nhận đơn mới
+                </button>
+                <button class="quick-action-btn" onclick="callKitchen()">
+                    <i class="fas fa-phone me-2"></i>Gọi bếp
+                </button>
+                <button class="quick-action-btn" onclick="requestSupport()">
+                    <i class="fas fa-hands-helping me-2"></i>Yêu cầu hỗ trợ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="dynamicContent" style="display: none;">
+        <!-- Content will be loaded here dynamically -->
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        // Toggle sidebar collapsed state
+        sidebar.classList.toggle('collapsed');
+
+        // Toggle main content expanded state
+        if (mainContent) {
+            mainContent.classList.toggle('expanded');
+        }
+
+        // Store sidebar state in memory (not localStorage as it's not supported)
+        window.sidebarCollapsed = sidebar.classList.contains('collapsed');
+    }
+
+    // Restore sidebar state on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        // You can set initial state here if needed
+        if (window.sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+            if (mainContent) {
+                mainContent.classList.add('expanded');
+            }
+        }
+    });
+
+    // Optional: Restore sidebar state on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const wasCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
+
+        if (wasCollapsed && sidebar) {
+            sidebar.classList.add('collapsed');
+            if (mainContent) {
+                mainContent.classList.add('expanded');
+            }
+        }
+    });
+
+    // Alternative function if you're still having issues
+    function toggleSidebarForced() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        if (sidebar.style.width === '70px' || sidebar.classList.contains('collapsed')) {
+            // Expand sidebar
+            sidebar.classList.remove('collapsed');
+            sidebar.style.width = '280px';
+            if (mainContent) {
+                mainContent.classList.remove('expanded');
+                mainContent.style.marginLeft = '280px';
+            }
+        } else {
+            // Collapse sidebar
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = '70px';
+            if (mainContent) {
+                mainContent.classList.add('expanded');
+                mainContent.style.marginLeft = '70px';
+            }
+        }
+    }
+
+    function setActiveNav(element) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        element.classList.add('active');
+    }
+
+    function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
+            document.body.style.opacity = '0.5';
+            document.body.style.transition = 'opacity 0.5s';
+
+            setTimeout(() => {
+                alert('Đã kết thúc ca làm việc! Cảm ơn bạn đã làm việc chăm chỉ.');
+                document.body.style.opacity = '1';
+            }, 1000);
+        }
+    }
+
+    function showDashboard() {
+        document.getElementById('pageTitle').textContent = 'Dashboard - Ca làm việc';
+        document.getElementById('dashboardContent').style.display = 'block';
+        document.getElementById('dynamicContent').style.display = 'none';
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector('[onclick="showDashboard()"]').classList.add('active');
+    }
+
+
+</script>
+<script src="js/show-table.js"></script>
+<script src="js/order.js"></script>
+<script src="../js/fetch-api.js"></script>
+</body>
+</html>

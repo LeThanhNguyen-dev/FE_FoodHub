@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chef Dashboard - Kitchen Management</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+  <div class="brand">
+    <h3>
+      <i class="fa fa-utensils"></i>
+      <span class="brand-text">FoodHub</span>
+    </h3>
+    <small>Bảng Điều Khiển Bếp</small>
+  </div>
+
+  <nav class="sidebar-nav flex-fill">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link active" onclick="showDashboard()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="nav-text">Tổng Quan</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showOrders()">
+          <i class="fas fa-clipboard-list"></i>
+          <span class="nav-text">Đơn Hàng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showTables()">
+          <i class="fas fa-chair"></i>
+          <span class="nav-text">Hàng Đợi</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showReports()">
+          <i class="fas fa-chart-line"></i>
+          <span class="nav-text">Báo Cáo Ca Làm</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="logout-section">
+    <button class="logout-btn" onclick="handleLogout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="btn-text">Kết Thúc Ca Làm</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="d-flex align-items-center">
+      <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h4 class="mb-0" id="pageTitle">Tổng Quan - Ca Làm Việc</h4>
+    </div>
+    <div class="d-flex align-items-center">
+      <div class="notification-bell">
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge" id="notificationCount">0</span>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="fas fa-user-circle me-2"></i>Nguyễn Văn A
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ Sơ</a></li>
+          <li><a class="dropdown-item" href="#"><i class="fas fa-clock me-2"></i>Lịch Làm Việc</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i
+                  class="fas fa-sign-out-alt me-2"></i>Kết Thúc Ca</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="stat-card">
+      <div class="stat-number" id="pendingCount">0</div>
+      <div class="stat-label">Đơn Chờ Xử Lý</div>
+      <i class="fas fa-hourglass-half stat-icon"></i>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="preparingCount">0</div>
+      <div class="stat-label">Đang Chế Biến</div>
+      <i class="fas fa-fire stat-icon"></i>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="readyCount">0</div>
+      <div class="stat-label">Sẵn Sàng Phục Vụ</div>
+      <i class="fas fa-check-circle stat-icon"></i>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="avgTime">15p</div>
+      <div class="stat-label">Thời Gian Nấu TB</div>
+      <i class="fas fa-stopwatch stat-icon"></i>
+    </div>
+  </div>
+
+  <!-- Orders Section -->
+  <div class="orders-section">
+    <div class="section-header">
+      <h3><i class="fas fa-clipboard-list"></i>Đơn Hàng Đang Xử Lý</h3>
+    </div>
+
+    <div class="orders-grid" id="ordersGrid">
+      <!-- Orders will be loaded here dynamically -->
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    // Toggle sidebar collapsed state
+    sidebar.classList.toggle('collapsed');
+
+    // Toggle main content expanded state
+    if (mainContent) {
+      mainContent.classList.toggle('expanded');
+    }
+
+    // Store sidebar state in memory (not localStorage as it's not supported)
+    window.sidebarCollapsed = sidebar.classList.contains('collapsed');
+  }
+
+  // Restore sidebar state on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    // You can set initial state here if needed
+    if (window.sidebarCollapsed) {
+      sidebar.classList.add('collapsed');
+      if (mainContent) {
+        mainContent.classList.add('expanded');
+      }
+    }
+  });
+
+  // Optional: Restore sidebar state on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const wasCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
+
+    if (wasCollapsed && sidebar) {
+      sidebar.classList.add('collapsed');
+      if (mainContent) {
+        mainContent.classList.add('expanded');
+      }
+    }
+  });
+
+  // Alternative function if you're still having issues
+  function toggleSidebarForced() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (sidebar.style.width === '70px' || sidebar.classList.contains('collapsed')) {
+      // Expand sidebar
+      sidebar.classList.remove('collapsed');
+      sidebar.style.width = '280px';
+      if (mainContent) {
+        mainContent.classList.remove('expanded');
+        mainContent.style.marginLeft = '280px';
+      }
+    } else {
+      // Collapse sidebar
+      sidebar.classList.add('collapsed');
+      sidebar.style.width = '70px';
+      if (mainContent) {
+        mainContent.classList.add('expanded');
+        mainContent.style.marginLeft = '70px';
+      }
+    }
+  }
+
+  function setActiveNav(element) {
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.classList.remove('active');
+    });
+    element.classList.add('active');
+  }
+
+  function handleLogout() {
+    if (confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
+      document.body.style.opacity = '0.5';
+      document.body.style.transition = 'opacity 0.5s';
+
+      setTimeout(() => {
+        alert('Đã kết thúc ca làm việc! Cảm ơn bạn đã làm việc chăm chỉ.');
+        document.body.style.opacity = '1';
+      }, 1000);
+    }
+  }
+
+  function showDashboard() {
+    document.getElementById('pageTitle').textContent = 'Dashboard - Ca làm việc';
+    document.getElementById('dashboardContent').style.display = 'block';
+    document.getElementById('dynamicContent').style.display = 'none';
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.classList.remove('active');
+    });
+    document.querySelector('[onclick="showDashboard()"]').classList.add('active');
+  }
+</script>
+<script src="js/order.js"></script>
+<script src="../js/fetch-api.js"></script>
+</body>
+</html>

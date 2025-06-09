@@ -1,0 +1,553 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>FoodHub Admin - Quản lý món ăn</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
+            rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/foodhub/css/menu.css" rel="stylesheet">
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" id="sidebar">
+    <div class="brand text-center">
+        <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
+        <small class="d-block">Admin Panel</small>
+    </div>
+
+    <nav class="sidebar-nav flex-fill">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="/foodhub/adminDashboard/adminDashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="adminDashboardUser.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý khách hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/foodhub/staff-manager/staffList.html" class="nav-link">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Quản lý nhân viên</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/foodhub/menu-manager/menu.html" class="nav-link active">
+                    <i class="fas fa-utensils"></i>
+                    <span>Quản lý món ăn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Quản lý tài chính</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Đơn hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/foodhub/staff-manager/lichlam.html" class="nav-link" onclick="showReports()">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Lịch làm</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="logout-section">
+        <button class="logout-btn" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+        </button>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="d-flex align-items-center">
+            <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h4 class="mb-0"><i class="fas fa-utensils me-2"></i>Quản lý món ăn</h4>
+        </div>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-success me-3" onclick="addNewDish()">
+                <i class="fas fa-plus me-2"></i>Thêm món ăn
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle me-2"></i>Admin
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Management Content -->
+    <div class="container-fluid p-4">
+        <!-- Filter Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-filter me-2"></i>Bộ lọc và tìm kiếm</h5>
+            </div>
+            <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="categoryId" class="form-label fw-bold">Danh mục</label>
+                        <select id="categoryId" class="form-select">
+                            <option value="">Tất cả danh mục</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sortBy" class="form-label fw-bold">Sắp xếp theo</label>
+                        <select id="sortBy" class="form-select">
+                            <option value="">Mặc định</option>
+                            <option value="price_asc">Giá tăng dần</option>
+                            <option value="price_desc">Giá giảm dần</option>
+                            <option value="name_asc">Tên A-Z</option>
+                            <option value="name_desc">Tên Z-A</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="keyword" class="form-label fw-bold">Tìm kiếm</label>
+                        <input type="text" id="keyword" class="form-control" placeholder="Nhập tên món ăn...">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Tìm kiếm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Menu Table Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list me-2"></i>Danh sách món ăn</h5>
+            </div>
+            <div class="card-body">
+                <!-- Loading spinner -->
+                <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Đang tải dữ liệu...</p>
+                </div>
+
+                <!-- Menu Table -->
+                <div id="menuTable" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th style="width: 80px;">Hình ảnh</th>
+                            <th>Tên món ăn</th>
+                            <th>Mô tả</th>
+                            <th style="width: 130px;">Giá</th>
+                            <th>Danh mục</th>
+                            <th style="width: 130px;">Trạng thái</th>
+                            <th style="width: 150px;">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody id="menuTableBody">
+                        <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty state -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-utensils"></i>
+                    <h5>Không có món ăn nào</h5>
+                    <p class="text-muted">Thử thay đổi bộ lọc để xem thêm món ăn hoặc thêm món ăn mới</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const apiMenuUrl = '/foodhub/menu-items';
+    const apiCategoryUrl = '/foodhub/categories';
+    let currentPage = 0;
+    const pageSize = 10;
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+
+    function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+            document.body.style.opacity = '0.5';
+            document.body.style.transition = 'opacity 0.5s';
+
+            setTimeout(() => {
+                alert('Đã đăng xuất thành công!');
+                document.body.style.opacity = '1';
+            }, 1000);
+        }
+    }
+
+    function addNewDish() {
+        // Redirect to add dish page
+        window.location.href = '/foodhub/menu-manager/add-dish.html';
+    }
+
+    function showLoading() {
+        document.getElementById('loadingSpinner').style.display = 'block';
+        document.getElementById('menuTable').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'none';
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('menuTable').style.display = 'block';
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 4000);
+    }
+
+    function fetchCategories() {
+        axios.get(apiCategoryUrl)
+            .then(response => {
+                if (response.data.code === 1000) {
+                    const select = document.getElementById('categoryId');
+                    const categories = response.data.result || [];
+                    select.innerHTML = '<option value="">Tất cả danh mục</option>';
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        select.appendChild(option);
+                    });
+                } else {
+                    showNotification(response.data.message || 'Không thể tải danh mục!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải danh mục:', error);
+                const errorMessage = error.response?.data?.message || 'Không thể tải danh mục do lỗi kết nối!';
+                showNotification(errorMessage, 'error');
+            });
+    }
+
+    function fetchMenuItems() {
+        showLoading();
+
+        const categoryId = document.getElementById('categoryId').value;
+        const sortValue = document.getElementById('sortBy').value;
+        const keyword = document.getElementById('keyword').value.trim();
+
+        let sortBy = null;
+        let sortDirection = 'asc';
+        if (sortValue) {
+            const parts = sortValue.split('_');
+            sortBy = parts[0];
+            sortDirection = parts[1] || 'asc';
+        }
+
+        const params = {
+            page: currentPage,
+            size: pageSize
+        };
+
+        if (categoryId) params.categoryId = categoryId;
+        if (sortBy) {
+            params.sortBy = sortBy;
+            params.sortDirection = sortDirection;
+        }
+        if (keyword) params.keyword = keyword;
+
+        axios.get(apiMenuUrl, { params })
+            .then(response => {
+                hideLoading();
+                if (response.data.code === 1000) {
+                    renderMenuTable(response.data.result.content);
+                    renderPagination(response.data.result.totalPages, response.data.result.number);
+                } else {
+                    showNotification(response.data.message, 'error');
+                    showEmptyState();
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Lỗi khi tải dữ liệu:', error);
+                const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi tải dữ liệu!';
+                showNotification(errorMessage, 'error');
+                showEmptyState();
+            });
+    }
+
+    function renderMenuTable(items) {
+        const tbody = document.getElementById('menuTableBody');
+
+        if (items.length === 0) {
+            showEmptyState();
+            return;
+        }
+
+        document.getElementById('emptyState').style.display = 'none';
+        tbody.innerHTML = '';
+
+        items.forEach(item => {
+            const isAvailable = item.status === 'AVAILABLE';
+            const statusClass = isAvailable ? 'status-available' : 'status-unavailable';
+            const statusText = isAvailable ? 'Có sẵn' : 'Hết món';
+
+            // Status icon
+            const statusIcon = isAvailable ? 'fas fa-check-circle' : 'fas fa-times-circle';
+
+            const actionButton = isAvailable
+                ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteItem(${item.id})" title="Xóa món">
+                     <i class="fas fa-trash"></i>
+                   </button>`
+                : `<button class="btn btn-outline-success btn-sm" onclick="restoreItem(${item.id})" title="Khôi phục món">
+                     <i class="fas fa-undo"></i>
+                   </button>`;
+
+            const row = `
+                <tr>
+                    <td>
+                        ${item.imageUrl
+                ? `<img src="${item.imageUrl}" class="menu-image" alt="${item.name}" onerror="this.outerHTML='<div class=&quot;menu-image bg-light d-flex align-items-center justify-content-center&quot; style=&quot;border: 2px dashed #ddd;&quot;><i class=&quot;fas fa-image text-muted&quot;></i></div>';">`
+                : `<div class="menu-image bg-light d-flex align-items-center justify-content-center" style="border: 2px dashed #ddd;">
+                                   <i class="fas fa-image text-muted"></i>
+                               </div>`
+            }
+                    </td>
+                    <td>
+                        <div class="fw-bold text-dark" style="font-size: 1.1em;">${item.name}</div>
+                    </td>
+                    <td>
+                        <div class="text-muted" style="max-width: 250px; font-size: 0.9em;">
+                            ${item.description || 'Không có mô tả'}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="price-text">${Number(item.price).toLocaleString()} ₫</span>
+                    </td>
+                    <td>
+                        <div style="max-width: 150px;">
+                            ${item.categoryNames ? item.categoryNames.join(', ') : 'Chưa phân loại'}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            <i class="${statusIcon} me-1"></i>${statusText}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons d-flex">
+                            <button class="btn btn-outline-primary btn-sm me-1" onclick="editItem(${item.id})" title="Chỉnh sửa món">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${actionButton}
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    function showEmptyState() {
+        document.getElementById('menuTable').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+    }
+
+    function renderPagination(totalPages, currentPageIndex) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        const prevDisabled = currentPageIndex === 0 ? 'disabled' : '';
+        pagination.innerHTML += `
+            <li class="page-item ${prevDisabled}">
+                <a class="page-link" href="#" onclick="changePage(${currentPageIndex - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>`;
+
+        const startPage = Math.max(0, currentPageIndex - 2);
+        const endPage = Math.min(totalPages - 1, currentPageIndex + 2);
+
+        if (startPage > 0) {
+            pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(0)">1</a>
+                </li>`;
+            if (startPage > 1) {
+                pagination.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const active = currentPageIndex === i ? 'active' : '';
+            pagination.innerHTML += `
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" onclick="changePage(${i})">${i + 1}</a>
+                </li>`;
+        }
+
+        if (endPage < totalPages - 1) {
+            if (endPage < totalPages - 2) {
+                pagination.innerHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            pagination.innerHTML += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${totalPages - 1})">${totalPages}</a>
+                </li>`;
+        }
+
+        const nextDisabled = currentPageIndex === totalPages - 1 ? 'disabled' : '';
+        pagination.innerHTML += `
+            <li class="page-item ${nextDisabled}">
+                <a class="page-link" href="#" onclick="changePage(${currentPageIndex + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>`;
+    }
+
+    function changePage(page) {
+        if (page < 0) return;
+        currentPage = page;
+        fetchMenuItems();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function editItem(id) {
+        window.location.href = `/foodhub/menu-manager/edit-dish.html?id=${id}`;
+    }
+
+    // Xóa món ăn
+    function deleteItem(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa món ăn này?\n(Món ăn sẽ chuyển sang trạng thái UNAVAILABLE)')) {
+            const deleteButton = document.querySelector(`button[onclick="deleteItem(${id})"]`);
+            const originalText = deleteButton.innerHTML;
+            deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            deleteButton.disabled = true;
+
+            axios.delete(`${apiMenuUrl}/${id}`)
+                .then(response => {
+                    if (response.data.code === 1000) {
+                        showNotification(response.data.message, 'success');
+                        fetchMenuItems();
+                    } else {
+                        showNotification(response.data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting item:', error);
+                    const errorMessage = error.response?.data?.message || 'Không thể xóa món ăn. Vui lòng thử lại!';
+                    showNotification(errorMessage, 'error');
+                })
+                .finally(() => {
+                    deleteButton.innerHTML = originalText;
+                    deleteButton.disabled = false;
+                });
+        }
+    }
+
+    // Khôi phục món ăn
+    function restoreItem(id) {
+        if (confirm('Bạn có chắc chắn muốn khôi phục món ăn này?\n(Món ăn sẽ chuyển sang trạng thái AVAILABLE)')) {
+            const restoreButton = document.querySelector(`button[onclick="restoreItem(${id})"]`);
+            const originalText = restoreButton.innerHTML;
+            restoreButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            restoreButton.disabled = true;
+
+            axios.put(`${apiMenuUrl}/${id}/restore`)
+                .then(response => {
+                    if (response.data.code === 1000) {
+                        showNotification(response.data.message, 'success');
+                        fetchMenuItems();
+                    } else {
+                        showNotification(response.data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error restoring item:', error);
+                    const errorMessage = error.response?.data?.message || 'Không thể khôi phục món ăn. Vui lòng thử lại!';
+                    showNotification(errorMessage, 'error');
+                })
+                .finally(() => {
+                    restoreButton.innerHTML = originalText;
+                    restoreButton.disabled = false;
+                });
+        }
+    }
+
+    // Event listeners
+    document.getElementById('filterForm').addEventListener('submit', e => {
+        e.preventDefault();
+        currentPage = 0;
+        fetchMenuItems();
+    });
+
+    // Khởi tạo
+    fetchCategories();
+    fetchMenuItems();
+</script>
+</body>
+</html>

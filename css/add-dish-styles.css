@@ -1,0 +1,206 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    padding: 1rem;
+}
+
+/* Container */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+
+.btn-secondary:hover {
+    background-color: #d1d5db;
+    transform: translateY(-1px);
+}
+
+/* Form card */
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1a202c;
+    margin-bottom: 0.4rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group select {
+    height: 120px; /* Adjusted for multiple selection */
+    background-color: #fff;
+    color: #1a202c;
+    cursor: pointer;
+}
+
+.form-group select option {
+    padding: 0.5rem;
+}
+
+.form-group small {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.3rem;
+}
+
+.required {
+    color: #ef4444;
+}
+
+/* Error message */
+.error-message {
+    display: none;
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+/* Image preview */
+#imagePreview {
+    max-width: 80px;
+    max-height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+/* Form actions */
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Notification */
+.notification-enter {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.notification-enter.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.notification-enter.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.notification-enter.alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

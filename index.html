@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Danh sách người dùng</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #errorMsg {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Danh sách người dùng</h1>
+
+<button onclick="fetchUsers()">Lấy danh sách người dùng</button>
+<div id="errorMsg"></div>
+
+<table id="userTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Họ tên</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Dữ liệu sẽ được thêm vào đây -->
+    </tbody>
+</table>
+<script src="js/fetch-api.js"></script>
+<script>
+    async function fetchUsers() {
+        try {
+            const token = localStorage.getItem('accessToken');
+
+            const data = await apiFetch('/users', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            renderUserTable(data.result);
+        } catch (error) {
+            document.getElementById('errorMsg').innerText = error.message;
+            console.error('Lỗi khi lấy danh sách người dùng:', error);
+        }
+    }
+
+    function renderUserTable(users) {
+        const tbody = document.querySelector('#userTable tbody');
+        tbody.innerHTML = ''; // Xóa dữ liệu cũ
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+        <td>${user.username}</td>
+        <td>${user.email}</td>
+      `;
+            tbody.appendChild(row);
+        });
+    }
+</script>
+
+</body>
+</html>
