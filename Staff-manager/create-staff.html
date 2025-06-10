@@ -654,10 +654,15 @@
     } catch (error) {
       clearErrors();
       const errorMessage = error.message || 'Có lỗi xảy ra khi tạo nhân viên!';
-      if (errorMessage.includes('exist') || errorMessage.includes('duplicate') || errorMessage.includes('1001')) {
+      const errorCode = error.code || (errorMessage.match(/code (\d+)/) ? errorMessage.match(/code (\d+)/)[1] : null);
+      if (errorCode === '1054' || errorMessage.toLowerCase().includes('username')) {
         document.getElementById('username').classList.add('is-invalid');
-        document.getElementById('username-error').textContent = 'Tên đăng nhập đã tồn tại';
+        document.getElementById('username-error').textContent = errorMessage.toLowerCase().includes('username') ? errorMessage : 'Tên đăng nhập đã tồn tại';
         showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
+      } else if (errorCode === '1055' || errorMessage.toLowerCase().includes('email')) {
+        document.getElementById('email').classList.add('is-invalid');
+        document.getElementById('email-error').textContent = errorMessage.toLowerCase().includes('email') ? errorMessage : 'Email đã tồn tại';
+        showNotification('Email đã tồn tại, vui lòng chọn email khác!', 'error');
       } else {
         showNotification(errorMessage, 'error');
       }
