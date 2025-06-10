@@ -491,8 +491,8 @@
 <body>
 <div class="container" id="container">
     <div class="top-nav">
-        <a href="#" class="home-btn" onclick="goHome()">
-            ← Trang chủ
+        <a href="staffList.html" class="home-btn" >
+            ← Quay Lại
         </a>
     </div>
 
@@ -585,12 +585,12 @@
     </div>
 </div>
 
+<script src="../js/fetch-api.js"></script>
 <script>
     let currentDate = new Date();
 
     // Go home function
     function goHome() {
-        // Replace with your actual home page URL
         window.location.href = '/';
     }
 
@@ -602,7 +602,6 @@
         const messageEl = document.getElementById('popupMessage');
         const actionsEl = document.getElementById('popupActions');
 
-        // Set icon based on type
         if (type === 'error') {
             icon.innerHTML = '⚠️';
             icon.className = 'popup-icon error';
@@ -643,7 +642,6 @@
         `;
         actionsEl.className = 'popup-actions';
 
-        // Store callbacks
         window.popupConfirmCallback = onConfirm;
         window.popupCancelCallback = onCancel;
 
@@ -678,8 +676,7 @@
         employeeNameSelect.innerHTML = '<option value="">Chọn nhân viên...</option>';
         if (role) {
             try {
-                const response = await fetch(`http://localhost:8080/shifts/employees?role=${role}`);
-                const employees = await response.json();
+                const employees = await apiFetch(`/shifts/employees?role=${role}`, { method: 'GET' });
                 employees.forEach(emp => {
                     const option = document.createElement('option');
                     option.value = emp.name;
@@ -687,7 +684,7 @@
                     employeeNameSelect.appendChild(option);
                 });
             } catch (error) {
-                console.error(`Error loading employees for role ${role}:`, error);
+                console.error(`Lỗi tải danh sách nhân viên cho role ${role}:`, error.message);
             }
         }
     }
@@ -715,12 +712,12 @@
 
         const weekStartStr = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
         try {
-            const response = await fetch(`http://localhost:8080/shifts?weekStart=${weekStartStr}`);
-            const shifts = await response.json();
+            const shifts = await apiFetch(`/shifts?weekStart=${weekStartStr}`, { method: 'GET' });
+            console.log('Danh sách ca:', shifts); // Debug dữ liệu ca
 
             for (let i = 0; i < 7; i++) {
                 const dayCell = document.createElement('div');
-                dayCell.className = 'day-cell';
+                dayCell.className = 'day-cell'; // Sửa từ day-row thành day-cell
 
                 const currentDay = new Date(weekStart);
                 currentDay.setDate(weekStart.getDate() + i);
@@ -761,7 +758,7 @@
                 calendar.appendChild(dayCell);
             }
         } catch (error) {
-            console.error('Error fetching shifts:', error);
+            console.error('Lỗi khi tải ca làm việc:', error.message);
         }
     }
 
@@ -777,7 +774,6 @@
 
     function openModal() {
         document.getElementById('shiftModal').classList.add('show');
-        // Reset form and update employee list
         document.getElementById('shiftForm').reset();
         updateEmployeeList();
     }
@@ -797,28 +793,24 @@
         };
 
         try {
-            const response = await fetch('http://localhost:8080/shifts', {
+            const response = await apiFetch('/shifts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newShift)
             });
-            if (response.ok) {
-                showAlert('Ca làm việc đã được thêm thành công!', 'Thành công', 'success');
-                renderCalendar();
-                closeModal();
-            } else {
-                const errorData = await response.json();
-                showAlert(`Lỗi: ${errorData.message || 'Không thể thêm ca làm việc'}`, 'Lỗi', 'error');
-            }
+            console.log('Phản hồi thêm ca:', response); // Debug phản hồi
+            showAlert('Ca làm việc đã được thêm thành công!', 'Thành công', 'success');
+            await renderCalendar();
+            closeModal();
         } catch (error) {
-            console.error('Error adding shift:', error);
-            showAlert('Lỗi kết nối. Vui lòng kiểm tra kết nối mạng và thử lại.', 'Lỗi kết nối', 'error');
+            console.error('Lỗi khi thêm ca:', error.message);
+            showAlert(error.message || 'Lỗi kết nối. Vui lòng kiểm tra kết nối mạng và thử lại.', 'Lỗi', 'error');
         }
     }
 
     function confirmRemoveShift(shiftId, employeeName) {
         showConfirm(
-            `Bạn có chắc chắn muốn xóa ca làm việc của "${employeeName}" không?`,
+            `Bạn có chắc muốn xóa ca làm việc của "${employeeName}" không?`,
             'Xác nhận xóa ca',
             () => removeShift(shiftId),
             () => console.log('Đã hủy xóa ca')
@@ -827,38 +819,29 @@
 
     async function removeShift(shiftId) {
         try {
-            const response = await fetch(`http://localhost:8080/shifts/${shiftId}`, {
-                method: 'DELETE'
-            });
-            if (response.ok) {
-                showAlert('Ca làm việc đã được xóa thành công!', 'Thành công', 'success');
-                renderCalendar();
-            } else {
-                showAlert('Lỗi khi xóa ca làm việc. Vui lòng thử lại sau.', 'Lỗi', 'error');
-            }
+            const response = await apiFetch(`/shifts/${shiftId}`, { method: 'DELETE' });
+            console.log('Phản hồi xóa ca:', response); // Debug phản hồi
+            showAlert('Ca làm việc đã được xóa thành công!', 'Thành công', 'success');
+            await renderCalendar();
         } catch (error) {
-            console.error('Error deleting shift:', error);
-            showAlert('Lỗi kết nối. Vui lòng kiểm tra kết nối mạng và thử lại.', 'Lỗi kết nối', 'error');
+            console.error('Lỗi khi xóa ca:', error.message); // Debug lỗi
+            showAlert(error.message || 'Lỗi kết nối. Vui lòng kiểm tra kết nối mạng và thử lại.', 'Lỗi', 'error');
         }
     }
 
-    // Close popup when clicking outside
     document.getElementById('customPopup').addEventListener('click', function(e) {
         if (e.target === this) {
             closePopup();
         }
     });
 
-    // Close modal when clicking outside
     document.getElementById('shiftModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeModal();
         }
     });
 
-    // Add event listener for role selection
     document.getElementById('employeeRole').addEventListener('change', updateEmployeeList);
-
     document.getElementById('shiftForm').addEventListener('submit', addShift);
     init();
 </script>

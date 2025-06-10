@@ -22,8 +22,8 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Axios -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Goong Map JavaScript SDK -->
+  <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7bVxaW"></script>
 
   <style>
     :root {
@@ -296,6 +296,30 @@
       border-radius: 15px 15px 0 0;
     }
 
+    .autocomplete-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .autocomplete-suggestion {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .autocomplete-suggestion:hover {
+      background-color: var(--light);
+    }
+
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
@@ -326,52 +350,53 @@
     <small class="d-block">Admin Panel</small>
   </div>
 
-    <nav class="sidebar-nav flex-fill">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a href="/adminDashboard/adminDashboard.html" class="nav-link">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="adminDashboardUser.html" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        <span>Quản lý khách hàng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="staffList.html" class="nav-link active">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Quản lý nhân viên</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/menu-manager/menu.html" class="nav-link ">
-                        <i class="fas fa-utensils"></i>
-                        <span>Quản lý món ăn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Quản lý tài chính</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Đơn hàng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="lichlam.html" class="nav-link" onclick="showReports()">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Lịch làm</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+  <nav class="sidebar-nav flex-fill">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="/adminDashboard/adminDashboard.html" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="adminDashboardUser.html" class="nav-link">
+          <i class="fas fa-users"></i>
+          <span>Quản lý khách hàng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="staffList.html" class="nav-link active">
+          <i class="fas fa-user-tie"></i>
+          <span>Quản lý nhân viên</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/menu-manager/menu.html" class="nav-link">
+          <i class="fas fa-utensils"></i>
+          <span>Quản lý món ăn</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Quản lý tài chính</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Đơn hàng</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="lichlam.html" class="nav-link">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Lịch làm</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
   <div class="logout-section">
     <button class="logout-btn" onclick="handleLogout()">
       <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
@@ -438,10 +463,11 @@
             <div class="invalid-feedback" id="phone-error"></div>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-6 position-relative">
             <label for="address" class="form-label">Địa chỉ</label>
             <input type="text" class="form-control" id="address" name="address"
                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <div id="addressSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
             <div class="invalid-feedback" id="address-error"></div>
           </div>
 
@@ -449,10 +475,10 @@
             <label for="roleName" class="form-label">Vai trò</label>
             <select class="form-select" id="roleName" name="roleName" required>
               <option value="" disabled selected>Chọn vai trò</option>
-              <option value="Manager">Manager</option>
-              <option value="Chef">Chef</option>
-              <option value="Waiter">Waiter</option>
-              <option value="Cashier">Cashier</option>
+              <option value="MANAGER">MANAGER</option>
+              <option value="CASHIER">CASHIER</option>
+              <option value="CHEF">CHEF</option>
+              <option value="WAITER">WAITER</option>
             </select>
             <div class="invalid-feedback" id="roleName-error"></div>
           </div>
@@ -469,27 +495,8 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
+<script src="../js/fetch-api.js"></script>
 <script>
-  const apiBaseUrl = 'http://localhost:8080/users';
-  const maxRetries = 2;
-
-  // Hàm gọi API với retry
-  async function fetchWithRetry(url, options, retries = maxRetries) {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        console.log(`Thử lần ${attempt}: Gửi yêu cầu API: ${url}`, options);
-        const response = await axios.request({ ...options, url, timeout: 5000 });
-        console.log(`Phản hồi từ API (lần ${attempt}):`, response.data);
-        return response;
-      } catch (error) {
-        console.error(`Lỗi lần ${attempt}:`, error);
-        if (attempt === retries) throw error;
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-      }
-    }
-  }
-
   // Xóa lỗi và viền đỏ
   function clearErrors() {
     const inputs = document.querySelectorAll('.form-control, .form-select');
@@ -505,10 +512,10 @@
     const notification = document.createElement('div');
     notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
     notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
     document.body.appendChild(notification);
     setTimeout(() => notification.remove(), 5000);
   }
@@ -521,6 +528,55 @@
       input.setAttribute('data-form-type', 'other');
       if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
         input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
+      }
+    });
+  }
+
+  // Gợi ý địa chỉ với Goong Map
+  function setupAddressAutocomplete() {
+    const addressInput = document.getElementById('address');
+    const suggestionsContainer = document.getElementById('addressSuggestions');
+    let debounceTimeout;
+
+    addressInput.addEventListener('input', () => {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(async () => {
+        const input = addressInput.value.trim();
+        if (input.length < 3) {
+          suggestionsContainer.style.display = 'none';
+          return;
+        }
+
+        try {
+          const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
+            method: 'GET'
+          });
+          if (response.predictions) {
+            suggestionsContainer.innerHTML = '';
+            response.predictions.forEach(prediction => {
+              const suggestion = document.createElement('div');
+              suggestion.className = 'autocomplete-suggestion';
+              suggestion.textContent = prediction.description;
+              suggestion.addEventListener('click', () => {
+                addressInput.value = prediction.description;
+                suggestionsContainer.style.display = 'none';
+              });
+              suggestionsContainer.appendChild(suggestion);
+            });
+            suggestionsContainer.style.display = response.predictions.length > 0 ? 'block' : 'none';
+          } else {
+            suggestionsContainer.style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+          suggestionsContainer.style.display = 'none';
+        }
+      }, 300);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+        suggestionsContainer.style.display = 'none';
       }
     });
   }
@@ -539,43 +595,37 @@
 
     let hasError = false;
 
-    // Validate username
     if (!formData.username || formData.username.length < 5 || formData.username.length > 255) {
       document.getElementById('username').classList.add('is-invalid');
       document.getElementById('username-error').textContent = !formData.username ? 'Tên đăng nhập không được để trống' : 'Tên đăng nhập phải từ 5 đến 255 ký tự';
       hasError = true;
     }
 
-    // Validate password
     if (!formData.password || formData.password.length < 8 || formData.password.length > 255) {
       document.getElementById('password').classList.add('is-invalid');
       document.getElementById('password-error').textContent = !formData.password ? 'Mật khẩu không được để trống' : 'Mật khẩu phải từ 8 đến 255 ký tự';
       hasError = true;
     }
 
-    // Validate email
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       document.getElementById('email').classList.add('is-invalid');
       document.getElementById('email-error').textContent = !formData.email ? 'Email không được để trống' : 'Email không hợp lệ';
       hasError = true;
     }
 
-    // Validate phone
     if (!formData.phone || !/^[0-9]{10}$/.test(formData.phone)) {
       document.getElementById('phone').classList.add('is-invalid');
       document.getElementById('phone-error').textContent = !formData.phone ? 'Số điện thoại không được để trống' : 'Số điện thoại phải có đúng 10 chữ số';
       hasError = true;
     }
 
-    // Validate address
     if (!formData.address) {
       document.getElementById('address').classList.add('is-invalid');
       document.getElementById('address-error').textContent = 'Địa chỉ không được để trống';
       hasError = true;
     }
 
-    // Validate role
-    if (!formData.roleName || !['Manager', 'Chef', 'Waiter', 'Cashier'].includes(formData.roleName)) {
+    if (!formData.roleName || !['MANAGER', 'CASHIER', 'CHEF', 'WAITER'].includes(formData.roleName)) {
       document.getElementById('roleName').classList.add('is-invalid');
       document.getElementById('roleName-error').textContent = 'Vui lòng chọn vai trò';
       hasError = true;
@@ -590,41 +640,26 @@
   // Tạo nhân viên
   async function createEmployee(data) {
     try {
-      const response = await fetchWithRetry(apiBaseUrl, {
+      const response = await apiFetch('/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: JSON.stringify(data)
+        body: JSON.stringify(data)
       });
-      if (response.data && response.data.code === 0) {
+      if (response.code === 0) {
         showNotification('Tạo nhân viên thành công!', 'success');
         setTimeout(() => goBack(), 1500);
       } else {
-        throw new Error(response.data.message || 'Lỗi khi tạo nhân viên!');
+        throw new Error(response.message || 'Lỗi khi tạo nhân viên!');
       }
     } catch (error) {
       clearErrors();
-      if (error.response && error.response.data && error.response.data.code === 1001) {
-        // Handle USER_EXISTED error
+      const errorMessage = error.message || 'Có lỗi xảy ra khi tạo nhân viên!';
+      if (errorMessage.includes('exist') || errorMessage.includes('duplicate') || errorMessage.includes('1001')) {
         document.getElementById('username').classList.add('is-invalid');
         document.getElementById('username-error').textContent = 'Tên đăng nhập đã tồn tại';
         showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
-      } else if (error.response && error.response.status === 400 && error.response.data && error.response.data.errors) {
-        // Handle validation errors
-        const errors = error.response.data.errors;
-        errors.forEach(err => {
-          const field = err.field;
-          const message = err.defaultMessage || err.message || 'Lỗi không xác định';
-          const input = document.getElementById(field);
-          const errorDiv = document.getElementById(`${field}-error`);
-          if (input && errorDiv) {
-            input.classList.add('is-invalid');
-            errorDiv.textContent = message;
-          }
-        });
-        showNotification('Vui lòng kiểm tra các lỗi trong form!', 'error');
       } else {
-        // Handle other errors (e.g., 404, 500, etc.)
-        showNotification(error.response?.data?.message || 'Có lỗi xảy ra khi tạo nhân viên!', 'error');
+        showNotification(errorMessage, 'error');
       }
     }
   }
@@ -678,7 +713,8 @@
       }
     });
 
-    // Xử lý sự kiện xác nhận trong modal
+    setupAddressAutocomplete();
+
     document.getElementById('confirmCreateBtn').addEventListener('click', () => {
       const formData = {
         username: document.getElementById('username').value.trim(),
@@ -693,7 +729,6 @@
       modal.hide();
     });
 
-    // Prevent autofill on focus
     document.querySelectorAll('input').forEach(input => {
       input.addEventListener('focus', function() {
         this.setAttribute('autocomplete', this.type === 'password' ? 'new-password' : 'off');
@@ -704,7 +739,6 @@
     });
   });
 
-  // Additional security to prevent autofill
   window.addEventListener('load', function() {
     setTimeout(() => {
       disableAutocomplete();

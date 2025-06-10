@@ -45,6 +45,7 @@ async function apiFetch(endpoint, options = {}) {
                 ...(latestToken ? { 'Authorization': `Bearer ${latestToken}` } : {})
             }
         });
+        
     };
 
     let response = await fetchWithToken();
@@ -59,7 +60,9 @@ async function apiFetch(endpoint, options = {}) {
             throw new Error("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
         }
     }
-
+   if (options.method === 'DELETE' && (response.status === 200 || response.status === 204)) {
+        return { code: 1000, message: 'Xóa thành công' };
+    }
     if (!response.ok) {
         if (contentType.includes('application/json')) {
             const errorData = await response.json();

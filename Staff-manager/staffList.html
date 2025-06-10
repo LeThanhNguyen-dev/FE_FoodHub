@@ -554,7 +554,6 @@
 <script>
     let currentPage = 0;
     const pageSize = 10;
-    const maxRetries = 2;
 
     // Hiển thị loading
     function showLoading() {
@@ -593,22 +592,6 @@
         document.getElementById('loadingSpinner').style.display = 'none';
     }
 
-    // Hàm gọi API với retry
-    async function fetchWithRetry(endpoint, options, retries = maxRetries) {
-        for (let attempt = 1; attempt <= retries; attempt++) {
-            try {
-                console.log(`Thử lần ${attempt}: Gửi yêu cầu API: ${BACKEND_BASE_URL}${endpoint}`, options);
-                const response = await apiFetch(endpoint, options);
-                console.log(`Phản hồi từ API (lần ${attempt}):`, response);
-                return { data: response }; // Định dạng phản hồi giống axios
-            } catch (error) {
-                console.error(`Lỗi lần ${attempt}:`, error);
-                if (attempt === retries) throw error;
-                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-            }
-        }
-    }
-
     // Tải danh sách nhân viên
     async function fetchEmployees() {
         showLoading();
@@ -634,24 +617,22 @@
         if (keyword) params.append('keyword', keyword);
 
         try {
-            const response = await fetchWithRetry(`/users/employees?${params.toString()}`, {
-                method: 'GET'
-            });
+            const response = await apiFetch(`/users/employees?${params.toString()}`, { method: 'GET' });
             hideLoading();
 
-            if (!response.data) {
+            if (!response) {
                 throw new Error('Phản hồi API không hợp lệ: Không có dữ liệu');
             }
 
-            if (response.data.code === 0) {
-                const data = response.data.result;
+            if (response.code === 0) {
+                const data = response.result;
                 if (!data || !data.content) {
                     throw new Error('Dữ liệu không hợp lệ: content không tồn tại');
                 }
                 renderEmployeeTable(data.content);
                 renderPagination(data.totalPages, data.number);
             } else {
-                const errorMessage = response.data.message || `Lỗi từ API: Code ${response.data.code}`;
+                const errorMessage = response.message || `Lỗi từ API: Code ${response.code}`;
                 showNotification(errorMessage, 'error');
                 showError(errorMessage);
             }
@@ -672,14 +653,12 @@
         if (!confirm('Bạn có chắc chắn muốn vô hiệu hóa nhân viên này?')) return;
 
         try {
-            const response = await fetchWithRetry(`/users/employees/${id}`, {
-                method: 'DELETE'
-            });
-            if (response.data.code === 1000) {
+            const response = await apiFetch(`/users/employees/${id}`, { method: 'DELETE' });
+            if (response.code === 1000) {
                 showNotification('Vô hiệu hóa nhân viên thành công!', 'success');
                 fetchEmployees();
             } else {
-                throw new Error(response.data.message || 'Lỗi khi vô hiệu hóa nhân viên');
+                throw new Error(response.message || 'Lỗi khi vô hiệu hóa nhân viên');
             }
         } catch (error) {
             const errorMessage = error.message || 'Có lỗi xảy ra khi vô hiệu hóa nhân viên!';
@@ -696,14 +675,12 @@
         if (!confirm('Bạn có chắc chắn muốn khôi phục nhân viên này?')) return;
 
         try {
-            const response = await fetchWithRetry(`/users/employees/${id}/restore`, {
-                method: 'PUT'
-            });
-            if (response.data.code === 1000) {
+            const response = await apiFetch(`/users/employees/${id}/restore`, { method: 'PUT' });
+            if (response.code === 1000) {
                 showNotification('Khôi phục nhân viên thành công!', 'success');
                 fetchEmployees();
             } else {
-                throw new Error(response.data.message || 'Lỗi khi khôi phục nhân viên');
+                throw new Error(response.message || 'Lỗi khi khôi phục nhân viên');
             }
         } catch (error) {
             showNotification(error.message || 'Có lỗi xảy ra khi khôi phục nhân viên!', 'error');
@@ -859,7 +836,7 @@
 
     // Thêm nhân viên
     function addNewEmployee() {
-        window.location.href = '/foodhub/Staff-manager/create-staff.html';
+        window.location.href = 'create-staff.html';
     }
 
     // Đăng xuất
