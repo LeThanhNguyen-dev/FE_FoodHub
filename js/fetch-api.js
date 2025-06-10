@@ -1,9 +1,5 @@
 const BACKEND_BASE_URL = "http://localhost:8080";
-function getContextPath() {
-    const path = window.location.pathname;
-    const firstSlashIndex = path.indexOf("/", 1);
-    return firstSlashIndex !== -1 ? path.substring(0, firstSlashIndex) : "";
-}
+
 
 async function RefreshToken() {
     const oldToken = localStorage.getItem("accessToken");
@@ -37,7 +33,6 @@ async function RefreshToken() {
 }
 
 async function apiFetch(endpoint, options = {}) {
-    const contextPath = getContextPath();
     const url = `${BACKEND_BASE_URL}${endpoint}`;
 
     const fetchWithToken = async () => {

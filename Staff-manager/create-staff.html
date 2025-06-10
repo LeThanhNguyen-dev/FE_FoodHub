@@ -326,53 +326,52 @@
     <small class="d-block">Admin Panel</small>
   </div>
 
-  <nav class="sidebar-nav flex-fill">
-    <ul class="nav flex-column">
-      <li class="nav-item">
-        <a href="adminDashboard.html" class="nav-link">
-          <i class="fas fa-tachometer-alt"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="staffList.html" class="nav-link active">
-          <i class="fas fa-users"></i>
-          <span>Quản lý người dùng</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="adminDashboardStaff.html" class="nav-link">
-          <i class="fas fa-user-tie"></i>
-          <span>Quản lý nhân viên</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="adminDashboardMenu.html" class="nav-link">
-          <i class="fas fa-utensils"></i>
-          <span>Quản lý món ăn</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">
-          <i class="fas fa-money-bill-wave"></i>
-          <span>Quản lý tài chính</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">
-          <i class="fas fa-shopping-cart"></i>
-          <span>Đơn hàng</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">
-          <i class="fas fa-chart-bar"></i>
-          <span>Báo cáo</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-
+    <nav class="sidebar-nav flex-fill">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="/adminDashboard/adminDashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="adminDashboardUser.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Quản lý khách hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="staffList.html" class="nav-link active">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Quản lý nhân viên</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/menu-manager/menu.html" class="nav-link ">
+                        <i class="fas fa-utensils"></i>
+                        <span>Quản lý món ăn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Quản lý tài chính</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Đơn hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="lichlam.html" class="nav-link" onclick="showReports()">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Lịch làm</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
   <div class="logout-section">
     <button class="logout-btn" onclick="handleLogout()">
       <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
@@ -472,7 +471,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  const apiBaseUrl = 'http://localhost:8080/foodhub/users';
+  const apiBaseUrl = 'http://localhost:8080/users';
   const maxRetries = 2;
 
   // Hàm gọi API với retry

@@ -678,7 +678,7 @@
         employeeNameSelect.innerHTML = '<option value="">Chọn nhân viên...</option>';
         if (role) {
             try {
-                const response = await fetch(`http://localhost:8080/foodhub/shifts/employees?role=${role}`);
+                const response = await fetch(`http://localhost:8080/shifts/employees?role=${role}`);
                 const employees = await response.json();
                 employees.forEach(emp => {
                     const option = document.createElement('option');
@@ -715,7 +715,7 @@
 
         const weekStartStr = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
         try {
-            const response = await fetch(`http://localhost:8080/foodhub/shifts?weekStart=${weekStartStr}`);
+            const response = await fetch(`http://localhost:8080/shifts?weekStart=${weekStartStr}`);
             const shifts = await response.json();
 
             for (let i = 0; i < 7; i++) {
@@ -797,7 +797,7 @@
         };
 
         try {
-            const response = await fetch('http://localhost:8080/foodhub/shifts', {
+            const response = await fetch('http://localhost:8080/shifts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newShift)
@@ -827,7 +827,7 @@
 
     async function removeShift(shiftId) {
         try {
-            const response = await fetch(`http://localhost:8080/foodhub/shifts/${shiftId}`, {
+            const response = await fetch(`http://localhost:8080/shifts/${shiftId}`, {
                 method: 'DELETE'
             });
             if (response.ok) {
