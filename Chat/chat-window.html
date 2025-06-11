@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Window - AI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 350px;
+            height: 500px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            flex-direction: column;
+            border: 2px solid #1976d2;
+            z-index: 1002;
+        }
+
+        .chat-container.show {
+            display: flex;
+        }
+
+        .messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .message {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .user {
+            background-color: #e1f5fe;
+            text-align: right;
+        }
+
+        .bot {
+            background-color: #f1f8e9;
+            text-align: left;
+        }
+
+        .bot ul {
+            list-style-type: disc;
+            padding-left: 15px;
+            margin: 5px 0;
+        }
+
+        .bot li {
+            margin-bottom: 3px;
+            font-size: 16px;
+        }
+
+        .bot strong {
+            color: #1976d2;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 5px 0;
+            margin-top: auto;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #1976d2;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0d47a1;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: 2px solid #1976d2;
+            background-color: #1976d2;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            outline: none;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0d47a1;
+            border-color: #0d47a1;
+        }
+
+        #chat-toggle {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-toggle" onclick="toggleChat()">💬</div>
+    <div id="chat-container" class="chat-container">
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') sendMessage()" />
+            <button onclick="sendMessage()">Gửi</button>
+            <button onclick="clearChatHistory()">Xóa lịch sử</button> <!-- Thêm nút xóa lịch sử -->
+        </div>
+    </div>
+
+    <script>
+        let chatHistory = JSON.parse(getCookie('chatHistory') || '[]');
+        chatHistory.forEach(msg => appendMessage(msg.sender, msg.text, msg.type));
+
+        async function sendMessage() {
+            const input = document.getElementById("userInput");
+            const message = input.value.trim();
+            if (!message) return;
+
+            const msgObj = { sender: "Bạn", text: message, type: "user" };
+            appendMessage(msgObj.sender, msgObj.text, msgObj.type);
+            chatHistory.push(msgObj);
+            saveChatHistory();
+
+            input.value = "";
+
+            try {
+                const response = await fetch("http://localhost:8080/api/gemini/reply", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Yêu cầu không thành công: " + response.status);
+                }
+
+                const data = await response.json();
+                if (data.result && data.result.reply) {
+                    const formattedReply = formatReply(data.result.reply);
+                    const botMsg = { sender: "Gemini", text: formattedReply, type: "bot" };
+                    appendMessage(botMsg.sender, botMsg.text, botMsg.type);
+                    chatHistory.push(botMsg);
+                    saveChatHistory();
+                } else {
+                    appendMessage("Gemini", "Không có phản hồi hợp lệ.", "bot");
+                }
+
+            } catch (err) {
+                appendMessage("Lỗi", "Không thể kết nối đến máy chủ: " + err.message, "bot");
+            }
+        }
+
+        function formatReply(text) {
+            let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formatted = formatted.replace(/^\*\s(.+?)$/gm, '<li>$1</li>')
+                                .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+                                .replace(/<\/ul>\s*<ul>/g, '');
+            formatted = formatted.replace(/^(.+?)(?:\n|$)/, '<p>$1</p>');
+            return formatted;
+        }
+
+        function appendMessage(sender, text, type) {
+            const msgDiv = document.getElementById("messages");
+            const div = document.createElement("div");
+            div.className = `message ${type}`;
+            div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            msgDiv.appendChild(div);
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+        }
+
+        function saveChatHistory() {
+            document.cookie = `chatHistory=${JSON.stringify(chatHistory)}; path=/; max-age=${60 * 60 * 24 * 30}`;
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function clearChatHistory() {
+            chatHistory = []; // Xóa mảng lịch sử
+            const msgDiv = document.getElementById("messages");
+            msgDiv.innerHTML = ""; // Xóa nội dung hiển thị
+            saveChatHistory(); // Cập nhật cookie
+        }
+    </script>
+</body>
+</html>
