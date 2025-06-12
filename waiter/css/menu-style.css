@@ -1,0 +1,298 @@
+/* Loại bỏ khoảng cách mặc định của body */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Đảm bảo container chính bắt đầu ngay sau header */
+.main-container {
+    padding: 20px;
+    margin: 0;
+}
+
+/* CSS menu hiện tại của bạn - giữ nguyên */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.menu-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.menu-item {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.item-image {
+    width: 100%;
+    height: 120px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 12px;
+    position: relative;
+    border-bottom: 1px solid #eee;
+}
+
+.golden-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #ff8c00;
+}
+
+.item-content {
+    padding: 15px;
+}
+
+.item-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.item-description {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.3;
+    margin-bottom: 15px;
+    text-align: center;
+    min-height: 30px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.item-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+}
+
+.price-format::after {
+    content: '';
+}
+
+/* Menu Controls Styling - Không ảnh hưởng đến menu-container và menu-grid */
+.menu-controls {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.filter-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    align-items: end;
+}
+
+.filter-section select,
+.filter-section input[type="text"] {
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.filter-section select:focus,
+.filter-section input[type="text"]:focus {
+    outline: none;
+    border-color: #ff8c00;
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.filter-section input[type="text"]::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+.filter-section button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.filter-section button:first-of-type {
+    background-color: #ff8c00;
+    color: #333;
+}
+
+.filter-section button:first-of-type:hover {
+    background-color: #ff9500;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+}
+
+.filter-section button:last-of-type {
+    background-color: #6c757d;
+    color: white;
+}
+
+.filter-section button:last-of-type:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+/* Pagination Styling */
+.pagination-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.pagination-info {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pagination-controls button {
+    padding: 8px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background-color: #ff8c00;
+    border-color: #ff8c00;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.pagination-controls button.active {
+    background-color: #ff8c00;
+    border-color: #ff8c00;
+    color: #333;
+    font-weight: 600;
+}
+
+#pageNumbers {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+#pageNumbers button {
+    min-width: 40px;
+    padding: 8px 12px;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {  
+    .menu-controls .filter-section {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .pagination-container .pagination-controls {
+        gap: 8px;
+    }
+    
+    .pagination-container .pagination-controls button {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .pagination-container #pageNumbers button {
+        min-width: 35px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-controls,
+    .pagination-container {
+        padding: 15px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .pagination-container .pagination-controls {
+        justify-content: space-between;
+    }
+    
+    .pagination-container .pagination-controls button {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+    
+    .pagination-container #pageNumbers {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+}

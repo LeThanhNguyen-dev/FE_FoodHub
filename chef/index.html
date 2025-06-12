@@ -127,21 +127,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-
-    // Toggle sidebar collapsed state
-    sidebar.classList.toggle('collapsed');
-
-    // Toggle main content expanded state
-    if (mainContent) {
-      mainContent.classList.toggle('expanded');
-    }
-
-    // Store sidebar state in memory (not localStorage as it's not supported)
-    window.sidebarCollapsed = sidebar.classList.contains('collapsed');
-  }
 
   // Restore sidebar state on page load
   document.addEventListener('DOMContentLoaded', function () {

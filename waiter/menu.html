@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Món Ăn</title>
+    <link href="css/menu-style.css" rel="stylesheet">
+
+</head>
+<body>
+    <!-- Template cho trang menu (ẩn) -->
+    <template id="menuPageTemplate">
+        <div class="menu-container">
+            <!-- Filters và Controls -->
+            <div class="menu-controls">
+                <div class="filter-section">
+                    <select id="categoryFilter">
+                        <option value="">Tất cả danh mục</option>
+                        <!-- Categories sẽ được load động -->
+                    </select>
+                    
+                    <input type="text" id="keywordFilter" placeholder="Tìm kiếm món ăn...">
+                    
+                    <select id="statusFilter">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="AVAILABLE">Có sẵn</option>
+                        <option value="UNAVAILABLE">Hết hàng</option>
+                    </select>
+                    
+                    <select id="sortByFilter">
+                        <option value="name">Tên món</option>
+                        <option value="price">Giá</option>
+                        <option value="createdAt">Ngày tạo</option>
+                    </select>
+                    
+                    <select id="sortDirectionFilter">
+                        <option value="asc">Tăng dần</option>
+                        <option value="desc">Giảm dần</option>
+                    </select>
+                    
+                    <select id="pageSizeFilter">
+                        <option value="10">10 món/trang</option>
+                        <option value="20">20 món/trang</option>
+                        <option value="50">50 món/trang</option>
+                    </select>
+                    
+                    <button onclick="applyFilters()">Áp dụng</button>
+                    <button onclick="resetFilters()">Đặt lại</button>
+                </div>
+            </div>
+
+            <!-- Menu Grid -->
+            <div class="menu-grid" id="menuGrid">
+                <!-- Menu items sẽ được load động -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    <span id="paginationInfo">Hiển thị 0 - 0 của 0 món ăn</span>
+                </div>
+                <div class="pagination-controls">
+                    <button onclick="goToPage(0)" id="firstPageBtn">Đầu</button>
+                    <button onclick="goToPage(currentPage - 1)" id="prevPageBtn">Trước</button>
+                    <span id="pageNumbers"></span>
+                    <button onclick="goToPage(currentPage + 1)" id="nextPageBtn">Sau</button>
+                    <button onclick="goToPage(totalPages - 1)" id="lastPageBtn">Cuối</button>
+                </div>
+            </div>
+        </div>
+    </template>
+</body>
+</html>

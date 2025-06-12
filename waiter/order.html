@@ -305,59 +305,59 @@
 <!-- Order Details Modal Template -->
 <template id="orderDetailsModalTemplate">
   <div class="modal-overlay" onclick="closeOrderDetails()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Chi tiết đơn hàng #{orderId}</h3>
-        <button class="btn-close" onclick="closeOrderDetails()">&times;</button>
-      </div>
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Chi tiết đơn hàng #${id}</h3>
+                    <button class="btn-close" onclick="closeOrderDetails()">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="order-summary">
+                        <div class="info-row">
+                            <span>Trạng thái:</span>
+                            <span class="badge ${getStatusBadgeClass(status)}">${getStatusText(status)}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Loại đơn:</span>
+                            <span>${getOrderTypeText(orderType)}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Thời gian:</span>
+                            <span>${formattedDate}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Bàn:</span>
+                            <span>${tableNumber || 'Mang về'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>Nhân viên:</span>
+                            <span>${username}</span>
+                        </div>
+                        ${note ? `<div class="info-row"><span>Ghi chú:</span><span>${note}</span></div>` : ''}
+                    </div>
 
-      <div class="modal-body">
-        <div class="order-summary">
-          <div class="info-row">
-            <span>Trạng thái:</span>
-            <span class="badge {statusClass}">{statusText}</span>
-          </div>
-          <div class="info-row">
-            <span>Loại đơn:</span>
-            <span>{orderTypeText}</span>
-          </div>
-          <div class="info-row">
-            <span>Thời gian:</span>
-            <span>{formattedDate}</span>
-          </div>
-          <div class="info-row">
-            <span>Bàn:</span>
-            <span>{tableInfo}</span>
-          </div>
-          <div class="info-row">
-            <span>Nhân viên:</span>
-            <span>{username}</span>
-          </div>
-          {noteSection}
+                    <div class="order-items-section">
+                        <h4>Danh sách món ăn:</h4>
+                        <div class="order-items-list">
+                            ${orderItemsHtml}
+                        </div>
+                    </div>
+
+                    <div class="order-total">
+                        <strong>Tổng tiền: ${formattedAmount}</strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="updateOrderStatus(${id})">
+                        Cập nhật trạng thái
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeOrderDetails()">
+                        Đóng
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div class="order-items-section">
-          <h4>Danh sách món ăn:</h4>
-          <div class="order-items-list">
-            {orderItemsHtml}
-          </div>
-        </div>
-
-        <div class="order-total">
-          <strong>Tổng tiền: {formattedAmount}</strong>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-primary" onclick="updateOrderStatus({orderId})">
-          Cập nhật trạng thái
-        </button>
-        <button class="btn btn-secondary" onclick="closeOrderDetails()">
-          Đóng
-        </button>
-      </div>
-    </div>
-  </div>
 </template>
 
 <!-- Order Item Template -->
@@ -369,6 +369,68 @@
     </div>
     <div class="item-status">
       <span class="badge {statusClass}">{statusText}</span>
+    </div>
+  </div>
+</template>
+
+<!-- Status Update Modal Template -->
+<template id="statusUpdateModalTemplate">
+  <div class="modal-overlay" onclick="closeStatusUpdateModal()">
+    <div class="modal-content status-update-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Cập nhật trạng thái đơn hàng #{orderId}</h3>
+        <button class="btn-close" onclick="closeStatusUpdateModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label><strong>Chọn món ăn cần cập nhật:</strong></label>
+          <div class="order-items-selection">
+            <div class="select-all-option">
+              <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+              <label for="selectAll"><strong>Chọn tất cả</strong></label>
+            </div>
+            <div id="orderItemsOptions">
+              <!-- Order items checkboxes will be inserted here -->
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newStatus"><strong>Trạng thái mới:</strong></label>
+          <select id="newStatus" class="form-control">
+            <option value="">-- Chọn trạng thái --</option>
+            <option value="PENDING">Chờ xác nhận</option>
+            <option value="CONFIRMED">Đã xác nhận</option>
+            <option value="COMPLETED">Hoàn thành</option>
+            <option value="CANCELLED">Đã hủy</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="executeStatusUpdate()">
+          Cập nhật trạng thái
+        </button>
+        <button class="btn btn-secondary" onclick="closeStatusUpdateModal()">
+          Hủy
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Order Item Option Template -->
+<<template id="orderItemOptionTemplate">
+  <div class="order-item-option" data-item-id="{itemId}">
+    <div class="item-info">
+      <input type="checkbox" id="item_{itemId}" value="{itemId}">
+      <label for="item_{itemId}">
+        <strong>{menuItemName}</strong>
+        <span class="item-details">SL: {quantity} - Trạng thái hiện tại: 
+          <span class="badge {statusClass}">{statusText}</span>
+        </span>
+      </label>
     </div>
   </div>
 </template>

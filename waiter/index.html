@@ -383,8 +383,29 @@
 
 
 </script>
-<script src="js/show-table.js"></script>
-<script src="js/order.js"></script>
-<script src="../js/fetch-api.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="js/menu.js" defer></script>
+    <script src="js/order.js" defer></script>
+    <script src="js/show-table.js" defer></script>
+    <script src="../js/fetch-api.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking functions:', {
+                showMenu: typeof showMenu,
+                showOrders: typeof showOrders,
+                showTables: typeof showTables
+            });
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const func = link.getAttribute('onclick');
+                    if (func) {
+                        console.log(`Calling ${func}`);
+                        eval(func);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
