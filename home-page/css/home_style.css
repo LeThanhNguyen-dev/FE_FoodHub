@@ -1,0 +1,195 @@
+/* General Styles */
+body {
+    font-family: 'Nunito', sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+.text-primary {
+    color: #ff6f61 !important;
+}
+
+.btn-primary {
+    background-color: #ff6f61;
+    border-color: #ff6f61;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #e65b50;
+    border-color: #e65b50;
+}
+
+/* Spinner */
+#spinner {
+    transition: opacity 0.5s ease;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 600;
+    padding: 10px 15px;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #ff6f61 !important;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero Section */
+.hero-header {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('img/hero-bg.jpg') center/cover no-repeat;
+}
+
+.hero-header h1 {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero-header .btn-primary {
+    font-size: 1.1rem;
+}
+
+/* About Section */
+.section-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.5rem;
+    color: #ff6f61;
+}
+
+.about img {
+    transition: transform 0.3s ease;
+}
+
+.about img:hover {
+    transform: scale(1.05);
+}
+
+/* Menu Section */
+.nav-pills .nav-link {
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #ff6f61;
+    color: #fff !important;
+}
+
+.tab-content .d-flex {
+    transition: background-color 0.3s ease;
+}
+
+.tab-content .d-flex:hover {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Team Section */
+.team-item {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.team-item:hover {
+    transform: translateY(-5px);
+}
+
+.team-item img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.btn-square {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+}
+
+/* Testimonial Section */
+.testimonial-carousel .testimonial-item {
+    transition: all 0.3s ease;
+}
+
+.testimonial-carousel .testimonial-item:hover {
+    background-color: #f8f9fa;
+}
+
+.testimonial-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+/* Footer */
+.footer {
+    background-color: #222;
+}
+
+.footer .btn-link {
+    color: #ccc;
+    transition: color 0.3s ease;
+}
+
+.footer .btn-link:hover {
+    color: #ff6f61;
+}
+
+.footer .btn-social {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+/* Back to Top */
+.back-to-top {
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-header h1 {
+        font-size: 2.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 8px 10px;
+    }
+
+    .team-item img {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-header .btn-primary {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+    }
+}

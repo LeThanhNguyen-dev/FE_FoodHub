@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Chính</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+        }
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+        }
+        #chat-toggle:hover {
+            background: #45a049;
+        }
+        #chat-frame {
+            border: none;
+            position: fixed;
+            bottom: 70px; /* Giá trị bạn có thể tự chỉnh sửa */
+            left: 20px;
+            z-index: 1000;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chào mừng đến với FoodHub</h1>
+    <div id="chat-toggle" onclick="toggleChat()">💬</div>
+    <iframe id="chat-frame" src="chat-window.html" style="width: 0; height: 0;" onload="resizeChatFrame()"></iframe>
+
+    <script>
+        let chatFrameLoaded = false;
+
+        function resizeChatFrame() {
+            if (!chatFrameLoaded) {
+                chatFrameLoaded = true;
+                const frame = document.getElementById('chat-frame');
+                console.log("Iframe loaded successfully");
+                frame.style.width = '350px';
+                frame.style.height = '500px';
+                setTimeout(() => {
+                    const chatContainer = frame.contentWindow.document.getElementById('chat-container');
+                    if (chatContainer) {
+                        chatContainer.classList.add('show');
+                    }
+                }, 500);
+            }
+        }
+
+        function toggleChat() {
+            const frame = document.getElementById('chat-frame');
+            const chatToggle = document.getElementById('chat-toggle');
+            if (frame.contentWindow && frame.contentWindow.document) {
+                const chatContainer = frame.contentWindow.document.getElementById('chat-container');
+                if (chatContainer && chatContainer.classList) {
+                    console.log("Toggling chat container");
+                    if (chatContainer.classList.contains('show')) {
+                        chatContainer.classList.remove('show');
+                        frame.style.width = '0';
+                        frame.style.height = '0';
+                    } else {
+                        chatContainer.classList.add('show');
+                        frame.style.width = '350px';
+                        frame.style.height = '500px';
+                        // Đảm bảo bottom được điều chỉnh nếu cần
+                        frame.style.bottom = '120px'; // Giữ đồng nhất với CSS
+                    }
+                } else {
+                    console.log("Chat container not found");
+                }
+            } else {
+                console.log("Iframe content not loaded");
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const frame = document.getElementById('chat-frame');
+            if (frame.contentWindow && frame.contentWindow.document) {
+                const chatToggle = frame.contentWindow.document.getElementById('chat-toggle');
+                if (chatToggle) {
+                    chatToggle.onclick = toggleChat;
+                    console.log("Chat toggle in iframe initialized");
+                } else {
+                    console.log("Chat toggle not found in iframe");
+                }
+            } else {
+                console.log("Iframe not fully loaded on page load");
+            }
+        });
+    </script>
+</body>
+</html>
