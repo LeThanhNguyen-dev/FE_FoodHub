@@ -1,881 +1,880 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Báo Cáo Tài Chính - Nhà Hàng Phố Huế</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        /* Giữ nguyên style từ mã gốc */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0F152B;
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
-            color: #f9fafb;
-        }
-
-        .dashboard {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px;
-            min-height: 100vh;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #1f2937;
-        }
-
-        .header h1 {
-            color: #fbbf24;
-            font-size: 2rem;
-            font-weight: 600;
-        }
-
-        .header p {
-            color: #9ca3af;
-            font-size: 1rem;
-            margin-top: 5px;
-        }
-
-        .date-filter {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .date-filter select, .date-filter input, .date-filter button {
-            padding: 8px 15px;
-            border: 1px solid #374151;
-            border-radius: 6px;
-            font-size: 14px;
-            background: #1f2937;
-            color: #f9fafb;
-            cursor: pointer;
-        }
-
-        .date-filter input[type="date"] {
-            width: 150px;
-        }
-
-        .date-filter button {
-            background: #fbbf24;
-            color: #0F152B;
-            border: none;
-            font-weight: 500;
-        }
-
-        .date-filter select:focus, .date-filter input:focus, .date-filter button:focus {
-            outline: none;
-            border-color: #fbbf24;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            text-align: left;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 4px 8px rgba(251, 191, 36, 0.3);
-            cursor: pointer;
-        }
-
-        .stat-icon {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            margin-right: 10px;
-            display: inline-block;
-        }
-
-        .stat-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 30px;
-        }
-
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .chart-container {
-            background: #1f2937;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            border: 1px solid #374151;
-            cursor: pointer;
-            height: 350px;
-            position: relative;
-        }
-
-        .chart-container canvas {
-            max-height: 300px;
-            width: 100% !important;
-        }
-
-        .chart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #f9fafb;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #374151;
-        }
-
-        .comparison-info {
-            position: absolute;
-            top: 60px;
-            left: 25px;
-            right: 25px;
-            font-size: 0.9rem;
-            color: #d1d5db;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .comparison-info .current {
-            color: #f9fafb;
-        }
-
-        .comparison-info .previous {
-            color: #9ca3af;
-        }
-
-        .comparison-info .change {
-            font-weight: 600;
-        }
-
-        .comparison-info .change.increase {
-            color: #10b981;
-        }
-
-        .comparison-info .change.decrease {
-            color: #ef4444;
-        }
-
-        .top-dishes {
-            background: #1f2937;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #374151;
-            height: fit-content;
-        }
-
-        .top-dishes .chart-title {
-            font-size: 1.2rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .top-dishes .chart-title::before {
-            content: '🔥';
-            font-size: 1.2rem;
-        }
-
-        .dish-item {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #374151;
-            transition: background 0.2s ease;
-        }
-
-        .dish-item:hover {
-            background: rgba(251, 191, 36, 0.05);
-        }
-
-        .dish-item:last-child {
-            border-bottom: none;
-        }
-
-        .dish-name {
-            font-weight: 500;
-            color: #e5e7eb;
-            font-size: 0.95rem;
-        }
-
-        .dish-item:first-child .dish-name {
-            color: #fbbf24;
-            font-weight: 600;
-        }
-
-        .dish-quantity {
-            background: #3b82f6;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .dish-revenue {
-            color: #10b981;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-align: right;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #64748b;
-        }
-
-        .error {
-            text-align: center;
-            padding: 20px;
-            color: #ef4444;
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 6px;
-            margin: 20px 0;
-        }
-
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .popup-content {
-            background: #1f2937;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 800px;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .popup-content h3 {
-            font-size: 1.5rem;
-            color: #f9fafb;
-            margin-bottom: 20px;
-        }
-
-        .popup-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            color: #f9fafb;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .popup-close:hover {
-            color: #fbbf24;
-        }
-
-        .popup-canvas {
-            width: 100% !important;
-            height: 400px !important;
-        }
-
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Báo Cáo Tài Chính</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
-            .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
 
-        @media (max-width: 768px) {
-            .charts-section {
-                grid-template-columns: 1fr;
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: #121826;
+                min-height: 100vh;
+                padding: 0;
+                margin: 0;
+                color: #f9fafb;
             }
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            .header h1 {
-                font-size: 1.5rem;
-            }
+
             .dashboard {
-                padding: 20px;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 40px;
+                min-height: 100vh;
             }
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #2d3748;
             }
-            .dish-item {
-                grid-template-columns: 2fr 1fr;
+
+            .header h1 {
+                color: #ffc107;
+                font-size: 2rem;
+                font-weight: 600;
+            }
+
+            .header p {
+                color: #9ca3af;
+                font-size: 1rem;
+                margin-top: 5px;
+            }
+
+            .date-filter {
+                display: flex;
+                align-items: center;
                 gap: 10px;
             }
-            .dish-revenue {
-                grid-column: 1 / 3;
+
+            .date-filter select, .date-filter input, .date-filter button {
+                padding: 8px 15px;
+                border: 1px solid #2d3748;
+                border-radius: 6px;
+                font-size: 14px;
+                background: #1f2937;
+                color: #f9fafb;
+                cursor: pointer;
+            }
+
+            .date-filter input[type="date"] {
+                width: 150px;
+            }
+
+            .date-filter button {
+                background: #ffc107;
+                color: #121826;
+                border: none;
+                font-weight: 500;
+            }
+
+            .date-filter select:focus, .date-filter input:focus, .date-filter button:focus {
+                outline: none;
+                border-color: #ffc107;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+                margin-bottom: 40px;
+            }
+
+            .stat-card {
+                background: #1f2937;
+                padding: 25px;
+                border-radius: 8px;
                 text-align: left;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border: 1px solid #2d3748;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
             }
+
+            .stat-card:hover {
+                transform: scale(1.03);
+                box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+                cursor: pointer;
+            }
+
+            .stat-icon {
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+                margin-right: 10px;
+                display: inline-block;
+            }
+
+            .stat-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #ffffff;
+                margin-bottom: 5px;
+            }
+
+            .stat-label {
+                color: #6b7280;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            .main-content {
+                display: grid;
+                grid-template-columns: 1fr 350px;
+                gap: 30px;
+            }
+
+            .charts-section {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px;
+            }
+
             .chart-container {
-                height: 300px;
+                background: #1f2937;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+                border: 1px solid #2d3748;
+                cursor: pointer;
+                height: 350px;
+                position: relative;
             }
+
             .chart-container canvas {
-                max-height: 250px;
+                max-height: 300px;
+                width: 100% !important;
             }
-            .popup-content {
-                width: 95%;
-                padding: 20px;
+
+            .chart-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #f9fafb;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #2d3748;
             }
-            .popup-canvas {
-                height: 300px !important;
-            }
+
             .comparison-info {
-                font-size: 0.8rem;
-                top: 50px;
+                position: absolute;
+                top: 60px;
+                left: 25px;
+                right: 25px;
+                font-size: 0.9rem;
+                color: #d1d5db;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
             }
-        }
 
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
+            .comparison-info .current {
+                color: #f9fafb;
+            }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+            .comparison-info .previous {
+                color: #9ca3af;
+            }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
+            .comparison-info .change {
+                font-weight: 600;
+            }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard">
-        <div class="header">
-            <div>
-                <h1>Dashboard Báo Cáo Tài Chính</h1>
-                <p>Nhà Hàng Phố Huế</p>
-            </div>
-            <div class="date-filter">
-                <select id="periodSelect">
-                    <option value="today">Hôm nay</option>
-                    <option value="week">Tuần này</option>
-                    <option value="month" selected>Tháng này</option>
-                    <option value="year">Năm này</option>
-                    <option value="specific">Ngày cụ thể</option>
-                </select>
-                <div id="specificDate" style="display: none;">
-                    <input type="date" id="specificDateInput">
-                    <button onclick="updateData()">Lọc</button>
-                </div>
-            </div>
-        </div>
+            .comparison-info .change.increase {
+                color: #34d399;
+            }
 
-        <div class="stats-grid">
-            <div class="stat-card revenue">
-                <div class="stat-header">
-                    <span class="stat-icon" style="color: #fbbf24;">💰</span>
-                    <div class="stat-label">Tổng Doanh Thu</div>
-                </div>
-                <div class="stat-value" id="totalRevenue">
-                    <span class="loading-spinner"></span>Đang tải...
-                </div>
-            </div>
-            <div class="stat-card orders" onclick="window.location.href='orders.html?period=' + document.getElementById('periodSelect').value">
-                <div class="stat-header">
-                    <span class="stat-icon" style="color: #fbbf24;">📈</span>
-                <div class="stat-label">Đơn hàng</div>
-                </div>
-                <div class="stat-value" id="totalOrders">
-                    <span class="loading-spinner"></span>Đang tải...
-                </div>
-            </div>
-            <div class="stat-card avg-order">
-                <div class="stat-header">
-                    <span class="stat-icon" style="color: #fbbf24;">📊</span>
-                    <div class="stat-label">Đơn Hàng Trung Bình</div>
-                </div>
-                <div class="stat-value" id="avgOrder">
-                    <span class="loading-spinner"></span>Đang tải...
-                </div>
-            </div>
-        </div>
+            .comparison-info .change.decrease {
+                color: #f87171;
+            }
 
-        <div class="main-content">
-            <div class="charts-section">
-                <div class="chart-container" onclick="showPopup('revenueChart', 'Doanh Thu Theo Thời Gian')">
-                    <h3 class="chart-title">Doanh Thu Theo Thời Gian</h3>
-                    <canvas id="revenueChart"></canvas>
+            .top-dishes {
+                background: #1f2937;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #2d3748;
+                height: fit-content;
+            }
+
+            .top-dishes .chart-title {
+                font-size: 1.2rem;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .top-dishes .chart-title::before {
+                content: '🔥';
+                font-size: 1.2rem;
+            }
+
+            .dish-item {
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr;
+                align-items: center;
+                padding: 12px 0;
+                border-bottom: 1px solid #2d3748;
+                transition: background 0.2s ease;
+            }
+
+            .dish-item:hover {
+                background: rgba(255, 193, 7, 0.05);
+            }
+
+            .dish-item:last-child {
+                border-bottom: none;
+            }
+
+            .dish-name {
+                font-weight: 500;
+                color: #e5e7eb;
+                font-size: 0.95rem;
+            }
+
+            .dish-item:first-child .dish-name {
+                color: #ffc107;
+                font-weight: 600;
+            }
+
+            .dish-quantity {
+                background: #34d399;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                text-align: center;
+            }
+
+            .dish-revenue {
+                color: #34d399;
+                font-weight: 600;
+                font-size: 0.95rem;
+                text-align: right;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+                color: #64748b;
+            }
+
+            .error {
+                text-align: center;
+                padding: 20px;
+                color: #f87171;
+                background: #2d3748;
+                border: 1px solid #4b5563;
+                border-radius: 6px;
+                margin: 20px 0;
+            }
+
+            .popup-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .popup-content {
+                background: #1f2937;
+                padding: 30px;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 800px;
+                position: relative;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .popup-content h3 {
+                font-size: 1.5rem;
+                color: #f9fafb;
+                margin-bottom: 20px;
+            }
+
+            .popup-close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 1.5rem;
+                color: #f9fafb;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+
+            .popup-close:hover {
+                color: #ffc107;
+            }
+
+            .popup-canvas {
+                width: 100% !important;
+                height: 400px !important;
+            }
+
+            @media (max-width: 1200px) {
+                .main-content {
+                    grid-template-columns: 1fr;
+                }
+                .stats-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .charts-section {
+                    grid-template-columns: 1fr;
+                }
+                .header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 15px;
+                }
+                .header h1 {
+                    font-size: 1.5rem;
+                }
+                .dashboard {
+                    padding: 20px;
+                }
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                    gap: 15px;
+                }
+                .dish-item {
+                    grid-template-columns: 2fr 1fr;
+                    gap: 10px;
+                }
+                .dish-revenue {
+                    grid-column: 1 / 3;
+                    text-align: left;
+                }
+                .chart-container {
+                    height: 300px;
+                }
+                .chart-container canvas {
+                    max-height: 250px;
+                }
+                .popup-content {
+                    width: 95%;
+                    padding: 20px;
+                }
+                .popup-canvas {
+                    height: 300px !important;
+                }
+                .comparison-info {
+                    font-size: 0.8rem;
+                    top: 50px;
+                }
+            }
+
+            .animate-fade-in {
+                animation: fadeIn 0.6s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .loading-spinner {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #ffc107;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-right: 10px;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="dashboard">
+            <div class="header">
+                <div>
+                    <h1>Báo Cáo Tài Chính</h1>
+                    <p>FOODHUB</p>
                 </div>
-                <div class="chart-container" onclick="showPopup('paymentMethodChart', 'Doanh Thu Theo Phương Thức Thanh Toán')">
-                    <h3 class="chart-title">Doanh Thu Theo Phương Thức Thanh Toán</h3>
-                    <canvas id="paymentMethodChart"></canvas>
-                </div>
-                <div class="chart-container" onclick="showPopup('orderTypeChart', 'Doanh Thu Theo Loại Đơn Hàng')">
-                    <h3 class="chart-title">Doanh Thu Theo Loại Đơn</h3>
-                    <canvas id="orderTypeChart"></canvas>
-                </div>
-                <div class="chart-container" onclick="showPopup('comparisonChart', 'So Sánh Doanh Thu')">
-                    <h3 class="chart-title">So Sánh Doanh Thu</h3>
-                    <div id="comparisonInfo" class="comparison-info"></div>
-                    <canvas id="comparisonChart"></canvas>
+                <div class="date-filter">
+                    <select id="periodSelect">
+                        <option value="today">Hôm nay</option>
+                        <option value="week">Tuần này</option>
+                        <option value="month" selected>Tháng này</option>
+                        <option value="year">Năm này</option>
+                        <option value="specific">Ngày cụ thể</option>
+                    </select>
+                    <div id="specificDate" style="display: none;">
+                        <input type="date" id="specificDateInput">
+                        <button onclick="updateData()">Lọc</button>
+                    </div>
                 </div>
             </div>
-            <div class="top-dishes">
-                <h3 class="chart-title">Top Món Ăn Bán Chạy Nhất</h3>
-                <div id="topDishes">
-                    <div class="loading">
-                        <span class="loading-spinner"></span>Đang tải dữ liệu...
+
+            <div class="stats-grid">
+                <div class="stat-card revenue">
+                    <div class="stat-header">
+                        <span class="stat-icon" style="color: #ffc107;">💰</span>
+                        <div class="stat-label">Tổng Doanh Thu</div>
+                    </div>
+                    <div class="stat-value" id="totalRevenue">
+                        <span class="loading-spinner"></span>Đang tải...
+                    </div>
+                </div>
+                <div class="stat-card orders" onclick="window.location.href='orders.html?period=' + document.getElementById('periodSelect').value">
+                    <div class="stat-header">
+                        <span class="stat-icon" style="color: #ffc107;">📈</span>
+                        <div class="stat-label">Đơn hàng</div>
+                    </div>
+                    <div class="stat-value" id="totalOrders">
+                        <span class="loading-spinner"></span>Đang tải...
+                    </div>
+                </div>
+                <div class="stat-card avg-order">
+                    <div class="stat-header">
+                        <span class="stat-icon" style="color: #ffc107;">📊</span>
+                        <div class="stat-label">Đơn Hàng Trung Bình</div>
+                    </div>
+                    <div class="stat-value" id="avgOrder">
+                        <span class="loading-spinner"></span>Đang tải...
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="charts-section">
+                    <div class="chart-container" onclick="showPopup('revenueChart', 'Doanh Thu Theo Thời Gian')">
+                        <h3 class="chart-title">Doanh Thu Theo Thời Gian</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="chart-container" onclick="showPopup('paymentMethodChart', 'Doanh Thu Theo Phương Thức Thanh Toán')">
+                        <h3 class="chart-title">Doanh Thu Theo Phương Thức Thanh Toán</h3>
+                        <canvas id="paymentMethodChart"></canvas>
+                    </div>
+                    <div class="chart-container" onclick="showPopup('orderTypeChart', 'Doanh Thu Theo Loại Đơn Hàng')">
+                        <h3 class="chart-title">Doanh Thu Theo Loại Đơn</h3>
+                        <canvas id="orderTypeChart"></canvas>
+                    </div>
+                    <div class="chart-container" onclick="showPopup('comparisonChart', 'So Sánh Doanh Thu')">
+                        <h3 class="chart-title">So Sánh Doanh Thu</h3>
+                        <div id="comparisonInfo" class="comparison-info"></div>
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+                <div class="top-dishes">
+                    <h3 class="chart-title">Top Món Ăn Bán Chạy Nhất</h3>
+                    <div id="topDishes">
+                        <div class="loading">
+                            <span class="loading-spinner"></span>Đang tải dữ liệu...
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="popup-overlay" id="chartPopup">
-        <div class="popup-content">
-            <span class="popup-close" onclick="closePopup()">×</span>
-            <h3 id="popupTitle"></h3>
-            <div id="popupComparisonInfo" class="comparison-info"></div>
-            <canvas id="popupChart"></canvas>
+        <div class="popup-overlay" id="chartPopup">
+            <div class="popup-content">
+                <span class="popup-close" onclick="closePopup()">×</span>
+                <h3 id="popupTitle"></h3>
+                <div id="popupComparisonInfo" class="comparison-info"></div>
+                <canvas id="popupChart"></canvas>
+            </div>
         </div>
-    </div>
-<script src="/js/fetch-api.js"></script>
-    <script>
-        let revenueChart, paymentMethodChart, orderTypeChart, comparisonChart, popupChart;
-        let chartData = null;
+        <script src="/js/fetch-api.js"></script>
+        <script>
+            let revenueChart, paymentMethodChart, orderTypeChart, comparisonChart, popupChart;
+            let chartData = null;
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND',
-                minimumFractionDigits: 0
-            }).format(amount);
-        }
-
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
-            errorDiv.innerHTML = `<strong>Lỗi:</strong> ${message}`;
-            const dashboard = document.querySelector('.dashboard');
-            const existingError = dashboard.querySelector('.error');
-            if (existingError) existingError.remove();
-            dashboard.insertBefore(errorDiv, dashboard.querySelector('.stats-grid'));
-        }
-
-        function hideError() {
-            const existingError = document.querySelector('.error');
-            if (existingError) existingError.remove();
-        }
-
-        function updateStats(data) {
-            const revenueEl = document.getElementById('totalRevenue');
-            const ordersEl = document.getElementById('totalOrders');
-            const avgOrderEl = document.getElementById('avgOrder');
-            
-            const avgOrder = data.orders > 0 ? Math.round(data.revenue / data.orders) : 0;
-            revenueEl.textContent = formatCurrency(data.revenue);
-            ordersEl.textContent = data.orders.toLocaleString('vi-VN');
-            avgOrderEl.textContent = formatCurrency(avgOrder);
-
-            if (data.revenue === 0 && data.orders === 0 && data.topDishes.length === 0) {
-                showError('Không có đơn hàng trong khoảng thời gian này.');
-            } else {
-                hideError();
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                    minimumFractionDigits: 0
+                }).format(amount);
             }
-        }
 
-        function updateComparisonInfo(data) {
-            const infoDiv = document.getElementById('comparisonInfo');
-            const popupInfoDiv = document.getElementById('popupComparisonInfo');
-            const percentage = data.previousRevenue > 0 
-                ? ((data.revenue - data.previousRevenue) / data.previousRevenue * 100).toFixed(1)
-                : data.revenue > 0 ? 100 : 0;
-            const isIncrease = percentage >= 0;
-            const arrow = isIncrease ? '↑' : '↓';
-            const changeClass = isIncrease ? 'increase' : 'decrease';
-            const changeText = `${arrow} ${Math.abs(percentage)}%`;
-            const period = document.getElementById('periodSelect').value;
-            const comparisonLabel = period === 'today' || period === 'specific' ? 'Hôm qua' :
-                                   period === 'week' ? 'Tuần trước' :
-                                   period === 'month' ? 'Tháng trước' : 'Năm trước';
-
-            const html = `
-                <div class="change ${changeClass}">Tăng trưởng: ${changeText}</div>
-            `;
-            infoDiv.innerHTML = html;
-            popupInfoDiv.innerHTML = html;
-        }
-
-        function getChartConfig(chartId, data) {
-            const period = document.getElementById('periodSelect').value;
-            const comparisonLabel = period === 'today' || period === 'specific' ? 'Hôm qua' :
-                                   period === 'week' ? 'Tuần trước' :
-                                   period === 'month' ? 'Tháng trước' : 'Năm trước';
-
-            if (chartId === 'revenueChart') {
-                return {
-                    type: 'line',
-                    data: {
-                        labels: data.dailyLabels,
-                        datasets: [{
-                            label: 'Doanh thu (₫)',
-                            data: data.dailyRevenue,
-                            borderColor: '#fbbf24',
-                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#fbbf24',
-                            pointBorderColor: '#0F152B',
-                            pointBorderWidth: 2,
-                            pointRadius: 6,
-                            pointHoverRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#374151' } },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#d1d5db',
-                                    callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
-                                },
-                                grid: { color: '#374151' }
-                            }
-                        },
-                        interaction: {
-                            mode: 'nearest',
-                            axis: 'x',
-                            intersect: false
-                        }
-                    }
-                };
-            } else if (chartId === 'paymentMethodChart') {
-                return {
-                    type: 'bar',
-                    data: {
-                        labels: data.paymentMethodLabels,
-                        datasets: [{
-                            label: 'Doanh thu (₫)',
-                            data: data.paymentMethodRevenue,
-                            backgroundColor: ['#fbbf24', '#3b82f6', '#10b981'],
-                            borderColor: ['#fbbf24', '#3b82f6', '#10b981'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#374151' } },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#d1d5db',
-                                    callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
-                                },
-                                grid: { color: '#374151' }
-                            }
-                        }
-                    }
-                };
-            } else if (chartId === 'orderTypeChart') {
-                return {
-                    type: 'line',
-                    data: {
-                        labels: data.orderTypeLabels,
-                        datasets: [{
-                            label: 'Doanh thu (₫)',
-                            data: data.orderTypeRevenue,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#3b82f6',
-                            pointBorderColor: '#0F152B',
-                            pointBorderWidth: 2,
-                            pointRadius: 6,
-                            pointHoverRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#374151' } },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#d1d5db',
-                                    callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
-                                },
-                                grid: { color: '#374151' }
-                            }
-                        },
-                        interaction: {
-                            mode: 'nearest',
-                            axis: 'x',
-                            intersect: false
-                        }
-                    }
-                };
-            } else if (chartId === 'comparisonChart') {
-                return {
-                    type: 'bar',
-                    data: {
-                        labels: ['Hiện tại', comparisonLabel],
-                        datasets: [{
-                            label: 'Doanh thu (₫)',
-                            data: [data.revenue, data.previousRevenue],
-                            backgroundColor: ['#fbbf24', '#3b82f6'],
-                            borderColor: ['#fbbf24', '#3b82f6'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#374151' } },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#d1d5db',
-                                    callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
-                                },
-                                grid: { color: '#374151' }
-                            }
-                        }
-                    }
-                };
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.innerHTML = `<strong>Lỗi:</strong> ${message}`;
+                const dashboard = document.querySelector('.dashboard');
+                const existingError = dashboard.querySelector('.error');
+                if (existingError) existingError.remove();
+                dashboard.insertBefore(errorDiv, dashboard.querySelector('.stats-grid'));
             }
-            return null;
-        }
 
-        function updateCharts(data) {
-            chartData = data;
-            if (revenueChart) revenueChart.destroy();
-            if (paymentMethodChart) paymentMethodChart.destroy();
-            if (orderTypeChart) orderTypeChart.destroy();
-            if (comparisonChart) comparisonChart.destroy();
-
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            revenueChart = new Chart(revenueCtx, getChartConfig('revenueChart', data));
-
-            const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
-            paymentMethodChart = new Chart(paymentMethodCtx, getChartConfig('paymentMethodChart', data));
-
-            const orderTypeCtx = document.getElementById('orderTypeChart').getContext('2d');
-            orderTypeChart = new Chart(orderTypeCtx, getChartConfig('orderTypeChart', data));
-
-            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
-            comparisonChart = new Chart(comparisonCtx, getChartConfig('comparisonChart', data));
-
-            updateComparisonInfo(data);
-        }
-
-        function showPopup(chartId, title) {
-            if (!chartData) return;
-            const popup = document.getElementById('chartPopup');
-            const popupTitle = document.getElementById('popupTitle');
-            const popupCanvas = document.getElementById('popupChart');
-            const popupInfoDiv = document.getElementById('popupComparisonInfo');
-
-            popupTitle.textContent = title;
-            popup.style.display = 'flex';
-            popupInfoDiv.style.display = chartId === 'comparisonChart' ? 'flex' : 'none';
-
-            if (popupChart) popupChart.destroy();
-            popupCanvas.className = 'popup-canvas';
-            const ctx = popupCanvas.getContext('2d');
-            popupChart = new Chart(ctx, getChartConfig(chartId, chartData));
-
-            popup.addEventListener('click', function(e) {
-                if (e.target === popup) closePopup();
-            }, { once: true });
-        }
-
-        function closePopup() {
-            const popup = document.getElementById('chartPopup');
-            popup.style.display = 'none';
-            if (popupChart) popupChart.destroy();
-        }
-
-        function updateTopDishes(dishes) {
-            const container = document.getElementById('topDishes');
-            if (!dishes || dishes.length === 0) {
-                container.innerHTML = '<div class="loading">Không có đơn hàng</div>';
-                return;
+            function hideError() {
+                const existingError = document.querySelector('.error');
+                if (existingError) existingError.remove();
             }
-            container.innerHTML = dishes.map((dish, index) => `
-                <div class="dish-item animate-fade-in" style="animation-delay: ${index * 0.1}s">
-                    <div class="dish-name">${index + 1}. ${dish.name}</div>
-                    <div class="dish-quantity">${dish.quantity} món</div>
-                    <div class="dish-revenue">${formatCurrency(dish.revenue)}</div>
-                </div>
-            `).join('');
-        }
 
-        async function updateData() {
-            const period = document.getElementById('periodSelect').value;
-            let queryParams = `period=${period}`;
-            if (period === 'specific') {
-                const specificDate = document.getElementById('specificDateInput').value;
-                if (!specificDate) {
-                    showError('Vui lòng chọn một ngày cụ thể.');
-                    return;
+            function updateStats(data) {
+                const revenueEl = document.getElementById('totalRevenue');
+                const ordersEl = document.getElementById('totalOrders');
+                const avgOrderEl = document.getElementById('avgOrder');
+                
+                const avgOrder = data.orders > 0 ? Math.round(data.revenue / data.orders) : 0;
+                revenueEl.textContent = formatCurrency(data.revenue);
+                ordersEl.textContent = data.orders.toLocaleString('vi-VN');
+                avgOrderEl.textContent = formatCurrency(avgOrder);
+
+                if (data.revenue === 0 && data.orders === 0 && data.topDishes.length === 0) {
+                    showError('Không có đơn hàng trong khoảng thời gian này.');
+                } else {
+                    hideError();
                 }
-                queryParams += `&specificDate=${specificDate}`;
             }
 
-          try {
-            document.getElementById('totalRevenue').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
-            document.getElementById('totalOrders').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
-            document.getElementById('avgOrder').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
-            document.getElementById('topDishes').innerHTML = '<div class="loading"><span class="loading-spinner"></span>Đang tải dữ liệu...</div>';
-            hideError();
+            function updateComparisonInfo(data) {
+                const infoDiv = document.getElementById('comparisonInfo');
+                const popupInfoDiv = document.getElementById('popupComparisonInfo');
+                const percentage = data.previousRevenue > 0 
+                    ? ((data.revenue - data.previousRevenue) / data.previousRevenue * 100).toFixed(1)
+                    : data.revenue > 0 ? 100 : 0;
+                const isIncrease = percentage >= 0;
+                const arrow = isIncrease ? '↑' : '↓';
+                const changeClass = isIncrease ? 'increase' : 'decrease';
+                const changeText = `${arrow} ${Math.abs(percentage)}%`;
+                const period = document.getElementById('periodSelect').value;
+                const comparisonLabel = period === 'today' || period === 'specific' ? 'Hôm qua' :
+                                    period === 'week' ? 'Tuần trước' :
+                                    period === 'month' ? 'Tháng trước' : 'Năm trước';
 
-            const data = await apiFetch(`/dashboard?${queryParams}`);
-            if (data.code !== 1000) throw new Error(data.message || 'Lỗi không xác định từ API');
+                const html = `
+                    <div class="change ${changeClass}">Tăng trưởng: ${changeText}</div>
+                `;
+                infoDiv.innerHTML = html;
+                popupInfoDiv.innerHTML = html;
+            }
 
-            updateStats(data.result);
-            updateCharts(data.result);
-            updateTopDishes(data.result.topDishes);
-        }  catch (error) {
-                showError(`Không thể tải dữ liệu dashboard: ${error.message}`);
-                document.getElementById('totalRevenue').textContent = formatCurrency(0);
-                document.getElementById('totalOrders').textContent = '0';
-                document.getElementById('avgOrder').textContent = formatCurrency(0);
-                document.getElementById('topDishes').innerHTML = '<div class="loading">Không có đơn hàng</div>';
+            function getChartConfig(chartId, data) {
+                const period = document.getElementById('periodSelect').value;
+                const comparisonLabel = period === 'today' || period === 'specific' ? 'Hôm qua' :
+                                    period === 'week' ? 'Tuần trước' :
+                                    period === 'month' ? 'Tháng trước' : 'Năm trước';
+
+                if (chartId === 'revenueChart') {
+                    return {
+                        type: 'line',
+                        data: {
+                            labels: data.dailyLabels,
+                            datasets: [{
+                                label: 'Doanh thu (₫)',
+                                data: data.dailyRevenue,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#ffc107',
+                                pointBorderColor: '#121826',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    enabled: true,
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: '#d1d5db',
+                                        callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
+                                    },
+                                    grid: { color: '#2d3748' }
+                                }
+                            },
+                            interaction: {
+                                mode: 'nearest',
+                                axis: 'x',
+                                intersect: false
+                            }
+                        }
+                    };
+                } else if (chartId === 'paymentMethodChart') {
+                    return {
+                        type: 'bar',
+                        data: {
+                            labels: data.paymentMethodLabels,
+                            datasets: [{
+                                label: 'Doanh thu (₫)',
+                                data: data.paymentMethodRevenue,
+                                backgroundColor: ['#ffc107', '#34d399', '#f87171'],
+                                borderColor: ['#ffc107', '#34d399', '#f87171'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: '#d1d5db',
+                                        callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
+                                    },
+                                    grid: { color: '#2d3748' }
+                                }
+                            }
+                        }
+                    };
+                } else if (chartId === 'orderTypeChart') {
+                    return {
+                        type: 'line',
+                        data: {
+                            labels: data.orderTypeLabels,
+                            datasets: [{
+                                label: 'Doanh thu (₫)',
+                                data: data.orderTypeRevenue,
+                                borderColor: '#34d399',
+                                backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#34d399',
+                                pointBorderColor: '#121826',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    enabled: true,
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: '#d1d5db',
+                                        callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
+                                    },
+                                    grid: { color: '#2d3748' }
+                                }
+                            },
+                            interaction: {
+                                mode: 'nearest',
+                                axis: 'x',
+                                intersect: false
+                            }
+                        }
+                    };
+                } else if (chartId === 'comparisonChart') {
+                    return {
+                        type: 'bar',
+                        data: {
+                            labels: ['Hiện tại', comparisonLabel],
+                            datasets: [{
+                                label: 'Doanh thu (₫)',
+                                data: [data.revenue, data.previousRevenue],
+                                backgroundColor: ['#ffc107', '#34d399'],
+                                borderColor: ['#ffc107', '#34d399'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: '#d1d5db',
+                                        callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
+                                    },
+                                    grid: { color: '#2d3748' }
+                                }
+                            }
+                        }
+                    };
+                }
+                return null;
+            }
+
+            function updateCharts(data) {
+                chartData = data;
                 if (revenueChart) revenueChart.destroy();
                 if (paymentMethodChart) paymentMethodChart.destroy();
                 if (orderTypeChart) orderTypeChart.destroy();
                 if (comparisonChart) comparisonChart.destroy();
+
+                const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                revenueChart = new Chart(revenueCtx, getChartConfig('revenueChart', data));
+
+                const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
+                paymentMethodChart = new Chart(paymentMethodCtx, getChartConfig('paymentMethodChart', data));
+
+                const orderTypeCtx = document.getElementById('orderTypeChart').getContext('2d');
+                orderTypeChart = new Chart(orderTypeCtx, getChartConfig('orderTypeChart', data));
+
+                const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+                comparisonChart = new Chart(comparisonCtx, getChartConfig('comparisonChart', data));
+
+                updateComparisonInfo(data);
+            }
+
+            function showPopup(chartId, title) {
+                if (!chartData) return;
+                const popup = document.getElementById('chartPopup');
+                const popupTitle = document.getElementById('popupTitle');
+                const popupCanvas = document.getElementById('popupChart');
+                const popupInfoDiv = document.getElementById('popupComparisonInfo');
+
+                popupTitle.textContent = title;
+                popup.style.display = 'flex';
+                popupInfoDiv.style.display = chartId === 'comparisonChart' ? 'flex' : 'none';
+
+                if (popupChart) popupChart.destroy();
+                popupCanvas.className = 'popup-canvas';
+                const ctx = popupCanvas.getContext('2d');
+                popupChart = new Chart(ctx, getChartConfig(chartId, chartData));
+
+                popup.addEventListener('click', function(e) {
+                    if (e.target === popup) closePopup();
+                }, { once: true });
+            }
+
+            function closePopup() {
+                const popup = document.getElementById('chartPopup');
+                popup.style.display = 'none';
                 if (popupChart) popupChart.destroy();
             }
-        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            updateData();
-            document.getElementById('periodSelect').addEventListener('change', function() {
-                document.getElementById('specificDate').style.display = this.value === 'specific' ? 'flex' : 'none';
-                if (this.value !== 'specific') updateData();
-            });
-            document.getElementById('specificDateInput').addEventListener('change', function() {
-                if (document.getElementById('periodSelect').value === 'specific') updateData();
-            });
-        });
+            function updateTopDishes(dishes) {
+                const container = document.getElementById('topDishes');
+                if (!dishes || dishes.length === 0) {
+                    container.innerHTML = '<div class="loading">Không có đơn hàng</div>';
+                    return;
+                }
+                container.innerHTML = dishes.map((dish, index) => `
+                    <div class="dish-item animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                        <div class="dish-name">${index + 1}. ${dish.name}</div>
+                        <div class="dish-quantity">${dish.quantity} món</div>
+                        <div class="dish-revenue">${formatCurrency(dish.revenue)}</div>
+                    </div>
+                `).join('');
+            }
 
-        setInterval(updateData, 5 * 60 * 1000);
-    </script>
-</body>
-</html>
+            async function updateData() {
+                const period = document.getElementById('periodSelect').value;
+                let queryParams = `period=${period}`;
+                if (period === 'specific') {
+                    const specificDate = document.getElementById('specificDateInput').value;
+                    if (!specificDate) {
+                        showError('Vui lòng chọn một ngày cụ thể.');
+                        return;
+                    }
+                    queryParams += `&specificDate=${specificDate}`;
+                }
+
+                try {
+                    document.getElementById('totalRevenue').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+                    document.getElementById('totalOrders').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+                    document.getElementById('avgOrder').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+                    document.getElementById('topDishes').innerHTML = '<div class="loading"><span class="loading-spinner"></span>Đang tải dữ liệu...</div>';
+                    hideError();
+
+                    const data = await apiFetch(`/dashboard?${queryParams}`);
+                    if (data.code !== 1000) throw new Error(data.message || 'Lỗi không xác định từ API');
+
+                    updateStats(data.result);
+                    updateCharts(data.result);
+                    updateTopDishes(data.result.topDishes);
+                } catch (error) {
+                    showError(`Không thể tải dữ liệu dashboard: ${error.message}`);
+                    document.getElementById('totalRevenue').textContent = formatCurrency(0);
+                    document.getElementById('totalOrders').textContent = '0';
+                    document.getElementById('avgOrder').textContent = formatCurrency(0);
+                    document.getElementById('topDishes').innerHTML = '<div class="loading">Không có đơn hàng</div>';
+                    if (revenueChart) revenueChart.destroy();
+                    if (paymentMethodChart) paymentMethodChart.destroy();
+                    if (orderTypeChart) orderTypeChart.destroy();
+                    if (comparisonChart) comparisonChart.destroy();
+                    if (popupChart) popupChart.destroy();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                updateData();
+                document.getElementById('periodSelect').addEventListener('change', function() {
+                    document.getElementById('specificDate').style.display = this.value === 'specific' ? 'flex' : 'none';
+                    if (this.value !== 'specific') updateData();
+                });
+                document.getElementById('specificDateInput').addEventListener('change', function() {
+                    if (document.getElementById('periodSelect').value === 'specific') updateData();
+                });
+            });
+
+            setInterval(updateData, 5 * 60 * 1000);
+        </script>
+    </body>
+    </html>
