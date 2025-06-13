@@ -108,7 +108,6 @@
 }
 
 .order-item:hover {
-    border-color: var(--waiter-blue);
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
 }
@@ -129,7 +128,7 @@
     background: #fff;
     border-radius: 4px;
     font-weight: 700;
-    color: var(--waiter-blue);
+    color: black;
     border: 1px solid #dee2e6;
 }
 
@@ -154,7 +153,7 @@
 /* Select All Option (độc đáo cho statusUpdateModal) */
 .select-all-option {
     padding: 10px;
-    border-bottom: 2px solid var(--waiter-blue);
+    border-bottom: 2px solid var(--dark);
     margin-bottom: 10px;
 }
 
@@ -207,7 +206,7 @@
 
 .form-control:focus {
     outline: none;
-    border-color: var(--waiter-blue);
+    border-color: var(--primary);
     box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
 }
 
@@ -223,14 +222,24 @@
 }
 
 .btn-primary {
-    background: var(--waiter-blue);
+    background: var(--primary);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #0052a3;
+    background: #ff7700;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.4);
+    box-shadow: 0 4px 8px rgb(255, 145, 0);
+}
+
+.btn-success {
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(21, 255, 0, 0.185);
 }
 
 .btn-secondary {
@@ -244,21 +253,6 @@
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
 }
 
-/* Scrollbar Styling */
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
 
-.modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
 
-.modal-content::-webkit-scrollbar-thumb {
-    background: var(--waiter-blue);
-    border-radius: 4px;
-}
 
-.modal-content::-webkit-scrollbar-thumb:hover {
-    background: #0052a3;
-}

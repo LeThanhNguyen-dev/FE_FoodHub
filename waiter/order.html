@@ -22,7 +22,7 @@
           Tất cả đơn hàng
         </h3>
         <div class="orders-actions">
-          <button class="btn-orders-action btn-success" onclick="takeNewOrder()">
+          <button class="btn-orders-action btn-success" onclick="showMenu()">
             <i class="fas fa-plus"></i>
             Nhận đơn mới
           </button>
@@ -44,7 +44,7 @@
               <i class="fas fa-filter me-1"></i>
               Trạng thái
             </label>
-            <select class="form-select" id="statusFilter" onchange="applyFilters()">
+            <select class="form-select" id="orderStatusFilter" onchange="applyOrderFilters()">
               <option value="">Tất cả trạng thái</option>
               <option value="PENDING">Chờ xử lý</option>
               <option value="CONFIRMED">Đã xác nhận</option>
@@ -61,7 +61,7 @@
               Bàn
             </label>
             <input type="text" class="form-control" id="tableNumberFilter"
-                   placeholder="Chọn bàn" onchange="applyFilters()">
+                   placeholder="Chọn bàn" onchange="applyOrderFilters()">
           </div>
 
           <!-- Min Price Filter -->
@@ -71,7 +71,7 @@
               Giá tối thiểu (VNĐ)
             </label>
             <input type="number" class="form-control" id="minPriceFilter"
-                   placeholder="0" onchange="applyFilters()">
+                   placeholder="0" onchange="applyOrderFilters()">
           </div>
 
           <!-- Max Price Filter -->
@@ -81,7 +81,7 @@
               Giá tối đa (VNĐ)
             </label>
             <input type="number" class="form-control" id="maxPriceFilter"
-                   placeholder="1000000" onchange="applyFilters()">
+                   placeholder="1000000" onchange="applyOrderFilters()">
           </div>
 
           <!-- Sort Field -->
@@ -90,7 +90,7 @@
               <i class="fas fa-sort me-1"></i>
               Sắp xếp theo
             </label>
-            <select class="form-select" id="sortByFilter" onchange="applyFilters()">
+            <select class="form-select" id="sortByOrderFilter" onchange="applyOrderFilters()">
               <option value="createdAt">Thời gian tạo</option>
               <option value="totalAmount">Tổng tiền</option>
               <option value="id">Mã đơn hàng</option>
@@ -104,7 +104,7 @@
               <i class="fas fa-sort-amount-down me-1"></i>
               Thứ tự
             </label>
-            <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
+            <select class="form-select" id="sortDirectionOrderFilter" onchange="applyOrderFilters()">
               <option value="DESC">Giảm dần</option>
               <option value="ASC">Tăng dần</option>
             </select>
@@ -116,7 +116,7 @@
               <i class="fas fa-list me-1"></i>
               Số đơn/trang
             </label>
-            <select class="form-select" id="pageSizeFilter" onchange="applyFilters()">
+            <select class="form-select" id="pageSizeOrderFilter" onchange="applyOrderFilters()">
               <option value="5">5 đơn</option>
               <option value="10" selected>10 đơn</option>
               <option value="20">20 đơn</option>
@@ -133,7 +133,7 @@
                 <i class="fas fa-times me-1"></i>
                 Xóa bộ lọc
               </button>
-              <button class="btn btn-primary" onclick="applyFilters()">
+              <button class="btn btn-primary" onclick="applyOrderFilters()">
                 <i class="fas fa-search me-1"></i>
                 Áp dụng
               </button>
@@ -199,9 +199,9 @@
       <div class="pagination-jump mt-2" id="paginationJump" style="display: none;">
         <div class="d-flex justify-content-center align-items-center gap-2">
           <span class="text-muted">Chuyển đến trang:</span>
-          <input type="number" class="form-control form-control-sm" id="jumpToPage"
+          <input type="number" class="form-control form-control-sm" id="jumpToOrderPage"
                  style="width: 80px;" min="1" max="1" placeholder="1">
-          <button class="btn btn-sm btn-outline-primary" onclick="jumpToPage()">
+          <button class="btn btn-sm btn-outline-primary" onclick="jumpToOrderPage()">
             <i class="fas fa-arrow-right"></i>
           </button>
         </div>
@@ -330,10 +330,10 @@
                             <span>${tableNumber || 'Mang về'}</span>
                         </div>
                         <div class="info-row">
-                            <span>Nhân viên:</span>
+                            <span>Khách hàng:</span>
                             <span>${username}</span>
                         </div>
-                        ${note ? `<div class="info-row"><span>Ghi chú:</span><span>${note}</span></div>` : ''}
+                        <div class="info-row"><span>Ghi chú:</span><span>${note}</span></div>
                     </div>
 
                     <div class="order-items-section">
@@ -349,7 +349,10 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="updateOrderStatus(${id})">
+                    <button class="btn btn-success" onclick="startAddItemsToOrder(`${id}`)">
+                      <span>🍽️</span> Gọi thêm món
+                    </button>
+                    <button class="btn btn-primary" onclick="updateOrderStatus(`${id}`)">
                         Cập nhật trạng thái
                     </button>
                     <button class="btn btn-secondary" onclick="closeOrderDetails()">

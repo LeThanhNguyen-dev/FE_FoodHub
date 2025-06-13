@@ -6,7 +6,7 @@
     <title>FoodHub Admin - Chỉnh sửa người dùng</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
-    <meta content="" name="description">
+    <meta name="description">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -23,8 +23,8 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Goong Map JavaScript SDK -->
+    <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7wVxaWF"></script>
 
     <style>
         :root {
@@ -167,6 +167,19 @@
             transform: scale(1.05);
         }
 
+        .btn-warning {
+            background: var(--warning);
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: scale(1.05);
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -213,7 +226,6 @@
             color: white;
         }
 
-        /* Enhanced autofill prevention */
         .password-field {
             position: relative;
         }
@@ -238,7 +250,6 @@
             color: var(--primary);
         }
 
-        /* Override Chrome autofill styles */
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
@@ -256,7 +267,6 @@
             font-size: 1rem !important;
         }
 
-        /* Hide autofill button */
         input[autocomplete="new-password"]::-webkit-credentials-auto-fill-button,
         input::-webkit-credentials-auto-fill-button {
             display: none !important;
@@ -266,7 +276,6 @@
             right: -9999px !important;
         }
 
-        /* Modal styling for consistency */
         .modal-content {
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -276,6 +285,65 @@
             background: linear-gradient(135deg, var(--primary), #ff8c00);
             color: white;
             border-radius: 15px 15px 0 0;
+        }
+
+        .password-note {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .autocomplete-suggestion {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: var(--light);
+        }
+
+        .is-invalid {
+            border-color: var(--danger) !important;
+        }
+
+        .invalid-feedback {
+            font-size: 0.85rem;
+            color: var(--danger);
+        }
+
+        .original-info-table {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .original-info-table th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .original-info-table td {
+            padding: 1rem;
+            color: #555;
+            border-bottom: 1px solid #eee;
         }
 
         @media (max-width: 768px) {
@@ -296,7 +364,7 @@
 </head>
 
 <body>
-<!-- Hidden inputs to trick autofill -->
+<!-- Hidden inputs để ngăn autofill -->
 <div style="display: none;">
     <input type="text" name="fake_username">
     <input type="password" name="fake_password">
@@ -312,25 +380,25 @@
     <nav class="sidebar-nav flex-fill">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a href="adminDashboard.html" class="nav-link">
+                <a href="/adminDashboard/adminDashboard.html" class="nav-link">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="staffList.html" class="nav-link active">
+                <a href="adminDashboardUser.html" class="nav-link">
                     <i class="fas fa-users"></i>
-                    <span>Quản lý người dùng</span>
+                    <span>Quản lý khách hàng</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="adminDashboardStaff.html" class="nav-link">
+                <a href="staffList.html" class="nav-link active">
                     <i class="fas fa-user-tie"></i>
                     <span>Quản lý nhân viên</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="adminDashboardMenu.html" class="nav-link">
+                <a href="/menu-manager/menu.html" class="nav-link">
                     <i class="fas fa-utensils"></i>
                     <span>Quản lý món ăn</span>
                 </a>
@@ -348,9 +416,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Báo cáo</span>
+                <a href="lichlam.html" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Lịch làm</span>
                 </a>
             </li>
         </ul>
@@ -385,6 +453,40 @@
     </div>
 
     <div class="container">
+        <!-- Original User Info Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Thông tin người dùng hiện tại</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table original-info-table">
+                        <thead>
+                            <tr>
+                                <th>Tên đăng nhập</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Địa chỉ</th>
+                                <th>Số điện thoại</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="original-username"></td>
+                                <td id="original-email"></td>
+                                <td id="original-roleName"></td>
+                                <td id="original-status"></td>
+                                <td id="original-address"></td>
+                                <td id="original-phone"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit User Card -->
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin người dùng</h5>
@@ -397,6 +499,7 @@
                         <label for="username" class="form-label">Tên đăng nhập</label>
                         <input type="text" class="form-control" id="username" name="username"
                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                        <div id="username-error" class="invalid-feedback"></div>
                     </div>
 
                     <div class="col-md-6">
@@ -424,10 +527,11 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 position-relative">
                         <label for="address" class="form-label">Địa chỉ</label>
                         <input type="text" class="form-control" id="address" name="address"
                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        <div id="addressSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
                     </div>
 
                     <div class="col-md-6">
@@ -444,9 +548,11 @@
                                    placeholder="Nhập mật khẩu mới...">
                             <i class="fas fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
                         </div>
+                        <small class="password-note">Mật khẩu cũ đã được mã hóa và không thể hiển thị.</small>
                     </div>
 
                     <div class="col-12 text-end">
+                        <button type="button" class="btn btn-warning me-2" onclick="restoreForm()">Khôi phục</button>
                         <button type="button" class="btn btn-secondary me-2" onclick="goBack()">Hủy</button>
                         <button type="button" class="btn btn-primary" onclick="showConfirmModal()">Lưu thay đổi</button>
                     </div>
@@ -458,10 +564,10 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
+<script src="../js/fetch-api.js"></script>
 <script>
-    const apiBaseUrl = 'http://localhost:8080/foodhub/users';
-    const maxRetries = 2;
+    // Lưu trữ dữ liệu ban đầu
+    let originalUserData = {};
 
     // Lấy tham số id từ URL
     function getQueryParam(param) {
@@ -469,38 +575,40 @@
         return urlParams.get(param);
     }
 
-    // Hàm gọi API với retry
-    async function fetchWithRetry(url, options, retries = maxRetries) {
-        for (let attempt = 1; attempt <= retries; attempt++) {
-            try {
-                console.log(`Thử lần ${attempt}: Gửi yêu cầu API: ${url}`, options);
-                const response = await axios.request({ ...options, url, timeout: 5000 });
-                console.log(`Phản hồi từ API (lần ${attempt}):`, response.data);
-                return response;
-            } catch (error) {
-                console.error(`Lỗi lần ${attempt}:`, error);
-                if (attempt === retries) throw error;
-                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-            }
-        }
-    }
-
     // Lấy thông tin người dùng
     async function fetchUserDetails(id) {
         try {
-            const response = await fetchWithRetry(`${apiBaseUrl}/${id}`, { method: 'GET' });
-            if (response.data && response.data.result) {
-                const user = response.data.result;
+            const response = await apiFetch(`/users/${id}`, { method: 'GET' });
+            if (response.result) {
+                const user = response.result;
+                originalUserData = {
+                    id: user.id,
+                    username: user.username || '',
+                    email: user.email || '',
+                    roleName: user.roleName?.name || 'ADMIN',
+                    status: user.status || 'ACTIVE',
+                    address: user.address || '',
+                    phone: user.phone || '',
+                    password: ''
+                };
+                // Populate edit form
                 document.getElementById('userId').value = user.id;
                 document.getElementById('username').value = user.username || '';
                 document.getElementById('email').value = user.email || '';
-                document.getElementById('roleName').value = user.roleName.name || 'ADMIN';
+                document.getElementById('roleName').value = user.roleName?.name || 'ADMIN';
                 document.getElementById('status').value = user.status || 'ACTIVE';
                 document.getElementById('address').value = user.address || '';
                 document.getElementById('phone').value = user.phone || '';
                 document.getElementById('password').value = '';
 
-                // Disable autocomplete sau khi load data
+                // Populate original info table
+                document.getElementById('original-username').textContent = originalUserData.username || '-';
+                document.getElementById('original-email').textContent = originalUserData.email || '-';
+                document.getElementById('original-roleName').textContent = originalUserData.roleName || '-';
+                document.getElementById('original-status').textContent = originalUserData.status || '-';
+                document.getElementById('original-address').textContent = originalUserData.address || '-';
+                document.getElementById('original-phone').textContent = originalUserData.phone || '-';
+
                 disableAutocomplete();
             } else {
                 throw new Error('Không thể tải thông tin người dùng!');
@@ -510,19 +618,14 @@
         }
     }
 
-    // Disable autocomplete và thêm tên ngẫu nhiên cho input
+    // Ngăn autofill và thêm tên ngẫu nhiên cho input
     function disableAutocomplete() {
         const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
         inputs.forEach(input => {
             input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
             input.setAttribute('data-form-type', 'other');
-            // Thêm tên ngẫu nhiên để ngăn autofill
-            if (input.id === 'password') {
-                input.setAttribute('name', `password_${Math.random().toString(36).substring(2, 15)}`);
-            } else if (input.id === 'username') {
-                input.setAttribute('name', `username_${Math.random().toString(36).substring(2, 15)}`);
-            } else if (input.id === 'email') {
-                input.setAttribute('name', `email_${Math.random().toString(36).substring(2, 15)}`);
+            if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
+                input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
             }
         });
     }
@@ -530,24 +633,54 @@
     // Cập nhật thông tin người dùng
     async function updateUser(id, data) {
         try {
-            // Nếu password trống, không gửi password trong request
             if (!data.password || data.password.trim() === '') {
                 delete data.password;
             }
 
-            const response = await fetchWithRetry(`${apiBaseUrl}/${id}`, {
+            const response = await apiFetch(`/users/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                data: JSON.stringify(data)
+                body: JSON.stringify(data)
             });
-            if (response.data && response.data.code === 1000) {
+            if (response.code === 1000) {
                 showNotification('Cập nhật thông tin người dùng thành công!', 'success');
+                originalUserData = { ...data, id }; // Cập nhật dữ liệu gốc sau khi lưu
+                // Cập nhật bảng thông tin gốc
+                document.getElementById('original-username').textContent = data.username || '-';
+                document.getElementById('original-email').textContent = data.email || '-';
+                document.getElementById('original-roleName').textContent = data.roleName || '-';
+                document.getElementById('original-status').textContent = data.status || '-';
+                document.getElementById('original-address').textContent = data.address || '-';
+                document.getElementById('original-phone').textContent = data.phone || '-';
                 setTimeout(() => goBack(), 1500);
             } else {
-                throw new Error(response.data.message || 'Lỗi khi cập nhật thông tin người dùng!');
+                throw new Error(response.message || 'Lỗi khi cập nhật thông tin người dùng!');
             }
         } catch (error) {
-            showNotification(error.message || 'Có lỗi xảy ra khi cập nhật thông tin người dùng!', 'error');
+            const errorMessage = error.message || 'Có lỗi xảy ra khi cập nhật!';
+            if (errorMessage.includes('exist') || errorMessage.includes('duplicate') || errorMessage.includes('1001')) {
+                document.getElementById('username').classList.add('is-invalid');
+                document.getElementById('username-error').textContent = 'Tên đăng nhập đã tồn tại';
+                showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
+            } else {
+                showNotification(errorMessage, 'error');
+            }
+        }
+    }
+
+    // Khôi phục thông tin gốc
+    function restoreForm() {
+        if (confirm('Bạn có chắc chắn muốn khôi phục thông tin gốc?')) {
+            document.getElementById('username').value = originalUserData.username;
+            document.getElementById('email').value = originalUserData.email;
+            document.getElementById('roleName').value = originalUserData.roleName;
+            document.getElementById('status').value = originalUserData.status;
+            document.getElementById('address').value = originalUserData.address;
+            document.getElementById('phone').value = originalUserData.phone;
+            document.getElementById('password').value = originalUserData.password;
+            document.getElementById('username').classList.remove('is-invalid');
+            document.getElementById('username-error').textContent = '';
+            showNotification('Đã khôi phục thông tin gốc!', 'success');
         }
     }
 
@@ -589,7 +722,7 @@
         mainContent.classList.toggle('expanded');
     }
 
-    // Toggle mật khẩu hiển thị/ẩn
+    // Toggle hiển thị mật khẩu
     function togglePasswordVisibility() {
         const passwordInput = document.getElementById('password');
         const toggleIcon = document.getElementById('togglePassword');
@@ -610,6 +743,55 @@
         modal.show();
     }
 
+    // Gợi ý địa chỉ với Goong Map
+    function setupAddressAutocomplete() {
+        const addressInput = document.getElementById('address');
+        const suggestionsContainer = document.getElementById('addressSuggestions');
+        let debounceTimeout;
+
+        addressInput.addEventListener('input', () => {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(async () => {
+                const input = addressInput.value.trim();
+                if (input.length < 3) {
+                    suggestionsContainer.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
+                        method: 'GET'
+                    });
+                    if (response.predictions) {
+                        suggestionsContainer.innerHTML = '';
+                        response.predictions.forEach(prediction => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'autocomplete-suggestion';
+                            suggestion.textContent = prediction.description;
+                            suggestion.addEventListener('click', () => {
+                                addressInput.value = prediction.description;
+                                suggestionsContainer.style.display = 'none';
+                            });
+                            suggestionsContainer.appendChild(suggestion);
+                        });
+                        suggestionsContainer.style.display = response.predictions.length > 0 ? 'block' : 'none';
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    }
+
     // Khởi tạo
     document.addEventListener('DOMContentLoaded', () => {
         const id = getQueryParam('id');
@@ -619,10 +801,7 @@
             return;
         }
 
-        // Disable autocomplete ngay từ đầu
         disableAutocomplete();
-
-        // Clear all inputs trước khi load data
         document.querySelectorAll('input').forEach(input => {
             if (input.type !== 'hidden') {
                 input.value = '';
@@ -630,8 +809,8 @@
         });
 
         fetchUserDetails(id);
+        setupAddressAutocomplete();
 
-        // Xử lý sự kiện xác nhận trong modal
         document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
             const formData = {
                 username: document.getElementById('username').value.trim(),
@@ -643,30 +822,26 @@
                 password: document.getElementById('password').value.trim()
             };
             updateUser(id, formData);
-            // Ẩn modal sau khi xác nhận
             const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
             modal.hide();
         });
 
-        // Prevent autofill on focus
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('focus', function() {
                 this.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
-                if (this.id === 'password' || this.id === 'username' || this.id === 'email') {
-                    this.setAttribute('name', `${this.id}_${Math.random().toString(36).substring(2, 15)}`);
+                if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
+                    this.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
                 }
             });
         });
     });
 
-    // Additional security to prevent autofill
     window.addEventListener('load', function() {
         setTimeout(() => {
             disableAutocomplete();
-            // Clear password field sau khi page load hoàn toàn
             const passwordField = document.getElementById('password');
             if (passwordField) {
-                passwordField.value = '';
+                document.getElementById('password').value = '';
             }
         }, 100);
     });

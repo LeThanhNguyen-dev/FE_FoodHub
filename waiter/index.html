@@ -47,31 +47,25 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showOrders()">
+                <a href="#" class="nav-link active" onclick="showOrders()">
                     <i class="fas fa-clipboard-list"></i>
                     <span class="nav-text">Đơn hàng</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showTables()">
+                <a href="#" class="nav-link active" onclick="showTables()">
                     <i class="fas fa-chair"></i>
                     <span class="nav-text">Quản lý bàn</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showMenu()">
+                <a href="#" class="nav-link active" onclick="showMenu()">
                     <i class="fas fa-book-open"></i>
                     <span class="nav-text">Thực đơn</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showCustomers()">
-                    <i class="fas fa-users"></i>
-                    <span class="nav-text">Khách hàng</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showReports()">
+                <a href="#" class="nav-link active " onclick="showReports()">
                     <i class="fas fa-chart-line"></i>
                     <span class="nav-text">Báo cáo ca làm</span>
                 </a>
@@ -260,7 +254,7 @@
             </div>
 
             <div class="quick-actions">
-                <button class="quick-action-btn" onclick="takeNewOrder()">
+                <button class="quick-action-btn" onclick="showMenu()">
                     <i class="fas fa-plus me-2"></i>Nhận đơn mới
                 </button>
                 <button class="quick-action-btn" onclick="callKitchen()">
@@ -384,28 +378,9 @@
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="js/menu.js" defer></script>
-    <script src="js/order.js" defer></script>
-    <script src="js/show-table.js" defer></script>
-    <script src="../js/fetch-api.js" defer></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, checking functions:', {
-                showMenu: typeof showMenu,
-                showOrders: typeof showOrders,
-                showTables: typeof showTables
-            });
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const func = link.getAttribute('onclick');
-                    if (func) {
-                        console.log(`Calling ${func}`);
-                        eval(func);
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="js/order.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/show-table.js"></script>
+    <script src="../js/fetch-api.js"></script>
 </body>
 </html>

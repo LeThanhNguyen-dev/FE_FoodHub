@@ -80,53 +80,54 @@ function renderOrdersTemplate() {
 // Setup event listeners after HTML is loaded
 function setupEventListeners() {
     // Setup jump to page input event listener
-    const jumpInput = document.getElementById('jumpToPage');
+    const jumpInput = document.getElementById('jumpToOrderPage');
     if (jumpInput) {
         jumpInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                jumpToPage();
+                jumpToOrderPage();
             }
         });
     }
 
     // Setup filter change listeners
     const filterElements = [
-        'statusFilter', 'tableNumberFilter', 'minPriceFilter',
-        'maxPriceFilter', 'sortByFilter', 'sortDirectionFilter', 'pageSizeFilter'
+        'orderStatusFilter', 'tableNumberFilter', 'minPriceFilter',
+        'maxPriceFilter', 'sortByOrderFilter', 'sortDirectionOrderFilter', 'pageSizeOrderFilter'
     ];
 
     filterElements.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('change', applyFilters);
+            element.addEventListener('change', applyOrderFilters);
         }
     });
 }
 
 // Global variables for pagination
-let currentPage = 0; // Backend uses 0-based pagination
-let totalPages = 1;
-let totalElements = 0;
+let currentOrderPage = 0; // Backend uses 0-based pagination
+let totalOrderPages = 1;
+let totalOrderElements = 0;
+let currentOrderForAddItems = null;
 
 // Load orders from API with filters and pagination
 async function loadOrders() {
     try {
         // Get filter values - với null checks
-        const statusFilter = document.getElementById('statusFilter');
+        const orderStatusFilter = document.getElementById('orderStatusFilter');
         const tableNumberFilter = document.getElementById('tableNumberFilter'); // Thay đổi từ tableIdFilter
         const minPriceFilter = document.getElementById('minPriceFilter');
         const maxPriceFilter = document.getElementById('maxPriceFilter');
-        const sortByFilter = document.getElementById('sortByFilter');
-        const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-        const pageSizeFilter = document.getElementById('pageSizeFilter');
+        const sortByOrderFilter = document.getElementById('sortByOrderFilter');
+        const sortDirectionOrderFilter = document.getElementById('sortDirectionOrderFilter');
+        const pageSizeOrderFilter = document.getElementById('pageSizeOrderFilter');
 
-        const status = statusFilter ? statusFilter.value : '';
+        const status = orderStatusFilter ? orderStatusFilter.value : '';
         const tableNumber = tableNumberFilter ? tableNumberFilter.value : ''; // Thay đổi từ tableId
         const minPrice = minPriceFilter ? minPriceFilter.value : '';
         const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
-        const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
-        const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
-        const pageSize = pageSizeFilter ? pageSizeFilter.value || '10' : '10';
+        const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
+        const sortDirection = sortDirectionOrderFilter ? sortDirectionOrderFilter.value || 'DESC' : 'DESC';
+        const pageSize = pageSizeOrderFilter ? pageSizeOrderFilter.value || '10' : '10';
 
         // Build query parameters
         const params = new URLSearchParams();
@@ -134,7 +135,7 @@ async function loadOrders() {
         if (tableNumber) params.append('tableNumber', tableNumber); // Thay đổi từ tableId thành tableNumber
         if (minPrice) params.append('minPrice', minPrice);
         if (maxPrice) params.append('maxPrice', maxPrice);
-        params.append('page', currentPage.toString());
+        params.append('page', currentOrderPage.toString());
         params.append('size', pageSize);
         params.append('orderBy', sortBy);
         params.append('sort', sortDirection);
@@ -148,9 +149,9 @@ async function loadOrders() {
         const orders = orderPage.content || [];
 
         // Update pagination info
-        totalPages = orderPage.totalPages;
-        totalElements = orderPage.totalElements;
-        currentPage = orderPage.number;
+        totalOrderPages = orderPage.totalPages;
+        totalOrderElements = orderPage.totalElements;
+        currentOrderPage = orderPage.number;
 
         // Render orders
         renderOrders(orders);
@@ -164,8 +165,8 @@ async function loadOrders() {
 }
 
 // Apply filters and reload data
-function applyFilters() {
-    currentPage = 0; // Reset to first page when applying filters
+function applyOrderFilters() {
+    currentOrderPage = 0; // Reset to first page when applying filters
     loadOrders();
     // Tạm dừng auto refresh khi người dùng thao tác filter
     pauseAutoRefreshTemporarily();
@@ -175,13 +176,13 @@ function applyFilters() {
 // Clear all filters
 function clearFilters() {
     const filterElements = [
-        {id: 'statusFilter', value: ''},
+        {id: 'orderStatusFilter', value: ''},
         {id: 'tableNumberFilter', value: ''}, // Thay đổi từ tableIdFilter
         {id: 'minPriceFilter', value: ''},
         {id: 'maxPriceFilter', value: ''},
-        {id: 'sortByFilter', value: 'createdAt'},
-        {id: 'sortDirectionFilter', value: 'DESC'},
-        {id: 'pageSizeFilter', value: '10'}
+        {id: 'sortByOrderFilter', value: 'createdAt'},
+        {id: 'sortDirectionOrderFilter', value: 'DESC'},
+        {id: 'pageSizeOrderFilter', value: '10'}
     ];
 
     filterElements.forEach(filter => {
@@ -191,7 +192,7 @@ function clearFilters() {
         }
     });
 
-    applyFilters();
+    applyMenuFilters();
 }
 
 // Render orders table
@@ -611,12 +612,12 @@ function updateSummary(orderPage) {
     const pageSize = orderPage.size;
     const currentPageNum = orderPage.number + 1; // Display 1-based page number
     const startItem = orderPage.number * pageSize + 1;
-    const endItem = Math.min((orderPage.number + 1) * pageSize, totalElements);
+    const endItem = Math.min((orderPage.number + 1) * pageSize, totalOrderElements);
 
     summaryElement.innerHTML = `
-        <strong>Tìm thấy ${totalElements} đơn hàng</strong> 
+        <strong>Tìm thấy ${totalOrderElements} đơn hàng</strong> 
         - Hiển thị ${startItem} - ${endItem} 
-        (Trang ${currentPageNum}/${totalPages})
+        (Trang ${currentPageNum}/${totalOrderPages})
     `;
 }
 
@@ -627,12 +628,12 @@ function updatePagination() {
 
     // Show/hide quick jump feature for large page counts
     const jumpContainer = document.getElementById('paginationJump');
-    const jumpInput = document.getElementById('jumpToPage');
+    const jumpInput = document.getElementById('jumpToOrderPage');
 
-    if (jumpContainer && jumpInput && totalPages > 10) {
+    if (jumpContainer && jumpInput && totalOrderPages > 10) {
         jumpContainer.style.display = 'block';
-        jumpInput.max = totalPages;
-        jumpInput.placeholder = `1-${totalPages}`;
+        jumpInput.max = totalOrderPages;
+        jumpInput.placeholder = `1-${totalOrderPages}`;
     } else if (jumpContainer) {
         jumpContainer.style.display = 'none';
     }
@@ -645,18 +646,18 @@ function generatePaginationButtons() {
 
     paginationList.innerHTML = '';
 
-    if (totalPages <= 1) return;
+    if (totalOrderPages <= 1) return;
 
-    const currentPageDisplay = currentPage + 1; // Convert to 1-based for display
+    const currentPageDisplay = currentOrderPage + 1; // Convert to 1-based for display
     const maxVisiblePages = 10;
 
     // Calculate page range to display
     let startPage, endPage;
 
-    if (totalPages <= maxVisiblePages) {
+    if (totalOrderPages <= maxVisiblePages) {
         // Show all pages if total is <= 10
         startPage = 1;
-        endPage = totalPages;
+        endPage = totalOrderPages;
     } else {
         // Smart pagination logic
         const halfVisible = Math.floor(maxVisiblePages / 2);
@@ -665,10 +666,10 @@ function generatePaginationButtons() {
             // Near the beginning
             startPage = 1;
             endPage = maxVisiblePages;
-        } else if (currentPageDisplay >= totalPages - halfVisible) {
+        } else if (currentPageDisplay >= totalOrderPages - halfVisible) {
             // Near the end
-            startPage = totalPages - maxVisiblePages + 1;
-            endPage = totalPages;
+            startPage = totalOrderPages - maxVisiblePages + 1;
+            endPage = totalOrderPages;
         } else {
             // In the middle
             startPage = currentPageDisplay - halfVisible;
@@ -677,7 +678,7 @@ function generatePaginationButtons() {
     }
 
     // Previous button
-    const prevBtn = createPaginationButton('‹', currentPage - 1, currentPage <= 0, 'Trang trước');
+    const prevBtn = createPaginationButton('‹', currentOrderPage - 1, currentOrderPage <= 0, 'Trang trước');
     paginationList.appendChild(prevBtn);
 
     // First page + ellipsis (if needed)
@@ -701,15 +702,15 @@ function generatePaginationButtons() {
     }
 
     // Last page + ellipsis (if needed)
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
+    if (endPage < totalOrderPages) {
+        if (endPage < totalOrderPages - 1) {
             paginationList.appendChild(createPaginationEllipsis('end'));
         }
-        paginationList.appendChild(createPaginationButton(totalPages.toString(), totalPages - 1));
+        paginationList.appendChild(createPaginationButton(totalOrderPages.toString(), totalOrderPages - 1));
     }
 
     // Next button
-    const nextBtn = createPaginationButton('›', currentPage + 1, currentPage >= totalPages - 1, 'Trang sau');
+    const nextBtn = createPaginationButton('›', currentOrderPage + 1, currentOrderPage >= totalOrderPages - 1, 'Trang sau');
     paginationList.appendChild(nextBtn);
 }
 
@@ -725,7 +726,7 @@ function createPaginationButton(text, pageIndex, disabled = false, title = '', a
     button.disabled = disabled;
 
     if (!disabled) {
-        button.onclick = () => goToPage(pageIndex);
+        button.onclick = () => goToOrderPage(pageIndex);
     }
 
     li.appendChild(button);
@@ -747,22 +748,22 @@ function createPaginationEllipsis(position) {
 }
 
 // Go to specific page
-function goToPage(pageIndex) {
-    if (pageIndex >= 0 && pageIndex < totalPages && pageIndex !== currentPage) {
-        currentPage = pageIndex;
+function goToOrderPage(pageIndex) {
+    if (pageIndex >= 0 && pageIndex < totalOrderPages && pageIndex !== currentOrderPage) {
+        currentOrderPage = pageIndex;
         loadOrders();
     }
 }
 
 // Jump to page functionality
-function jumpToPage() {
-    const jumpInput = document.getElementById('jumpToPage');
+function jumpToOrderPage() {
+    const jumpInput = document.getElementById('jumpToOrderPage');
     if (!jumpInput) return;
 
     const pageNumber = parseInt(jumpInput.value);
 
-    if (pageNumber && pageNumber >= 1 && pageNumber <= totalPages) {
-        goToPage(pageNumber - 1); // Convert to 0-based
+    if (pageNumber && pageNumber >= 1 && pageNumber <= totalOrderPages) {
+        goToOrderPage(pageNumber - 1); // Convert to 0-based
         jumpInput.value = ''; // Clear input
     } else {
         // Show error feedback
@@ -1026,7 +1027,7 @@ async function displayOrderDetails(orderData) {
         modalContent.querySelector('.info-row:nth-child(2) span:nth-child(2)').textContent = getOrderTypeText(orderType);
         modalContent.querySelector('.info-row:nth-child(3) span:nth-child(2)').textContent = formattedDate;
         modalContent.querySelector('.info-row:nth-child(4) span:nth-child(2)').textContent = tableNumber || 'Mang về';
-        modalContent.querySelector('.info-row:nth-child(5) span:nth-child(2)').textContent = username;
+        modalContent.querySelector('.info-row:nth-child(5) span:nth-child(2)').textContent = username || 'Guest';
         if (note) {
             const noteRow = modalContent.querySelector('.info-row:nth-child(6) span:nth-child(2)');
             if (noteRow) noteRow.textContent = note;
@@ -1037,6 +1038,7 @@ async function displayOrderDetails(orderData) {
         modalContent.querySelector('.order-items-list').innerHTML = orderItemsHtml;
         modalContent.querySelector('.order-total strong').textContent = `Tổng tiền: ${formattedAmount}`;
         modalContent.querySelector('.btn-primary').setAttribute('onclick', `updateOrderStatus(${id})`);
+        modalContent.querySelector('.btn-success').setAttribute('onclick', `startAddItemsToOrder(${id})`);
 
         // Thêm modal vào body
         document.body.appendChild(modalTemplate);
@@ -1083,6 +1085,29 @@ async function displayOrderDetails(orderData) {
         `);
     }
 }
+
+function startAddItemsToOrder(orderId) {
+    // Lưu thông tin đơn hàng để sử dụng sau
+    currentOrderForAddItems = {
+        orderId: orderId,
+        isAddingItems: true
+    };
+    
+    // Đóng modal chi tiết đơn hàng
+    closeModal();
+    
+    // Chuyển đến trang menu
+    showMenu();
+    
+    // Hiển thị thông báo
+    showToast('Chế độ gọi thêm món được kích hoạt. Chọn món muốn thêm vào đơn hàng.', 'info');
+    
+    // Cập nhật giao diện để hiển thị trạng thái gọi thêm món
+    updateUIForAddItemsMode();
+}
+
+
+
 // Đóng modal
 function closeOrderDetails() {
     const modal = document.querySelector('.modal-overlay');
@@ -1336,11 +1361,6 @@ function closeStatusUpdateModal() {
     }
 }
 
-// Hàm nhận đơn mới
-function takeNewOrder() {
-    // TODO: Implement take new order functionality
-    alert('Chức năng nhận đơn mới sẽ được hoàn thiện sau!');
-}
 
 let refreshInterval;
 
