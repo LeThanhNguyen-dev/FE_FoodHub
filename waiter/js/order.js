@@ -466,7 +466,6 @@ function showNotification(message, type = 'info') {
     `;
 
     // Thêm CSS nếu chưa có
-    addNotificationStyles();
 
     // Thêm vào body
     document.body.appendChild(notification);
