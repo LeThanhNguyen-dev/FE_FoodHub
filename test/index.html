@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đơn Hàng Nhà Bếp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Kitchen Dashboard</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showDashboard()">Tổng Quan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showOrders()">Đơn Hàng</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Bàn</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Báo Cáo</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <h2 id="pageTitle">Tổng Quan - Ca Làm Việc</h2>
+            
+            <div class="filters-section mb-4" id="filtersSection">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-filter"></i> Bộ lọc & Sắp xếp
+                        </h6>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleFilters()">
+                            <i class="fas fa-chevron-down" id="filterToggleIcon"></i>
+                        </button>
+                    </div>
+                    <div class="card-body collapse" id="filtersBody">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="fas fa-info-circle"></i> Trạng thái
+                                </label>
+                                <select class="form-select" id="statusFilter" onchange="applyFilters()">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="PENDING">Chờ Xử Lý</option>
+                                    <option value="CONFIRMED">Đã Xác Nhận</option>
+                                    <option value="PREPARING">Đang Chế Biến</option>
+                                    <option value="READY">Sẵn Sàng</option>
+                                    <option value="COMPLETED">Hoàn Thành</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="fas fa-chair"></i> Bàn số
+                                </label>
+                                <input type="number" class="form-control" id="tableIdFilter" 
+                                       placeholder="Chọn bàn" onchange="applyFilters()" min="1">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="fas fa-money-bill-wave"></i> Giá tối thiểu (VND)
+                                </label>
+                                <input type="number" class="form-control" id="minPriceFilter" 
+                                       placeholder="0" onchange="applyFilters()" min="0" step="1000">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="fas fa-credit-card"></i> Giá tối đa (VND)
+                                </label>
+                                <input type="number" class="form-control" id="maxPriceFilter" 
+                                       placeholder="10000000" onchange="applyFilters()" min="0" step="1000">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-sort"></i> Sắp xếp theo
+                                </label>
+                                <select class="form-select" id="sortByFilter" onchange="applyFilters()">
+                                    <option value="createdAt">Thời gian tạo</option>
+                                    <option value="totalAmount">Tổng tiền</option>
+                                    <option value="tableNumber">Số bàn</option>
+                                    <option value="status">Trạng thái</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-arrows-alt-v"></i> Thứ tự
+                                </label>
+                                <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
+                                    <option value="DESC">Giảm dần</option>
+                                    <option value="ASC">Tăng dần</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-list"></i> Số đơn/trang
+                                </label>
+                                <select class="form-select" id="pageSizeFilter" onchange="applyFilters()">
+                                    <option value="5">5 đơn</option>
+                                    <option value="10" selected>10 đơn</option>
+                                    <option value="20">20 đơn</option>
+                                    <option value="50">50 đơn</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary" onclick="applyFilters()">
+                                        <i class="fas fa-search"></i> Áp dụng
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                        <i class="fas fa-times"></i> Xóa bộ lọc
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="loadOrders()">
+                                        <i class="fas fa-sync-alt"></i> Làm mới
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ordersGrid" class="row g-3">
+                <!-- Order cards will be inserted here -->
+            </div>
+
+            <div class="pagination-section mt-4" id="paginationSection">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-muted">
+                            <small id="paginationInfo">Hiển thị 0 đơn hàng</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <nav aria-label="Orders pagination">
+                            <ul class="pagination justify-content-end mb-0" id="paginationList">
+                                <!-- Pagination items will be inserted here -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
