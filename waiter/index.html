@@ -93,7 +93,7 @@
         <div class="d-flex align-items-center">
             <div class="notification-bell">
                 <i class="fas fa-bell"></i>
-                <span class="notification-badge">3</span>
+                <span class="notification-badge">0</span>
             </div>
             <div class="dropdown">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -268,6 +268,34 @@
         </div>
     </div>
 
+    <!-- No Work Schedule Message -->
+    <div id="noScheduleMessage" style="display: none;">
+        <div class="alert alert-info text-center" style="margin: 2rem; padding: 3rem;">
+            <i class="fas fa-calendar-times" style="font-size: 4rem; color: #17a2b8; margin-bottom: 1.5rem;"></i>
+            <h3 class="mb-3">Chưa có ca làm việc hôm nay</h3>
+            <p class="mb-4">Hiện tại bạn chưa được phân công ca làm việc cho ngày hôm nay. Vui lòng liên hệ với quản lý để được hỗ trợ.</p>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button class="btn btn-primary" onclick="loadWorkSchedule()">
+                    <i class="fas fa-refresh me-2"></i>Kiểm tra lại
+                </button>
+                <button class="btn btn-outline-primary" onclick="contactManager()">
+                    <i class="fas fa-phone me-2"></i>Liên hệ quản lý
+                </button>
+                <button class="btn btn-outline-secondary" onclick="viewWeekSchedule()">
+                    <i class="fas fa-calendar-week me-2"></i>Xem lịch tuần
+                </button>
+            </div>
+            
+            <div class="mt-4 pt-3" style="border-top: 1px solid #dee2e6;">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Nếu bạn đã được phân công ca làm việc, vui lòng thử lại sau vài phút hoặc liên hệ bộ phận IT để được hỗ trợ.
+                </small>
+            </div>
+        </div>
+    </div>
+
     <!-- Error Message -->
     <div id="errorMessage" style="display: none; text-align: center; padding: 50px;">
         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
@@ -312,7 +340,26 @@
             }
         } catch (error) {
             console.error('Error loading work schedule:', error);
-            showError(error.message);
+            
+            // Handle specific error cases
+            if (error.response && error.response.status === 404) {
+                // Handle 404 error - could be network issue or API not found
+                const errorData = await error.response.json().catch(() => null);
+                
+                if (errorData && errorData.code === 1041) {
+                    // Specific case: Work schedule not found
+                    showNoScheduleMessage();
+                } else {
+                    // General 404 error
+                    showError('Không thể kết nối đến hệ thống. Vui lòng kiểm tra kết nối internet và thử lại.');
+                }
+            } else if (error.message && error.message.includes('1041')) {
+                // Handle case where error message contains code 1041
+                showNoScheduleMessage();
+            } else {
+                // Handle other errors
+                showError(error.message || 'Đã xảy ra lỗi không xác định. Vui lòng thử lại.');
+            }
         }
     }
 
@@ -351,11 +398,35 @@
             `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${schedule.area}`;
     }
 
+    // Function to show no schedule message
+    function showNoScheduleMessage() {
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('noScheduleMessage').style.display = 'block';
+        
+        // Update page title
+        document.getElementById('pageTitle').textContent = 'Thông báo - Lịch làm việc';
+        
+        // Update waiter name to default
+        document.getElementById('waiterName').textContent = 'Nhân viên';
+    }
+
     // Function to show error message
     function showError(errorText) {
         document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('noScheduleMessage').style.display = 'none';
         document.getElementById('errorMessage').style.display = 'block';
         document.getElementById('errorText').textContent = errorText;
+    }
+
+    // Function to handle contact manager action
+    function contactManager() {
+        alert('Chức năng liên hệ quản lý sẽ được triển khai sớm. Vui lòng liên hệ trực tiếp với quản lý ca hoặc bộ phận nhân sự.');
+    }
+
+    // Function to handle view week schedule action
+    function viewWeekSchedule() {
+        alert('Chức năng xem lịch tuần sẽ được triển khai sớm. Vui lòng liên hệ với quản lý để biết lịch làm việc trong tuần.');
     }
 
     // Function to get current date in Vietnamese format
@@ -410,12 +481,15 @@
         document.getElementById('dashboardContent').style.display = 'block';
         document.getElementById('dynamicContent').style.display = 'none';
         document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('noScheduleMessage').style.display = 'none';
 
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
         });
         document.querySelector('[onclick="showDashboard()"]').classList.add('active');
     }
+
+    
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="js/order.js"></script>
