@@ -141,7 +141,11 @@ async function showTables(filters = {}, sort = {}) {
     try {
         // Build query parameters
         const queryParams = new URLSearchParams();
-
+        if (currentWorkSchedule.area && currentWorkSchedule.area.trim()) {
+            queryParams.append('area', currentWorkSchedule.area.trim());
+        } else {
+            throw new Error('Không tìm thấy thông tin khu vực của nhân viên.');
+        }
         if (currentTableFilters.tableNumber && currentTableFilters.tableNumber.trim()) {
             queryParams.append('tableNumber', currentTableFilters.tableNumber.trim());
         }

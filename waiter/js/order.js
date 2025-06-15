@@ -114,7 +114,7 @@ async function loadOrders() {
     try {
         // Get filter values - với null checks
         const orderStatusFilter = document.getElementById('orderStatusFilter');
-        const tableNumberFilter = document.getElementById('tableNumberFilter'); // Thay đổi từ tableIdFilter
+        const tableNumberFilter = document.getElementById('tableNumberFilter');
         const minPriceFilter = document.getElementById('minPriceFilter');
         const maxPriceFilter = document.getElementById('maxPriceFilter');
         const sortByOrderFilter = document.getElementById('sortByOrderFilter');
@@ -122,7 +122,7 @@ async function loadOrders() {
         const pageSizeOrderFilter = document.getElementById('pageSizeOrderFilter');
 
         const status = orderStatusFilter ? orderStatusFilter.value : '';
-        const tableNumber = tableNumberFilter ? tableNumberFilter.value : ''; // Thay đổi từ tableId
+        const tableNumber = tableNumberFilter ? tableNumberFilter.value : '';
         const minPrice = minPriceFilter ? minPriceFilter.value : '';
         const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
         const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
@@ -132,7 +132,7 @@ async function loadOrders() {
         // Build query parameters
         const params = new URLSearchParams();
         if (status) params.append('status', status);
-        if (tableNumber) params.append('tableNumber', tableNumber); // Thay đổi từ tableId thành tableNumber
+        if (tableNumber) params.append('tableNumber', tableNumber);
         if (minPrice) params.append('minPrice', minPrice);
         if (maxPrice) params.append('maxPrice', maxPrice);
         params.append('page', currentOrderPage.toString());
@@ -140,8 +140,16 @@ async function loadOrders() {
         params.append('orderBy', sortBy);
         params.append('sort', sortDirection);
 
+        // Add area and startTime from currentWorkSchedule
+        if (currentWorkSchedule && currentWorkSchedule.area) {
+            params.append('area', currentWorkSchedule.area);
+        }
+        if (currentWorkSchedule && currentWorkSchedule.startTime) {
+            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
+        }
+
         // Fetch orders with filters
-        const data = await apiFetch(`/orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
             method: 'GET'
         });
 
@@ -192,7 +200,7 @@ function clearFilters() {
         }
     });
 
-    applyMenuFilters();
+    applyOrderFilters();
 }
 
 // Render orders table
@@ -464,8 +472,6 @@ function showNotification(message, type = 'info') {
             <span>${message}</span>
         </div>
     `;
-
-    // Thêm CSS nếu chưa có
 
     // Thêm vào body
     document.body.appendChild(notification);
@@ -983,12 +989,13 @@ async function viewOrderDetails(orderId) {
 async function displayOrderDetails(orderData) {
     try {
         const {
-            id, status, orderType, createdAt, note,
+            id, status, orderType, createdAt, updatedAt, note,
             tableNumber, username, totalAmount, orderItems
         } = orderData;
 
         // Format dữ liệu
-        const formattedDate = new Date(createdAt).toLocaleString('vi-VN');
+        const formattedDateCreation = new Date(createdAt).toLocaleString('vi-VN');
+        const formattedDateUpdate = updatedAt ? new Date(updatedAt).toLocaleString('vi-VN') : 'Chưa cập nhật';
         const formattedAmount = formatCurrency(totalAmount);
 
         // Fetch order.html
@@ -1019,21 +1026,32 @@ async function displayOrderDetails(orderData) {
             return itemNode.querySelector('.order-item').outerHTML;
         }).join('');
 
-        // Cập nhật nội dung modal
+        // Cập nhật nội dung modal - SỬA LẠI THỨ TỰ
         modalContent.querySelector('h3').textContent = `Chi tiết đơn hàng #${id}`;
         modalContent.querySelector('.badge').className = `badge ${getStatusBadgeClass(status)}`;
         modalContent.querySelector('.badge').textContent = getStatusText(status);
-        modalContent.querySelector('.info-row:nth-child(2) span:nth-child(2)').textContent = getOrderTypeText(orderType);
-        modalContent.querySelector('.info-row:nth-child(3) span:nth-child(2)').textContent = formattedDate;
-        modalContent.querySelector('.info-row:nth-child(4) span:nth-child(2)').textContent = tableNumber || 'Mang về';
-        modalContent.querySelector('.info-row:nth-child(5) span:nth-child(2)').textContent = username || 'Guest';
-        if (note) {
-            const noteRow = modalContent.querySelector('.info-row:nth-child(6) span:nth-child(2)');
-            if (noteRow) noteRow.textContent = note;
-        } else {
-            const noteRow = modalContent.querySelector('.info-row:nth-child(6)');
-            if (noteRow) noteRow.remove();
-        }
+        
+        // Cập nhật từng info-row theo đúng thứ tự
+        const infoRows = modalContent.querySelectorAll('.info-row');
+        
+        // info-row[1]: Loại đơn (index 1)
+        infoRows[1].querySelector('span:nth-child(2)').textContent = getOrderTypeText(orderType);
+        
+        // info-row[2]: Thời gian tạo (index 2)
+        infoRows[2].querySelector('span:nth-child(2)').textContent = formattedDateCreation;
+        
+        // info-row[3]: Thời gian cập nhật (index 3)
+        infoRows[3].querySelector('span:nth-child(2)').textContent = formattedDateUpdate;
+        
+        // info-row[4]: Bàn (index 4)
+        infoRows[4].querySelector('span:nth-child(2)').textContent = tableNumber || 'Mang về';
+        
+        // info-row[5]: Khách hàng (index 5)
+        infoRows[5].querySelector('span:nth-child(2)').textContent = username || 'Guest';
+        
+        // info-row[6]: Ghi chú (index 6)
+        infoRows[6].querySelector('span:nth-child(2)').textContent = note || 'Không có ghi chú';
+
         modalContent.querySelector('.order-items-list').innerHTML = orderItemsHtml;
         modalContent.querySelector('.order-total strong').textContent = `Tổng tiền: ${formattedAmount}`;
         modalContent.querySelector('.btn-primary').setAttribute('onclick', `updateOrderStatus(${id})`);
@@ -1046,7 +1064,7 @@ async function displayOrderDetails(orderData) {
         if (!document.querySelector('link[href="css/modal-style.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'css/modal-style.css'; // Đường dẫn đúng tới modal-style.css
+            link.href = 'css/modal-style.css';
             document.head.appendChild(link);
         }
 
@@ -1084,6 +1102,7 @@ async function displayOrderDetails(orderData) {
         `);
     }
 }
+
 
 function startAddItemsToOrder(orderId) {
     // Lưu thông tin đơn hàng để sử dụng sau

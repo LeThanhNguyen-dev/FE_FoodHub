@@ -305,62 +305,69 @@
 <!-- Order Details Modal Template -->
 <template id="orderDetailsModalTemplate">
   <div class="modal-overlay" onclick="closeOrderDetails()">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                    <h3>Chi tiết đơn hàng #${id}</h3>
-                    <button class="btn-close" onclick="closeOrderDetails()">&times;</button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="order-summary">
-                        <div class="info-row">
-                            <span>Trạng thái:</span>
-                            <span class="badge ${getStatusBadgeClass(status)}">${getStatusText(status)}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Loại đơn:</span>
-                            <span>${getOrderTypeText(orderType)}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Thời gian:</span>
-                            <span>${formattedDate}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Bàn:</span>
-                            <span>${tableNumber || 'Mang về'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Khách hàng:</span>
-                            <span>${username}</span>
-                        </div>
-                        <div class="info-row"><span>Ghi chú:</span><span>${note}</span></div>
-                    </div>
-
-                    <div class="order-items-section">
-                        <h4>Danh sách món ăn:</h4>
-                        <div class="order-items-list">
-                            ${orderItemsHtml}
-                        </div>
-                    </div>
-
-                    <div class="order-total">
-                        <strong>Tổng tiền: ${formattedAmount}</strong>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-success" onclick="startAddItemsToOrder(`${id}`)">
-                      <span>🍽️</span> Gọi thêm món
-                    </button>
-                    <button class="btn btn-primary" onclick="updateOrderStatus(`${id}`)">
-                        Cập nhật trạng thái
-                    </button>
-                    <button class="btn btn-secondary" onclick="closeOrderDetails()">
-                        Đóng
-                    </button>
-                </div>
-            </div>
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Chi tiết đơn hàng #${id}</h3>
+        <button class="btn-close" onclick="closeOrderDetails()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="order-summary">
+          <div class="info-row">
+            <span>Trạng thái:</span>
+            <span class="badge ${getStatusBadgeClass(status)}">${getStatusText(status)}</span>
+          </div>
+          <div class="info-row">
+            <span>Loại đơn:</span>
+            <span>${getOrderTypeText(orderType)}</span>
+          </div>
+          <div class="info-row">
+            <span>Thời gian tạo:</span>
+            <span>${formattedDateCreation}</span>
+          </div>
+          <div class="info-row">
+            <span>Thời gian cập nhật:</span>
+            <span>${formattedDateUpdate}</span>
+          </div>
+          <div class="info-row">
+            <span>Bàn:</span>
+            <span>${tableNumber || 'Mang về'}</span>
+          </div>
+          <div class="info-row">
+            <span>Khách hàng:</span>
+            <span>${username}</span>
+          </div>
+          <div class="info-row">
+            <span>Ghi chú:</span>
+            <span>${note}</span>
+          </div>
         </div>
+
+        <div class="order-items-section">
+          <h4>Danh sách món ăn:</h4>
+          <div class="order-items-list">
+            ${orderItemsHtml}
+          </div>
+        </div>
+
+        <div class="order-total">
+          <strong>Tổng tiền: ${formattedAmount}</strong>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="startAddItemsToOrder(`${id}`)">
+          <span>🍽️</span> Gọi thêm món
+        </button>
+        <button class="btn btn-primary" onclick="updateOrderStatus(`${id}`)">
+          Cập nhật trạng thái
+        </button>
+        <button class="btn btn-secondary" onclick="closeOrderDetails()">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <!-- Order Item Template -->

@@ -97,7 +97,7 @@
             </div>
             <div class="dropdown">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-user-circle me-2"></i>Nguyễn Văn A
+                    <i class="fas fa-user-circle me-2"></i><span id="waiterName">Đang tải...</span>
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
@@ -118,9 +118,10 @@
         <div class="welcome-section">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h2 class="mb-3">Chào buổi sáng, Nguyễn Văn A!</h2>
-                    <p class="mb-2"><i class="fas fa-clock me-2"></i>Ca làm: 08:00 - 16:00</p>
-                    <p class="mb-0"><i class="fas fa-calendar me-2"></i>Hôm nay: Thứ Hai, 02/06/2025</p>
+                    <h2 class="mb-3" id="welcomeMessage">Chào bạn!</h2>
+                    <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
+                    <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
+                    <p class="mb-0" id="shiftArea"><i class="fas fa-map-marker-alt me-2"></i>Khu vực: Đang tải...</p>
                 </div>
                 <div class="col-md-4 text-center">
                     <i class="fas fa-user-tie" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
@@ -267,6 +268,16 @@
         </div>
     </div>
 
+    <!-- Error Message -->
+    <div id="errorMessage" style="display: none; text-align: center; padding: 50px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+        <h4>Không thể tải thông tin ca làm việc</h4>
+        <p id="errorText">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
+        <button class="btn btn-primary" onclick="loadWorkSchedule()">
+            <i class="fas fa-refresh me-2"></i>Thử lại
+        </button>
+    </div>
+
     <!-- Dynamic Content Area -->
     <div id="dynamicContent" style="display: none;">
         <!-- Content will be loaded here dynamically -->
@@ -277,72 +288,100 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Global variables to store work schedule data
+    let currentWorkSchedule = null;
+
+    // Load work schedule when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadWorkSchedule();
+    });
+
+    // Function to load work schedule from API
+    async function loadWorkSchedule() {
+        try {
+            const data = await apiFetch('/shifts/my-work-schedule/today', {
+                method: 'GET',
+            });
+            
+            if (data.code === 1000 && data.result) {
+                currentWorkSchedule = data.result;
+                displayWorkSchedule(data.result);
+                showDashboard();
+            } else {
+                throw new Error(data.message || 'Invalid response format');
+            }
+        } catch (error) {
+            console.error('Error loading work schedule:', error);
+            showError(error.message);
+        }
+    }
+
+    // Function to display work schedule data
+    function displayWorkSchedule(schedule) {
+        // Update waiter name
+        document.getElementById('waiterName').textContent = schedule.name || 'Nhân viên';
+        
+        // Update welcome message
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const currentHour = new Date().getHours();
+        let greeting = 'Chào bạn';
+        
+        if (currentHour < 12) {
+            greeting = 'Chào buổi sáng';
+        } else if (currentHour < 18) {
+            greeting = 'Chào buổi chiều';
+        } else {
+            greeting = 'Chào buổi tối';
+        }
+        
+        welcomeMessage.textContent = `${greeting}, ${schedule.name}!`;
+        
+        // Update shift information
+        document.getElementById('shiftDate').innerHTML = 
+            `<i class="fas fa-calendar me-2"></i>Ngày: ${schedule.date}`;
+        
+        // Use startTime and endTime directly
+        const startTime = schedule.startTime || 'Đang cập nhật';
+        const endTime = schedule.endTime || 'Đang cập nhật';
+        document.getElementById('shiftTime').innerHTML = 
+            `<i class="fas fa-clock me-2"></i>Ca làm: ${startTime} - ${endTime}`;
+        
+        // Update area
+        document.getElementById('shiftArea').innerHTML = 
+            `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${schedule.area}`;
+    }
+
+    // Function to show error message
+    function showError(errorText) {
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorText').textContent = errorText;
+    }
+
+    // Function to get current date in Vietnamese format
+    function getCurrentDateVietnamese() {
+        const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+        const now = new Date();
+        const dayName = days[now.getDay()];
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        
+        return `${dayName}, ${day}/${month}/${year}`;
+    }
+
+    // Existing functions
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
 
-        // Toggle sidebar collapsed state
         sidebar.classList.toggle('collapsed');
 
-        // Toggle main content expanded state
         if (mainContent) {
             mainContent.classList.toggle('expanded');
         }
 
-        // Store sidebar state in memory (not localStorage as it's not supported)
         window.sidebarCollapsed = sidebar.classList.contains('collapsed');
-    }
-
-    // Restore sidebar state on page load
-    document.addEventListener('DOMContentLoaded', function () {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        // You can set initial state here if needed
-        if (window.sidebarCollapsed) {
-            sidebar.classList.add('collapsed');
-            if (mainContent) {
-                mainContent.classList.add('expanded');
-            }
-        }
-    });
-
-    // Optional: Restore sidebar state on page load
-    document.addEventListener('DOMContentLoaded', function () {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        const wasCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
-
-        if (wasCollapsed && sidebar) {
-            sidebar.classList.add('collapsed');
-            if (mainContent) {
-                mainContent.classList.add('expanded');
-            }
-        }
-    });
-
-    // Alternative function if you're still having issues
-    function toggleSidebarForced() {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        if (sidebar.style.width === '70px' || sidebar.classList.contains('collapsed')) {
-            // Expand sidebar
-            sidebar.classList.remove('collapsed');
-            sidebar.style.width = '280px';
-            if (mainContent) {
-                mainContent.classList.remove('expanded');
-                mainContent.style.marginLeft = '280px';
-            }
-        } else {
-            // Collapse sidebar
-            sidebar.classList.add('collapsed');
-            sidebar.style.width = '70px';
-            if (mainContent) {
-                mainContent.classList.add('expanded');
-                mainContent.style.marginLeft = '70px';
-            }
-        }
     }
 
     function setActiveNav(element) {
@@ -360,6 +399,8 @@
             setTimeout(() => {
                 alert('Đã kết thúc ca làm việc! Cảm ơn bạn đã làm việc chăm chỉ.');
                 document.body.style.opacity = '1';
+                // Redirect to login or home page
+                // window.location.href = '/login';
             }, 1000);
         }
     }
@@ -368,19 +409,18 @@
         document.getElementById('pageTitle').textContent = 'Dashboard - Ca làm việc';
         document.getElementById('dashboardContent').style.display = 'block';
         document.getElementById('dynamicContent').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
 
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
         });
         document.querySelector('[onclick="showDashboard()"]').classList.add('active');
     }
-
-
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="js/order.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/show-table.js"></script>
-    <script src="../js/fetch-api.js"></script>
+<script src="js/order.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/show-table.js"></script>
+<script src="../js/fetch-api.js"></script>
 </body>
 </html>

@@ -326,19 +326,10 @@
 
         async function fetchMenuItems() {
             try {
-                const response = await fetch('http://localhost:8080/menu', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
-                    }
+                const data = await apiFetch('/menu-items', {
+                    method: 'GET'
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Lỗi ${response.status}: Không thể tải danh sách món ăn`);
-                }
-
-                const data = await response.json();
                 const menuItems = data.result || [];
 
                 // Nhóm món ăn theo danh mục
@@ -386,5 +377,7 @@
         // Tải danh sách món ăn khi trang được tải
         document.addEventListener('DOMContentLoaded', fetchMenuItems);
     </script>
+    <script src="../../js/fetch-api.js"></script>
+
 </body>
 </html>
