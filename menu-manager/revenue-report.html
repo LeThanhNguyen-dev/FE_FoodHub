@@ -14,11 +14,11 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #121826;
+            background: #ffffff;
             min-height: 100vh;
             padding: 0;
             margin: 0;
-            color: #f9fafb;
+            color: #121826;
         }
 
         .dashboard {
@@ -34,7 +34,7 @@
             align-items: center;
             margin-bottom: 40px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #2d3748;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .header h1 {
@@ -44,7 +44,7 @@
         }
 
         .header p {
-            color: #9ca3af;
+            color: #6b7280;
             font-size: 1rem;
             margin-top: 5px;
         }
@@ -57,11 +57,11 @@
 
         .date-filter select, .date-filter input, .date-filter button {
             padding: 8px 15px;
-            border: 1px solid #2d3748;
+            border: 1px solid #e5e7eb;
             border-radius: 6px;
             font-size: 14px;
-            background: #1f2937;
-            color: #f9fafb;
+            background: #f9fafb;
+            color: #121826;
             cursor: pointer;
             transition: border-color 0.3s ease;
         }
@@ -87,7 +87,6 @@
             border-color: #ffc107;
         }
 
-        /* Prevent form submission issues */
         .date-filter form {
             display: contents;
         }
@@ -100,12 +99,12 @@
         }
 
         .stat-card {
-            background: #1f2937;
+            background: #f9fafb;
             padding: 25px;
             border-radius: 8px;
             text-align: left;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #2d3748;
+            border: 1px solid #e5e7eb;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
@@ -113,13 +112,6 @@
             transform: scale(1.03);
             box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
             cursor: pointer;
-        }
-
-        .stat-icon {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            margin-right: 10px;
-            display: inline-block;
         }
 
         .stat-header {
@@ -131,7 +123,7 @@
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #121826;
             margin-bottom: 5px;
         }
 
@@ -154,11 +146,11 @@
         }
 
         .chart-container {
-            background: #1f2937;
+            background: #f9fafb;
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            border: 1px solid #2d3748;
+            border: 1px solid #e5e7eb;
             cursor: pointer;
             height: 350px;
             position: relative;
@@ -191,18 +183,13 @@
         .chart-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #f9fafb;
+            color: #121826;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #2d3748;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .chart-title::before {
-            content: '📊';
-            font-size: 1.2rem;
         }
 
         .category-filter {
@@ -214,16 +201,16 @@
 
         .category-filter label {
             font-size: 0.95rem;
-            color: #d1d5db;
+            color: #374151;
             font-weight: 500;
         }
 
         .category-filter select {
             padding: 8px 12px;
-            border: 1px solid #2d3748;
+            border: 1px solid #e5e7eb;
             border-radius: 6px;
-            background: #1f2937;
-            color: #f9fafb;
+            background: #f9fafb;
+            color: #121826;
             font-size: 14px;
             cursor: pointer;
             flex: 0 0 200px;
@@ -241,18 +228,18 @@
             left: 25px;
             right: 25px;
             font-size: 0.9rem;
-            color: #d1d5db;
+            color: #374151;
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
 
         .comparison-info .current {
-            color: #f9fafb;
+            color: #121826;
         }
 
         .comparison-info .previous {
-            color: #9ca3af;
+            color: #6b7280;
         }
 
         .comparison-info .change {
@@ -268,10 +255,10 @@
         }
 
         .top-dishes {
-            background: #1f2937;
+            background: #f9fafb;
             padding: 20px;
             border-radius: 12px;
-            border: 1px solid #2d3748;
+            border: 1px solid #e5e7eb;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             height: fit-content;
         }
@@ -284,17 +271,12 @@
             gap: 8px;
         }
 
-        .top-dishes .chart-title::before {
-            content: '🔥';
-            font-size: 1.2rem;
-        }
-
         .dish-item {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid #2d3748;
+            border-bottom: 1px solid #e5e7eb;
             transition: background 0.2s ease;
         }
 
@@ -308,7 +290,7 @@
 
         .dish-name {
             font-weight: 500;
-            color: #e5e7eb;
+            color: #374151;
             font-size: 0.95rem;
         }
 
@@ -337,15 +319,15 @@
         .loading {
             text-align: center;
             padding: 20px;
-            color: #64748b;
+            color: #6b7280;
         }
 
         .error {
             text-align: center;
             padding: 20px;
             color: #f87171;
-            background: #2d3748;
-            border: 1px solid #4b5563;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
             border-radius: 6px;
             margin: 20px 0;
         }
@@ -364,7 +346,7 @@
         }
 
         .popup-content {
-            background: #1f2937;
+            background: #f9fafb;
             padding: 30px;
             border-radius: 12px;
             width: 90%;
@@ -375,7 +357,7 @@
 
         .popup-content h3 {
             font-size: 1.5rem;
-            color: #f9fafb;
+            color: #121826;
             margin-bottom: 20px;
         }
 
@@ -384,7 +366,7 @@
             top: 15px;
             right: 15px;
             font-size: 1.5rem;
-            color: #f9fafb;
+            color: #121826;
             cursor: pointer;
             transition: color 0.2s;
         }
@@ -481,20 +463,11 @@
             }
         }
 
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .loading-spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 2px solid #f3f3f3;
+            border: 2px solid #e5e7eb;
             border-top: 2px solid #ffc107;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -532,7 +505,6 @@
         <div class="stats-grid">
             <div class="stat-card revenue">
                 <div class="stat-header">
-                    <span class="stat-icon" style="color: #ffc107;">💰</span>
                     <div class="stat-label">Tổng Doanh Thu</div>
                 </div>
                 <div class="stat-value" id="totalRevenue">
@@ -541,7 +513,6 @@
             </div>
             <div class="stat-card orders" onclick="window.location.href='orders.html?period=' + document.getElementById('periodSelect').value">
                 <div class="stat-header">
-                    <span class="stat-icon" style="color: #ffc107;">📈</span>
                     <div class="stat-label">Đơn hàng</div>
                 </div>
                 <div class="stat-value" id="totalOrders">
@@ -550,7 +521,6 @@
             </div>
             <div class="stat-card avg-order">
                 <div class="stat-header">
-                    <span class="stat-icon" style="color: #ffc107;">📊</span>
                     <div class="stat-label">Đơn Hàng Trung Bình</div>
                 </div>
                 <div class="stat-value" id="avgOrder">
@@ -584,7 +554,6 @@
                         <label for="categoryFilter">Danh mục:</label>
                         <select id="categoryFilter">
                             <option value="">Tất cả danh mục</option>
-                            <!-- Điền động từ API /dashboard -->
                         </select>
                     </div>
                     <canvas id="dishChart"></canvas>
@@ -613,6 +582,7 @@
     <script>
         let revenueChart, paymentMethodChart, orderTypeChart, comparisonChart, dishChart, popupChart;
         let chartData = null;
+        
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('vi-VN', {
@@ -706,12 +676,12 @@
                         datasets: [{
                             label: 'Doanh thu (₫)',
                             data: data.dailyRevenue,
-                            borderColor: '#ffc107',
+                            borderColor: '#3b82f6',
                             backgroundColor: 'rgba(255, 193, 7, 0.1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            pointBackgroundColor: '#ffc107',
+                            pointBackgroundColor: '#3b82f6',
                             pointBorderColor: '#121826',
                             pointBorderWidth: 2,
                             pointRadius: 6,
@@ -734,14 +704,14 @@
                             }
                         },
                         scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                            x: { ticks: { color: '#374151' }, grid: { color: '#e5e7eb' } },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: '#d1d5db',
+                                    color: '#374151',
                                     callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
                                 },
-                                grid: { color: '#2d3748' }
+                                grid: { color: '#e5e7eb' }
                             }
                         },
                         interaction: {
@@ -759,8 +729,8 @@
                         datasets: [{
                             label: 'Doanh thu (₫)',
                             data: data.paymentMethodRevenue,
-                            backgroundColor: ['#ffc107', '#3b82f6', '#f87171'], /* Thay #34d399 thành #3b82f6 */
-                            borderColor: ['#ffc107', '#2563eb', '#f87171'], /* Thay #34d399 thành #2563eb */
+                            backgroundColor: ['#ffc107', '#3b82f6', '#f87171'],
+                            borderColor: ['#ffc107', '#2563eb', '#f87171'],
                             borderWidth: 1
                         }]
                     },
@@ -777,14 +747,14 @@
                             }
                         },
                         scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                            x: { ticks: { color: '#374151' }, grid: { color: '#e5e7eb' } },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: '#d1d5db',
+                                    color: '#374151',
                                     callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
                                 },
-                                grid: { color: '#2d3748' }
+                                grid: { color: '#e5e7eb' }
                             }
                         }
                     }
@@ -797,12 +767,12 @@
                         datasets: [{
                             label: 'Doanh thu (₫)',
                             data: data.orderTypeRevenue,
-                            borderColor: '#3b82f6', /* Thay #34d399 thành #3b82f6 */
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)', /* Thay rgba(52, 211, 153, 0.1) thành rgba xanh dương */
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            pointBackgroundColor: '#3b82f6', /* Thay #34d399 thành #3b82f6 */
+                            pointBackgroundColor: '#3b82f6',
                             pointBorderColor: '#121826',
                             pointBorderWidth: 2,
                             pointRadius: 6,
@@ -825,14 +795,14 @@
                             }
                         },
                         scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                            x: { ticks: { color: '#374151' }, grid: { color: '#e5e7eb' } },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: '#d1d5db',
+                                    color: '#374151',
                                     callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
                                 },
-                                grid: { color: '#2d3748' }
+                                grid: { color: '#e5e7eb' }
                             }
                         },
                         interaction: {
@@ -850,8 +820,8 @@
                         datasets: [{
                             label: 'Doanh thu (₫)',
                             data: [data.revenue, data.previousRevenue],
-                            backgroundColor: ['#ffc107', '#3b82f6'], /* Thay #34d399 thành #3b82f6 */
-                            borderColor: ['#ffc107', '#2563eb'], /* Thay #34d399 thành #2563eb */
+                            backgroundColor: ['#ffc107', '#3b82f6'],
+                            borderColor: ['#ffc107', '#2563eb'],
                             borderWidth: 1
                         }]
                     },
@@ -868,14 +838,14 @@
                             }
                         },
                         scales: {
-                            x: { ticks: { color: '#d1d5db' }, grid: { color: '#2d3748' } },
+                            x: { ticks: { color: '#374151' }, grid: { color: '#e5e7eb' } },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: '#d1d5db',
+                                    color: '#374151',
                                     callback: value => value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : (value / 1000).toFixed(0) + 'K'
                                 },
-                                grid: { color: '#2d3748' }
+                                grid: { color: '#e5e7eb' }
                             }
                         }
                     }
@@ -915,8 +885,8 @@
                         },
                         scales: {
                             x: {
-                                display: false, // Hide x-axis labels
-                                grid: { color: '#2d3748' },
+                                display: false,
+                                grid: { color: '#e5e7eb' },
                                 title: {
                                     display: false
                                 }
@@ -924,14 +894,14 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: '#d1d5db',
+                                    color: '#374151',
                                     callback: value => value.toLocaleString('vi-VN')
                                 },
-                                grid: { color: '#2d3748' },
+                                grid: { color: '#e5e7eb' },
                                 title: {
                                     display: true,
                                     text: 'Số lượng',
-                                    color: '#f9fafb',
+                                    color: '#121826',
                                     font: { size: 14, weight: '600' }
                                 }
                             }
@@ -1002,7 +972,7 @@
                 return;
             }
             container.innerHTML = dishes.map((dish, index) => `
-                <div class="dish-item animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                <div class="dish-item">
                     <div class="dish-name">${index + 1}. ${dish.name}</div>
                     <div class="dish-quantity">${dish.quantity} món</div>
                     <div class="dish-revenue">${formatCurrency(dish.revenue)}</div>

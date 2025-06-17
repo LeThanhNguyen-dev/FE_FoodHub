@@ -1,36 +1,83 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lịch Ca Làm Việc</title>
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/sidebar.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Sử dụng biến màu từ sidebar.css */
+        :root {
+            --primary: #FEA116;
+            --light: #F1F8FF;
+            --dark: #0F172B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #0F152B, #1A233F);
-            color: #E0E7FF;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--light);
             min-height: 100vh;
+        }
+
+        /* Điều chỉnh main-content để phù hợp với sidebar */
+        .main-content {
+            margin-left: 280px;
+            transition: all 0.3s;
             padding: 20px;
-            line-height: 1.6;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        /* Top bar tương tự staffList.html */
+        .top-bar {
+            background: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .top-nav {
-            margin-bottom: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 30px;
         }
 
         .home-btn {
-            background: linear-gradient(90deg, #FF9509, #FFB347);
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -41,10 +88,11 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
         }
 
         .home-btn:hover {
+            background-color: #e8960f;
             transform: translateY(-2px);
         }
 
@@ -54,154 +102,174 @@
         }
 
         .header h1 {
-            color: #FF9509;
+            color: var(--primary);
             font-size: 2.5em;
             font-weight: 700;
         }
 
         .header p {
-            color: #A3BFFA;
+            color: #6c757d;
             font-size: 1em;
         }
 
         .calendar-nav {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .nav-btn {
-            background: linear-gradient(90deg, #FF9509, #FFB347);
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: transform 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
         }
 
         .nav-btn:hover {
+            background-color: #e8960f;
             transform: translateY(-2px);
         }
 
         .week-display {
-            font-size: 1.5em;
-            color: #FF9509;
+            font-size: 1.4em;
+            color: var(--primary);
             font-weight: 600;
-            min-width: 200px;
+            min-width: 220px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-            background: rgba(255, 255, 255, 0.05);
+            gap: 10px;
+            background-color: #ffffff;
             border-radius: 10px;
             overflow: hidden;
+            border: 1px solid #e9ecef;
         }
 
         .day-header {
-            background: linear-gradient(90deg, #FF9509, #FFB347);
+            background-color: var(--primary);
             color: white;
             padding: 12px;
             text-align: center;
             font-weight: 600;
+            border-bottom: 1px solid #e8960f;
         }
 
         .day-cell {
-            background: rgba(255, 255, 255, 0.03);
-            min-height: 120px;
+            background-color: #fefefe;
+            min-height: 140px;
             padding: 10px;
-            border-radius: 6px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .day-number {
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 18px;
             margin-bottom: 8px;
-            color: #FF9509;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(255, 149, 9, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 5px;
+            background-color: rgba(254, 161, 22, 0.1);
             display: inline-block;
         }
 
         .shifts-container {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .shift-group {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
         .shift-header {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
-            color: #FF9509;
+            color: var(--primary);
             text-transform: uppercase;
+            margin-bottom: 2px;
         }
 
         .employee-card {
-            background: rgba(255, 149, 9, 0.1);
+            background-color: rgba(254, 161, 22, 0.08);
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 7px 12px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .employee-card:hover {
-            background: rgba(255, 149, 9, 0.2);
+            background-color: rgba(254, 161, 22, 0.15);
+            transform: translateY(-1px);
         }
 
-        .employee-card.chef { border-left: 4px solid #ff6b6b; }
-        .employee-card.waiter { border-left: 4px solid #dbeafe; }
-        .employee-card.cashier { border-left: 4px solid #45b7d1; }
-        .employee-card.manager { border-left: 4px solid #0d9668; }
+        .employee-card.chef { border-left: 4px solid #dc3545; }
+        .employee-card.waiter { border-left: 4px solid #007bff; }
+        .employee-card.cashier { border-left: 4px solid #28a745; }
+        .employee-card.manager { border-left: 4px solid #6f42c1; }
 
         .employee-name {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 500;
-            color: #E0E7FF;
+            color: #343a40;
         }
 
         .area-tag {
-            font-size: 10px;
-            background: #1E293B;
-            padding: 2px 6px;
+            font-size: 9px;
+            background-color: #e9ecef;
+            padding: 3px 7px;
             border-radius: 4px;
-            color: #A3BFFA;
+            color: #495057;
+            font-weight: 500;
         }
 
         .add-shift-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(90deg, #FF9509, #FFB347);
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height:
+            55px;
+            background-color: var(--primary);
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 149, 9, 0.3);
-            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(254, 161, 22, 0.4);
+            transition: transform 0.2s, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .add-shift-btn:hover {
             transform: scale(1.1);
+            background-color: #e8960f;
         }
 
+        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -209,74 +277,94 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 21, 43, 0.8);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .modal.show {
             display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 1;
         }
 
         .modal-content {
-            background: #1A233F;
-            padding: 20px;
+            background-color: #ffffff;
+            padding: 25px;
             border-radius: 10px;
             width: 90%;
-            max-width: 400px;
-            border: 1px solid #FF9509;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 450px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-top: 5px solid var(--primary);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
         }
 
         .modal-title {
-            color: #FF9509;
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            color: #FF9509;
-            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95em;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid rgba(255, 149, 9, 0.2);
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
             border-radius: 6px;
-            background: #1E293B;
-            color: #E0E7FF;
-            font-size: 14px;
+            background-color: #f8f9fa;
+            color: #343a40;
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
+            outline: none;
         }
 
         .form-group select option {
-            background: #1E293B;
-            color: #E0E7FF;
+            background-color: #ffffff;
+            color: #343a40;
         }
 
         .form-actions {
             display: flex;
             gap: 10px;
-            justify-content: center;
+            justify-content: flex-end;
+            margin-top: 25px;
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
-            transition: transform 0.2s;
+            font-weight: 600;
+            transition: transform 0.2s, background-color 0.2s;
+            font-size: 15px;
         }
 
         .btn:hover {
@@ -284,21 +372,33 @@
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, #FF9509, #FFB347);
+            background-color: var(--primary);
             color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e8960f;
         }
 
         .btn-secondary {
-            background: #1E293B;
-            color: #E0E7FF;
-            border: 1px solid rgba(255, 149, 9, 0.2);
-        }
-
-        .btn-danger {
-            background: #dc3545;
+            background-color: #6c757d;
             color: white;
         }
 
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Custom Popup styles */
         .custom-popup {
             display: none;
             position: fixed;
@@ -306,524 +406,670 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 21, 43, 0.9);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .custom-popup.show {
             display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 1;
         }
 
         .popup-content {
-            background: #1A233F;
-            padding: 20px;
+            background-color: #ffffff;
+            padding: 25px;
             border-radius: 10px;
             width: 90%;
-            max-width: 350px;
-            border: 1px solid #FF9509;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 380px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             text-align: center;
+            border-top: 5px solid;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .custom-popup.show .popup-content {
+            transform: translateY(0);
         }
 
         .popup-icon {
-            font-size: 2em;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            line-height: 1;
+        }
+
+        .popup-icon.error { border-color: #dc3545; color: #dc3545; }
+        .popup-icon.success { border-color: #28a745; color: #28a745; }
+        .popup-icon.confirm { border-color: var(--primary); color: var(--primary); }
+
+        .popup-title {
+            color: var(--primary);
+            font-size: 1.3em;
+            font-weight: 700;
             margin-bottom: 10px;
         }
 
-        .popup-title {
-            color: #FF9509;
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
         .popup-message {
-            color: #A3BFFA;
-            font-size: 0.9em;
-            margin-bottom: 15px;
+            color: #495057;
+            font-size: 1em;
+            margin-bottom: 20px;
         }
 
         .popup-actions {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
         }
 
+        /* Legend styles */
         .legend {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
+            gap: 25px;
+            margin-top: 30px;
             flex-wrap: wrap;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             font-weight: 500;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        .legend-item .employee-card {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            padding: 0;
+            box-shadow: none;
+            cursor: default;
+            background-color: transparent;
         }
 
         .shift-times-table {
-            margin-top: 20px;
-            border: 1px solid rgba(255, 149, 9, 0.2);
-            border-radius: 6px;
+            margin-top: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
             overflow: hidden;
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
             margin-left: auto;
             margin-right: auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .shift-times-table table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
         .shift-times-table th,
         .shift-times-table td {
-            padding: 8px;
+            padding: 12px;
             text-align: center;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .shift-times-table th {
-            background: rgba(255, 149, 9, 0.1);
-            color: #FF9509;
-            font-weight: 600;
+            background-color: rgba(254, 161, 22, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9em;
         }
 
         .shift-times-table td {
-            background: #1E293B;
+            background-color: #fefefe;
+            color: #343a40;
         }
-select[multiple] option:checked {
-        background: linear-gradient(90deg, #FF9509, #FFB347);
-        color: white;
-    }
+
+        .shift-times-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        select[multiple] option:checked {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .calendar { font-size: 12px; }
-            .day-cell { min-height: 100px; padding: 6px; }
-            .employee-card { padding: 4px 8px; }
-            .employee-name { font-size: 10px; }
-            .modal-content { padding: 15px; }
-            .calendar-nav { gap: 10px; }
-            .week-display { font-size: 1.2em; min-width: 180px; }
+            .main-content {
+                margin-left: 0;
+            }
+
+            .calendar {
+                font-size: 11px;
+                gap: 5px;
+            }
+
+            .day-cell {
+                min-height: 100px;
+                padding: 8px;
+            }
+
+            .employee-card {
+                padding: 5px 10px;
+            }
+
+            .employee-name {
+                font-size: 11px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .calendar-nav {
+                gap: 8px;
+            }
+
+            .week-display {
+                font-size: 1.1em;
+                min-width: 150px;
+            }
+
+            .nav-btn {
+                padding: 8px 15px;
+            }
+
+            .add-shift-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .legend {
+                gap: 15px;
+            }
         }
     </style>
 </head>
+
 <body>
-<div class="container" id="container">
-    <div class="top-nav">
-        <a href="/staff-manager/staffList.html" class="home-btn">← Quay Lại</a>
-    </div>
+    <!-- Sidebar Include -->
+    <div id="sidebar-container"></div>
 
-    <div class="header">
-        <h1>Lịch Ca Làm Việc</h1>
-        <p>Quản lý ca làm việc nhà hàng</p>
-    </div>
-
-    <div class="calendar-nav" id="calendar-nav">
-        <button class="nav-btn" onclick="prevWeek()">← Tuần trước</button>
-        <div class="week-display" id="weekDisplay"></div>
-        <button class="nav-btn" onclick="nextWeek()">Tuần sau →</button>
-    </div>
-
-    <div class="calendar" id="calendar"></div>
-
-    <div class="legend">
-        <div class="legend-item">
-            <div class="employee-card chef" style="width: 15px; height: 15px;"></div>
-            <span>Bếp trưởng</span>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center">
+                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Lịch Ca Làm Việc</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>Admin
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></hr>
+                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="legend-item">
-            <div class="employee-card waiter" style="width: 15px; height: 15px;"></div>
-            <span>Phục vụ</span>
+
+        <div class="container" id="container">
+            <div class="top-nav">
+                <a href="/staff-manager/staffList.html" class="home-btn">← Quay Lại</a>
+            </div>
+
+            <div class="header">
+                <h1>Lịch Ca Làm Việc</h1>
+                <p>Quản lý ca làm việc nhà hàng</p>
+            </div>
+
+            <div class="calendar-nav" id="calendar-nav">
+                <button class="nav-btn" onclick="prevWeek()">← Tuần trước</button>
+                <div class="week-display" id="weekDisplay"></div>
+                <button class="nav-btn" onclick="nextWeek()">Tuần sau →</button>
+            </div>
+
+            <div class="calendar" id="calendar"></div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="employee-card chef" style="width: 15px; height: 15px;"></div>
+                    <span>Bếp trưởng</span>
+                </div>
+                <div class="legend-item">
+                    <div class="employee-card waiter" style="width: 15px; height: 15px;"></div>
+                    <span>Phục vụ</span>
+                </div>
+                <div class="legend-item">
+                    <div class="employee-card cashier" style="width: 15px; height: 15px;"></div>
+                    <span>Thu ngân</span>
+                </div>
+                <div class="legend-item">
+                    <div class="employee-card manager" style="width: 15px; height: 15px;"></div>
+                    <span>Quản lý</span>
+                </div>
+            </div>
+
+            <div class="shift-times-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ca</th>
+                            <th>Giờ bắt đầu</th>
+                            <th>Giờ kết thúc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ca Sáng</td>
+                            <td>08:30</td>
+                            <td>12:30</td>
+                        </tr>
+                        <tr>
+                            <td>Ca Chiều</td>
+                            <td>12:30</td>
+                            <td>17:30</td>
+                        </tr>
+                        <tr>
+                            <td>Ca Tối</td>
+                            <td>17:30</td>
+                            <td>22:30</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="legend-item">
-            <div class="employee-card cashier" style="width: 15px; height: 15px;"></div>
-            <span>Thu ngân</span>
+    </div>
+
+    <button class="add-shift-btn" onclick="openModal()">+</button>
+
+    <div class="modal" id="shiftModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Thêm Ca Làm Việc</h2>
+            <form id="shiftForm">
+                <div class="form-group">
+                    <label for="employeeRole">Vị trí công việc</label>
+                    <select id="employeeRole" name="employeeRole" required>
+                        <option value="">Chọn vị trí...</option>
+                        <option value="chef">Bếp trưởng (Chef)</option>
+                        <option value="waiter">Phục vụ (Waiter)</option>
+                        <option value="cashier">Thu ngân (Cashier)</option>
+                        <option value="manager">Quản lý (Manager)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="employeeName">Tên nhân viên</label>
+                    <select id="employeeName" name="employeeName" multiple required>
+                        <option value="">Chọn nhân viên...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="areaGroup" style="display: none;">
+                    <label for="area">Khu vực (Area)</label>
+                    <select id="area" name="area">
+                        <option value="">Chọn khu vực...</option>
+                        <option value="C1">C1</option>
+                        <option value="C2">C2</option>
+                        <option value="C3">C3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shiftDate">Ngày làm việc</label>
+                    <input type="date" id="shiftDate" name="shiftDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="shiftType">Ca làm việc</label>
+                    <select id="shiftType" name="shiftType" required>
+                        <option value="">Chọn ca...</option>
+                        <option value="morning">Ca Sáng</option>
+                        <option value="afternoon">Ca Chiều</option>
+                        <option value="night">Ca Tối</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm Ca</button>
+                </div>
+            </form>
         </div>
-        <div class="legend-item">
-            <div class="employee-card manager" style="width: 15px; height: 15px;"></div>
-            <span>Quản lý</span>
+    </div>
+
+    <div class="custom-popup" id="customPopup">
+        <div class="popup-content">
+            <span class="popup-icon" id="popupIcon"></span>
+            <h3 class="popup-title" id="popupTitle"></h3>
+            <p class="popup-message" id="popupMessage"></p>
+            <div class="popup-actions" id="popupActions"></div>
         </div>
     </div>
 
-    <div class="shift-times-table">
-        <table>
-            <thead>
-                <tr>
-                    <th>Ca</th>
-                    <th>Giờ bắt đầu</th>
-                    <th>Giờ kết thúc</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Ca Sáng</td>
-                    <td>08:30</td>
-                    <td>12:30</td>
-                </tr>
-                <tr>
-                    <td>Ca Chiều</td>
-                    <td>12:30</td>
-                    <td>17:30</td>
-                </tr>
-                <tr>
-                    <td>Ca Tối</td>
-                    <td>17:30</td>
-                    <td>22:30</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<button class="add-shift-btn" onclick="openModal()">+</button>
-
-<div class="modal" id="shiftModal">
-    <div class="modal-content">
-        <h2 class="modal-title">Thêm Ca Làm Việc</h2>
-        <form id="shiftForm">
-            <div class="form-group">
-                <label for="employeeRole">Vị trí công việc</label>
-                <select id="employeeRole" name="employeeRole" required>
-                    <option value="">Chọn vị trí...</option>
-                    <option value="chef">Bếp trưởng (Chef)</option>
-                    <option value="waiter">Phục vụ (Waiter)</option>
-                    <option value="cashier">Thu ngân (Cashier)</option>
-                    <option value="manager">Quản lý (Manager)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="employeeName">Tên nhân viên</label>
-                <select id="employeeName" name="employeeName" multiple required>
-                    <option value="">Chọn nhân viên...</option>
-                </select>
-            </div>
-            <div class="form-group" id="areaGroup" style="display: none;">
-                <label for="area">Khu vực (Area)</label>
-                <select id="area" name="area">
-                    <option value="">Chọn khu vực...</option>
-                    <option value="C1">C1</option>
-                    <option value="C2">C2</option>
-                    <option value="C3">C3</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="shiftDate">Ngày làm việc</label>
-                <input type="date" id="shiftDate" name="shiftDate" required>
-            </div>
-            <div class="form-group">
-                <label for="shiftType">Ca làm việc</label>
-                <select id="shiftType" name="shiftType" required>
-                    <option value="">Chọn ca...</option>
-                    <option value="morning">Ca Sáng</option>
-                    <option value="afternoon">Ca Chiều</option>
-                    <option value="night">Ca Tối</option>
-                </select>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
-                <button type="submit" class="btn btn-primary">Thêm Ca</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="custom-popup" id="customPopup">
-    <div class="popup-content">
-        <span class="popup-icon" id="popupIcon"></span>
-        <h3 class="popup-title" id="popupTitle"></h3>
-        <p class="popup-message" id="popupMessage"></p>
-        <div class="popup-actions" id="popupActions"></div>
-    </div>
-</div>
-
-<script src="../js/fetch-api.js"></script>
-<script>
-    let currentDate = new Date();
-
-function goHome() {
-    window.location.href = '/';
-}
-
-function showAlert(message, title = 'Thông báo', type = 'error') {
-    const popup = document.getElementById('customPopup');
-    const icon = document.getElementById('popupIcon');
-    const titleEl = document.getElementById('popupTitle');
-    const messageEl = document.getElementById('popupMessage');
-    const actionsEl = document.getElementById('popupActions');
-
-    icon.className = `popup-icon ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
-    icon.innerHTML = type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    actionsEl.innerHTML = `<button class="btn btn-primary" onclick="closePopup()">Đồng ý</button>`;
-    actionsEl.className = 'popup-actions';
-
-    popup.classList.add('show');
-}
-
-function showConfirm(message, title = 'Xác nhận', onConfirm, onCancel) {
-    const popup = document.getElementById('customPopup');
-    const icon = document.getElementById('popupIcon');
-    const titleEl = document.getElementById('popupTitle');
-    const messageEl = document.getElementById('popupMessage');
-    const actionsEl = document.getElementById('popupActions');
-
-    icon.className = 'popup-icon';
-    icon.innerHTML = '❓';
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    actionsEl.innerHTML = `
-        <button class="btn btn-secondary" onclick="handlePopupCancel()">Hủy</button>
-        <button class="btn btn-danger" onclick="handlePopupConfirm()">Xác nhận</button>
-    `;
-
-    window.popupConfirmCallback = onConfirm;
-    window.popupCancelCallback = onCancel;
-
-    popup.classList.add('show');
-}
-
-function closePopup() {
-    document.getElementById('customPopup').classList.remove('show');
-}
-
-function handlePopupConfirm() {
-    closePopup();
-    if (window.popupConfirmCallback) window.popupConfirmCallback();
-}
-
-function handlePopupCancel() {
-    closePopup();
-    if (window.popupCancelCallback) window.popupCancelCallback();
-}
-
-async function init() {
-    await renderCalendar();
-}
-
-async function updateEmployeeList() {
-    const role = document.getElementById('employeeRole').value;
-    const employeeNameSelect = document.getElementById('employeeName');
-    const areaGroup = document.getElementById('areaGroup');
-    employeeNameSelect.innerHTML = '<option value="">Chọn nhân viên...</option>';
-    areaGroup.style.display = role === 'waiter' ? 'block' : 'none';
-    if (role) {
-        try {
-            const response = await apiFetch(`/shifts/employees?role=${role}`, { method: 'GET' });
-            const employees = response.result || [];
-            employees.forEach(emp => {
-                const option = document.createElement('option');
-                option.value = emp.name;
-                option.textContent = emp.name;
-                employeeNameSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error(`Lỗi tải danh sách nhân viên: ${error.message}`);
-            showAlert('Lỗi tải danh sách nhân viên. Vui lòng thử lại.', 'Lỗi', 'error');
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/js/fetch-api.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script>
+        async function loadSidebar() {
+            try {
+                const response = await fetch('/components/sidebar.html');
+                if (!response.ok) throw new Error('Không thể tải sidebar');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                setActiveNavLink();
+            } catch (error) {
+                console.error('Lỗi khi tải sidebar:', error);
+                showNotification('Lỗi tải sidebar!', 'error');
+                document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+            }
         }
-    }
-}
 
-async function renderCalendar() {
-    const calendar = document.getElementById('calendar');
-    calendar.innerHTML = '';
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
 
-    const weekStart = new Date(currentDate);
-    const dayOfWeek = weekStart.getDay();
-    weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    document.getElementById('weekDisplay').textContent = `Tuần: ${weekStart.getDate()}/${weekStart.getMonth() + 1} - ${weekEnd.getDate()}/${weekEnd.getMonth() + 1}/${weekEnd.getFullYear()}`;
+        let currentDate = new Date();
 
-    const dayHeaders = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
-    dayHeaders.forEach(day => {
-        const dayHeaderEl = document.createElement('div');
-        dayHeaderEl.className = 'day-header';
-        dayHeaderEl.textContent = day;
-        calendar.appendChild(dayHeaderEl);
-    });
+        function showAlert(message, title = 'Thông báo', type = 'error') {
+            const popup = document.getElementById('customPopup');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const messageEl = document.getElementById('popupMessage');
+            const actionsEl = document.getElementById('popupActions');
 
-    const weekStartStr = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
-    try {
-        const response = await apiFetch(`/shifts?weekStart=${weekStartStr}`, { method: 'GET' });
-        const shifts = response.result || [];
+            icon.className = `popup-icon ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+            icon.innerHTML = type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️';
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            actionsEl.innerHTML = `<button class="btn btn-primary" onclick="closePopup()">Đồng ý</button>`;
+            actionsEl.className = 'popup-actions';
 
-        for (let i = 0; i < 7; i++) {
-            const dayCell = document.createElement('div');
-            dayCell.className = 'day-cell';
+            popup.classList.add('show');
+        }
 
-            const currentDay = new Date(weekStart);
-            currentDay.setDate(weekStart.getDate() + i);
-            const dateStr = `${currentDay.getFullYear()}-${String(currentDay.getMonth() + 1).padStart(2, '0')}-${String(currentDay.getDate()).padStart(2, '0')}`;
-            const dayShifts = shifts.filter(shift => shift.date === dateStr);
+        function showConfirm(message, title = 'Xác nhận', onConfirm, onCancel) {
+            const popup = document.getElementById('customPopup');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const messageEl = document.getElementById('popupMessage');
+            const actionsEl = document.getElementById('popupActions');
 
-            const groupedShifts = {
-                morning: dayShifts.filter(s => s.shift.toLowerCase() === 'morning'),
-                afternoon: dayShifts.filter(s => s.shift.toLowerCase() === 'afternoon'),
-                night: dayShifts.filter(s => s.shift.toLowerCase() === 'night')
-            };
+            icon.className = 'popup-icon';
+            icon.innerHTML = '❓';
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            actionsEl.innerHTML = `
+                <button class="btn btn-secondary" onclick="handlePopupCancel()">Hủy</button>
+                <button class="btn btn-danger" onclick="handlePopupConfirm()">Xác nhận</button>
+            `;
 
-            let shiftsHtml = '';
-            ['morning', 'afternoon', 'night'].forEach(shiftType => {
-                if (groupedShifts[shiftType].length > 0) {
-                    shiftsHtml += `
-                        <div class="shift-group">
-                            <div class="shift-header">${shiftType === 'morning' ? 'Ca Sáng' : shiftType === 'afternoon' ? 'Ca Chiều' : 'Ca Tối'}</div>
-                            ${groupedShifts[shiftType].map(shift => `
-                                <div class="employee-card ${shift.role.toLowerCase()}" onclick="confirmRemoveShift(${shift.id}, '${shift.name}${shift.area ? ' ' + shift.area : ''}', '${shift.date}', '${shift.shift}')">
-                                    <span class="employee-name">${shift.name}</span>
-                                    ${shift.area ? `<span class="area-tag">${shift.area}</span>` : ''}
+            window.popupConfirmCallback = onConfirm;
+            window.popupCancelCallback = onCancel;
+
+            popup.classList.add('show');
+        }
+
+        function closePopup() {
+            document.getElementById('customPopup').classList.remove('show');
+        }
+
+        function handlePopupConfirm() {
+            closePopup();
+            if (window.popupConfirmCallback) window.popupConfirmCallback();
+        }
+
+        function handlePopupCancel() {
+            closePopup();
+            if (window.popupCancelCallback) window.popupCancelCallback();
+        }
+
+        async function init() {
+            await loadSidebar();
+            await renderCalendar();
+        }
+
+        async function updateEmployeeList() {
+            const role = document.getElementById('employeeRole').value;
+            const employeeNameSelect = document.getElementById('employeeName');
+            const areaGroup = document.getElementById('areaGroup');
+            employeeNameSelect.innerHTML = '<option value="">Chọn nhân viên...</option>';
+            areaGroup.style.display = role === 'waiter' ? 'block' : 'none';
+            if (role) {
+                try {
+                    const response = await apiFetch(`/shifts/employees?role=${role}`, { method: 'GET' });
+                    const employees = response.result || [];
+                    employees.forEach(emp => {
+                        const option = document.createElement('option');
+                        option.value = emp.name;
+                        option.textContent = emp.name;
+                        employeeNameSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error(`Lỗi tải danh sách nhân viên: ${error.message}`);
+                    showAlert('Lỗi tải danh sách nhân viên. Vui lòng thử lại.', 'Lỗi', 'error');
+                }
+            }
+        }
+
+        async function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+
+            const weekStart = new Date(currentDate);
+            const dayOfWeek = weekStart.getDay();
+            weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            document.getElementById('weekDisplay').textContent = `Tuần: ${weekStart.getDate()}/${weekStart.getMonth() + 1} - ${weekEnd.getDate()}/${weekEnd.getMonth() + 1}/${weekEnd.getFullYear()}`;
+
+            const dayHeaders = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
+            dayHeaders.forEach(day => {
+                const dayHeaderEl = document.createElement('div');
+                dayHeaderEl.className = 'day-header';
+                dayHeaderEl.textContent = day;
+                calendar.appendChild(dayHeaderEl);
+            });
+
+            const weekStartStr = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
+            try {
+                const response = await apiFetch(`/shifts?weekStart=${weekStartStr}`, { method: 'GET' });
+                const shifts = response.result || [];
+
+                for (let i = 0; i < 7; i++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'day-cell';
+
+                    const currentDay = new Date(weekStart);
+                    currentDay.setDate(weekStart.getDate() + i);
+                    const dateStr = `${currentDay.getFullYear()}-${String(currentDay.getMonth() + 1).padStart(2, '0')}-${String(currentDay.getDate()).padStart(2, '0')}`;
+                    const dayShifts = shifts.filter(shift => shift.date === dateStr);
+
+                    const groupedShifts = {
+                        morning: dayShifts.filter(s => s.shift.toLowerCase() === 'morning'),
+                        afternoon: dayShifts.filter(s => s.shift.toLowerCase() === 'afternoon'),
+                        night: dayShifts.filter(s => s.shift.toLowerCase() === 'night')
+                    };
+
+                    let shiftsHtml = '';
+                    ['morning', 'afternoon', 'night'].forEach(shiftType => {
+                        if (groupedShifts[shiftType].length > 0) {
+                            shiftsHtml += `
+                                <div class="shift-group">
+                                    <div class="shift-header">${shiftType === 'morning' ? 'Ca Sáng' : shiftType === 'afternoon' ? 'Ca Chiều' : 'Ca Tối'}</div>
+                                    ${groupedShifts[shiftType].map(shift => `
+                                        <div class="employee-card ${shift.role.toLowerCase()}" onclick="confirmRemoveShift(${shift.id}, '${shift.name}${shift.area ? ' ' + shift.area : ''}', '${shift.date}', '${shift.shift}')">
+                                            <span class="employee-name">${shift.name}</span>
+                                            ${shift.area ? `<span class="area-tag">${shift.area}</span>` : ''}
+                                        </div>
+                                    `).join('')}
                                 </div>
-                            `).join('')}
+                            `;
+                        }
+                    });
+
+                    dayCell.innerHTML = `
+                        <div class="day-number">${currentDay.getDate()}</div>
+                        <div class="shifts-container">
+                            ${shiftsHtml}
                         </div>
                     `;
+                    calendar.appendChild(dayCell);
                 }
-            });
-
-            dayCell.innerHTML = `
-                <div class="day-number">${currentDay.getDate()}</div>
-                <div class="shifts-container">
-                    ${shiftsHtml}
-                </div>
-            `;
-            calendar.appendChild(dayCell);
+            } catch (error) {
+                console.error('Lỗi khi tải ca làm việc:', error.message);
+                showAlert('Lỗi tải ca làm việc. Vui lòng thử lại.', 'Lỗi', 'error');
+            }
         }
-    } catch (error) {
-        console.error('Lỗi khi tải ca làm việc:', error.message);
-        showAlert('Lỗi tải ca làm việc. Vui lòng thử lại.', 'Lỗi', 'error');
-    }
-}
 
-function prevWeek() {
-    currentDate.setDate(currentDate.getDate() - 7);
-    renderCalendar();
-}
-
-function nextWeek() {
-    currentDate.setDate(currentDate.getDate() + 7);
-    renderCalendar();
-}
-
-function openModal() {
-    document.getElementById('shiftModal').classList.add('show');
-    document.getElementById('shiftForm').reset();
-    document.getElementById('employeeName').innerHTML = '<option value="">Chọn nhân viên...</option>';
-    document.getElementById('areaGroup').style.display = 'none';
-    updateEmployeeList();
-}
-
-function closeModal() {
-    document.getElementById('shiftModal').classList.remove('show');
-}
-
-async function addShift(event) {
-    event.preventDefault();
-    const formData = new FormData(document.getElementById('shiftForm'));
-    const employeeNames = Array.from(document.getElementById('employeeName').selectedOptions).map(opt => opt.value);
-    if (employeeNames.length === 0) {
-        showAlert('Vui lòng chọn ít nhất một nhân viên.', 'Lỗi', 'error');
-        return;
-    }
-
-    const shiftDate = new Date(formData.get('shiftDate'));
-    const shiftType = formData.get('shiftType');
-    const today = new Date();
-    const currentHours = today.getHours();
-    const currentMinutes = today.getMinutes();
-
-    // Kiểm tra ngày trong quá khứ
-    if (shiftDate.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0)) {
-        showAlert('Không thể thêm ca cho ngày trong quá khứ.', 'Lỗi', 'error');
-        return;
-    }
-
-    // Kiểm tra ca hôm nay đã qua giờ bắt đầu
-    if (shiftDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
-        if (shiftType === 'morning' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 30))) {
-            showAlert('Không thể thêm ca sáng vì đã qua giờ bắt đầu (08:30).', 'Lỗi', 'error');
-            return;
+        function prevWeek() {
+            currentDate.setDate(currentDate.getDate() - 7);
+            renderCalendar();
         }
-        if (shiftType === 'afternoon' && (currentHours > 12 || (currentHours === 12 && currentMinutes >= 30))) {
-            showAlert('Không thể thêm ca chiều vì đã qua giờ bắt đầu (12:30).', 'Lỗi', 'error');
-            return;
+
+        function nextWeek() {
+            currentDate.setDate(currentDate.getDate() + 7);
+            renderCalendar();
         }
-        if (shiftType === 'night' && (currentHours > 17 || (currentHours === 17 && currentMinutes >= 30))) {
-            showAlert('Không thể thêm ca tối vì đã qua giờ bắt đầu (17:30).', 'Lỗi', 'error');
-            return;
+
+        function openModal() {
+            document.getElementById('shiftModal').classList.add('show');
+            document.getElementById('shiftForm').reset();
+            document.getElementById('employeeName').innerHTML = '<option value="">Chọn nhân viên...</option>';
+            document.getElementById('areaGroup').style.display = 'none';
+            updateEmployeeList();
         }
-    }
 
-    const newShifts = employeeNames.map(name => ({
-        name,
-        role: formData.get('employeeRole'),
-        date: formData.get('shiftDate'),
-        shift: formData.get('shiftType'),
-        area: formData.get('area') || null
-    }));
-
-    try {
-        const responses = await Promise.all(newShifts.map(shift =>
-            apiFetch('/shifts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(shift)
-            })
-        ));
-        const hasError = responses.some(r => r.code !== 1000);
-        if (hasError) {
-            const errorMsg = responses.find(r => r.code !== 1000)?.message || 'Lỗi không xác định';
-            showAlert(errorMsg, 'Lỗi', 'error');
-        } else {
-            showAlert('Thêm ca làm việc thành công!', 'Thành công', 'success');
-            await renderCalendar();
-            closeModal();
+        function closeModal() {
+            document.getElementById('shiftModal').classList.remove('show');
         }
-    } catch (error) {
-        console.error('Lỗi khi thêm ca:', error.message);
-        showAlert(error.message || 'Lỗi kết nối. Vui lòng thử lại.', 'Lỗi', 'error');
-    }
-}
 
-function confirmRemoveShift(shiftId, employeeName, shiftDate, shiftType) {
-    const shiftDateObj = new Date(shiftDate);
-    const today = new Date();
-    if (shiftDateObj.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0)) {
-        showAlert('Không thể xóa ca làm việc trong quá khứ.', 'Lỗi', 'error');
-        return;
-    }
-    showConfirm(
-        `Bạn có chắc muốn xóa ca làm việc của "${employeeName}" không?`,
-        'Xác nhận xóa ca',
-        () => removeShift(shiftId),
-        () => {}
-    );
-}
+        async function addShift(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('shiftForm'));
+            const employeeNames = Array.from(document.getElementById('employeeName').selectedOptions).map(opt => opt.value);
+            if (employeeNames.length === 0) {
+                showAlert('Vui lòng chọn ít nhất một nhân viên.', 'Lỗi', 'error');
+                return;
+            }
 
-async function removeShift(shiftId) {
-    try {
-        const response = await apiFetch(`/shifts/${shiftId}`, { method: 'DELETE' });
-        if (response.code === 1000) {
-            showAlert(response.message || 'Xóa ca làm việc thành công!', 'Thành công', 'success');
-            await renderCalendar();
-        } else {
-            showAlert(response.message || 'Lỗi không xác định', 'Lỗi', 'error');
+            const shiftDate = new Date(formData.get('shiftDate'));
+            const shiftType = formData.get('shiftType');
+            const today = new Date();
+            const currentHours = today.getHours();
+            const currentMinutes = today.getMinutes();
+
+            if (shiftDate.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0)) {
+                showAlert('Không thể thêm ca cho ngày trong quá khứ.', 'Lỗi', 'error');
+                return;
+            }
+
+            if (shiftDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
+                if (shiftType === 'morning' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 30))) {
+                    showAlert('Không thể thêm ca sáng vì đã qua giờ bắt đầu (08:30).', 'Lỗi', 'error');
+                    return;
+                }
+                if (shiftType === 'afternoon' && (currentHours > 12 || (currentHours === 12 && currentMinutes >= 30))) {
+                    showAlert('Không thể thêm ca chiều vì đã qua giờ bắt đầu (12:30).', 'Lỗi', 'error');
+                    return;
+                }
+                if (shiftType === 'night' && (currentHours > 17 || (currentHours === 17 && currentMinutes >= 30))) {
+                    showAlert('Không thể thêm ca tối vì đã qua giờ bắt đầu (17:30).', 'Lỗi', 'error');
+                    return;
+                }
+            }
+
+            const newShifts = employeeNames.map(name => ({
+                name,
+                role: formData.get('employeeRole'),
+                date: formData.get('shiftDate'),
+                shift: formData.get('shiftType'),
+                area: formData.get('area') || null
+            }));
+
+            try {
+                const responses = await Promise.all(newShifts.map(shift =>
+                    apiFetch('/shifts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(shift)
+                    })
+                ));
+                const hasError = responses.some(r => r.code !== 1000);
+                if (hasError) {
+                    const errorMsg = responses.find(r => r.code !== 1000)?.message || 'Lỗi không xác định';
+                    showAlert(errorMsg, 'Lỗi', 'error');
+                } else {
+                    showAlert('Thêm ca làm việc thành công!', 'Thành công', 'success');
+                    await renderCalendar();
+                    closeModal();
+                }
+            } catch (error) {
+                console.error('Lỗi khi thêm ca:', error.message);
+                showAlert(error.message || 'Lỗi kết nối. Vui lòng thử lại.', 'Lỗi', 'error');
+            }
         }
-    } catch (error) {
-        console.error('Lỗi khi xóa ca:', error.message);
-        showAlert(error.message || 'Lỗi kết nối. Vui lòng thử lại.', 'Lỗi', 'error');
-    }
-}
 
-document.getElementById('customPopup').addEventListener('click', e => {
-    if (e.target === document.getElementById('customPopup')) closePopup();
-});
-document.getElementById('shiftModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('shiftModal')) closeModal();
-});
-document.getElementById('employeeRole').addEventListener('change', updateEmployeeList);
-document.getElementById('shiftForm').addEventListener('submit', addShift);
+        function confirmRemoveShift(shiftId, employeeName, shiftDate, shiftType) {
+            const shiftDateObj = new Date(shiftDate);
+            const today = new Date();
+            if (shiftDateObj.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0)) {
+                showAlert('Không thể xóa ca làm việc trong quá khứ.', 'Lỗi', 'error');
+                return;
+            }
+            showConfirm(
+                `Bạn có chắc muốn xóa ca làm việc của "${employeeName}" không?`,
+                'Xác nhận xóa ca',
+                () => removeShift(shiftId),
+                () => {}
+            );
+        }
 
-init();
-</script>
+        async function removeShift(shiftId) {
+            try {
+                const response = await apiFetch(`/shifts/${shiftId}`, { method: 'DELETE' });
+                if (response.code === 1000) {
+                    showAlert(response.message || 'Xóa ca làm việc thành công!', 'Thành công', 'success');
+                    await renderCalendar();
+                } else {
+                    showAlert(response.message || 'Lỗi không xác định', 'Lỗi', 'error');
+                }
+            } catch (error) {
+                console.error('Lỗi khi xóa ca:', error.message);
+                showAlert(error.message || 'Lỗi kết nối. Vui lòng thử lại.', 'Lỗi', 'error');
+            }
+        }
+
+        document.getElementById('customPopup').addEventListener('click', e => {
+            if (e.target === document.getElementById('customPopup')) closePopup();
+        });
+        document.getElementById('shiftModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('shiftModal')) closeModal();
+        });
+        document.getElementById('employeeRole').addEventListener('change', updateEmployeeList);
+        document.getElementById('shiftForm').addEventListener('submit', addShift);
+
+        init();
+    </script>
 </body>
+
 </html>
