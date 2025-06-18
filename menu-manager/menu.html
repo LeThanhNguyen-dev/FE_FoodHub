@@ -308,13 +308,13 @@
                 const row = `
                     <tr>
                         <td>
-                            ${item.imageUrl
-                                ? `<img src="${item.imageUrl}" class="menu-image" alt="${item.name}" onerror="this.outerHTML='<div class="menu-image bg-light d-flex align-items-center justify-content-center" style="border: 2px dashed #ddd;"><i class="fas fa-image text-muted"></i></div>';">`
-                                : `<div class="menu-image bg-light d-flex align-items-center justify-content-center" style="border: 2px dashed #ddd;">
-                                       <i class="fas fa-image text-muted"></i>
-                                   </div>`
-                            }
-                        </td>
+    ${item.imageUrl 
+        ? `<img src="${item.imageUrl}" class="menu-image" alt="${item.name.replace(/"/g, '&quot;')}" onerror="this.outerHTML='&lt;div class=&quot;menu-image bg-light d-flex align-items-center justify-content-center&quot; style=&quot;border: 2px dashed #ddd;&quot;&gt;&lt;i class=&quot;fas fa-image text-muted&quot;&gt;&lt;/i&gt;&lt;/div&gt;';">` 
+        : `<div class="menu-image bg-light d-flex align-items-center justify-content-center" style="border: 2px dashed #ddd;">
+               <i class="fas fa-image text-muted"></i>
+           </div>`
+    }
+</td>
                         <td>
                             <div class="fw-bold text-dark" style="font-size: 1.1em;">${item.name}</div>
                         </td>

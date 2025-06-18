@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>FoodHub Admin - Chỉnh sửa khách hàng</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta name="description">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/edit-staff.css">
+
+    <!-- Goong Map JavaScript SDK -->
+    <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7wVxaWF"></script>
+</head>
+
+<body>
+<!-- Hidden inputs để ngăn autofill -->
+<div style="display: none;">
+    <input type="text" name="fake_username">
+    <input type="password" name="fake_password">
+</div>
+
+<!-- Sidebar Include -->
+<div id="sidebar-container"></div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmUpdateModalLabel">Xác nhận cập nhật</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn lưu các thay đổi cho khách hàng này?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmUpdateBtn">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Original Customer Info Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Thông tin khách hàng hiện tại</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table original-info-table">
+                        <thead>
+                            <tr>
+                                <th>Tên đăng nhập</th>
+                                <th>Email</th>
+                                <th>Trạng thái</th>
+                                <th>Địa chỉ</th>
+                                <th>Số điện thoại</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="original-username"></td>
+                                <td id="original-email"></td>
+                                <td id="original-status"></td>
+                                <td id="original-address"></td>
+                                <td id="original-phone"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Customer Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin khách hàng</h5>
+            </div>
+            <div class="card-body">
+                <form id="editCustomerForm" class="row g-3" autocomplete="off">
+                    <input type="hidden" id="userId" name="id">
+
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                        <div id="username-error" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 position-relative">
+                        <label for="address" class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" id="address" name="address"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        <div id="addressSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Số điện thoại</label>
+                        <input type="tel" class="form-control" id="phone" name="phone"
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Mật khẩu mới (để trống nếu không thay đổi)</label>
+                        <div class="password-field">
+                            <input type="password" class="form-control" id="password" name="password"
+                                   autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                   placeholder="Nhập mật khẩu mới...">
+                            <i class="fas fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                        </div>
+                        <small class="password-note">Mật khẩu cũ đã được mã hóa và không thể hiển thị.</small>
+                    </div>
+
+                    <div class="col-12 text-end">
+                        <button type="button" class="btn btn-warning me-2" onclick="restoreForm()">Khôi phục</button>
+                        <button type="button" class="btn btn-secondary me-2" onclick="goBack()">Hủy</button>
+                        <button type="button" class="btn btn-primary" onclick="showConfirmModal()">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="/js/fetch-api.js"></script>
+<script src="/js/sidebar.js"></script>
+<script>
+    // Lưu trữ dữ liệu ban đầu
+    let originalCustomerData = {};
+
+    // Lấy tham số id từ URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Tải sidebar
+    async function loadSidebar() {
+        try {
+            const response = await fetch('/components/sidebar.html');
+            if (!response.ok) throw new Error('Không thể tải sidebar');
+            const sidebarHtml = await response.text();
+            document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+            setActiveNavLink();
+        } catch (error) {
+            console.error('Lỗi khi tải sidebar:', error);
+            showNotification('Lỗi tải sidebar!', 'error');
+            document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+        }
+    }
+
+    // Lấy thông tin khách hàng
+    async function fetchCustomerDetails(id) {
+        try {
+            const response = await apiFetch(`/users/${id}`, { method: 'GET' });
+            if (response.result) {
+                const customer = response.result;
+                originalCustomerData = {
+                    id: customer.id,
+                    username: customer.username || '',
+                    email: customer.email || '',
+                    status: customer.status || 'ACTIVE',
+                    address: customer.address || '',
+                    phone: customer.phone || '',
+                    password: ''
+                };
+                // Populate edit form
+                document.getElementById('userId').value = customer.id;
+                document.getElementById('username').value = customer.username || '';
+                document.getElementById('email').value = customer.email || '';
+                document.getElementById('status').value = customer.status || 'ACTIVE';
+                document.getElementById('address').value = customer.address || '';
+                document.getElementById('phone').value = customer.phone || '';
+                document.getElementById('password').value = '';
+
+                // Populate original info table
+                document.getElementById('original-username').textContent = originalCustomerData.username || '-';
+                document.getElementById('original-email').textContent = originalCustomerData.email || '-';
+                document.getElementById('original-status').textContent = originalCustomerData.status || '-';
+                document.getElementById('original-address').textContent = originalCustomerData.address || '-';
+                document.getElementById('original-phone').textContent = originalCustomerData.phone || '-';
+
+                disableAutocomplete();
+            } else {
+                throw new Error('Không thể tải thông tin khách hàng!');
+            }
+        } catch (error) {
+            showNotification(error.message || 'Có lỗi xảy ra khi tải thông tin khách hàng!', 'error');
+        }
+    }
+
+    // Ngăn autofill và thêm tên ngẫu nhiên cho input
+    function disableAutocomplete() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
+        inputs.forEach(input => {
+            input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
+            input.setAttribute('data-form-type', 'other');
+            if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
+                input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
+            }
+        });
+    }
+
+    // Cập nhật thông tin khách hàng
+    async function updateCustomer(id, data) {
+        try {
+            if (!data.password || data.password.trim() === '') {
+                delete data.password;
+            }
+            // Cố định roleName là CUSTOMER
+            data.roleName = 'CUSTOMER';
+
+            const response = await apiFetch(`/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (response.code === 1000) {
+                showNotification('Cập nhật thông tin khách hàng thành công!', 'success');
+                originalCustomerData = { ...data, id };
+                document.getElementById('original-username').textContent = data.username || '-';
+                document.getElementById('original-email').textContent = data.email || '-';
+                document.getElementById('original-status').textContent = data.status || '-';
+                document.getElementById('original-address').textContent = data.address || '-';
+                document.getElementById('original-phone').textContent = data.phone || '-';
+                setTimeout(() => goBack(), 1500);
+            } else {
+                throw new Error(response.message || 'Lỗi khi cập nhật thông tin khách hàng!');
+            }
+        } catch (error) {
+            const errorMessage = error.message || 'Có lỗi xảy ra khi cập nhật!';
+            if (errorMessage.includes('exist') || errorMessage.includes('duplicate') || errorMessage.includes('1001')) {
+                document.getElementById('username').classList.add('is-invalid');
+                document.getElementById('username-error').textContent = 'Tên đăng nhập đã tồn tại';
+                showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
+            } else {
+                showNotification(errorMessage, 'error');
+            }
+        }
+    }
+
+    // Khôi phục thông tin gốc
+    function restoreForm() {
+        if (confirm('Bạn có chắc chắn muốn khôi phục thông tin gốc?')) {
+            document.getElementById('username').value = originalCustomerData.username;
+            document.getElementById('email').value = originalCustomerData.email;
+            document.getElementById('status').value = originalCustomerData.status;
+            document.getElementById('address').value = originalCustomerData.address;
+            document.getElementById('phone').value = originalCustomerData.phone;
+            document.getElementById('password').value = originalCustomerData.password;
+            document.getElementById('username').classList.remove('is-invalid');
+            document.getElementById('username-error').textContent = '';
+            showNotification('Đã khôi phục thông tin gốc!', 'success');
+        }
+    }
+
+    // Hiển thị thông báo
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    // Quay lại danh sách
+    function goBack() {
+        window.location.href = '/customer-manager/customerList.html';
+    }
+
+    // Toggle hiển thị mật khẩu
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePassword');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Hiển thị modal xác nhận
+    function showConfirmModal() {
+        const modal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
+        modal.show();
+    }
+
+    // Gợi ý địa chỉ với Goong Map
+    function setupAddressAutocomplete() {
+        const addressInput = document.getElementById('address');
+        const suggestionsContainer = document.getElementById('addressSuggestions');
+        let debounceTimeout;
+
+        addressInput.addEventListener('input', () => {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(async () => {
+                const input = addressInput.value.trim();
+                if (input.length < 3) {
+                    suggestionsContainer.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
+                        method: 'GET'
+                    });
+                    if (response.predictions) {
+                        suggestionsContainer.innerHTML = '';
+                        response.predictions.forEach(prediction => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'autocomplete-suggestion';
+                            suggestion.textContent = prediction.description;
+                            suggestion.addEventListener('click', () => {
+                                addressInput.value = prediction.description;
+                                suggestionsContainer.style.display = 'none';
+                            });
+                            suggestionsContainer.appendChild(suggestion);
+                        });
+                        suggestionsContainer.style.display = response.predictions.length > 0 ? 'block' : 'none';
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', () => {
+        const id = getQueryParam('id');
+        if (!id) {
+            showNotification('Không tìm thấy ID khách hàng!', 'error');
+            setTimeout(() => goBack(), 2000);
+            return;
+        }
+
+        loadSidebar();
+        disableAutocomplete();
+        document.querySelectorAll('input').forEach(input => {
+            if (input.type !== 'hidden') {
+                input.value = '';
+            }
+        });
+
+        fetchCustomerDetails(id);
+        setupAddressAutocomplete();
+
+        document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                status: document.getElementById('status').value,
+                address: document.getElementById('address').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: document.getElementById('password').value.trim()
+            };
+            updateCustomer(id, formData);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
+            modal.hide();
+        });
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
+                if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
+                    this.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
+                }
+            });
+        });
+    });
+
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            disableAutocomplete();
+            const passwordField = document.getElementById('password');
+            if (passwordField) {
+                document.getElementById('password').value = '';
+            }
+        }, 100);
+    });
+</script>
+</body>
+</html>

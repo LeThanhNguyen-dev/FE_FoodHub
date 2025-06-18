@@ -550,7 +550,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const response = await fetch('/foodhub/users', { headers });
+            const response = await fetch('/users', { headers });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Không thể tải danh sách người dùng: ${response.status} ${errorText}`);
@@ -636,7 +636,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const response = await fetch(`/foodhub/api/users/${id}`, { headers });
+            const response = await fetch(`/users/${id}`, { headers });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Không thể tải thông tin người dùng: ${response.status} ${errorText}`);
@@ -700,7 +700,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const url = id ? `/foodhub/api/users/${id}` : '/foodhub/api/users';
+            const url = id ? `/users/${id}` : '/users';
             const method = id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
@@ -729,7 +729,7 @@
                     'Accept': 'application/json',
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 };
-                const response = await fetch(`/foodhub/api/users/${id}/deactivate`, {
+                const response = await fetch(`users/${id}/deactivate`, {
                     method: 'PUT',
                     headers
                 });
