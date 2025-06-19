@@ -1,0 +1,185 @@
+<!-- Edit Profile Page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <style>
+    .gradient-bg { background: linear-gradient(135deg, #6b7280, #4b5563); }
+    .input-focus { transition: all 0.3s ease; }
+    .input-focus:focus { transform: scale(1.02); box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
+    .btn-hover { transition: all 0.3s ease; }
+    .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center py-12">
+  <div class="container mx-auto p-6 max-w-lg">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+      <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-6">Update Your Profile</h2>
+      <div id="welcome-message" class="hidden text-center text-gray-700 mb-4">
+        Welcome, <span id="username-greeting">Customer</span>!
+      </div>
+      <div id="error-message" class="hidden bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center"></div>
+      <div id="success-message" class="hidden bg-green-100 text-green-700 p-3 rounded-lg mb-4 text-center"></div>
+      <div id="profile-form" class="space-y-6">
+        <div class="relative">
+          <label for="username" class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
+          <div class="flex items-center">
+            <i class="fas fa-user absolute ml-3 text-gray-400"></i>
+            <input type="text" id="username" class="pl-10 w-full border-gray-300 rounded-lg shadow-sm input-focus" readonly>
+          </div>
+        </div>
+        <div class="relative">
+          <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+          <div class="flex items-center">
+            <i class="fas fa-envelope absolute ml-3 text-gray-400"></i>
+            <input type="email" id="email" class="pl-10 w-full border-gray-300 rounded-lg shadow-sm input-focus">
+          </div>
+        </div>
+        <div class="relative">
+          <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
+          <div class="flex items-center">
+            <i class="fas fa-phone absolute ml-3 text-gray-400"></i>
+            <input type="tel" id="phone" class="pl-10 w-full border-gray-300 rounded-lg shadow-sm input-focus">
+          </div>
+        </div>
+        <div class="relative">
+          <label for="address" class="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+          <div class="flex items-center">
+            <i class="fas fa-map-marker-alt absolute ml-3 text-gray-400"></i>
+            <input type="text" id="address" class="pl-10 w-full border-gray-300 rounded-lg shadow-sm input-focus">
+          </div>
+        </div>
+        <button id="save-button" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold btn-hover flex items-center justify-center">
+          <i class="fas fa-save mr-2"></i> Save Changes
+        </button>
+        <button id="logout-button" class="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-semibold btn-hover flex items-center justify-center">
+          <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080';
+
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error("Token không hợp lệ:", e);
+        return null;
+      }
+    }
+
+    function isLoggedIn() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return false;
+      const payload = parseJwt(token);
+      return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
+    }
+
+    function logout() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('cart');
+      window.location.href = 'login.html';
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.textContent = message;
+      errorDiv.classList.remove('hidden');
+      document.getElementById('success-message').classList.add('hidden');
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      successDiv.textContent = message;
+      successDiv.classList.remove('hidden');
+      document.getElementById('error-message').classList.add('hidden');
+    }
+
+    async function fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id;
+
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!response.ok) throw new Error('Không thể lấy thông tin người dùng');
+        const data = await response.json();
+        const user = data.result;
+        document.getElementById('username').value = user.username || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.phone || '';
+        document.getElementById('address').value = user.address || '';
+      } catch (error) {
+        showError('Lỗi khi lấy thông tin: ' + error.message);
+      }
+    }
+
+    async function saveUserInfo() {
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập để lưu thông tin!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const token = localStorage.getItem('accessToken');
+      const payload = parseJwt(token);
+      const userId = payload.id;
+
+      const request = {
+        email: document.getElementById('email').value,
+        phoneNumber: document.getElementById('phone').value,
+        address: document.getElementById('address').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/cus/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(request)
+        });
+        if (!response.ok) throw new Error('Không thể cập nhật thông tin');
+        const data = await response.json();
+        showSuccess(data.message || 'Cập nhật thông tin thành công!');
+      } catch (error) {
+        showError('Lỗi khi cập nhật: ' + error.message);
+      }
+    }
+
+    function updateUI() {
+      const token = localStorage.getItem('accessToken');
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập để chỉnh sửa thông tin!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const payload = parseJwt(token);
+      document.getElementById('welcome-message').classList.remove('hidden');
+      document.getElementById('username-greeting').textContent = payload.sub || 'Customer';
+
+      fetchUserInfo();
+    }
+
+    document.getElementById('save-button').addEventListener('click', saveUserInfo);
+    document.getElementById('logout-button').addEventListener('click', logout);
+    document.addEventListener('DOMContentLoaded', updateUI);
+  </script>
+</body>
+</html>

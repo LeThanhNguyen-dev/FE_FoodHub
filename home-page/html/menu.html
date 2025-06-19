@@ -321,7 +321,7 @@
                         <a class="nav-link" href="about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="home.html#contact">Contact</a>
+                        <a class="nav-link" href="cart.html">Contact</a>
                     </li>
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Login</a>
@@ -392,124 +392,130 @@
     <script src="../js/auth.js"></script>
     <!-- Page-specific JS -->
     <script>
-        // Hàm hiển thị danh mục
-        function showCategory(categoryId) {
-            document.querySelectorAll('.menu-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            const contentElement = document.getElementById(`category-${categoryId}`);
-            if (contentElement) {
-                contentElement.classList.add('active');
-            }
+    // Biến lưu trữ tạm thời các món ăn để truy xuất khi nhấn nút
+let menuItemsCache = {};
 
-            document.querySelectorAll('.menu-nav .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const activeButton = document.querySelector(`.menu-nav .btn[data-category-id="${categoryId}"]`);
-            if (activeButton) {
-                activeButton.classList.add('active');
-            }
+// Hàm hiển thị danh mục
+function showCategory(categoryId) {
+    document.querySelectorAll('.menu-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const contentElement = document.getElementById(`category-${categoryId}`);
+    if (contentElement) {
+        contentElement.classList.add('active');
+    }
+
+    document.querySelectorAll('.menu-nav .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeButton = document.querySelector(`.menu-nav .btn[data-category-id="${categoryId}"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
+
+// Hàm lấy danh mục và tạo điều hướng
+async function fetchCategories() {
+    const navContainer = document.getElementById('category-nav');
+    const contentContainer = document.getElementById('menu-contents');
+    navContainer.innerHTML = '<div class="loading-spinner">Loading categories...</div>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch categories');
+        }
+        const data = await response.json();
+        const categories = data.result || data;
+        if (!Array.isArray(categories)) {
+            throw new Error('Invalid category data format');
         }
 
-        // Hàm lấy danh mục và tạo điều hướng
-        async function fetchCategories() {
-            const navContainer = document.getElementById('category-nav');
-            const contentContainer = document.getElementById('menu-contents');
-            navContainer.innerHTML = '<div class="loading-spinner">Loading categories...</div>';
+        navContainer.innerHTML = '';
+        contentContainer.innerHTML = '';
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/categories`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch categories');
-                }
-                const data = await response.json();
-                const categories = data.result || data;
-                if (!Array.isArray(categories)) {
-                    throw new Error('Invalid category data format');
-                }
-
-                navContainer.innerHTML = '';
-                contentContainer.innerHTML = '';
-
-                categories.forEach((category, index) => {
-                    const safeCategoryId = `cat-${category.id}`;
-                    navContainer.innerHTML += `
-                        <button class="btn ${index === 0 ? 'active' : ''}" data-category-id="${category.id}" onclick="fetchMenuItems(${category.id}, '${safeCategoryId}')">
-                            ${category.name}
-                        </button>
-                    `;
-                    contentContainer.innerHTML += `
-                        <div id="category-${category.id}" class="menu-content ${index === 0 ? 'active' : ''}">
-                            <div class="loading-spinner">Loading...</div>
-                        </div>
-                    `;
-                });
-
-                if (categories.length > 0) {
-                    fetchMenuItems(categories[0].id, `cat-${categories[0].id}`);
-                }
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-                navContainer.innerHTML = '<div class="error-message">Failed to load categories. Please try again later.</div>';
-            }
-        }
-
-        // Hàm lấy món ăn theo danh mục
-        async function fetchMenuItems(categoryId, safeCategoryId) {
-            showCategory(categoryId);
-            const container = document.getElementById(`category-${categoryId}`);
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading-spinner">Loading...</div>';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=10&sortBy=name&sortDirection=asc`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                const menuItems = data.result.content;
-
-                if (menuItems.length === 0) {
-                    container.innerHTML = '<div class="error-message">No items found for this category.</div>';
-                    return;
-                }
-
-                const loggedIn = isLoggedIn();
-
-                container.innerHTML = '<div class="menu-items-container">';
-                menuItems.forEach(item => {
-                    const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Price not available';
-                    const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
-                    if (item.status === 'AVAILABLE') {
-                        container.innerHTML += `
-                            <div class="menu-card">
-                                <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
-                                <div class="card-body">
-                                    <span class="badge">Available</span>
-                                    <h5 class="card-title">${item.name}</h5>
-                                    <p class="card-text">${item.description || 'No description available.'}</p>
-                                    <p class="card-price">${price}</p>
-                                    ${loggedIn ? `
-                                        <button class="btn btn-order" onclick='orderItem(${JSON.stringify(item)})'>Đặt món</button>
-                                        <button class="btn btn-add-to-cart" onclick='addToCart(${JSON.stringify(item)})'>Thêm vào giỏ hàng</button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                container.innerHTML += '</div>';
-            } catch (error) {
-                console.error('Error fetching menu items:', error);
-                container.innerHTML = '<div class="error-message">Failed to load menu items. Please try again later.</div>';
-            }
-        }
-
-        // Khởi tạo trang
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchCategories();
+        categories.forEach((category, index) => {
+            const safeCategoryId = `cat-${category.id}`;
+            navContainer.innerHTML += `
+                <button class="btn ${index === 0 ? 'active' : ''}" data-category-id="${category.id}" onclick="fetchMenuItems(${category.id}, '${safeCategoryId}')">
+                    ${category.name}
+                </button>
+            `;
+            contentContainer.innerHTML += `
+                <div id="category-${category.id}" class="menu-content ${index === 0 ? 'active' : ''}">
+                    <div class="loading-spinner">Loading...</div>
+                </div>
+            `;
         });
+
+        if (categories.length > 0) {
+            fetchMenuItems(categories[0].id, `cat-${categories[0].id}`);
+        }
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        navContainer.innerHTML = '<div class="error-message">Failed to load categories. Please try again later.</div>';
+    }
+}
+
+// Hàm lấy món ăn theo danh mục
+async function fetchMenuItems(categoryId, safeCategoryId) {
+    showCategory(categoryId);
+    const container = document.getElementById(`category-${categoryId}`);
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading-spinner">Loading...</div>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=10&sortBy=name&sortDirection=asc`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        const menuItems = data.result.content;
+
+        if (menuItems.length === 0) {
+            container.innerHTML = '<div class="error-message">No items found for this category.</div>';
+            return;
+        }
+
+        const loggedIn = isLoggedIn();
+        // Lưu món ăn vào cache với categoryId làm khóa
+        menuItemsCache[categoryId] = menuItems;
+
+        container.innerHTML = '<div class="menu-items-container">';
+        menuItems.forEach((item, index) => {
+            const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Price not available';
+            const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+            if (item.status === 'AVAILABLE') {
+                container.innerHTML += `
+                    <div class="menu-card">
+                        <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                        <div class="card-body">
+                            <span class="badge">Available</span>
+                            <h5 class="card-title">${item.name}</h5>
+                            <p class="card-text">${item.description || 'No description available.'}</p>
+                            <p class="card-price">${price}</p>
+                            ${loggedIn ? `
+                                <button class="btn btn-order" onclick="orderItem(menuItemsCache[${categoryId}][${index}])">Đặt món</button>
+                                <button class="btn btn-add-to-cart" onclick="addToCart(menuItemsCache[${categoryId}][${index}])">Thêm vào giỏ hàng</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        container.innerHTML += '</div>';
+    } catch (error) {
+        console.error('Error fetching menu items:', error);
+        container.innerHTML = '<div class="error-message">Failed to load menu items. Please try again later.</div>';
+    }
+}
+
+// Khởi tạo trang
+document.addEventListener('DOMContentLoaded', () => {
+    updateUI(); // Gọi từ auth.js để cập nhật giao diện
+    fetchCategories();
+});
     </script>
 </body>
 </html>
