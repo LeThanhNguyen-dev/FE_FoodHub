@@ -148,7 +148,6 @@ body {
 
 .stat-card:hover {
     transform: scale(1.03);
-    box-shadow: 0 4px 8px rgba(254, 161, 22, 0.3);
     cursor: pointer;
 }
 

@@ -419,6 +419,56 @@ body {
 .btn-danger:hover {
     background-color: #b91c1c;
 }
+/* Popup thông tin ca làm việc */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.close-btn:hover {
+    color: var(--gray-600);
+    background-color: var(--gray-100);
+}
+
+.shift-info-content {
+    margin-bottom: 24px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item strong {
+    color: var(--gray-700);
+    font-weight: 600;
+}
+
+.info-item span {
+    color: var(--gray-600);
+    font-weight: 500;
+}
 
 /* Custom popup */
 .custom-popup {
