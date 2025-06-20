@@ -602,7 +602,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const response = await fetch(BASE_API_URL, { headers });
+            const response = await fetch('/users', { headers });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Không thể tải danh sách người dùng: ${response.status} ${errorText}`);
@@ -696,7 +696,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const response = await fetch(`${BASE_API_URL}/${id}`, { headers });
+            const response = await fetch(`/users/${id}`, { headers });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Không thể tải thông tin người dùng: ${response.status} ${errorText}`);
@@ -756,7 +756,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const url = id ? `${BASE_API_URL}/${id}` : BASE_API_URL;
+            const url = id ? `/users/${id}` : '/users';
             const method = id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
@@ -785,7 +785,7 @@
                     'Accept': 'application/json',
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 };
-                const response = await fetch(`${BASE_API_URL}/${id}/deactivate`, {
+                const response = await fetch(`users/${id}/deactivate`, {
                     method: 'PUT',
                     headers
                 });
