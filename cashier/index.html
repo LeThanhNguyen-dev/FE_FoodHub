@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>FoodHub Waiter - Bảng điều khiển phục vụ</title>
+    <title>FoodHub Cashier - Bảng điều khiển thu ngân</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -35,7 +35,7 @@
                 <i class="fa fa-utensils"></i>
                 <span class="brand-text">FoodHub</span>
             </h3>
-            <small>Waiter Panel</small>
+            <small>Cashier Panel</small>
         </div>
 
         <nav class="sidebar-nav flex-fill">
@@ -53,15 +53,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="handleNavClick('tables')">
+                    <a href="#" class="nav-link" onclick="handleNavClick('transactions')">
                         <i class="fas fa-chair"></i>
-                        <span class="nav-text">Quản lý bàn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="handleNavClick('menu')">
-                        <i class="fas fa-book-open"></i>
-                        <span class="nav-text">Thực đơn</span>
+                        <span class="nav-text">Quản Giao dịch</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -97,7 +91,7 @@
                 </div>
                 <div class="dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i><span id="waiterName">Đang tải...</span>
+                        <i class="fas fa-user-circle me-2"></i><span id="cashierName">Đang tải...</span>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
@@ -121,8 +115,6 @@
                         <h2 class="mb-3" id="welcomeMessage">Chào bạn!</h2>
                         <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
                         <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
-                        <p class="mb-0" id="shiftArea"><i class="fas fa-map-marker-alt me-2"></i>Khu vực: Đang tải...
-                        </p>
                     </div>
                     <div class="col-md-4 text-center">
                         <i class="fas fa-user-tie" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
@@ -341,7 +333,7 @@
             } catch (error) {
                 console.error('Error loading user info:', error);
                 // If user info fails, set default name
-                document.getElementById('waiterName').textContent = 'Nhân viên';
+                document.getElementById('cashierName').textContent = 'Nhân viên';
                 throw error;
             }
         }
@@ -361,7 +353,7 @@
             }
 
             // Update waiter name in header
-            document.getElementById('waiterName').textContent = displayName;
+            document.getElementById('cashierName').textContent = displayName;
 
             // Save user info to memory for later use
             currentUserInfo.displayName = displayName;
@@ -445,7 +437,7 @@
 
             // Make sure user name is still displayed even without work schedule
             if (currentUserInfo && currentUserInfo.displayName) {
-                document.getElementById('waiterName').textContent = currentUserInfo.displayName;
+                document.getElementById('cashierName').textContent = currentUserInfo.displayName;
             }
 
             // Update active nav state
@@ -511,10 +503,6 @@
             const endTime = schedule.endTime || 'Đang cập nhật';
             document.getElementById('shiftTime').innerHTML =
                 `<i class="fas fa-clock me-2"></i>Ca làm: ${startTime} - ${endTime}`;
-
-            // Update area
-            document.getElementById('shiftArea').innerHTML =
-                `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${schedule.area}`;
         }
 
         // Function to show error message
@@ -598,7 +586,6 @@
     <script src="js/order.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/show-table.js"></script>
-    <script src="js/report.js"></script>
     <script src="../js/fetch-api.js"></script>
 </body>
 
