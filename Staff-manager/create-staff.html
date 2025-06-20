@@ -22,319 +22,12 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/create-staff.css">
+
   <!-- Goong Map JavaScript SDK -->
   <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7bVxaW"></script>
-
-  <style>
-    :root {
-      --primary: #FEA116;
-      --light: #F1F8FF;
-      --dark: #0F172B;
-      --success: #10B981;
-      --warning: #F59E0B;
-      --danger: #EF4444;
-      --info: #3B82F6;
-    }
-
-    body {
-      font-family: 'Nunito', sans-serif;
-      background-color: var(--light);
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 280px;
-      background: var(--dark);
-      transition: all 0.3s;
-      z-index: 1000;
-      overflow-y: auto;
-    }
-
-    .sidebar.collapsed {
-      width: 70px;
-    }
-
-    .sidebar .brand {
-      padding: 1.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar .brand h3 {
-      color: var(--primary);
-      margin: 0;
-      font-family: 'Pacifico', cursive;
-    }
-
-    .sidebar .brand small {
-      color: #fff;
-      font-style: italic;
-    }
-
-    .sidebar-nav {
-      padding: 1rem 0;
-      flex: 1;
-    }
-
-    .nav-item {
-      margin-bottom: 0.5rem;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-      transition: all 0.3s;
-      border-radius: 0;
-    }
-
-    .nav-link:hover,
-    .nav-link.active {
-      background: rgba(254, 161, 22, 0.1);
-      color: var(--primary);
-    }
-
-    .nav-link i {
-      width: 20px;
-      margin-right: 1rem;
-      text-align: center;
-    }
-
-    .main-content {
-      margin-left: 280px;
-      padding: 2rem;
-      transition: all 0.3s;
-    }
-
-    .main-content.expanded {
-      margin-left: 70px;
-    }
-
-    .card {
-      border: none;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s;
-    }
-
-    .card-header {
-      background: linear-gradient(135deg, var(--primary), #ff8c00);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 15px 15px 0 0;
-    }
-
-    .form-control, .form-select {
-      border-radius: 10px;
-      border: 2px solid #eee;
-      transition: all 0.3s;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
-    }
-
-    .form-control.is-invalid {
-      border-color: var(--danger);
-    }
-
-    .form-control.is-invalid:focus {
-      box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
-    }
-
-    .form-select.is-invalid {
-      border-color: var(--danger);
-    }
-
-    .form-select.is-invalid:focus {
-      box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
-    }
-
-    .invalid-feedback {
-      color: var(--danger);
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-      display: block;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .btn-primary:hover {
-      background: #e8960f;
-      transform: scale(1.05);
-    }
-
-    .btn-secondary {
-      background: #6c757d;
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .btn-secondary:hover {
-      background: #5c636a;
-      transform: scale(1.05);
-    }
-
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 2000;
-      min-width: 300px;
-      animation: slideInRight 0.3s ease-out;
-      border-radius: 15px;
-      border: none;
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    .logout-section {
-      padding: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: auto;
-    }
-
-    .logout-btn {
-      background: linear-gradient(135deg, #dc3545, #c82333);
-      border: none;
-      color: white;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      width: 100%;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .logout-btn:hover {
-      background: linear-gradient(135deg, #c82333, #a71e2a);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
-      color: white;
-    }
-
-    .password-field {
-      position: relative;
-    }
-
-    .password-field .form-control {
-      padding-right: 3rem;
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #6c757d;
-      z-index: 10;
-      font-size: 1rem;
-      transition: color 0.3s;
-    }
-
-    .password-toggle:hover {
-      color: var(--primary);
-    }
-
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    input:-webkit-autofill:active {
-      -webkit-box-shadow: 0 0 0 1000px white inset !important;
-      -webkit-text-fill-color: #333 !important;
-      background-color: white !important;
-      transition: background-color 5000s ease-in-out 0s !important;
-      border: 2px solid #eee !important;
-      border-radius: 10px !important;
-    }
-
-    input:-webkit-autofill::first-line {
-      font-family: 'Nunito', sans-serif !important;
-      font-size: 1rem !important;
-    }
-
-    input[autocomplete="new-password"]::-webkit-credentials-auto-fill-button,
-    input::-webkit-credentials-auto-fill-button {
-      display: none !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-      position: absolute !important;
-      right: -9999px !important;
-    }
-
-    .modal-content {
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal-header {
-      background: linear-gradient(135deg, var(--primary), #ff8c00);
-      color: white;
-      border-radius: 15px 15px 0 0;
-    }
-
-    .autocomplete-suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .autocomplete-suggestion {
-      padding: 0.75rem 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .autocomplete-suggestion:hover {
-      background-color: var(--light);
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
-      .sidebar.show {
-        transform: translateX(0);
-      }
-
-      .main-content {
-        margin-left: 0;
-        padding: 1rem;
-      }
-    }
-  </style>
 </head>
 <body>
 <!-- Hidden inputs to trick autofill -->
@@ -343,66 +36,8 @@
   <input type="password" name="fake_password">
 </div>
 
-<!-- Sidebar -->
-<div class="sidebar d-flex flex-column" id="sidebar">
-  <div class="brand text-center">
-    <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
-    <small class="d-block">Admin Panel</small>
-  </div>
-
-  <nav class="sidebar-nav flex-fill">
-    <ul class="nav flex-column">
-      <li class="nav-item">
-        <a href="/adminDashboard/adminDashboard.html" class="nav-link">
-          <i class="fas fa-tachometer-alt"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="adminDashboardUser.html" class="nav-link">
-          <i class="fas fa-users"></i>
-          <span>Quản lý khách hàng</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="staffList.html" class="nav-link active">
-          <i class="fas fa-user-tie"></i>
-          <span>Quản lý nhân viên</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="/menu-manager/menu.html" class="nav-link">
-          <i class="fas fa-utensils"></i>
-          <span>Quản lý món ăn</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">
-          <i class="fas fa-money-bill-wave"></i>
-          <span>Quản lý tài chính</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">
-          <i class="fas fa-shopping-cart"></i>
-          <span>Đơn hàng</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="lichlam.html" class="nav-link">
-          <i class="fas fa-calendar-alt"></i>
-          <span>Lịch làm</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-
-  <div class="logout-section">
-    <button class="logout-btn" onclick="handleLogout()">
-      <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-    </button>
-  </div>
-</div>
+<!-- Sidebar Include -->
+<div id="sidebar-container"></div>
 
 <!-- Main Content -->
 <div class="main-content" id="mainContent">
@@ -495,7 +130,8 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script src="../js/fetch-api.js"></script>
+<script src="/js/fetch-api.js"></script>
+<script src="/js/sidebar.js"></script>
 <script>
   // Xóa lỗi và viền đỏ
   function clearErrors() {
@@ -530,6 +166,21 @@
         input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
       }
     });
+  }
+
+  // Tải sidebar
+  async function loadSidebar() {
+    try {
+      const response = await fetch('/components/sidebar.html');
+      if (!response.ok) throw new Error('Không thể tải sidebar');
+      const sidebarHtml = await response.text();
+      document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+      setActiveNavLink();
+    } catch (error) {
+      console.error('Lỗi khi tải sidebar:', error);
+      showNotification('Lỗi tải sidebar!', 'error');
+      document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+    }
   }
 
   // Gợi ý địa chỉ với Goong Map
@@ -671,27 +322,7 @@
 
   // Quay lại danh sách
   function goBack() {
-    window.location.href = 'staffList.html';
-  }
-
-  // Đăng xuất
-  function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
-      document.body.style.opacity = '0.5';
-      document.body.style.transition = 'opacity 0.5s';
-      setTimeout(() => {
-        alert('Đã đăng xuất thành công!');
-        window.location.href = '/login.html';
-      }, 1000);
-    }
-  }
-
-  // Toggle Sidebar
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('expanded');
+    window.location.href = '/staff-manager/staffList.html';
   }
 
   // Toggle mật khẩu hiển thị/ẩn
@@ -711,6 +342,7 @@
 
   // Khởi tạo
   document.addEventListener('DOMContentLoaded', () => {
+    loadSidebar();
     disableAutocomplete();
     document.querySelectorAll('input').forEach(input => {
       if (input.type !== 'hidden') {
