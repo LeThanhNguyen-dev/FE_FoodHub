@@ -863,7 +863,7 @@ async function showCart() {
 async function generateTableOptions() {
     try {
         // Gọi API /tables để lấy danh sách bàn
-        const data = await apiFetch('/tables',{
+        const data = await apiFetch(`/tables?area=${currentWorkSchedule.area}`,{
             method: 'GET'
         });
 
@@ -1029,11 +1029,14 @@ function clearCart() {
 async function submitOrder() {
     const tableSelect = document.getElementById('tableSelect');
     const orderNote = document.getElementById('orderNote');
+    const orderTypeSelect = document.getElementById('orderTypeSelect');
 
     const tableId = parseInt(tableSelect.value);
     const note = orderNote.value.trim();
+    const orderType = orderTypeSelect.value;
 
-    if (!tableId) {
+
+    if (orderType == 'DINE_IN' && !tableId) {
         showToast('Vui lòng chọn bàn', 'error');
         return;
     }

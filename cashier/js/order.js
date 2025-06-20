@@ -6,7 +6,7 @@ async function showOrders() {
         document.getElementById('dynamicContent').style.display = 'block';
 
         // Fetch order.html
-        const response = await fetch('/waiter/order.html');
+        const response = await fetch('/cashier/order.html');
         if (!response.ok) {
             throw new Error('Không thể tải order.html');
         }
@@ -149,7 +149,7 @@ async function loadOrders() {
         }
 
         // Fetch orders with filters
-        const data = await apiFetch(`/orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
             method: 'GET'
         });
 
@@ -318,18 +318,6 @@ function createOrderActionButtons(order) {
         `;
     }
     
-    // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
-    if (order.status === 'COMPLETED') {
-        buttons += `
-            <button class="action-btn btn-info checkout-btn" 
-                    data-order='${JSON.stringify(order)}'
-                    onclick="event.stopPropagation(); handleCheckoutClick(this)"
-                    title="Thanh toán đơn hàng">
-                <i class="fas fa-money-bill"></i>
-            </button>
-        `;
-    }
-    
     // Nút hủy đơn hàng - hiển thị cho các trạng thái có thể hủy
     if (['PENDING', 'CONFIRMED'].includes(order.status)) {
         buttons += `
@@ -342,249 +330,6 @@ function createOrderActionButtons(order) {
     }
     
     return buttons;
-}
-
-// Hàm helper để xử lý click checkout
-function handleCheckoutClick(buttonElement) {
-    try {
-        const orderData = JSON.parse(buttonElement.getAttribute('data-order'));
-        checkoutOrder(orderData);
-    } catch (error) {
-        console.error('Error parsing order data:', error);
-        alert('Có lỗi xảy ra khi xử lý dữ liệu đơn hàng');
-    }
-}
-
-
-async function checkoutOrder(order) {
-    console.log('checkoutOrder called with:', order);
-    try {
-        const paymentMethod = await showOrderDetailsAndPaymentModal(order);
-
-        if (paymentMethod && confirm(`Xác nhận thanh toán bằng ${paymentMethod} và hoàn thành đơn hàng?`)) {
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'block';
-            }
-
-            const paymentRequest = {
-                orderId: order.id,
-                paymentMethod: paymentMethod
-            };
-
-            const data = await apiFetch('/payments', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(paymentRequest)
-            });
-
-            if (data.code === 0) {
-                const paymentResult = data.result;
-
-                if (paymentResult.paymentMethod === 'BANKING' && paymentResult.status === 'PENDING') {
-                    // Lưu orderId vào sessionStorage trước khi redirect
-                    sessionStorage.setItem('pendingOrderId', order.id);
-                    // Redirect đến PayOS
-                    if (paymentResult.paymentUrl) {
-                        window.location.href = paymentResult.paymentUrl;
-                    } else {
-                        alert('Đang chuyển hướng đến cổng thanh toán PayOS...');
-                    }
-                } else {
-                    alert(`Thanh toán thành công!\nSố tiền: ${paymentResult.amount.toLocaleString('vi-VN')} VND`);
-                    await loadOrders();
-                }
-            } else {
-                throw new Error(data.message || 'Có lỗi xảy ra khi xử lý thanh toán');
-            }
-        }
-    } catch (error) {
-        console.error('Error during checkout:', error);
-        alert('Có lỗi xảy ra khi thanh toán: ' + error.message);
-    } finally {
-        const loadingElement = document.getElementById('loading');
-        if (loadingElement) {
-            loadingElement.style.display = 'none';
-        }
-    }
-}
-async function handlePaymentCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('orderId');
-    const status = urlParams.get('status');
-    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
-
-    // Kiểm tra xem có phải redirect từ PayOS không
-    if (orderId && pendingOrderId && orderId === pendingOrderId) {
-        try {
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'block';
-            }
-
-            // Gọi API /payments/callback với query string
-            const response = await apiFetch(`/payments/callback?${urlParams.toString()}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.code === 0) {
-                const paymentResult = response.result;
-                if (paymentResult.status === 'PAID') {
-                    alert(`Thanh toán thành công!\nSố tiền: ${paymentResult.amount.toLocaleString('vi-VN')} VND\nMã giao dịch: ${paymentResult.transactionId}`);
-                } else if (paymentResult.status === 'CANCELLED') {
-                    alert('Thanh toán đã bị hủy.');
-                } else {
-                    alert(`Trạng thái thanh toán: ${paymentResult.status}`);
-                }
-                await loadOrders();
-            } else {
-                throw new Error(response.message || 'Lỗi khi xử lý kết quả thanh toán');
-            }
-        } catch (error) {
-            console.error('Error handling callback:', error);
-            alert('Có lỗi khi xử lý kết quả thanh toán: ' + error.message);
-        } finally {
-            sessionStorage.removeItem('pendingOrderId');
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
-        }
-    }
-}
-
-
-// Helper function để hiển thị modal với thông tin đơn hàng và chọn phương thức thanh toán
-function showOrderDetailsAndPaymentModal(order) {
-    return new Promise((resolve) => {
-        // Tạo HTML cho danh sách món ăn
-        const orderItemsHtml = order.orderItems.map(item => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f8ff;">
-                <div style="flex: 1;">
-                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">${item.menuItemName}</div>
-                    <div style="color: #6b7280; font-size: 13px;">
-                        <span style="margin-right: 12px;">SL: ${item.quantity}</span>
-                        <span>Đơn giá: ${item.price.toLocaleString('vi-VN')} VND</span>
-                    </div>
-                </div>
-                <div style="font-weight: 700; color: #FEA116; font-size: 15px;">
-                    ${(item.quantity * item.price).toLocaleString('vi-VN')} VND
-                </div>
-            </div>
-        `).join('');
-
-        const modal = document.createElement('div');
-        modal.innerHTML = `
-            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
-                <div style="background: white; border-radius: 16px; max-width: 520px; width: 100%; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);">
-                    
-                    <!-- Header -->
-                    <div style="background: linear-gradient(135deg, #FEA116 0%, #f59e0b 100%); padding: 24px; text-align: center;">
-                        <h3 style="margin: 0; color: white; font-size: 22px; font-weight: 700;">Thông tin thanh toán</h3>
-                        <div style="width: 40px; height: 3px; background: rgba(255,255,255,0.3); margin: 8px auto 0; border-radius: 2px;"></div>
-                    </div>
-                    
-                    <div style="padding: 24px; overflow-y: auto; max-height: calc(90vh - 120px);">
-                        <!-- Thông tin đơn hàng -->
-                        <div style="background: #F1F8FF; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <div>
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">MÃ ĐƠN HÀNG</div>
-                                    <div style="color: #1f2937; font-weight: 600;">#${order.id}</div>
-                                </div>
-                                <div>
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">BÀN SỐ</div>
-                                    <div style="color: #1f2937; font-weight: 600;">${order.tableNumber}</div>
-                                </div>
-                                <div style="grid-column: 1 / -1;">
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">NHÂN VIÊN</div>
-                                    <div style="color: #1f2937; font-weight: 600;">${order.username}</div>
-                                </div>
-                                ${order.note ? `
-                                <div style="grid-column: 1 / -1; margin-top: 8px;">
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">GHI CHÚ</div>
-                                    <div style="color: #6b7280; font-style: italic; background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #FEA116;">${order.note}</div>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-
-                        <!-- Danh sách món ăn -->
-                        <div style="margin-bottom: 24px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                <div style="width: 24px; height: 24px; background: #FEA116; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                    <span style="color: white; font-size: 12px; font-weight: bold;">📋</span>
-                                </div>
-                                <h4 style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 600;">Chi tiết đơn hàng</h4>
-                            </div>
-                            <div style="background: white; border: 1px solid #f1f8ff; border-radius: 12px; max-height: 200px; overflow-y: auto;">
-                                <div style="padding: 16px;">
-                                    ${orderItemsHtml}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tổng tiền -->
-                        <div style="background: linear-gradient(135deg, #FEA116 0%, #f59e0b 100%); border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
-                            <div style="color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; margin-bottom: 4px;">TỔNG THANH TOÁN</div>
-                            <div style="color: white; font-size: 24px; font-weight: 800;">
-                                ${order.totalAmount.toLocaleString('vi-VN')} VND
-                            </div>
-                        </div>
-
-                        <!-- Chọn phương thức thanh toán -->
-                        <div style="margin-bottom: 24px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                <div style="width: 24px; height: 24px; background: #FEA116; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                    <span style="color: white; font-size: 12px; font-weight: bold;">💳</span>
-                                </div>
-                                <h4 style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 600;">Phương thức thanh toán</h4>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <button onclick="selectPaymentMethod('CASH')" 
-                                    style="padding: 16px; background: white; border: 2px solid #FEA116; border-radius: 12px; cursor: pointer; font-weight: 600; color: #FEA116; display: flex; align-items: center; justify-content: center; gap: 8px;"
-                                    onmouseover="this.style.background='#FEA116'; this.style.color='white';" 
-                                    onmouseout="this.style.background='white'; this.style.color='#FEA116';">
-                                    <span style="font-size: 18px;">💵</span>
-                                    <span>Tiền mặt</span>
-                                </button>
-                                <button onclick="selectPaymentMethod('BANKING')" 
-                                    style="padding: 16px; background: white; border: 2px solid #3b82f6; border-radius: 12px; cursor: pointer; font-weight: 600; color: #3b82f6; display: flex; align-items: center; justify-content: center; gap: 8px;"
-                                    onmouseover="this.style.background='#3b82f6'; this.style.color='white';" 
-                                    onmouseout="this.style.background='white'; this.style.color='#3b82f6';">
-                                    <span style="font-size: 18px;">💳</span>
-                                    <span>BANKING</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Nút hủy -->
-                        <div style="text-align: center;">
-                            <button onclick="selectPaymentMethod(null)" 
-                                style="padding: 12px 32px; background: white; border: 2px solid #EF4444; color: #EF4444; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;"
-                                onmouseover="this.style.background='#EF4444'; this.style.color='white';" 
-                                onmouseout="this.style.background='white'; this.style.color='#EF4444';">
-                                ❌ Hủy bỏ
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        window.selectPaymentMethod = (method) => {
-            document.body.removeChild(modal);
-            delete window.selectPaymentMethod;
-            resolve(method);
-        };
-    });
 }
 
 async function cancelOrder(orderId) {
@@ -1649,11 +1394,9 @@ function startSmartRefresh() {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Chỉ gọi dashboard nếu không phải trang payment-result
-    if (!window.location.pathname.includes('/payment-result')) {
-        showDashboard();
-        startSmartRefresh();
-    }
+    console.log('Kitchen Dashboard initialized');
+    showDashboard();
+    startSmartRefresh();
 });
 
 // Stop refresh when page is hidden
