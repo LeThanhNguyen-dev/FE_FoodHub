@@ -1172,7 +1172,7 @@ async function loadOrdersWithFilters() {
         }
         console.log('Fetching orders with params:', params.toString());
 
-        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders?${params.toString()}`, {
             method: 'GET',
         });
 
@@ -1347,7 +1347,7 @@ async function loadOrders(isAutoRefresh = false) {
         console.log('Fetching orders with params:', params.toString());
 
         // Fetch orders with filters
-        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders?${params.toString()}`, {
             method: 'GET'
         });
 
