@@ -13,7 +13,8 @@ body {
 }
 
 .main-container.cart-open {
-    margin-right: 400px; /* Desktop width */
+    margin-right: 400px;
+    /* Desktop width */
 }
 
 /* CSS menu hiện tại của bạn - giữ nguyên */
@@ -265,6 +266,10 @@ body.cart-open .pagination-controls {
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
 }
 
 body.cart-open .pagination-controls button {
@@ -275,6 +280,7 @@ body.cart-open .pagination-controls button {
 .pagination-controls button:hover:not(:disabled) {
     background-color: #ff8c00;
     border-color: #ff8c00;
+    color: white;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
 }
@@ -289,8 +295,14 @@ body.cart-open .pagination-controls button {
 .pagination-controls button.active {
     background-color: #ff8c00;
     border-color: #ff8c00;
-    color: #333;
+    color: white;
     font-weight: 600;
+}
+
+.pagination-controls button svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
 }
 
 #pageNumbers {
@@ -320,7 +332,7 @@ body.cart-open #pageNumbers button {
     body.cart-open .main-container {
         margin-right: 320px;
     }
-    
+
     body.cart-open .menu-grid {
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 12px;
@@ -332,7 +344,7 @@ body.cart-open #pageNumbers button {
         margin-right: 0;
         transform: translateX(-160px);
     }
-    
+
     .menu-controls .filter-section {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -355,7 +367,7 @@ body.cart-open #pageNumbers button {
         min-width: 35px;
         padding: 6px 10px;
     }
-    
+
     body.cart-open .menu-grid {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 10px;
@@ -394,29 +406,29 @@ body.cart-open #pageNumbers button {
         justify-content: center;
         margin-top: 10px;
     }
-    
+
     body.cart-open .menu-grid {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 8px;
     }
-    
+
     body.cart-open .item-image {
         height: 80px;
     }
-    
+
     body.cart-open .item-content {
         padding: 8px;
     }
-    
+
     body.cart-open .item-name {
         font-size: 12px;
     }
-    
+
     body.cart-open .item-description {
         font-size: 10px;
         margin-bottom: 8px;
     }
-    
+
     body.cart-open .item-price {
         font-size: 12px;
     }
@@ -564,12 +576,18 @@ body.cart-open #pageNumbers button {
 }
 
 @keyframes bounce {
-    0%, 20%, 60%, 100% {
+
+    0%,
+    20%,
+    60%,
+    100% {
         transform: translateY(-2px);
     }
+
     40% {
         transform: translateY(-6px);
     }
+
     80% {
         transform: translateY(-4px);
     }
@@ -579,9 +597,11 @@ body.cart-open #pageNumbers button {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.2);
     }
+
     100% {
         transform: scale(1);
     }
@@ -653,6 +673,3 @@ a.cart-button,
 .cart-button:not(:hover) {
     transform: translateY(0) !important;
 }
-
-
-

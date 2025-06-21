@@ -10,7 +10,6 @@ let currentMenuFilters = {
     sortDirection: 'asc'
 };
 
-let currentUserId = 1;
 let cart = [];
 let isCartSidebarOpen = false;
 
@@ -152,7 +151,7 @@ function setupMenuEventListeners() {
 
     const filterElements = [
         'categoryFilter', 'menuStatusFilter', 'sortByMenuFilter',
-        'sortDirectionMenuFilter', 'pageSizeMenuFilter'
+        'sortDirectionMenuFilter'
     ];
 
     filterElements.forEach(id => {
@@ -178,14 +177,13 @@ async function loadMenuItems() {
         const menuStatusFilter = document.getElementById('menuStatusFilter');
         const sortByMenuFilter = document.getElementById('sortByMenuFilter');
         const sortDirectionMenuFilter = document.getElementById('sortDirectionMenuFilter');
-        const pageSizeMenuFilter = document.getElementById('pageSizeMenuFilter');
 
         const categoryId = categoryFilter ? categoryFilter.value : '';
         const keyword = keywordFilter ? keywordFilter.value : '';
         const status = menuStatusFilter ? menuStatusFilter.value : '';
         const sortBy = sortByMenuFilter ? sortByMenuFilter.value || 'name' : 'name';
         const sortDirection = sortDirectionMenuFilter ? sortDirectionMenuFilter.value || 'asc' : 'asc';
-        const pageSize = pageSizeMenuFilter ? pageSizeMenuFilter.value || '20' : '20';
+        const pageSize = '20';
 
         // Build query parameters
         const params = new URLSearchParams();
@@ -1200,7 +1198,6 @@ async function submitOrder() {
 
         // Chuẩn bị dữ liệu đơn hàng
         const orderData = {
-            userId: currentUserId,
             note: note || null,
             orderType: selectedOrderType,
             status: "PENDING",

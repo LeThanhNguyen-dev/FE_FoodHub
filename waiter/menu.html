@@ -39,12 +39,6 @@
                         <option value="desc">Giảm dần</option>
                     </select>
 
-                    <select id="pageSizeMenuFilter">
-                        <option value="10">10 món/trang</option>
-                        <option value="20">20 món/trang</option>
-                        <option value="50">50 món/trang</option>
-                    </select>
-
                     <button onclick="applyMenuFilters()">Áp dụng</button>
                     <button onclick="resetFilters()">Đặt lại</button>
                 </div>
@@ -61,11 +55,17 @@
                     <span id="paginationInfo">Hiển thị 0 - 0 của 0 món ăn</span>
                 </div>
                 <div class="pagination-controls">
-                    <button onclick="goToMenuPage(0)" id="firstPageBtn">Đầu</button>
-                    <button onclick="goToMenuPage(currentPage - 1)" id="prevPageBtn">Trước</button>
+                    <button onclick="goToMenuPage(currentMenuPage - 1)" id="prevPageBtn" title="Trang trước">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg>
+                    </button>
                     <span id="pageNumbers"></span>
-                    <button onclick="goToMenuPage(currentPage + 1)" id="nextPageBtn">Sau</button>
-                    <button onclick="goToMenuPage(totalPages - 1)" id="lastPageBtn">Cuối</button>
+                    <button onclick="goToMenuPage(currentMenuPage + 1)" id="nextPageBtn" title="Trang sau">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>

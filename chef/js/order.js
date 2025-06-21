@@ -237,93 +237,87 @@ function renderOrders(orders) {
     }
 
     const ordersHTML = activeOrders.map(order => {
-        // Show only first 3 items
-        const visibleItems = order.orderItems ? order.orderItems.slice(0, 3) : [];
-        const hasMoreItems = order.orderItems && order.orderItems.length > 3;
-        const remainingCount = hasMoreItems ? order.orderItems.length - 3 : 0;
+        // Show all items in the order
+        const allItems = order.orderItems || [];
 
-        const itemsHTML = visibleItems.map(item => `
+        const itemsHTML = allItems.map(item => `
             <div class="item-row">
                 <div class="item-info">
                     <span class="item-name">${item.menuItemName || 'Món ăn'}</span>
-                    <span class="item-quantity">x${item.quantity}</span>
                 </div>
-                <span class="item-status ${statusClasses[item.status] || 'status-pending'}">
-                    ${statusTranslations[item.status] || item.status}
-                </span>
+                <div class="item-quantity">
+                    <span class="quantity-number">${item.quantity}</span>
+                </div>
             </div>
         `).join('');
 
-        const moreItemsHTML = hasMoreItems ? `
-            <div class="more-items" onclick="viewOrderDetails(${order.id})">
-                <i class="fas fa-plus-circle"></i> +${remainingCount} món khác - Xem chi tiết
-            </div>
-        ` : '';
-
         // Calculate total items for display
-        const totalItems = order.orderItems ? order.orderItems.length : 0;
+        const totalItems = allItems.length;
+
+        // Determine order type display
+        function getOrderTypeDisplay(orderType, tableNumber) {
+            switch(orderType) {
+                case 'TAKEAWAY':
+                    return '<i class="fas fa-shopping-bag"></i> Mang Về';
+                case 'DELIVERY':
+                    return '<i class="fas fa-motorcycle"></i> Giao Hàng';
+                case 'DINE_IN':
+                default:
+                    return `<i class="fas fa-chair"></i> ${tableNumber || 'Bàn N/A'}`;
+            }
+        }
 
         return `
             <div class="order-card" data-order-id="${order.id}">
                 <div class="order-header">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="order-title-row">
                         <div class="order-number">
-                            <strong>Đơn #${order.id.toString().padStart(3, '0')}</strong>
+                            <span class="order-label">Order #${order.id.toString().padStart(3, '0')}</span>
                         </div>
-                        <div class="text-end">
-                            <div class="table-badge mb-1">
-                                <i class="fas fa-chair"></i> ${order.tableNumber || 'Bàn N/A'}
-                            </div>
-                            <div class="order-time">
-                                <i class="fas fa-clock"></i>
-                                <small>${timeAgo(order.createdAt)}</small>
-                            </div>
+                        <div class="order-time">
+                            <span>${timeAgo(order.createdAt)}</span>
                         </div>
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="status-badge ${statusClasses[order.status]}">
+                    <div class="order-meta">
+                        <div class="item-count">
+                            <span>${totalItems} món</span>
+                        </div>
+                        <div class="customer-info">
+                            ${getOrderTypeDisplay(order.orderType, order.tableNumber)}
+                        </div>
+                    </div>
+                    
+                    <div class="status-row">
+                        <span class="status-badge status-${order.status.toLowerCase()}">
                             ${statusTranslations[order.status] || order.status}
                         </span>
                     </div>
-                    
-                    <div class="order-summary mb-2">
-                        <small class="text-muted">
-                            <i class="fas fa-utensils"></i> ${totalItems} món | 
-                            <i class="fas fa-money-bill-wave"></i> ${formatCurrency(order.totalAmount)}
-                        </small>
-                    </div>
-                    
-                    ${order.note ? `
-                        <div class="order-note mb-2">
-                            <small class="text-info">
-                                <i class="fas fa-sticky-note"></i> ${order.note}
-                            </small>
-                        </div>
-                    ` : ''}
                 </div>
                 
                 <div class="order-items">
+                    <div class="items-header">
+                        <span class="header-item">TÊN MÓN</span>
+                        <span class="header-qty">SL</span>
+                    </div>
                     ${itemsHTML}
-                    ${moreItemsHTML}
                 </div>
                 
-                <div class="order-actions mt-3">
-                    <button class="btn btn-primary btn-sm" onclick="updateOrderStatus(${order.id}, 'PREPARING')">
+                <div class="order-actions">
+                    <button class="btn btn-preparing" onclick="updateOrderStatus(${order.id}, 'PREPARING')">
                         <i class="fas fa-fire"></i> Bắt Đầu Nấu
                     </button>
-                    <button class="btn btn-success btn-sm" onclick="updateOrderStatus(${order.id}, 'READY')">
+                    <button class="btn btn-ready" onclick="updateOrderStatus(${order.id}, 'READY')">
                         <i class="fas fa-check"></i> Hoàn Thành
                     </button>
-                    <button class="btn btn-outline-info btn-sm" onclick="viewOrderDetails(${order.id})">
-                        <i class="fas fa-eye"></i> Chi Tiết
+                    <button class="btn btn-details" onclick="viewOrderDetails(${order.id})">
+                        <i class="fas fa-eye"></i>
                     </button>
                 </div>
             </div>
         `;
     }).join('');
 
-    // Render trực tiếp không có hiệu ứng opacity
     ordersGrid.innerHTML = ordersHTML;
 }
 
@@ -1347,7 +1341,7 @@ async function loadOrders(isAutoRefresh = false) {
         console.log('Fetching orders with params:', params.toString());
 
         // Fetch orders with filters
-        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders?${params.toString()}`, {
             method: 'GET'
         });
 

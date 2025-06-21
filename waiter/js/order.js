@@ -1,4 +1,5 @@
 async function showOrders() {
+    hideCartSidebar();
     try {
         // Update page title and toggle visibility
         document.getElementById('pageTitle').textContent = 'Quản lý đơn hàng';
@@ -1034,6 +1035,7 @@ function jumpToOrderPage() {
     }
 }
 
+
 // Refresh orders
 async function refreshOrders() {
     const refreshBtn = document.querySelector('[onclick="refreshOrders()"]');
@@ -1723,7 +1725,6 @@ document.addEventListener('visibilitychange', function() {
         }
     }
 });
-
 
 
 

@@ -3,184 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Đơn Hàng</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Quản lý Đơn hàng - Kitchen Management</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/order-style.css">
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid py-4">
         <!-- Header -->
-        <div class="row">
+        <div class="row mb-4">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
-                    <h2 id="pageTitle">Quản Lý Đơn Hàng</h2>
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stats-summary d-flex gap-3">
-                            <div class="stat-item">
-                                <span class="badge bg-warning">Chờ: <span id="pendingCount">0</span></span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="badge bg-info">Đang nấu: <span id="preparingCount">0</span></span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="badge bg-success">Sẵn sàng: <span id="readyCount">0</span></span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="badge bg-secondary">Thời gian TB: <span id="avgTime">0</span></span>
-                            </div>
-                        </div>
+                <h2><i class="fas fa-utensils"></i> Quản lý Đơn hàng</h2>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-2x text-warning"></i>
+                        <h4 id="pendingCount">0</h4>
+                        <small>Chờ Xử Lý</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-fire fa-2x text-danger"></i>
+                        <h4 id="preparingCount">0</h4>
+                        <small>Đang Chế Biến</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                        <h4 id="readyCount">0</h4>
+                        <small>Sẵn Sàng</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-stopwatch fa-2x text-info"></i>
+                        <h4 id="avgTime">15p</h4>
+                        <small>Thời gian TB</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Navigation -->
-        <div class="row">
-            <div class="col-12">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                    <div class="container-fluid">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showDashboard()">
-                                    <i class="fas fa-tachometer-alt"></i> Tổng Quan
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#" onclick="showOrders()">
-                                    <i class="fas fa-clipboard-list"></i> Đơn Hàng
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTables()">
-                                    <i class="fas fa-chair"></i> Bàn Ăn
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showReports()">
-                                    <i class="fas fa-chart-bar"></i> Báo Cáo
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Filters Section (will be dynamically inserted) -->
-        <div class="row">
-            <div class="col-12" id="filtersContainer">
-                <!-- Filters will be inserted here by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Orders Grid -->
-        <div class="row">
-            <div class="col-12">
-                <div id="ordersGrid" class="orders-grid">
-                    <!-- Orders will be loaded here -->
-                    <div class="text-center">
-                        <div class="loading"></div> 
-                        Đang tải đơn hàng...
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination Section (will be dynamically inserted) -->
-        <div class="row">
-            <div class="col-12" id="paginationContainer">
-                <!-- Pagination will be inserted here by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Templates -->
-    
-    <!-- Order Details Modal Template -->
-    <template id="orderDetailsModalTemplate">
-        <div class="modal-overlay" onclick="closeOrderDetails()">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                    <h3 id="modalOrderTitle">Chi tiết đơn hàng</h3>
-                    <button class="btn-close" onclick="closeOrderDetails()">×</button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="order-summary" id="modalOrderSummary">
-                        <!-- Order summary will be populated here -->
-                    </div>
-
-                    <div class="order-items-section">
-                        <h4>Danh sách món ăn:</h4>
-                        <div class="order-items-list" id="modalOrderItems">
-                            <!-- Order items will be populated here -->
-                        </div>
-                    </div>
-
-                    <div class="order-total" id="modalOrderTotal">
-                        <!-- Total will be populated here -->
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-primary" id="modalUpdateStatusBtn">
-                        Cập nhật trạng thái
-                    </button>
-                    <button class="btn btn-secondary" onclick="closeOrderDetails()">
-                        Đóng
-                    </button>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <!-- Status Update Modal Template -->
-    <template id="statusUpdateModalTemplate">
-        <div class="modal-overlay" onclick="closeStatusUpdateModal()">
-            <div class="modal-content status-update-modal" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                    <h3 id="statusModalTitle">Cập nhật trạng thái đơn hàng</h3>
-                    <button class="btn-close" onclick="closeStatusUpdateModal()">&times;</button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label><strong>Chọn món ăn cần cập nhật:</strong></label>
-                        <div class="order-items-selection">
-                            <div class="select-all-option">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
-                                <label for="selectAll"><strong>Chọn tất cả</strong></label>
-                            </div>
-                            <div id="statusModalItems">
-                                <!-- Items will be populated here -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="newStatus"><strong>Trạng thái mới:</strong></label>
-                        <select id="newStatus" class="form-control">
-                            <option value="">-- Chọn trạng thái --</option>
-                            <option value="PREPARING">Bắt đầu nấu</option>
-                            <option value="READY">Hoàn thành</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="executeStatusUpdate()">
-                        Cập nhật trạng thái
-                    </button>
-                    <button class="btn btn-secondary" onclick="closeStatusUpdateModal()">
-                        Hủy
-                    </button>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <!-- Filters Template -->
-    <template id="filtersTemplate">
+        <!-- Filters Section -->
         <div class="filters-section mb-4" id="filtersSection">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -252,8 +132,8 @@
                                 <i class="fas fa-arrows-alt-v"></i> Thứ tự
                             </label>
                             <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
-                                <option value="DESC">Giảm dần</option>
                                 <option value="ASC">Tăng dần</option>
+                                <option value="DESC">Giảm dần</option>
                             </select>
                         </div>
 
@@ -288,10 +168,18 @@
                 </div>
             </div>
         </div>
-    </template>
 
-    <!-- Pagination Template -->
-    <template id="paginationTemplate">
+        <!-- Orders Grid -->
+        <div class="row" id="ordersGrid">
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <div>Đang tải đơn hàng...</div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
         <div class="pagination-section mt-4" id="paginationSection">
             <div class="row">
                 <div class="col-md-6">
@@ -308,65 +196,76 @@
                 </div>
             </div>
         </div>
-    </template>
+    </div>
 
-    <!-- Order Card Template -->
-    <template id="orderCardTemplate">
-        <div class="order-card">
-            <div class="order-header">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div class="order-number">
-                        <strong class="order-id">Đơn #000</strong>
-                    </div>
-                    <div class="text-end">
-                        <div class="table-badge mb-1">
-                            <i class="fas fa-chair"></i> <span class="table-number">Bàn N/A</span>
-                        </div>
-                        <div class="order-time">
-                            <i class="fas fa-clock"></i>
-                            <small class="time-ago">0 phút trước</small>
-                        </div>
-                    </div>
+    <!-- Order Details Modal Template -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsTitle">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="status-badge">Trạng thái</span>
+                <div class="modal-body" id="orderDetailsBody">
+                    <!-- Order details content will be inserted here -->
                 </div>
-                
-                <div class="order-summary mb-2">
-                    <small class="text-muted order-meta">
-                        <i class="fas fa-utensils"></i> <span class="items-count">0</span> món | 
-                        <i class="fas fa-money-bill-wave"></i> <span class="total-amount">0đ</span>
-                    </small>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="updateStatusBtn">
+                        Cập nhật trạng thái
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Đóng
+                    </button>
                 </div>
-                
-                <div class="order-note mb-2" style="display: none;">
-                    <small class="text-info">
-                        <i class="fas fa-sticky-note"></i> <span class="note-text"></span>
-                    </small>
-                </div>
-            </div>
-            
-            <div class="order-items">
-                <!-- Items will be populated here -->
-            </div>
-            
-            <div class="order-actions mt-3">
-                <button class="btn btn-primary btn-sm btn-start-cooking">
-                    <i class="fas fa-fire"></i> Bắt Đầu Nấu
-                </button>
-                <button class="btn btn-success btn-sm btn-complete">
-                    <i class="fas fa-check"></i> Hoàn Thành
-                </button>
-                <button class="btn btn-outline-info btn-sm btn-details">
-                    <i class="fas fa-eye"></i> Chi Tiết
-                </button>
             </div>
         </div>
-    </template>
+    </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="orders.js"></script>
+    <!-- Status Update Modal Template -->
+    <div class="modal fade" id="statusUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusUpdateTitle">Cập nhật trạng thái đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="statusUpdateBody">
+                    <div class="form-group mb-3">
+                        <label><strong>Chọn món ăn cần cập nhật:</strong></label>
+                        <div class="order-items-selection" id="orderItemsSelection">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="selectAll" onchange="toggleSelectAll()">
+                                <label class="form-check-label" for="selectAll">
+                                    <strong>Chọn tất cả</strong>
+                                </label>
+                            </div>
+                            <!-- Order items will be inserted here -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newStatus"><strong>Trạng thái mới:</strong></label>
+                        <select id="newStatus" class="form-select">
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="PREPARING">Bắt đầu nấu</option>
+                            <option value="READY">Hoàn thành</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="executeStatusUpdate()">
+                        Cập nhật trạng thái
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
