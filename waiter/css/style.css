@@ -137,6 +137,7 @@ body {
     margin-left: 280px;
     transition: all 0.3s;
     min-height: 100vh;
+    padding-top: 80px; /* Thêm padding-top để tạo không gian cho top-bar fixed */
 }
 
 .main-content.expanded {
@@ -144,6 +145,10 @@ body {
 }
 
 .top-bar {
+    position: fixed; /* Thay đổi từ relative sang fixed */
+    top: 0;
+    left: 280px; /* Bắt đầu từ vị trí sau sidebar */
+    right: 0;
     background: linear-gradient(135deg, #fff, #f8f9fa);
     padding: 1rem 2rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -151,6 +156,14 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 3px solid var(--primary);
+    z-index: 1040; /* Đảm bảo nằm dưới sidebar nhưng trên nội dung */
+    transition: all 0.3s; /* Thêm transition để smooth khi sidebar collapse */
+}
+
+/* Điều chỉnh top-bar khi sidebar collapsed */
+.sidebar.collapsed ~ .main-content .top-bar,
+.main-content.expanded .top-bar {
+    left: 70px;
 }
 
 .dashboard-cards {
@@ -323,6 +336,7 @@ body {
     0%, 100% { border-color: var(--danger); }
     50% { border-color: #ff6b6b; }
 }
+
 .sidebar.collapsed .brand h3 span,
 .sidebar.collapsed .brand small,
 .sidebar.collapsed .nav-link span,
