@@ -1,0 +1,258 @@
+/* modal-style.css */
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Loại bỏ border: 2px solid var(--primary); */
+    position: relative;
+}
+
+/* Modal Content for Status Update (độc đáo) */
+.modal-content.status-update-modal {
+    max-width: 700px; /* Tăng kích thước cho modal cập nhật trạng thái */
+}
+
+/* Modal Header */
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--dark); /* Text màu mặc định trên nền trắng */
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 20px;
+}
+
+/* Modal Footer */
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    background: #f8f9fa;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* Close Button */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.8); /* Màu xám phù hợp với header không nền */
+    transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+    color: #000;
+    transform: scale(1.1);
+}
+
+/* Info Row (dùng cho displayOrderDetails) */
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95rem;
+}
+
+.info-row span:first-child {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* Order Items Section (dùng cho displayOrderDetails) */
+.order-items-section {
+    margin: 20px 0;
+}
+
+/* Order Item (dùng cho displayOrderDetails) */
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.order-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+}
+
+/* Item Details (dùng chung cho cả hai) */
+.item-details {
+    color: #666;
+    font-size: 14px;
+    display: block;
+}
+
+/* Order Total (dùng cho displayOrderDetails) */
+.order-total {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 4px;
+    font-weight: 700;
+    color: black;
+    border: 1px solid #dee2e6;
+}
+
+/* Badge (dùng chung cho cả hai) */
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Order Items Selection (độc đáo cho statusUpdateModal) */
+.order-items-selection {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+/* Select All Option (độc đáo cho statusUpdateModal) */
+.select-all-option {
+    padding: 10px;
+    border-bottom: 2px solid var(--dark);
+    margin-bottom: 10px;
+}
+
+.select-all-option label {
+    color: var(--waiter-blue);
+    font-weight: 600;
+}
+
+/* Order Item Option (độc đáo cho statusUpdateModal) */
+.order-item-option {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 5px;
+}
+
+.order-item-option:last-child {
+    border-bottom: none;
+}
+
+.order-item-option label {
+    display: block;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.order-item-option input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Form Group (dùng chung cho cả hai, nhưng mở rộng từ statusUpdateModal) */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* Form Control (dùng chung, mở rộng từ statusUpdateModal) */
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+}
+
+/* Buttons (dùng chung, kết hợp từ cả hai) */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #ff7700;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgb(255, 145, 0);
+}
+
+.btn-success {
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(21, 255, 0, 0.185);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5c636a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
+}
+
+
+
+

@@ -303,22 +303,25 @@
         const payload = parseJwt(token);
         const scopes = payload?.scope?.split(" ");
 
-        if (scopes.includes("ROLE_ADMIN")) {
-          window.location.href = '../../adminDashboard/adminDashboard.html';
-        } else if (scopes.includes("ROLE_WAITER")) {
-          window.location.href = '../../waiter/index.html';
-        } else if (scopes.includes("ROLE_CHEF")) {
-          window.location.href = '../../chef/index.html';
-        } else if (scopes.includes("ROLE_CASHIER")) {
-          window.location.href = '../../cashier/index.html';
-        } else if (scopes.includes("ROLE_CUSTOMER")) {
-          window.location.href = 'home.html';
-        } else {
-          window.location.href = 'adminDashboard/adminDashboard.html'; // fallback
+        
+            
+
+            if (scopes.includes("ROLE_ADMIN")) {
+                window.location.href = 'adminDashboard/adminDashboard.html';
+            } else if (scopes.includes("ROLE_WAITER")) {
+                window.location.href = '../../waiter/index.html';
+            }else if (scopes.includes("ROLE_CHEF")) {
+                window.location.href = '../../chef/index.html';
+            }else if (scopes.includes("ROLE_CASHIER")) {
+                window.location.href = '../../cashier/index.html';
+            } else if (scopes.includes("ROLE_CUSTOMER")) {
+                window.location.href = 'home.html';
+            } else {
+                window.location.href = 'adminDashboard/adminDashboard.html'; // fallback
+            }
+        } catch (err) {
+            document.getElementById('errorMsg').innerText = err.message;
         }
-      } catch (err) {
-        document.getElementById('errorMsg').innerText = err.message;
-      }
     });
   </script>
 </body>

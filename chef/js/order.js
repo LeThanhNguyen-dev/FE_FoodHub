@@ -1006,8 +1006,9 @@ function initializeFilters() {
                                 <i class="fas fa-arrows-alt-v"></i> Thứ tự
                             </label>
                             <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
-                                <option value="DESC">Giảm dần</option>
                                 <option value="ASC">Tăng dần</option>
+                                <option value="DESC">Giảm dần</option>
+                                
                             </select>
                         </div>
 
@@ -1117,7 +1118,7 @@ function clearFilters() {
     if (minPriceFilter) minPriceFilter.value = '';
     if (maxPriceFilter) maxPriceFilter.value = '';
     if (sortByFilter) sortByFilter.value = 'createdAt';
-    if (sortDirectionFilter) sortDirectionFilter.value = 'DESC';
+    if (sortDirectionFilter) sortDirectionFilter.value = 'ASC';
     if (pageSizeFilter) pageSizeFilter.value = '10';
 
     // Reset pagination
@@ -1129,6 +1130,14 @@ function clearFilters() {
 
 // Updated showOrders function
 function showOrders() {
+    // Ẩn các content không cần thiết
+    document.getElementById('dynamicContent').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('noWorkScheduleMessage').style.display = 'none';
+    
+    // Hiển thị dashboardContent (chứa ordersGrid)
+    document.getElementById('dashboardContent').style.display = 'block';
+    
     const pageTitle = document.getElementById('pageTitle');
     if (pageTitle) {
         pageTitle.textContent = 'Quản Lý Đơn Hàng';
@@ -1136,8 +1145,8 @@ function showOrders() {
 
     updateActiveNav('orders');
     initializeFilters();
-    initializePagination(); // Initialize pagination after orders grid
-    loadOrders();
+    initializePagination();
+    loadOrders(); // Render vào ordersGrid trong dashboardContent
 }
 
 // Load orders with current filters and pagination
@@ -1158,7 +1167,9 @@ async function loadOrdersWithFilters() {
         params.append('size', currentFilters.size);
         params.append('SorderBy', currentFilters.sortBy);
         params.append('sort', currentFilters.sort);
-
+        if (currentWorkSchedule && currentWorkSchedule.startTime) {
+            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
+        }
         console.log('Fetching orders with params:', params.toString());
 
         const data = await apiFetch(`/orders?${params.toString()}`, {
@@ -1330,7 +1341,9 @@ async function loadOrders(isAutoRefresh = false) {
         params.append('size', pageSize);
         params.append('SorderBy', sortBy); // Note: backend uses 'SorderBy'
         params.append('sort', sortDirection);
-
+        if (currentWorkSchedule && currentWorkSchedule.startTime) {
+            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
+        }
         console.log('Fetching orders with params:', params.toString());
 
         // Fetch orders with filters
@@ -1484,15 +1497,29 @@ function hasActiveFilters() {
 
 // Enhanced showOrders function to initialize filters
 function showOrders() {
-    const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) {
-        pageTitle.textContent = 'Quản Lý Đơn Hàng';
+    if (!hasWorkSchedule) {
+        showNoWorkScheduleMessage();
+        return;
     }
+    
+    // Update page title
+    document.getElementById('pageTitle').textContent = 'Quản Lý Đơn Hàng';
+    
+    // Show dashboard content (contains ordersGrid) and hide others
+    document.getElementById('dashboardContent').style.display = 'block';
+    document.getElementById('dynamicContent').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('noWorkScheduleMessage').style.display = 'none';
 
+    // Update active navigation
     updateActiveNav('orders');
+    
+    // Initialize and load orders
     initializeFilters();
-    loadOrders();
+    initializePagination();
+    loadOrders(); // This will render into ordersGrid within dashboardContent
 }
+
 
 // Enhanced showDashboard function to initialize filters
 function showDashboard() {

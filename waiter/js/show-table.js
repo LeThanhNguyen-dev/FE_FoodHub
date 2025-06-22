@@ -790,13 +790,6 @@ function showOrderModal(html) {
 }
 
 
-// Hàm thanh toán bàn
-function checkoutTable(tableId) {
-    if (confirm('Xác nhận thanh toán và dọn bàn?')) {
-        // TODO: Implement checkout table functionality
-        showNotification('Chức năng thanh toán sẽ được cập nhật sau!', 'info');
-    }
-}
 
 // Hàm xem chi tiết đặt bàn
 function viewReservation(tableId) {

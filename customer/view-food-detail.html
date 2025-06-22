@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết món ăn - FoodHub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/view-food-detail.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-sticky">
+        <div class="container-custom py-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-light me-3" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="d-flex align-items-center">
+                        <div class="restaurant-logo me-3">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div>
+                            <h1 class="h5 mb-0 fw-bold">FoodHub</h1>
+                            <small class="text-muted">Chi tiết món ăn</small>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary position-relative p-2 rounded-circle" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartBadge" class="cart-badge d-none">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" class="error-message d-none">
+        <div class="container-custom">
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span>Không thể tải thông tin món ăn. Vui lòng thử lại.</span>
+                <button class="btn btn-sm btn-outline-danger ms-2" onclick="loadFoodDetail()">
+                    <i class="fas fa-refresh me-1"></i>Thử lại
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Detail Content -->
+    <div id="foodDetailContent" class="d-none">
+        <!-- Food Image -->
+        <div class="food-image-container">
+            <div id="foodImage" class="food-image">
+                <div class="placeholder-image">
+                    <i class="fas fa-utensils"></i>
+                </div>
+            </div>
+            <div class="image-overlay">
+                <button class="btn btn-light btn-sm favorite-btn" onclick="toggleFavorite()">
+                    <i class="far fa-heart" id="favoriteIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Food Info -->
+        <div class="container-custom">
+            <div class="food-info">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 id="foodName" class="h3 fw-bold mb-2">Tên món ăn</h2>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <span class="badge bg-secondary" id="foodCategory">Danh mục</span>
+                            <div class="d-flex align-items-center">
+                                <div class="rating-stars">
+                                    <i class="fas fa-star rating-star"></i>
+                                    <i class="fas fa-star rating-star"></i>
+                                    <i class="fas fa-star rating-star"></i>
+                                    <i class="fas fa-star rating-star"></i>
+                                    <i class="far fa-star rating-star"></i>
+                                </div>
+                                <span class="text-muted ms-2">(4.2)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="price-text h4 mb-0" id="foodPrice">0₫</div>
+                    </div>
+                </div>
+
+                <!-- Status Badge -->
+                <div id="statusBadge" class="mb-3">
+                    <span class="badge bg-success">Còn hàng</span>
+                </div>
+
+                <!-- Description -->
+                <div class="food-description mb-4">
+                    <h5 class="fw-semibold mb-2">Mô tả món ăn</h5>
+                    <p id="foodDescription" class="text-muted">
+                        Đang tải mô tả...
+                    </p>
+                </div>
+
+                <!-- Customer Notes Section -->
+                <div class="customer-notes">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="fas fa-sticky-note text-warning me-2"></i>
+                        Ghi chú đặc biệt
+                    </h6>
+                    <div class="mb-3">
+                        <textarea 
+                            id="customerNote" 
+                            class="note-input" 
+                            placeholder="Nhập ghi chú của bạn về món ăn này... (Ví dụ: ít cay, không hành, thêm rau...)"
+                            maxlength="200"
+                            oninput="updateNoteCounter()"
+                        ></textarea>
+                        <div class="note-counter">
+                            <span id="noteCounter">0</span>/200 ký tự
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="text-muted small">Gợi ý:</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="addQuickNote('Ít cay')">Ít cay</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="addQuickNote('Không hành')">Không hành</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="addQuickNote('Thêm rau')">Thêm rau</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="addQuickNote('Không đường')">Không đường</button>
+                    </div>
+                    <div class="alert alert-info small mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Ghi chú của bạn sẽ được gửi đến bếp cùng với đơn hàng
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Foods Section -->
+            <div class="related-foods mb-4">
+                <h5 class="fw-semibold mb-3">
+                    <i class="fas fa-heart text-danger me-2"></i>
+                    Món ăn liên quan
+                </h5>
+                <div id="relatedFoodsContainer" class="related-foods-scroll">
+                    <div class="d-flex justify-content-center py-4">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div id="bottomActionBar" class="bottom-action-bar d-none">
+        <div class="container-custom">
+            <div class="d-flex align-items-center gap-3">
+                <div class="quantity-selector">
+                    <button class="btn btn-outline-secondary" id="decreaseQty" onclick="changeQuantity(-1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="quantity-display" id="selectedQuantity">1</span>
+                    <button class="btn btn-outline-secondary" id="increaseQty" onclick="changeQuantity(1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <button class="btn btn-primary flex-fill" id="addToCartBtn" onclick="addToCart()">
+                    <i class="fas fa-plus me-2"></i>
+                    Thêm vào giỏ hàng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-bold">Giỏ hàng (<span id="cartItemCount">0</span> món)</h5>
+                    <button class="btn btn-sm" onclick="toggleCart()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="cart-body">
+                <div id="emptyCart" class="text-center py-5">
+                    <i class="fas fa-shopping-cart text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">Giỏ hàng trống</p>
+                </div>
+                <div id="cartItems">
+                    <!-- Cart items will be populated by JavaScript -->
+                </div>
+            </div>
+            <div id="cartFooter" class="cart-footer d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-semibold">Tổng cộng:</span>
+                    <span class="fw-bold fs-5 price-text" id="totalPrice">0₫</span>
+                </div>
+                <button class="btn btn-primary w-100 py-2 fw-semibold" onclick="placeOrder()">
+                    Đặt món ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Cart Button -->
+    <button id="floatingCart" class="floating-cart d-none" onclick="toggleCart()">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="floatingTotal">0₫</span>
+            <span class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 20px; height: 20px; font-size: 10px; font-weight: bold;"
+                  id="floatingCount">0</span>
+        </div>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="js/cart-manager.js"></script> 
+    <script src="js/view-food-detail.js"></script>
+</body>
+</html>

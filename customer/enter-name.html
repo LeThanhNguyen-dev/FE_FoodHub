@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FoodHub - Chào mừng</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .welcome-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .welcome-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+        
+        .logo-container i {
+            font-size: 2rem;
+            color: white;
+            
+        }
+        
+        .table-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .welcome-text {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .table-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="welcome-card">
+            <div class="logo-container">
+                <i class="fas fa-utensils"></i>
+            </div>
+            
+            <h2 class="welcome-text">Chào mừng đến với FoodHub!</h2>
+            <p class="subtitle">Vui lòng nhập tên để bắt đầu đặt món</p>
+            
+            <div class="table-info">
+                <div class="d-flex align-items-center justify-content-center">
+                    <i class="fas fa-chair me-2 text-muted"></i>
+                    <span>Bàn số <span class="table-number" id="tableNumber">--</span></span>
+                </div>
+            </div>
+            
+            <form id="customerForm" onsubmit="submitForm(event)">
+                <div class="mb-3">
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="customerName" 
+                        placeholder="Nhập tên của bạn..."
+                        required
+                        minlength="2"
+                        maxlength="50"
+                    >
+                    <div class="error-message" id="errorMessage">
+                        Vui lòng nhập tên hợp lệ (2-50 ký tự)
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                    <i class="fas fa-arrow-right me-2"></i>
+                    Bắt đầu đặt món
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Lấy tableNumber từ URL parameter
+        function getTableNumberFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tableNumber = urlParams.get('tableNumber');
+            
+            if (tableNumber) {
+                document.getElementById('tableNumber').textContent = String(tableNumber).padStart(2, '0');
+                // Lưu vào localStorage để sử dụng ở các trang khác
+                localStorage.setItem('tableNumber', tableNumber);
+                localStorage.setItem('sessionStartTime', new Date().toISOString());
+            } else {
+                // Nếu không có tableNumber, redirect về trang lỗi hoặc trang chủ
+                document.getElementById('tableNumber').textContent = '??';
+                console.warn('Không tìm thấy số bàn trong URL');
+            }
+        }
+        
+        // Xử lý form submit
+        function submitForm(event) {
+            event.preventDefault();
+            
+            const customerName = document.getElementById('customerName').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Validate tên khách hàng
+            if (customerName.length < 2 || customerName.length > 50) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Ẩn error message
+            errorMessage.style.display = 'none';
+            
+            // Disable button và show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+            
+            // Lưu thông tin khách hàng
+            const tableNumber = localStorage.getItem('tableNumber');
+            localStorage.setItem('customerName', customerName);
+            localStorage.setItem('customerSession', JSON.stringify({
+                name: customerName,
+                tableNumber: tableNumber,
+                startTime: new Date().toISOString()
+            }));
+            
+            // Chuyển hướng đến home page sau 1 giây
+            setTimeout(() => {
+                window.location.href = `customer-home.html?tableNumber=${tableNumber}`;
+            }, 1000);
+        }
+        
+        // Khởi tạo khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            getTableNumberFromURL();
+            
+            // Auto focus vào input
+            document.getElementById('customerName').focus();
+            
+            // Xử lý enter key
+            document.getElementById('customerName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitForm(e);
+                }
+            });
+            
+            // Ẩn error message khi user bắt đầu gõ
+            document.getElementById('customerName').addEventListener('input', function() {
+                document.getElementById('errorMessage').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

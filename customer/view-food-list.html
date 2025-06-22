@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Nhà hàng ABC - Đặt món</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/view-food-list.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header-sticky">
+        <div class="container-custom py-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-light me-3" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="restaurant-logo me-3">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div>
+                        <h1 class="h5 mb-0 fw-bold">FoodHub</h1>
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            Bàn số <span id="tableNumber"></span>
+                        </small>
+                    </div>
+                </div>
+                <button class="btn btn-primary position-relative p-2 rounded-circle" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartBadge" class="cart-badge d-none">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="container-custom py-3">
+        <div class="position-relative">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control search-input" placeholder="Tìm kiếm món ăn..." id="searchInput"
+                oninput="filterItems()" />
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="container-custom pb-3">
+        <div id="categoriesContainer" class="d-flex gap-2" style="overflow-x: auto;">
+            <button class="category-btn active" data-category="all" onclick="selectCategory('all', this)">
+                🍽️ Tất cả
+            </button>
+            <!-- Other categories will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Menu Items -->
+    <div class="container-custom pb-5">
+        <div id="menuContainer">
+            <!-- Loading spinner -->
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+            </div>
+            <!-- Error message -->
+            <div id="errorMessage" class="error-message d-none">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span>Không thể tải dữ liệu. Vui lòng thử lại.</span>
+                <button class="btn btn-sm btn-outline-danger ms-2" onclick="loadMenuData()">
+                    <i class="fas fa-refresh me-1"></i>Thử lại
+                </button>
+            </div>
+            <!-- Menu items will be populated by JavaScript -->
+        </div>
+        <!-- Pagination Controls -->
+        <div id="paginationContainer" class="pagination-container d-none">
+            <button id="prevPage" class="btn btn-outline-primary pagination-btn" onclick="changePage(-1)">
+                <i class="fas fa-chevron-left me-1"></i>
+            </button>
+            <div id="pageNumbers" class="d-flex gap-1"></div>
+            <button id="nextPage" class="btn btn-outline-primary pagination-btn" onclick="changePage(1)">
+                <i class="fas fa-chevron-right ms-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-bold">Giỏ hàng (<span id="cartItemCount">0</span> món)</h5>
+                    <button class="btn btn-sm" onclick="toggleCart()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="cart-body">
+                <div id="emptyCart" class="text-center py-5">
+                    <i class="fas fa-shopping-cart text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">Giỏ hàng trống</p>
+                </div>
+                <div id="cartItems">
+                    <!-- Cart items will be populated by JavaScript -->
+                </div>
+            </div>
+            <div id="cartFooter" class="cart-footer d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-semibold">Tổng cộng:</span>
+                    <span class="fw-bold fs-5 price-text" id="totalPrice">0₫</span>
+                </div>
+                <button class="btn btn-primary w-100 py-2 fw-semibold" onclick="placeOrder()">
+                    Đặt món ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Cart Button -->
+    <button id="floatingCart" class="floating-cart d-none" onclick="toggleCart()">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="floatingTotal">0₫</span>
+            <span class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center"
+                style="width: 20px; height: 20px; font-size: 10px; font-weight: bold;" id="floatingCount">0</span>
+        </div>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="js/cart-manager.js"></script>
+    <script src="js/view-food-list.js"></script>
+    <script>
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Chặn double-tap zoom trên mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (e) {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+    </script>
+</body>
+
+</html>
