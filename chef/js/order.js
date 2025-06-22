@@ -7,6 +7,7 @@ let lastUpdateTime = null;
 let currentPage = 0;
 let totalPages = 0;
 let totalElements = 0;
+let pageSize = '20';
 // Status translations
 const statusTranslations = {
     'PENDING': 'Chờ Xử Lý',
@@ -138,50 +139,47 @@ async function loadOrders(isAutoRefresh = false) {
         // Get filter values - với null checks
         const statusFilter = document.getElementById('statusFilter');
         const tableIdFilter = document.getElementById('tableIdFilter');
-        const minPriceFilter = document.getElementById('minPriceFilter');
-        const maxPriceFilter = document.getElementById('maxPriceFilter');
         const sortByFilter = document.getElementById('sortByFilter');
         const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-        const pageSizeFilter = document.getElementById('pageSizeFilter');
 
         const status = statusFilter ? statusFilter.value : '';
         const tableId = tableIdFilter ? tableIdFilter.value : '';
-        const minPrice = minPriceFilter ? minPriceFilter.value : '';
-        const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
         const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
         const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
-        const pageSize = pageSizeFilter ? pageSizeFilter.value || '10' : '10';
 
         // Chỉ show loading khi không có dữ liệu và không phải auto refresh
         if (!isAutoRefresh && (!ordersData || ordersData.length === 0)) {
             ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
         }
 
-        // Kiểm tra xem có filters không, nếu không thì dùng API đơn giản
-        const hasFilters = status || tableId || minPrice || maxPrice || 
-                          (sortBy !== 'createdAt') || (sortDirection !== 'DESC') || 
-                          (pageSize !== '10');
+        // Luôn luôn sử dụng API có pagination và sorting để đảm bảo tính năng hoạt động đúng
+        // Chỉ dùng API đơn giản khi là auto refresh và không có bất kỳ thay đổi nào
+        const useSimpleAPI = isAutoRefresh && !status && !tableId && 
+                            sortBy === 'createdAt' && sortDirection === 'DESC' && 
+                            (!currentPage || currentPage === 0);
 
         let data;
         
-        if (hasFilters) {
-            // Build query parameters cho filtered request
+        if (useSimpleAPI) {
+            // Simple request chỉ cho auto refresh khi mặc định hoàn toàn
+            console.log('Fetching orders from simple API for auto refresh...');
+            data = await apiFetch('/orders', { method: 'GET' });
+        } else {
+            // Luôn dùng API có pagination cho tất cả các trường hợp khác
             const params = new URLSearchParams();
+            
+            // Thêm filters nếu có
             if (status) params.append('status', status);
             if (tableId) params.append('tableId', tableId);
-            if (minPrice) params.append('minPrice', minPrice);
-            if (maxPrice) params.append('maxPrice', maxPrice);
+            
+            // Luôn thêm pagination và sorting parameters
             params.append('page', (currentPage || 0).toString());
             params.append('size', pageSize);
-            params.append('SorderBy', sortBy);
+            params.append('sortBy', sortBy);
             params.append('sort', sortDirection);
 
-            console.log('Fetching filtered orders with params:', params.toString());
+            console.log('Fetching orders with pagination and sorting:', params.toString());
             data = await apiFetch(`/orders?${params.toString()}`, { method: 'GET' });
-        } else {
-            // Simple request without filters (cho auto refresh và lần load đầu)
-            console.log('Fetching orders from API...');
-            data = await apiFetch('/orders', { method: 'GET' });
         }
 
         console.log('API Response:', data);
@@ -194,17 +192,22 @@ async function loadOrders(isAutoRefresh = false) {
                 const orderPage = data.result;
                 orders = orderPage.content || [];
                 
-                // Update pagination info if available
-                if (typeof totalPages !== 'undefined') totalPages = orderPage.totalPages;
-                if (typeof totalElements !== 'undefined') totalElements = orderPage.totalElements;
-                if (typeof currentPage !== 'undefined') currentPage = orderPage.number;
+                // Update pagination info
+                if (typeof totalPages !== 'undefined') totalPages = orderPage.totalPages || 0;
+                if (typeof totalElements !== 'undefined') totalElements = orderPage.totalElements || 0;
+                if (typeof currentPage !== 'undefined') currentPage = orderPage.number || 0;
                 
                 // Update additional components if functions exist
                 if (typeof updateSummary === 'function') updateSummary(orderPage);
                 if (typeof updatePagination === 'function') updatePagination();
             } else {
-                // Simple response (array)
+                // Simple response (array) - chỉ cho auto refresh
                 orders = Array.isArray(data.result) ? data.result : [data.result];
+                
+                // Reset pagination info for simple response
+                if (typeof totalPages !== 'undefined') totalPages = 1;
+                if (typeof totalElements !== 'undefined') totalElements = orders.length;
+                if (typeof currentPage !== 'undefined') currentPage = 0;
             }
 
             // Check if data has changed for auto refresh
@@ -960,15 +963,7 @@ function initializeFilters() {
     const filtersHTML = `
         <div class="filters-section mb-4" id="filtersSection">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">
-                        <i class="fas fa-filter"></i> Bộ lọc & Sắp xếp
-                    </h6>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleFilters()">
-                        <i class="fas fa-chevron-down" id="filterToggleIcon"></i>
-                    </button>
-                </div>
-                <div class="card-body collapse" id="filtersBody">
+                <div class="card-body">
                     <div class="row g-3">
                         <!-- Status Filter -->
                         <div class="col-md-3">
@@ -995,25 +990,8 @@ function initializeFilters() {
                                    placeholder="Chọn bàn" onchange="applyFilters()" min="1">
                         </div>
 
-                        <!-- Price Range -->
-                        <div class="col-md-3">
-                            <label class="form-label">
-                                <i class="fas fa-money-bill-wave"></i> Giá tối thiểu (VND)
-                            </label>
-                            <input type="number" class="form-control" id="minPriceFilter" 
-                                   placeholder="0" onchange="applyFilters()" min="0" step="1000">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">
-                                <i class="fas fa-credit-card"></i> Giá tối đa (VND)
-                            </label>
-                            <input type="number" class="form-control" id="maxPriceFilter" 
-                                   placeholder="10000000" onchange="applyFilters()" min="0" step="1000">
-                        </div>
-
                         <!-- Sort Options -->
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">
                                 <i class="fas fa-sort"></i> Sắp xếp theo
                             </label>
@@ -1025,26 +1003,13 @@ function initializeFilters() {
                             </select>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">
                                 <i class="fas fa-arrows-alt-v"></i> Thứ tự
                             </label>
                             <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
                                 <option value="DESC">Giảm dần</option>
                                 <option value="ASC">Tăng dần</option>
-                            </select>
-                        </div>
-
-                        <!-- Page Size -->
-                        <div class="col-md-4">
-                            <label class="form-label">
-                                <i class="fas fa-list"></i> Số đơn/trang
-                            </label>
-                            <select class="form-select" id="pageSizeFilter" onchange="applyFilters()">
-                                <option value="5">5 đơn</option>
-                                <option value="10" selected>10 đơn</option>
-                                <option value="20">20 đơn</option>
-                                <option value="50">50 đơn</option>
                             </select>
                         </div>
 
@@ -1104,24 +1069,6 @@ function initializePagination() {
     }
 }
 
-
-
-// Toggle filters visibility
-function toggleFilters() {
-    const filtersBody = document.getElementById('filtersBody');
-    const toggleIcon = document.getElementById('filterToggleIcon');
-
-    if (filtersBody.classList.contains('show')) {
-        filtersBody.classList.remove('show');
-        toggleIcon.classList.remove('fa-chevron-up');
-        toggleIcon.classList.add('fa-chevron-down');
-    } else {
-        filtersBody.classList.add('show');
-        toggleIcon.classList.remove('fa-chevron-down');
-        toggleIcon.classList.add('fa-chevron-up');
-    }
-}
-
 // Apply filters and reload orders
 function applyFilters() {
     currentPage = 0; // Reset to first page when applying filters
@@ -1137,7 +1084,6 @@ function clearFilters() {
     const maxPriceFilter = document.getElementById('maxPriceFilter');
     const sortByFilter = document.getElementById('sortByFilter');
     const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-    const pageSizeFilter = document.getElementById('pageSizeFilter');
 
     if (statusFilter) statusFilter.value = '';
     if (tableIdFilter) tableIdFilter.value = '';
@@ -1145,7 +1091,6 @@ function clearFilters() {
     if (maxPriceFilter) maxPriceFilter.value = '';
     if (sortByFilter) sortByFilter.value = 'createdAt';
     if (sortDirectionFilter) sortDirectionFilter.value = 'DESC';
-    if (pageSizeFilter) pageSizeFilter.value = '10';
 
     // Reset pagination
     currentPage = 0;
