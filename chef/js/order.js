@@ -457,10 +457,6 @@ function displayOrderDetails(orderData) {
                             <span>Bàn:</span>
                             <span>${tableNumber || 'Mang về'}</span>
                         </div>
-                        <div class="info-row">
-                            <span>Nhân viên:</span>
-                            <span>${username}</span>
-                        </div>
                         ${note ? `<div class="info-row"><span>Ghi chú:</span><span>${note}</span></div>` : ''}
                     </div>
 
@@ -1107,10 +1103,6 @@ async function loadOrdersContent() {
     const ordersHTML = `
         <!-- Orders Section -->
         <div class="orders-section">
-            <div class="section-header">
-                <h3><i class="fas fa-clipboard-list"></i> Đơn Hàng Đang Xử Lý</h3>
-            </div>
-
             <!-- Filters Section sẽ được inject ở đây -->
             
             <div class="orders-grid" id="ordersGrid">

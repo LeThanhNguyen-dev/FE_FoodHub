@@ -228,30 +228,6 @@ body {
     min-height: calc(100vh - 120px) !important;
 }
 
-.section-header {
-    margin-bottom: 2rem !important;
-    padding: 1.5rem 0 !important;
-    background: rgba(255, 255, 255, 0.8) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-}
-
-.section-header h3 {
-    color: var(--dark) !important;
-    font-weight: 700 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    font-size: 1.5rem !important;
-    margin: 0 !important;
-    padding: 0 1.5rem !important;
-}
-
-.section-header h3 i {
-    color: var(--primary) !important;
-    font-size: 1.3rem !important;
-}
-
 .orders-grid {
     display: grid !important;
     grid-template-columns: repeat(4, minmax(250px, 1fr)) !important;
@@ -708,6 +684,9 @@ body {
 
 
 /* Filter Section Styles - Simplified */
+.filters-section{
+    margin-top: 20px;
+}
 .filters-section .card {
     border: 1px solid #e3e6f0;
     box-shadow: 0 2px 4px rgba(58, 59, 69, 0.1);
@@ -893,11 +872,6 @@ body {
         padding: 0.7rem;
         font-size: 0.8rem;
         min-width: auto;
-    }
-
-    .section-header h3 {
-        font-size: 1.3rem;
-        padding: 0 1rem;
     }
 
     .filters-section .col-md-3,
