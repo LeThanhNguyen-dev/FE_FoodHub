@@ -149,7 +149,7 @@ async function loadOrders() {
         }
 
         // Fetch orders with filters
-        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders?${params.toString()}`, {
             method: 'GET'
         });
 
