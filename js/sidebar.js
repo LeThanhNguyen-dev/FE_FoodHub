@@ -32,27 +32,62 @@ function showReports() {
 function setActiveNavLink() {
     const navLinks = document.querySelectorAll('.nav-link');
     const currentPath = window.location.pathname.toLowerCase().replace(/^\//, '').replace(/\.html$/, '');
-    console.log('Current Path:', currentPath); // Debug
+    console.log('Current Path:', currentPath);
 
     navLinks.forEach(link => {
         link.classList.remove('active');
         const href = link.getAttribute('href')?.toLowerCase().replace(/^\//, '').replace(/\.html$/, '');
-        console.log('Link Href:', href); // Debug
+        console.log('Link Href:', href);
 
         if (href) {
-            // Kiểm tra theo thư mục
-            if (currentPath.startsWith('menu-manager') && href.includes('menu-manager')) {
+            // Kiểm tra theo thư mục cho các folder có nhiều file
+            if (currentPath.startsWith('menu-manager/') && href.includes('menu-manager/')) {
                 link.classList.add('active');
-                console.log('Active: menu-manager', href); // Debug
-            } else if (currentPath.startsWith('staff-manager') && href.includes('staff-manager')) {
+                console.log('Active: menu-manager', href);
+            } 
+            else if (currentPath.startsWith('staff-manager/') && href.includes('staff-manager/')) {
                 link.classList.add('active');
-                console.log('Active: staff-manager', href); // Debug
+                console.log('Active: staff-manager', href);
             }
-            // Kiểm tra chính xác cho các trang khác
+            else if (currentPath.startsWith('customer-manager/') && href.includes('customer-manager/')) {
+                link.classList.add('active');
+                console.log('Active: customer-manager', href);
+            }
+            else if (currentPath.startsWith('revenue-report/order.html') && href.includes('revenue-report/order.html')) {
+                link.classList.add('active');
+                console.log('Active: revenue-report', href);
+            }
+             else if (currentPath.startsWith('revenue-report/revenue-report.html') && href.includes('revenue-report/revenue-report.html')) {
+                link.classList.add('active');
+                console.log('Active: revenue-report', href);
+            }
+            else if (currentPath.startsWith('schedule/') && href.includes('schedule/')) {
+                link.classList.add('active');
+                console.log('Active: schedule', href);
+            }
+            // Kiểm tra chính xác cho các trang đơn lẻ (như dashboard)
             else if (currentPath === href) {
                 link.classList.add('active');
-                console.log('Active: exact match', href); // Debug
+                console.log('Active: exact match', href);
             }
+        }
+    });
+}
+
+// Alternative approach - nếu bạn muốn active chính xác từng file
+function setActiveNavLinkExact() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const currentPath = window.location.pathname.toLowerCase();
+    console.log('Current Path:', currentPath);
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href')?.toLowerCase();
+        console.log('Link Href:', href);
+
+        if (href && currentPath.includes(href.replace(/^\//, ''))) {
+            link.classList.add('active');
+            console.log('Active:', href);
         }
     });
 }

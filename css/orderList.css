@@ -77,19 +77,6 @@ body {
     transform: scale(1.05);
 }
 
-.btn-success {
-    background: var(--success);
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-success:hover {
-    background: #0d9668;
-    transform: scale(1.05);
-}
-
 .table {
     background: white;
     border-radius: 15px;
@@ -102,6 +89,11 @@ body {
     font-weight: 600;
     border: none;
     padding: 1rem;
+    cursor: pointer;
+}
+
+.table th:hover {
+    background: linear-gradient(135deg, #1e293b, var(--dark));
 }
 
 .table td {
@@ -112,44 +104,6 @@ body {
 
 .table-hover tbody tr:hover {
     background-color: rgba(254, 161, 22, 0.05);
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center;
-    min-width: 90px;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.status-active {
-    background: linear-gradient(135deg, #10B981, #059669);
-    color: white;
-    border-color: #10B981;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.status-active:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-}
-
-.status-inactive {
-    background: linear-gradient(135deg, #EF4444, #DC2626);
-    color: white;
-    border-color: #EF4444;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-}
-
-.status-inactive:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .action-buttons .btn {
@@ -175,12 +129,18 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
 }
 
+.pagination-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
 .pagination .page-link {
     border-radius: 8px;
     margin: 0 2px;
-    border: none;
+    border: 1px solid var(--primary);
     color: var(--primary);
     font-weight: 600;
+    transition: all 0.3s;
 }
 
 .pagination .page-item.active .page-link {
@@ -188,6 +148,17 @@ body {
     border-color: var(--primary);
     color: var(--primary);
     font-weight: 600;
+}
+
+.pagination .page-link:hover {
+    background: rgba(254, 161, 22, 0.1);
+    color: var(--primary);
+}
+
+.pagination .page-item.disabled .page-link {
+    border-color: #e5e7eb;
+    color: #6b7280;
+    background: transparent;
 }
 
 .notification {
@@ -228,14 +199,26 @@ body {
     margin-bottom: 1rem;
 }
 
+.modal-content {
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary), #ff8c00);
+    color: white;
+    border: none;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0;
-    }
-    .status-badge {
-        font-size: 0.75rem;
-        padding: 4px 10px;
-        min-width: 80px;
     }
     .action-buttons {
         flex-direction: column;

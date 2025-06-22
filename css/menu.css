@@ -289,8 +289,10 @@ body {
 }
 
 .pagination .page-item.active .page-link {
-    background: var(--primary);
+    background: rgba(254, 161, 22, 0.2);
     border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 /* Notification */
