@@ -128,91 +128,116 @@ async function loadOrders(isAutoRefresh = false) {
     try {
         isReloading = true;
 
-        // Chỉ hiển thị loading khi không có dữ liệu và không phải auto refresh
-        if (!isAutoRefresh && ordersData.length === 0) {
-            const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid) {
-                ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
-            }
+        // Kiểm tra xem ordersGrid có tồn tại không
+        const ordersGrid = document.getElementById('ordersGrid');
+        if (!ordersGrid) {
+            console.error('Orders grid element not found');
+            return;
         }
 
-        console.log('Fetching orders from API...');
+        // Get filter values - với null checks
+        const statusFilter = document.getElementById('statusFilter');
+        const tableIdFilter = document.getElementById('tableIdFilter');
+        const minPriceFilter = document.getElementById('minPriceFilter');
+        const maxPriceFilter = document.getElementById('maxPriceFilter');
+        const sortByFilter = document.getElementById('sortByFilter');
+        const sortDirectionFilter = document.getElementById('sortDirectionFilter');
+        const pageSizeFilter = document.getElementById('pageSizeFilter');
 
-        const data = await apiFetch('/orders', {
-            method: 'GET',
-        });
+        const status = statusFilter ? statusFilter.value : '';
+        const tableId = tableIdFilter ? tableIdFilter.value : '';
+        const minPrice = minPriceFilter ? minPriceFilter.value : '';
+        const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
+        const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
+        const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
+        const pageSize = pageSizeFilter ? pageSizeFilter.value || '10' : '10';
+
+        // Chỉ show loading khi không có dữ liệu và không phải auto refresh
+        if (!isAutoRefresh && (!ordersData || ordersData.length === 0)) {
+            ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
+        }
+
+        // Kiểm tra xem có filters không, nếu không thì dùng API đơn giản
+        const hasFilters = status || tableId || minPrice || maxPrice || 
+                          (sortBy !== 'createdAt') || (sortDirection !== 'DESC') || 
+                          (pageSize !== '10');
+
+        let data;
+        
+        if (hasFilters) {
+            // Build query parameters cho filtered request
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            if (tableId) params.append('tableId', tableId);
+            if (minPrice) params.append('minPrice', minPrice);
+            if (maxPrice) params.append('maxPrice', maxPrice);
+            params.append('page', (currentPage || 0).toString());
+            params.append('size', pageSize);
+            params.append('SorderBy', sortBy);
+            params.append('sort', sortDirection);
+
+            console.log('Fetching filtered orders with params:', params.toString());
+            data = await apiFetch(`/orders?${params.toString()}`, { method: 'GET' });
+        } else {
+            // Simple request without filters (cho auto refresh và lần load đầu)
+            console.log('Fetching orders from API...');
+            data = await apiFetch('/orders', { method: 'GET' });
+        }
 
         console.log('API Response:', data);
 
-        if (data.code === 0 && data.result && data.result.content) {
-            const newOrders = data.result.content;
+        if (data.code === 0 && data.result) {
+            let orders;
+            
+            if (data.result.content) {
+                // Paginated response
+                const orderPage = data.result;
+                orders = orderPage.content || [];
+                
+                // Update pagination info if available
+                if (typeof totalPages !== 'undefined') totalPages = orderPage.totalPages;
+                if (typeof totalElements !== 'undefined') totalElements = orderPage.totalElements;
+                if (typeof currentPage !== 'undefined') currentPage = orderPage.number;
+                
+                // Update additional components if functions exist
+                if (typeof updateSummary === 'function') updateSummary(orderPage);
+                if (typeof updatePagination === 'function') updatePagination();
+            } else {
+                // Simple response (array)
+                orders = Array.isArray(data.result) ? data.result : [data.result];
+            }
 
-            // Check if data has changed
-            if (isAutoRefresh && !hasOrdersChanged(newOrders, ordersData)) {
+            // Check if data has changed for auto refresh
+            if (isAutoRefresh && typeof hasOrdersChanged === 'function' && !hasOrdersChanged(orders, ordersData)) {
                 console.log('No changes detected, skipping render');
                 return;
             }
 
-            // Store previous data
-            const previousOrders = [...ordersData];
-            ordersData = newOrders;
+            // Store orders data
+            ordersData = orders;
 
-            // Try to update existing cards first
-            let needsFullRender = false;
+            // Render orders
+            renderOrders(orders);
+            
+            // Update stats if function exists
+            if (typeof updateStats === 'function') updateStats();
+            
+            // Update last update time if exists
+            if (typeof lastUpdateTime !== 'undefined') lastUpdateTime = new Date();
 
-            if (isAutoRefresh && previousOrders.length > 0) {
-                // Check if we need full render (new orders added/removed)
-                const currentIds = new Set(ordersData.map(o => o.id));
-                const previousIds = new Set(previousOrders.map(o => o.id));
-
-                if (currentIds.size !== previousIds.size ||
-                    ![...currentIds].every(id => previousIds.has(id))) {
-                    needsFullRender = true;
-                }
-            } else {
-                needsFullRender = true;
-            }
-
-            if (needsFullRender) {
-                renderOrders(ordersData);
-            } else {
-                // Update existing cards
-                ordersData.forEach(order => {
-                    updateOrderCard(order);
-                });
-            }
-
-            updateStats();
-            lastUpdateTime = new Date();
-            console.log('Orders updated successfully:', ordersData.length);
+            console.log('Orders loaded successfully:', orders.length);
         } else {
             throw new Error('Invalid response format or no data');
         }
+
     } catch (error) {
         console.error('Error loading orders:', error);
-
-        // Only show error if it's not an auto refresh or if we have no data
-        if (!isAutoRefresh || ordersData.length === 0) {
-            const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid) {
-                ordersGrid.innerHTML = `
-                    <div class="text-center text-danger">
-                        <i class="fas fa-exclamation-triangle mb-2"></i>
-                        <div>Lỗi tải dữ liệu đơn hàng</div>
-                        <small>${error.message}</small>
-                        <div class="mt-2">
-                            <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">
-                                <i class="fas fa-refresh"></i> Thử lại
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
+        showErrorState(error.message);
     } finally {
         isReloading = false;
     }
 }
+
 
 // Render orders with smooth animations
 function renderOrders(orders) {
@@ -223,10 +248,10 @@ function renderOrders(orders) {
         return;
     }
 
-    // Filter out cancelled orders for kitchen display
-    const activeOrders = orders.filter(order => order.status !== 'CANCELLED');
+    // Hiển thị tất cả đơn hàng bao gồm cả đơn đã hủy
+    const allOrders = orders;
 
-    if (activeOrders.length === 0) {
+    if (allOrders.length === 0) {
         ordersGrid.innerHTML = `
             <div class="text-center text-muted py-4">
                 <i class="fas fa-clipboard-list fa-3x mb-3 opacity-50"></i>
@@ -236,7 +261,7 @@ function renderOrders(orders) {
         return;
     }
 
-    const ordersHTML = activeOrders.map(order => {
+    const ordersHTML = allOrders.map(order => {
         // Show all items in the order
         const allItems = order.orderItems || [];
 
@@ -268,7 +293,7 @@ function renderOrders(orders) {
         }
 
         return `
-            <div class="order-card" data-order-id="${order.id}">
+            <div class="order-card ${order.status === 'CANCELLED' ? 'cancelled-order' : ''}" data-order-id="${order.id}">
                 <div class="order-header">
                     <div class="order-title-row">
                         <div class="order-number">
@@ -304,12 +329,15 @@ function renderOrders(orders) {
                 </div>
                 
                 <div class="order-actions">
-                    <button class="btn btn-preparing" onclick="updateOrderStatus(${order.id}, 'PREPARING')">
-                        <i class="fas fa-fire"></i> Bắt Đầu Nấu
-                    </button>
-                    <button class="btn btn-ready" onclick="updateOrderStatus(${order.id}, 'READY')">
-                        <i class="fas fa-check"></i> Hoàn Thành
-                    </button>
+                    ${order.status === 'CANCELLED' ? 
+                        '<div class="cancelled-notice"><i class="fas fa-ban"></i> Đơn hàng đã bị hủy</div>' : 
+                        `<button class="btn btn-preparing" onclick="updateOrderStatus(${order.id}, 'PREPARING')">
+                            <i class="fas fa-fire"></i> Bắt Đầu Nấu
+                        </button>
+                        <button class="btn btn-ready" onclick="updateOrderStatus(${order.id}, 'READY')">
+                            <i class="fas fa-check"></i> Hoàn Thành
+                        </button>`
+                    }
                     <button class="btn btn-details" onclick="viewOrderDetails(${order.id})">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -320,6 +348,7 @@ function renderOrders(orders) {
 
     ordersGrid.innerHTML = ordersHTML;
 }
+
 
 
 // Update statistics with smooth animations
@@ -953,6 +982,7 @@ function initializeFilters() {
                                 <option value="PREPARING">Đang Chế Biến</option>
                                 <option value="READY">Sẵn Sàng</option>
                                 <option value="COMPLETED">Hoàn Thành</option>
+                                <option value="CANCELLED">Đã Hủy</option>
                             </select>
                         </div>
 
@@ -1000,9 +1030,8 @@ function initializeFilters() {
                                 <i class="fas fa-arrows-alt-v"></i> Thứ tự
                             </label>
                             <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
-                                <option value="ASC">Tăng dần</option>
                                 <option value="DESC">Giảm dần</option>
-                                
+                                <option value="ASC">Tăng dần</option>
                             </select>
                         </div>
 
@@ -1039,12 +1068,14 @@ function initializeFilters() {
         </div>
     `;
 
-    // Insert filters before orders grid
+    // Insert filters before orders grid trong dynamicContent
     const ordersGrid = document.getElementById('ordersGrid');
     if (ordersGrid && !document.getElementById('filtersSection')) {
         ordersGrid.insertAdjacentHTML('beforebegin', filtersHTML);
     }
 }
+
+// Hàm initializePagination được sửa lại
 function initializePagination() {
     const paginationHTML = `
         <!-- Pagination -->
@@ -1066,12 +1097,13 @@ function initializePagination() {
         </div>
     `;
 
-    // Insert pagination after orders grid
+    // Insert pagination after orders grid trong dynamicContent
     const ordersGrid = document.getElementById('ordersGrid');
     if (ordersGrid && !document.getElementById('paginationSection')) {
         ordersGrid.insertAdjacentHTML('afterend', paginationHTML);
     }
 }
+
 
 
 // Toggle filters visibility
@@ -1112,7 +1144,7 @@ function clearFilters() {
     if (minPriceFilter) minPriceFilter.value = '';
     if (maxPriceFilter) maxPriceFilter.value = '';
     if (sortByFilter) sortByFilter.value = 'createdAt';
-    if (sortDirectionFilter) sortDirectionFilter.value = 'ASC';
+    if (sortDirectionFilter) sortDirectionFilter.value = 'DESC';
     if (pageSizeFilter) pageSizeFilter.value = '10';
 
     // Reset pagination
@@ -1123,25 +1155,43 @@ function clearFilters() {
 }
 
 // Updated showOrders function
-function showOrders() {
-    // Ẩn các content không cần thiết
-    document.getElementById('dynamicContent').style.display = 'none';
-    document.getElementById('errorMessage').style.display = 'none';
-    document.getElementById('noWorkScheduleMessage').style.display = 'none';
+async function loadOrdersContent() {
+    const dynamicContent = document.getElementById('dynamicContent');
     
-    // Hiển thị dashboardContent (chứa ordersGrid)
-    document.getElementById('dashboardContent').style.display = 'block';
-    
-    const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) {
-        pageTitle.textContent = 'Quản Lý Đơn Hàng';
-    }
+    // Tạo HTML structure cho orders (giữ nguyên class để CSS hoạt động)
+    const ordersHTML = `
+        <!-- Orders Section -->
+        <div class="orders-section">
+            <div class="section-header">
+                <h3><i class="fas fa-clipboard-list"></i> Đơn Hàng Đang Xử Lý</h3>
+            </div>
 
-    updateActiveNav('orders');
+            <!-- Filters Section sẽ được inject ở đây -->
+            
+            <div class="orders-grid" id="ordersGrid">
+                <div class="text-center">
+                    <div class="loading"></div> Đang tải đơn hàng...
+                </div>
+            </div>
+
+            <!-- Pagination Section sẽ được inject ở đây -->
+        </div>
+    `;
+
+    // Load HTML vào dynamicContent
+    dynamicContent.innerHTML = ordersHTML;
+
+    // Đợi một chút để DOM được render
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Initialize filters và pagination
     initializeFilters();
     initializePagination();
-    loadOrders(); // Render vào ordersGrid trong dashboardContent
+
+    // Load orders data
+    await loadOrders();
 }
+
 
 // Load orders with current filters and pagination
 async function loadOrdersWithFilters() {
@@ -1161,12 +1211,10 @@ async function loadOrdersWithFilters() {
         params.append('size', currentFilters.size);
         params.append('SorderBy', currentFilters.sortBy);
         params.append('sort', currentFilters.sort);
-        if (currentWorkSchedule && currentWorkSchedule.startTime) {
-            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
-        }
+
         console.log('Fetching orders with params:', params.toString());
 
-        const data = await apiFetch(`/orders/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders?${params.toString()}`, {
             method: 'GET',
         });
 
@@ -1298,83 +1346,7 @@ function updatePaginationInfo(pageData) {
 }
 
 // Enhanced loadOrders function to work with filters
-async function loadOrders(isAutoRefresh = false) {
-    try {
-        // Get filter values - với null checks
-        const statusFilter = document.getElementById('statusFilter');
-        const tableIdFilter = document.getElementById('tableIdFilter');
-        const minPriceFilter = document.getElementById('minPriceFilter');
-        const maxPriceFilter = document.getElementById('maxPriceFilter');
-        const sortByFilter = document.getElementById('sortByFilter');
-        const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-        const pageSizeFilter = document.getElementById('pageSizeFilter');
 
-        const status = statusFilter ? statusFilter.value : '';
-        const tableId = tableIdFilter ? tableIdFilter.value : '';
-        const minPrice = minPriceFilter ? minPriceFilter.value : '';
-        const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
-        const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
-        const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
-        const pageSize = pageSizeFilter ? pageSizeFilter.value || '10' : '10';
-
-        // Chỉ show loading khi không có dữ liệu và không phải auto refresh
-        if (!isAutoRefresh && ordersData.length === 0) {
-            const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid) {
-                ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
-            }
-        }
-
-        // Build query parameters
-        const params = new URLSearchParams();
-        if (status) params.append('status', status);
-        if (tableId) params.append('tableId', tableId);
-        if (minPrice) params.append('minPrice', minPrice);
-        if (maxPrice) params.append('maxPrice', maxPrice);
-        params.append('page', currentPage.toString());
-        params.append('size', pageSize);
-        params.append('SorderBy', sortBy); // Note: backend uses 'SorderBy'
-        params.append('sort', sortDirection);
-        if (currentWorkSchedule && currentWorkSchedule.startTime) {
-            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
-        }
-        console.log('Fetching orders with params:', params.toString());
-
-        // Fetch orders with filters
-        const data = await apiFetch(`/orders?${params.toString()}`, {
-            method: 'GET'
-        });
-
-        console.log('API Response:', data);
-
-        if (data.code === 0 && data.result) {
-            const orderPage = data.result;
-            const orders = orderPage.content || [];
-
-            // Update pagination info
-            totalPages = orderPage.totalPages;
-            totalElements = orderPage.totalElements;
-            currentPage = orderPage.number;
-
-            // Store orders data
-            ordersData = orders;
-
-            // Render orders
-            renderOrders(orders);
-            updateSummary(orderPage);
-            updatePagination();
-            updateStats();
-
-            console.log('Orders loaded successfully:', orders.length);
-        } else {
-            throw new Error('Invalid response format or no data');
-        }
-
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-        showErrorState(error.message);
-    }
-}
 
 function updateSummary(orderPage) {
     const paginationInfo = document.getElementById('paginationInfo');
@@ -1490,43 +1462,30 @@ function hasActiveFilters() {
 }
 
 // Enhanced showOrders function to initialize filters
-function showOrders() {
-    if (!hasWorkSchedule) {
-        showNoWorkScheduleMessage();
-        return;
-    }
-    
+async function showOrders() {
     // Update page title
-    document.getElementById('pageTitle').textContent = 'Quản Lý Đơn Hàng';
-    
-    // Show dashboard content (contains ordersGrid) and hide others
-    document.getElementById('dashboardContent').style.display = 'block';
-    document.getElementById('dynamicContent').style.display = 'none';
+    const pageTitle = document.getElementById('pageTitle');
+    if (pageTitle) {
+        pageTitle.textContent = 'Quản Lý Đơn Hàng';
+    }
+
+    // Show dynamic content and hide others
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('dynamicContent').style.display = 'block';
     document.getElementById('errorMessage').style.display = 'none';
-    document.getElementById('noWorkScheduleMessage').style.display = 'none';
+    const noWorkScheduleMsg = document.getElementById('noWorkScheduleMessage');
+    if (noWorkScheduleMsg) {
+        noWorkScheduleMsg.style.display = 'none';
+    }
 
     // Update active navigation
     updateActiveNav('orders');
-    
-    // Initialize and load orders
-    initializeFilters();
-    initializePagination();
-    loadOrders(); // This will render into ordersGrid within dashboardContent
+
+    // Load orders content into dynamicContent
+    await loadOrdersContent();
 }
 
 
-// Enhanced showDashboard function to initialize filters
-function showDashboard() {
-    const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) {
-        pageTitle.textContent = 'Tổng Quan - Ca Làm Việc';
-    }
-
-    updateActiveNav('dashboard');
-    initializeFilters();
-    initializePagination(); // Initialize pagination after orders grid
-    loadOrders();
-}
 
 // Update active navigation
 function updateActiveNav(section) {

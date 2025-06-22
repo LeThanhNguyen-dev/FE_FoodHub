@@ -372,37 +372,39 @@ body {
 
 /* Đã xác nhận - Xanh dương */
 .status-confirmed {
-    background: #dbeafe !important;
-    color: #2563eb !important;
-    border: 1px solid #60a5fa !important;
+    background: #dbeafe;
+    color: #2563eb;
+    border: 1px solid #60a5fa;
 }
 
-/* Đang chuẩn bị - Vàng cam */
 .status-preparing {
-    background: #fef3c7 !important;
-    color: #d97706 !important;
-    border: 1px solid #fbbf24 !important;
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fbbf24;
 }
 
-/* Sẵn sàng - Xanh lá cây nhạt */
 .status-ready {
-    background: #ecfdf5 !important;
-    color: #059669 !important;
-    border: 1px solid #6ee7b7 !important;
+    background: #d1fae5;
+    color: #059669;
+    border: 1px solid #34d399;
 }
 
-/* Hoàn thành - Xanh lá đậm */
 .status-completed {
-    background: #d1fae5 !important;
-    color: #047857 !important;
-    border: 1px solid #34d399 !important;
+    background: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #4ade80;
 }
 
-/* Chờ xử lý - Đỏ */
 .status-pending {
-    background: #fef2f2 !important;
-    color: #dc2626 !important;
-    border: 1px solid #fca5a5 !important;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #f87171;
 }
 
 /* Order Items - High Priority */
