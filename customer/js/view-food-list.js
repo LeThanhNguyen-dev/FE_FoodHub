@@ -10,11 +10,17 @@ let totalPages = 0;
 let pageSize = 10;
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:8080/menu-items';
-const CATEGORIES_API_URL = 'http://localhost:8080/categories';
-
+const BACKEND_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = `${BACKEND_BASE_URL}/menu-items`;
+const CATEGORIES_API_URL = `${BACKEND_BASE_URL}/categories`;
+const tableNumber = getUrlParameter('tableNumber');
 // Default placeholder for images
 const DEFAULT_EMOJI = '🍽️';
+
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
 
 // Get placeholder image for items without image
 function getPlaceholderImage() {
@@ -386,7 +392,15 @@ function filterItems() {
 
 // View item detail
 function viewItemDetail(itemId) {
-    window.location.href = `view-food-detail.html?itemId=${itemId}`;
+    window.location.href = `view-food-detail.html?itemId=${itemId}&tableNumber=${new URLSearchParams(window.location.search).get('tableNumber') || 'N/A'}   `;
+}
+
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = '/menu';
+    }
 }
 
 // Đăng ký callback để cập nhật UI khi cart thay đổi
@@ -399,6 +413,10 @@ cartManager.addCallback(() => {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function () {
+    const tableNumberElement = document.getElementById('tableNumber');
+    if (tableNumberElement) {
+        tableNumberElement.textContent = tableNumber;
+    }
     loadMenuData(0);
     
     // Setup search input
@@ -407,3 +425,4 @@ document.addEventListener('DOMContentLoaded', function () {
         searchInput.addEventListener('input', filterItems);
     }
 });
+

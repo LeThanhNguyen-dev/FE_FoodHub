@@ -1,5 +1,5 @@
-const apiMenuUrl = 'http://localhost:8080/foodhub/menu-items';
-const apiCategoryUrl = 'http://localhost:8080/foodhub/categories';
+const apiMenuUrl = 'http://localhost:8080/menu-items';
+const apiCategoryUrl = 'http://localhost:8080/categories';
 let selectedImageBase64 = null;
 
 function fetchCategories() {

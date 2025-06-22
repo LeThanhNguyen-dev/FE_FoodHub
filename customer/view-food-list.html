@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Nhà hàng ABC - Đặt món</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -16,6 +17,9 @@
         <div class="container-custom py-3">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
+                    <button class="btn btn-light me-3" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                     <div class="restaurant-logo me-3">
                         <i class="fas fa-utensils"></i>
                     </div>
@@ -23,7 +27,7 @@
                         <h1 class="h5 mb-0 fw-bold">FoodHub</h1>
                         <small class="text-muted">
                             <i class="fas fa-map-marker-alt me-1"></i>
-                            Bàn số <span id="tableNumber">05</span>
+                            Bàn số <span id="tableNumber"></span>
                         </small>
                     </div>
                 </div>
@@ -130,6 +134,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="js/cart-manager.js"></script>
     <script src="js/view-food-list.js"></script>
+    <script>
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Chặn double-tap zoom trên mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (e) {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+    </script>
 </body>
 
 </html>
