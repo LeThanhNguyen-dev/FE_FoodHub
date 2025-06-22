@@ -1,6 +1,6 @@
 :root {
-    --dark-green: #02052f;
-    --gold: #D4A017;
+    --dark-green: #0F172B;
+    --gold: #FEA116;
     --light-gold: #F7E6A3;
     --light-gray: #f8f9fa;
 }
@@ -16,15 +16,15 @@ body {
 }
 
 .navbar-brand {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Pacifico', cursive;
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 200;
     color: var(--gold) !important;
 }
 
 .nav-link {
     font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--light-gold) !important;
     transition: color 0.3s ease;
 }
@@ -93,6 +93,7 @@ body {
 }
 
 .footer {
+    font-family: 'Montserrat', sans-serif;
     background-color: var(--dark-green);
     color: var(--light-gold);
     padding: 3rem 0;
@@ -112,7 +113,7 @@ body {
 }
 
 .footer .contact-info {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Pacifico', cursive;
     margin-top: 1rem;
 }
 
