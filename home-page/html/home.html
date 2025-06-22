@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,12 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap"
+        rel="stylesheet">
     <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
@@ -18,31 +23,292 @@
             background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
             background-size: cover;
             background-position: center;
-            height: 50vh;
+            height: 60vh;
             display: flex;
             align-items: center;
             text-align: center;
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), rgba(26, 60, 52, 0.1));
+            animation: shimmer 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes shimmer {
+            0% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0.7;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .hero h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: 3rem;
-            color: var(--gold);
+            color: #FEA116;
         }
 
         .hero p {
             font-size: 1.1rem;
-            color: var(--light-gold);
+            color: #FEA116;
+        }
+
+        .hero-btn {
+            background: #FEA116;
+            color: var(--dark-green);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 1rem;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px #FEA116;
+            color: var(--dark-green);
+        }
+
+        .carousel-item .hero {
+    height: 60vh;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: white;
+}
+
+.carousel-item .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 0;
+}
+
+.carousel-item .container {
+    position: relative;
+    z-index: 2;
+}
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--dark-green);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--gold);
+            font-family: 'Montserrat', sans-serif;
+
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 5rem 0;
+            background: var(--cream);
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            background: linear-gradient(45deg, var(--gold), #FEA116);
+            color: var(--dark-green);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .feature-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+        }
+
+        /* Menu Preview Section */
+        .menu-preview {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--dark-green), var(--light-green));
+            color: rgb(0, 0, 0);
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .menu-item-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item-price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FEA116;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .testimonial-card {
+            background: var(--cream);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-gray);
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .stars {
+            color: #FEA116;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .section-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Montserrat', sans-serif;
             color: var(--dark-green);
             font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        
+        /* Welcome Message */
+        .welcome-message {
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 25px;
+            padding: 1rem 2rem;
+            margin-top: 1rem;
+            border: 2px solid var(--gold);
         }
 
         @media (max-width: 768px) {
@@ -57,84 +323,302 @@
             .section-title {
                 font-size: 2rem;
             }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
+
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="home.html">FoodHub</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="menu.html">Menu</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.html">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact</a>
-                    </li>
-                    <li class="nav-item" id="auth-nav-item">
-                        <a class="nav-link btn-login" href="login.html">Login</a>
-                    </li>
-                    <li class="nav-item d-none" id="user-nav-item">
-                        <div class="user-dropdown dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                                <span id="username-display"></span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="profile.html">Chỉnh sửa thông tin</a></li>
-                                <li><a class="dropdown-item" href="#">Xem đơn hàng</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng xuất</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li class="nav-item d-none" id="cart-nav-item">
-                        <a class="nav-link cart-icon" href="cart.html">
-                            <i class="bi bi-cart"></i>
-                            <span class="badge" id="cart-count">0</span>
+<!-- Thanh Điều Hướng -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+            <i class="fa fa-utensils"></i>
+            <span>FoodHub</span>    </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link active" href="home.html">Trang Chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="menu.html">Thực Đơn</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">Giới Thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Liên Hệ</a>
+                </li>
+                <li class="nav-item" id="auth-nav-item">
+                    <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
+                </li>
+                <li class="nav-item d-none" id="user-nav-item">
+                    <div class="user-dropdown dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                            <span id="username-display"></span>
                         </a>
-                    </li>
-                </ul>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
+                            <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item d-none" id="cart-nav-item">
+                    <a class="nav-link cart-icon" href="cart.html">
+                        <i class="bi bi-cart"></i>
+                        <span class="badge" id="cart-count">0</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Phần Chào Mừng -->
+<section id="hero-carousel" class="carousel slide hero" data-bs-ride="carousel">
+    <div class="carousel-inner">
+
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <div class="hero d-flex align-items-center"
+                style="background-image: url('https://images.unsplash.com/photo-1555992336-cbf8f63ba2e3'); background-size: cover; background-position: center;">
+                <div class="container text-center text-white">
+                    <h1>Chào Mừng Đến Với FoodHub</h1>
+                    <p>Thưởng thức hương vị tuyệt hảo trong từng món ăn.</p>
+                    <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Khám Phá Thực Đơn</a>
+                </div>
             </div>
         </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Welcome to FoodHub</h1>
-            <p>Savor the taste of excellence with every bite.</p>
-            <p id="welcome-message" class="welcome-message d-none">Hello, <span id="username-greeting"></span>!</p>
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <div class="hero d-flex align-items-center"
+                style="background-image: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092'); background-size: cover; background-position: center;">
+                <div class="container text-center text-white">
+                    <h1>Món Ăn Tươi Ngon Mỗi Ngày</h1>
+                    <p>Được chế biến từ nguyên liệu chất lượng cao.</p>
+                    <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Xem Ngay</a>
+                </div>
+            </div>
         </div>
-    </section>
+
+       
+
+    </div>
+
+    <!-- Điều hướng -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Trước</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Tiếp</span>
+    </button>
+</section>
+  
+
+<!-- Phần Thống Kê -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-6">
+                <div class="stat-item fade-in">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Khách Hàng Hài Lòng</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item fade-in">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Món Ăn Ngon</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item fade-in">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Năm Kinh Nghiệm</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item fade-in">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Phục Vụ Mọi Lúc</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Phần Lý Do Chọn FoodHub -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title fade-in">Vì Sao Chọn FoodHub?</h2>
+        <p class="section-subtitle fade-in">Chúng tôi cam kết mang đến cho bạn trải nghiệm ẩm thực tốt nhất với chất
+            lượng và dịch vụ tuyệt vời.</p>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h3 class="feature-title">Chất Lượng Cao Cấp</h3>
+                    <p>Chúng tôi chỉ sử dụng những nguyên liệu tốt nhất từ các nhà cung cấp uy tín để đảm bảo món ăn
+                        luôn đạt chuẩn cao nhất.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="bi bi-lightning"></i>
+                    </div>
+                    <h3 class="feature-title">Giao Hàng Nhanh Chóng</h3>
+                    <p>Hệ thống giao hàng hiệu quả giúp món ăn đến tay bạn luôn nóng hổi và tươi ngon trong thời gian
+                        ngắn nhất.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h3 class="feature-title">Chế Biến Bằng Tâm Huyết</h3>
+                    <p>Mỗi món ăn đều được chế biến với niềm đam mê và sự tỉ mỉ bởi các đầu bếp giàu kinh nghiệm và yêu
+                        nghề.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <<!-- Phần Xem Trước Thực Đơn -->
+<section id="menu-preview" class="menu-preview">
+    <div class="container">
+        <h2 class="section-title text-black fade-in">Món Ăn Nổi Bật</h2>
+        <p class="section-subtitle text-black fade-in">
+            Khám phá những món ăn được yêu thích nhất và được đầu bếp đề xuất – chắc chắn sẽ làm say mê vị giác của bạn.
+        </p>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="menu-item fade-in">
+                    <img src="https://mycayseouly.vn/Images/image/mycay/Lau-Thai-Bo-My.jpg" alt="Lẩu kim chi bò mỹ">
+                    <h3 class="menu-item-title">Lẩu Kim Chi Bò Mỹ</h3>
+                    <p>Lẩu kim chi với thịt bò Mỹ tươi, nấm, đậu phụ và rau xanh trong nước dùng cay nồng đậm vị Hàn Quốc.</p>
+                    <div class="menu-item-price">289.000₫</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="menu-item fade-in">
+                    <img src="https://cdn-www.vinid.net/2020/01/Buzza-BBQ-voi-uu-dai-200.000-dong-tu-app-VinID-1024x576.jpg" alt="Ba chỉ bò mỹ nướng">
+                    <h3 class="menu-item-title">Ba Chỉ Bò Mỹ Nướng</h3>
+                    <p>Ba chỉ bò Mỹ nướng than hồng, tẩm ướp đậm đà, dùng kèm rau xanh và nước chấm đặc biệt.</p>
+                    <div class="menu-item-price">129.000₫</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="menu-item fade-in">
+                    <img src="https://mcdn.coolmate.me/image/July2023/cocktail-trai-cay-1734_240.jpg" alt="Cocktail trái cây">
+                    <h3 class="menu-item-title">Cocktail Trái Cây</h3>
+                    <p>Cocktail trái cây tươi mát, kết hợp dưa hấu, dứa, kiwi và cam mọng nước, hòa quyện trong lớp syrup ngọt nhẹ và đá viên mát lạnh.</p>
+                    <div class="menu-item-price">60.000₫</div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="menu.html" class="hero-btn">Xem Toàn Bộ Thực Đơn</a>
+        </div>
+    </div>
+</section>
+
+
+    <!-- Testimonials Section
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title fade-in">What Our Customers Say</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="testimonial-card fade-in">
+                        <div class="stars">★★★★★</div>
+                        <p class="testimonial-text">"The food quality is outstanding and the service is exceptional.
+                            FoodHub has become our go-to restaurant!"</p>
+                        <div class="testimonial-author">- Sarah Johnson</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="testimonial-card fade-in">
+                        <div class="stars">★★★★★</div>
+                        <p class="testimonial-text">"Amazing flavors and beautiful presentation. The chefs here really
+                            know what they're doing!"</p>
+                        <div class="testimonial-author">- Michael Chen</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="testimonial-card fade-in">
+                        <div class="stars">★★★★★</div>
+                        <p class="testimonial-text">"Fast delivery and the food arrived hot and fresh. Definitely
+                            ordering again!"</p>
+                        <div class="testimonial-author">- Emily Davis</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
 
     <!-- About Section -->
-    <section id="about" class="py-5">
+    <section id="about" class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title">About Us</h2>
-            <p class="text-center">FoodHub is dedicated to bringing you the finest dining experience with fresh ingredients and exceptional service.</p>
+            <h2 class="section-title fade-in">Về Chúng Tôi</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="fade-in">
+                        <p class="lead">FoodHub cam kết mang đến cho bạn trải nghiệm ẩm thực tuyệt vời nhất với các nguyên liệu tươi ngon và dịch vụ đặc biệt.</p>
+                        <p>Được thành lập với niềm đam mê về sự xuất sắc trong ẩm thực, chúng tôi kết hợp các phương pháp nấu ăn truyền thống với
+                        sự đổi mới hiện đại để tạo ra những món ăn không chỉ có hương vị tuyệt vời mà còn kể một câu chuyện. Cam kết về chất
+                        lượng của chúng tôi mở rộng từ các nguyên liệu được lựa chọn cẩn thận đến đội ngũ nhân viên được đào tạo chuyên nghiệp
+                        của chúng tôi.</p>
+                        <p>Cho dù bạn đang ăn tại chỗ hay đặt giao hàng, chúng tôi đảm bảo mọi bữa ăn đều được chế biến với cùng mức độ chăm chút
+                        và chú ý đến từng chi tiết đã khiến chúng tôi trở thành một phần được yêu mến của cộng đồng.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2" alt="Restaurant Interior"
+                        class="img-fluid rounded fade-in" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer id="contact" class="footer">
         <div class="container">
-            <h3 style="font-family: 'Playfair Display', serif; color: var(--gold);">FoodHub</h3>
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
             <p class="contact-info">1 FPT | Phone: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#">Facebook</a>
                 <a href="#">Instagram</a>
                 <a href="#">Twitter</a>
-                <a href="#">Reservation</a>
             </div>
             <p class="mt-3">© 2025 FoodHub. All rights reserved.</p>
         </div>
@@ -144,5 +628,61 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
+
+    <script>
+        // Scroll animations
+        function handleScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in');
+
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // Navbar background change on scroll
+        function handleNavbarScroll() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = '#0F172B';
+            } else {
+                navbar.style.background = '#0F172B';
+            }
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Event listeners
+        window.addEventListener('scroll', () => {
+            handleScrollAnimations();
+            handleNavbarScroll();
+        });
+
+        window.addEventListener('load', handleScrollAnimations);
+
+        
+
+        // Initialize cart count (placeholder)
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize any auth state or cart count here
+        });
+    </script>
 </body>
+
 </html>
