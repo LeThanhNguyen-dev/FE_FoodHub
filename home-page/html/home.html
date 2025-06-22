@@ -3,63 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodHub - Menu</title>
+    <title>FoodHub - Home</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- Shared CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
+    <!-- Page-specific CSS -->
     <style>
-        :root {
-            --dark-green: #02052f;
-            --gold: #D4A017;
-            --light-gold: #F7E6A3;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .navbar {
-            background-color: var(--dark-green);
-        }
-
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gold) !important;
-        }
-
-        .nav-link {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            color: var(--light-gold) !important;
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover {
-            color: var(--gold) !important;
-        }
-
-        .btn-login {
-            background-color: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            padding: 8px 20px;
-            transition: all 0.3s;
-        }
-
-        .btn-login:hover {
-            background-color: var(--gold);
-            color: var(--dark-green);
-        }
-
         .hero {
             background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
             background-size: cover;
@@ -78,7 +32,6 @@
         }
 
         .hero p {
-            font-family: 'Montserrat', sans-serif;
             font-size: 1.1rem;
             color: var(--light-gold);
         }
@@ -90,122 +43,6 @@
             font-weight: 700;
             text-align: center;
             margin-bottom: 2rem;
-        }
-
-        .menu-card {
-            background-color: white;
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .menu-card img {
-            height: 200px;
-            object-fit: cover;
-            width: 100%;
-        }
-
-        .menu-card .card-body {
-            padding: 1.5rem;
-            text-align: center;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .menu-card .card-title {
-            font-family: 'Playfair Display', serif;
-            color: var(--dark-green);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .menu-card .card-text {
-            font-family: 'Montserrat', sans-serif;
-            color: #555;
-            font-size: 0.95rem;
-            flex-grow: 1;
-        }
-
-        .menu-card .card-price {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gold);
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .menu-nav .btn {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            margin: 0 0.5rem;
-            border: 2px solid var(--dark-green);
-            color: var(--dark-green);
-            background-color: transparent;
-            transition: all 0.3s;
-        }
-
-        .menu-nav .btn.active, .menu-nav .btn:hover {
-            background-color: var(--dark-green);
-            color: var(--gold);
-        }
-
-        .menu-content {
-            display: none;
-        }
-
-        .menu-content.active {
-            display: block;
-        }
-
-        .footer {
-            background-color: var(--dark-green);
-            color: var(--light-gold);
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .footer a {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gold);
-            text-decoration: none;
-            margin: 0 1rem;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            color: var(--light-gold);
-        }
-
-        .footer .contact-info {
-            font-family: 'Montserrat', sans-serif;
-            margin-top: 1rem;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 2rem;
-            font-family: 'Montserrat', sans-serif;
-            color: var(--dark-green);
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 2rem;
-            font-family: 'Montserrat', sans-serif;
-            color: #dc3545;
-            font-size: 1rem;
         }
 
         @media (max-width: 768px) {
@@ -220,11 +57,6 @@
             .section-title {
                 font-size: 2rem;
             }
-
-            .menu-nav .btn {
-                font-size: 0.9rem;
-                padding: 8px 15px;
-            }
         }
     </style>
 </head>
@@ -232,26 +64,44 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">FoodHub</a>
+            <a class="navbar-brand" href="home.html">FoodHub</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#home">Home</a>
+                        <a class="nav-link active" href="home.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="menu.html">Menu</a>
+                        <a class="nav-link" href="menu.html">Menu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#about">About</a>
+                        <a class="nav-link" href="about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#contact">Contact</a>
+                        <a class="nav-link" href="contact.html">Contact</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item d-none" id="user-nav-item">
+                        <div class="user-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span id="username-display"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html">Chỉnh sửa thông tin</a></li>
+                                <li><a class="dropdown-item" href="#">Xem đơn hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item d-none" id="cart-nav-item">
+                        <a class="nav-link cart-icon" href="cart.html">
+                            <i class="bi bi-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -259,37 +109,19 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="menu-hero" class="hero">
+    <section class="hero">
         <div class="container">
-            <h1>Our Menu</h1>
-            <p>Explore our delicious offerings, crafted with passion and the finest ingredients.</p>
+            <h1>Welcome to FoodHub</h1>
+            <p>Savor the taste of excellence with every bite.</p>
+            <p id="welcome-message" class="welcome-message d-none">Hello, <span id="username-greeting"></span>!</p>
         </div>
     </section>
 
-    <!-- Menu Section -->
-    <section id="menu" class="py-5">
+    <!-- About Section -->
+    <section id="about" class="py-5">
         <div class="container">
-            <h2 class="section-title">Explore Our Menu</h2>
-            <div class="menu-nav text-center mb-4">
-                <button class="btn active" onclick="showCategory('dishes')">Dishes</button>
-                <button class="btn" onclick="showCategory('drinks')">Drinks</button>
-                <button class="btn" onclick="showCategory('desserts')">Desserts</button>
-            </div>
-            <div id="dishes" class="menu-content active">
-                <div class="row g-4" id="dishes-content">
-                    <div class="loading-spinner">Đang tải...</div>
-                </div>
-            </div>
-            <div id="drinks" class="menu-content">
-                <div class="row g-4" id="drinks-content">
-                    <div class="loading-spinner">Đang tải...</div>
-                </div>
-            </div>
-            <div id="desserts" class="menu-content">
-                <div class="row g-4" id="desserts-content">
-                    <div class="loading-spinner">Đang tải...</div>
-                </div>
-            </div>
+            <h2 class="section-title">About Us</h2>
+            <p class="text-center">FoodHub is dedicated to bringing you the finest dining experience with fresh ingredients and exceptional service.</p>
         </div>
     </section>
 
@@ -310,74 +142,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script>
-        function showCategory(category) {
-            document.querySelectorAll('.menu-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(category).classList.add('active');
-
-            document.querySelectorAll('.menu-nav .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`.menu-nav .btn[onclick="showCategory('${category}')"]`).classList.add('active');
-        }
-
-        async function fetchMenuItems() {
-            try {
-                const data = await apiFetch('/menu-items', {
-                    method: 'GET'
-                });
-
-                const menuItems = data.result || [];
-
-                // Nhóm món ăn theo danh mục
-                const dishes = menuItems.filter(item => item.category?.toLowerCase() === 'dishes');
-                const drinks = menuItems.filter(item => item.category?.toLowerCase() === 'drinks');
-                const desserts = menuItems.filter(item => item.category?.toLowerCase() === 'desserts');
-
-                // Hiển thị món ăn cho từng danh mục
-                renderMenuItems(dishes, 'dishes-content');
-                renderMenuItems(drinks, 'drinks-content');
-                renderMenuItems(desserts, 'desserts-content');
-            } catch (err) {
-                console.error('Lỗi khi tải món ăn:', err);
-                // Hiển thị thông báo lỗi thay vì nội dung tĩnh
-                document.getElementById('dishes-content').innerHTML = `<div class="error-message">${err.message}</div>`;
-                document.getElementById('drinks-content').innerHTML = `<div class="error-message">${err.message}</div>`;
-                document.getElementById('desserts-content').innerHTML = `<div class="error-message">${err.message}</div>`;
-            }
-        }
-
-        function renderMenuItems(items, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            if (items.length === 0) {
-                container.innerHTML = '<div class="col-12 text-center">Không có món ăn nào</div>';
-                return;
-            }
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'col-md-4';
-                card.innerHTML = `
-                    <div class="card menu-card">
-                        <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0'}" class="card-img-top" alt="${item.name}">
-                        <div class="card-body">
-                            <h5 class="card-title">${item.name}</h5>
-                            <p class="card-text">${item.description || 'Không có mô tả'}</p>
-                            <p class="card-price">$${item.price ? item.price.toFixed(2) : 'N/A'}</p>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Tải danh sách món ăn khi trang được tải
-        document.addEventListener('DOMContentLoaded', fetchMenuItems);
-    </script>
-    <script src="../../js/fetch-api.js"></script>
-
+    <!-- Shared JS -->
+    <script src="../js/auth.js"></script>
 </body>
 </html>

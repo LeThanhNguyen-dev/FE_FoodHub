@@ -10,58 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- Shared CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
+    <!-- Page-specific CSS -->
     <style>
-        :root {
-            --dark-green: #02052f;
-            --gold: #D4A017;
-            --light-gold: #F7E6A3;
-            --light-gray: #f8f9fa;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--light-gray);
-        }
-
-        .navbar {
-            background-color: var(--dark-green);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gold) !important;
-        }
-
-        .nav-link {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            color: var(--light-gold) !important;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--gold) !important;
-        }
-
-        .btn-login {
-            background-color: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            padding: 8px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-login:hover {
-            background-color: var(--gold);
-            color: var(--dark-green);
-        }
-
         .hero {
             background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
             background-size: cover;
@@ -132,7 +84,7 @@
         .menu-nav .btn.active {
             background-color: var(--dark-green);
             color: var(--gold);
-            box-shadow: 0 4px 10px rgba(0, 0,0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .menu-nav .btn::after {
@@ -169,31 +121,31 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .menu-items-container::-webkit-scroll {
+        .menu-items-container::-webkit-scrollbar {
             height: 8px;
         }
 
-        .menu-items-container::-webkit-scroll::-webkit-scroll-track {
-            background: #f1f1f1 color;
+        .menu-items-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
             border-radius: 10px;
         }
 
-        .menu-items-container::-webkit-scroll::-webkit-scroll-thumb {
+        .menu-items-container::-webkit-scrollbar-thumb {
             background: var(--gold);
             border-radius: 5px;
         }
 
-        .menu-items-container::-webkit-scroll::-webkit-scroll-thumb:hover {
+        .menu-items-container::-webkit-scrollbar-thumb:hover {
             background: var(--dark-green);
         }
 
         .menu-card {
-            background: linear-gradient(145deg, #ffffff, #f8f9faf8);
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
             border: none;
             border-radius: 15px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 250px;
             min-width: 250px;
             margin: 0 15px;
@@ -204,7 +156,7 @@
 
         .menu-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .menu-card img {
@@ -231,7 +183,7 @@
             margin-bottom: 0.5rem;
         }
 
-        .menu-card .menu-card-text {
+        .menu-card .card-text {
             font-family: 'Montserrat', sans-serif;
             color: #555;
             font-size: 0.9rem;
@@ -244,7 +196,7 @@
             -webkit-box-orient: vertical;
         }
 
-        .menu-card .menu-card-price {
+        .menu-card .card-price {
             font-family: 'Montserrat', sans-serif;
             color: var(--gold);
             font-size: 1.1rem;
@@ -261,30 +213,6 @@
             font-weight: 600;
             padding: 5px 10px;
             border-radius: 5px;
-        }
-
-        .footer {
-            background-color: var(--dark-green);
-            color: var(--light-gold);
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .footer a {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gold);
-            text-decoration: none;
-            margin: 0 1rem;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            color: var(--light-gold);
-        }
-
-        .footer .contact-info {
-            font-family: 'Montserrat', sans-serif;
-            margin-top: 1rem;
         }
 
         .loading-spinner {
@@ -341,11 +269,11 @@
                 font-size: 1.2rem;
             }
 
-            .menu-card .menu-card-text {
+            .menu-card .card-text {
                 font-size: 0.85rem;
             }
 
-            .menu-card .menu-card-price {
+            .menu-card .card-price {
                 font-size: 1rem;
             }
 
@@ -377,12 +305,12 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">FoodHub</a>
+            <a class="navbar-brand" href="home.html">FoodHub</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
                         <a class="nav-link" href="home.html">Home</a>
                     </li>
@@ -390,13 +318,31 @@
                         <a class="nav-link active" href="menu.html">Menu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#about">About</a>
+                        <a class="nav-link" href="about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#contact">Contact</a>
+                        <a class="nav-link" href="cart.html">Contact</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item d-none" id="user-nav-item">
+                        <div class="user-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span id="username-display"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Chỉnh sửa thông tin</a></li>
+                                <li><a class="dropdown-item" href="#">Xem đơn hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item d-none" id="cart-nav-item">
+                        <a class="nav-link cart-icon" href="cart.html">
+                            <i class="bi bi-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -408,6 +354,7 @@
         <div class="container">
             <h1>Our Menu</h1>
             <p>Explore our delicious offerings, crafted with passion and the finest ingredients.</p>
+            <p id="welcome-message" class="welcome-message d-none">Hello, <span id="username-greeting"></span>!</p>
         </div>
     </section>
 
@@ -441,127 +388,134 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
+    <!-- Shared JS -->
+    <script src="../js/auth.js"></script>
+    <!-- Page-specific JS -->
     <script>
-        // API base URL (adjust this to match your backend)
-        const API_BASE_URL = 'http://localhost:8080';
+    // Biến lưu trữ tạm thời các món ăn để truy xuất khi nhấn nút
+let menuItemsCache = {};
 
-        // Function to show/hide categories
-        function showCategory(categoryId) {
-            document.querySelectorAll('.menu-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            const contentElement = document.getElementById(`category-${categoryId}`);
-            if (contentElement) {
-                contentElement.classList.add('active');
-            }
+// Hàm hiển thị danh mục
+function showCategory(categoryId) {
+    document.querySelectorAll('.menu-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const contentElement = document.getElementById(`category-${categoryId}`);
+    if (contentElement) {
+        contentElement.classList.add('active');
+    }
 
-            document.querySelectorAll('.menu-nav .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const activeButton = document.querySelector(`.menu-nav .btn[data-category-id="${categoryId}"]`);
-            if (activeButton) {
-                activeButton.classList.add('active');
-            }
+    document.querySelectorAll('.menu-nav .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeButton = document.querySelector(`.menu-nav .btn[data-category-id="${categoryId}"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
+
+// Hàm lấy danh mục và tạo điều hướng
+async function fetchCategories() {
+    const navContainer = document.getElementById('category-nav');
+    const contentContainer = document.getElementById('menu-contents');
+    navContainer.innerHTML = '<div class="loading-spinner">Loading categories...</div>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch categories');
+        }
+        const data = await response.json();
+        const categories = data.result || data;
+        if (!Array.isArray(categories)) {
+            throw new Error('Invalid category data format');
         }
 
-        // Function to fetch categories and create navigation
-        async function fetchCategories() {
-            const navContainer = document.getElementById('category-nav');
-            const contentContainer = document.getElementById('menu-contents');
-            navContainer.innerHTML = '<div class="loading-spinner">Loading categories...</div>';
+        navContainer.innerHTML = '';
+        contentContainer.innerHTML = '';
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/categories`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch categories');
-                }
-                const data = await response.json();
-                const categories = data.result || data; // Handle ApiResponse wrapper if present
-                if (!Array.isArray(categories)) {
-                    throw new Error('Invalid category data format');
-                }
+        categories.forEach((category, index) => {
+            const safeCategoryId = `cat-${category.id}`;
+            navContainer.innerHTML += `
+                <button class="btn ${index === 0 ? 'active' : ''}" data-category-id="${category.id}" onclick="fetchMenuItems(${category.id}, '${safeCategoryId}')">
+                    ${category.name}
+                </button>
+            `;
+            contentContainer.innerHTML += `
+                <div id="category-${category.id}" class="menu-content ${index === 0 ? 'active' : ''}">
+                    <div class="loading-spinner">Loading...</div>
+                </div>
+            `;
+        });
 
-                // Clear loading spinner
-                navContainer.innerHTML = '';
-                contentContainer.innerHTML = '';
+        if (categories.length > 0) {
+            fetchMenuItems(categories[0].id, `cat-${categories[0].id}`);
+        }
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        navContainer.innerHTML = '<div class="error-message">Failed to load categories. Please try again later.</div>';
+    }
+}
 
-                // Create category buttons and content divs
-                categories.forEach((category, index) => {
-                    const safeCategoryId = `cat-${category.id}`; // Ensure safe ID for DOM
-                    // Add button
-                    navContainer.innerHTML += `
-                        <button class="btn ${index === 0 ? 'active' : ''}" data-category-id="${category.id}" onclick="fetchMenuItems(${category.id}, '${safeCategoryId}')">
-                            ${category.name}
-                        </button>
-                    `;
-                    // Add content div
-                    contentContainer.innerHTML += `
-                        <div id="category-${category.id}" class="menu-content ${index === 0 ? 'active' : ''}">
-                            <div class="loading-spinner">Loading...</div>
+// Hàm lấy món ăn theo danh mục
+async function fetchMenuItems(categoryId, safeCategoryId) {
+    showCategory(categoryId);
+    const container = document.getElementById(`category-${categoryId}`);
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading-spinner">Loading...</div>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=10&sortBy=name&sortDirection=asc`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        const menuItems = data.result.content;
+
+        if (menuItems.length === 0) {
+            container.innerHTML = '<div class="error-message">No items found for this category.</div>';
+            return;
+        }
+
+        const loggedIn = isLoggedIn();
+        // Lưu món ăn vào cache với categoryId làm khóa
+        menuItemsCache[categoryId] = menuItems;
+
+        container.innerHTML = '<div class="menu-items-container">';
+        menuItems.forEach((item, index) => {
+            const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Price not available';
+            const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+            if (item.status === 'AVAILABLE') {
+                container.innerHTML += `
+                    <div class="menu-card">
+                        <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                        <div class="card-body">
+                            <span class="badge">Available</span>
+                            <h5 class="card-title">${item.name}</h5>
+                            <p class="card-text">${item.description || 'No description available.'}</p>
+                            <p class="card-price">${price}</p>
+                            ${loggedIn ? `
+                                <button class="btn btn-order" onclick="orderItem(menuItemsCache[${categoryId}][${index}])">Đặt món</button>
+                                <button class="btn btn-add-to-cart" onclick="addToCart(menuItemsCache[${categoryId}][${index}])">Thêm vào giỏ hàng</button>
+                            ` : ''}
                         </div>
-                    `;
-                });
-
-                // Fetch items for the first category
-                if (categories.length > 0) {
-                    fetchMenuItems(categories[0].id, `cat-${categories[0].id}`);
-                }
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-                navContainer.innerHTML = '<div class="error-message">Failed to load categories. Please try again later.</div>';
+                    </div>
+                `;
             }
-        }
+        });
+        container.innerHTML += '</div>';
+    } catch (error) {
+        console.error('Error fetching menu items:', error);
+        container.innerHTML = '<div class="error-message">Failed to load menu items. Please try again later.</div>';
+    }
+}
 
-        // Function to fetch menu items for a category
-        async function fetchMenuItems(categoryId, safeCategoryId) {
-            showCategory(categoryId);
-            const container = document.getElementById(`category-${categoryId}`);
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading-spinner">Loading...</div>';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=10&sortBy=name&sortDirection=asc`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                const menuItems = data.result.content; // Access the content array from the Page object
-
-                if (menuItems.length === 0) {
-                    container.innerHTML = '<div class="error-message">No items found for this category.</div>';
-                    return;
-                }
-
-                // Render menu items
-                container.innerHTML = '<div class="menu-items-container">';
-                menuItems.forEach(item => {
-                    const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Price not available';
-                    const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
-                    if (item.status === 'AVAILABLE') {
-                        container.innerHTML += `
-                            <div class="menu-card">
-                                <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
-                                <div class="card-body">
-                                    <span class="badge">Available</span>
-                                    <h5 class="card-title">${item.name}</h5>
-                                    <p class="card-text">${item.description || 'No description available.'}</p>
-                                    <p class="card-price">${price}</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                container.innerHTML += '</div>';
-            } catch (error) {
-                console.error('Error fetching menu items:', error);
-                container.innerHTML = '<div class="error-message">Failed to load menu items. Please try again later.</div>';
-            }
-        }
-
-        // Fetch categories on page load
-        document.addEventListener('DOMContentLoaded', fetchCategories);
+// Khởi tạo trang
+document.addEventListener('DOMContentLoaded', () => {
+    updateUI(); // Gọi từ auth.js để cập nhật giao diện
+    fetchCategories();
+});
     </script>
 </body>
 </html>
