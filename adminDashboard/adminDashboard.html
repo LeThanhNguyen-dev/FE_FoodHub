@@ -14,9 +14,7 @@
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
-            rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -26,7 +24,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        :root {
+         :root {
             --primary: #FEA116;
             --light: #F1F8FF;
             --dark: #0F172B;
@@ -35,12 +33,12 @@
             --danger: #EF4444;
             --info: #3B82F6;
         }
-
+        
         body {
             font-family: 'Nunito', sans-serif;
             background-color: var(--light);
         }
-
+        
         .sidebar {
             position: fixed;
             top: 0;
@@ -52,36 +50,36 @@
             z-index: 1000;
             overflow-y: auto;
         }
-
+        
         .sidebar.collapsed {
             width: 70px;
         }
-
+        
         .sidebar .brand {
             padding: 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
+        
         .sidebar .brand h3 {
             color: var(--primary);
             margin: 0;
             font-family: 'Pacifico', cursive;
         }
-
+        
         .sidebar .brand small {
             color: #fff;
             font-style: italic;
         }
-
+        
         .sidebar-nav {
             padding: 1rem 0;
             flex: 1;
         }
-
+        
         .nav-item {
             margin-bottom: 0.5rem;
         }
-
+        
         .nav-link {
             display: flex;
             align-items: center;
@@ -91,29 +89,29 @@
             transition: all 0.3s;
             border-radius: 0;
         }
-
+        
         .nav-link:hover,
         .nav-link.active {
             background: rgba(254, 161, 22, 0.1);
             color: var(--primary);
         }
-
+        
         .nav-link i {
             width: 20px;
             margin-right: 1rem;
             text-align: center;
         }
-
+        
         .main-content {
             margin-left: 280px;
             transition: all 0.3s;
             min-height: 100vh;
         }
-
+        
         .main-content.expanded {
             margin-left: 70px;
         }
-
+        
         .top-bar {
             background: #fff;
             padding: 1rem 2rem;
@@ -122,14 +120,14 @@
             justify-content: space-between;
             align-items: center;
         }
-
+        
         .dashboard-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             padding: 2rem;
         }
-
+        
         .card {
             border: none;
             border-radius: 15px;
@@ -137,35 +135,35 @@
             transition: all 0.3s;
             overflow: hidden;
         }
-
+        
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
-
+        
         .card-header {
             background: linear-gradient(135deg, var(--primary), #ff8c00);
             color: white;
             padding: 1.5rem;
             border: none;
         }
-
+        
         .card-header h5 {
             margin: 0;
             font-weight: 700;
         }
-
+        
         .card-body {
             padding: 2rem;
         }
-
+        
         .stats-number {
             font-size: 2.5rem;
             font-weight: 700;
             color: var(--primary);
             margin-bottom: 0.5rem;
         }
-
+        
         .btn-manage {
             background: var(--primary);
             border: none;
@@ -175,20 +173,20 @@
             font-weight: 600;
             transition: all 0.3s;
         }
-
+        
         .btn-manage:hover {
             background: #e8960f;
             transform: scale(1.05);
             color: white;
         }
-
+        
         .toggle-sidebar {
             background: none;
             border: none;
             color: var(--dark);
             font-size: 1.2rem;
         }
-
+        
         .welcome-section {
             background: linear-gradient(135deg, var(--dark), #1e293b);
             color: white;
@@ -196,13 +194,13 @@
             margin: 2rem;
             border-radius: 15px;
         }
-
+        
         .management-icon {
             font-size: 3rem;
             color: var(--primary);
             margin-bottom: 1rem;
         }
-
+        
         .activity-feed {
             background: white;
             border-radius: 15px;
@@ -210,18 +208,18 @@
             margin: 2rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
-
+        
         .activity-item {
             display: flex;
             align-items: center;
             padding: 1rem 0;
             border-bottom: 1px solid #eee;
         }
-
+        
         .activity-item:last-child {
             border-bottom: none;
         }
-
+        
         .activity-icon {
             width: 40px;
             height: 40px;
@@ -231,13 +229,13 @@
             justify-content: center;
             margin-right: 1rem;
         }
-
+        
         .logout-section {
             padding: 1.5rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             margin-top: auto;
         }
-
+        
         .logout-btn {
             background: linear-gradient(135deg, #dc3545, #c82333);
             border: none;
@@ -250,14 +248,14 @@
             position: relative;
             overflow: hidden;
         }
-
+        
         .logout-btn:hover {
             background: linear-gradient(135deg, #c82333, #a71e2a);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
             color: white;
         }
-
+        
         .logout-btn::before {
             content: '';
             position: absolute;
@@ -268,18 +266,18 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
-
+        
         .logout-btn:hover::before {
             left: 100%;
         }
-
         /* Chart containers */
+        
         .chart-container {
             position: relative;
             height: 400px;
             margin-bottom: 2rem;
         }
-
+        
         .report-card {
             background: white;
             border-radius: 15px;
@@ -287,45 +285,41 @@
             margin: 1rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
-
+        
         .chart-title {
             color: var(--dark);
             font-weight: 700;
             margin-bottom: 1.5rem;
             text-align: center;
         }
-
+        
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-
             .sidebar.show {
                 transform: translateX(0);
             }
-
             .main-content {
                 margin-left: 0;
             }
-
             .dashboard-cards {
                 grid-template-columns: 1fr;
                 padding: 1rem;
             }
-
             .chart-container {
                 height: 300px;
             }
         }
-
         /* Animation for loading charts */
+        
         .chart-loading {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 400px;
         }
-
+        
         .spinner {
             width: 40px;
             height: 40px;
@@ -334,13 +328,17 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
+        
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
-
         /* Loading spinner for stats */
+        
         .stats-loading {
             display: inline-block;
             width: 20px;
@@ -356,386 +354,385 @@
 </head>
 
 <body>
-<!-- Sidebar -->
-<div class="sidebar d-flex flex-column" id="sidebar">
-    <div class="brand text-center">
-        <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
-        <small class="d-block">Admin Panel</small>
-    </div>
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column" id="sidebar">
+        <div class="brand text-center">
+            <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
+            <small class="d-block">Admin Panel</small>
+        </div>
 
-    <nav class="sidebar-nav flex-fill">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a href="#" class="nav-link active" onclick="showDashboard()">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="adminDashboardUser.html" class="nav-link" onclick="showCustomerManagement()">
-                    <i class="fas fa-users"></i>
-                    <span>Quản lý khách hàng</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="adminDashboardStaff.html" class="nav-link" onclick="showStaffManagement()">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Quản lý nhân viên</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/foodhub/menu-manager/menu.html" class="nav-link" onclick="showMenuManagement()">
-                    <i class="fas fa-utensils"></i>
-                    <span>Quản lý món ăn</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showFinanceManagement()">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <span>Quản lý tài chính</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showOrders()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Đơn hàng</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/foodhub/staff-manager/lichlam.html" class="nav-link" >
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Lịch làm</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+        <nav class="sidebar-nav flex-fill">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showDashboard()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link" onclick="showCustomerManagement()">
+                        <i class="fas fa-users"></i>
+                        <span>Quản lý khách hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="../Staff-manager/staffList.html" class="nav-link" onclick="showStaffManagement()">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Quản lý nhân viên</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="../menu-manager/menu.html" class="nav-link" onclick="showMenuManagement()">
+                        <i class="fas fa-utensils"></i>
+                        <span>Quản lý món ăn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showFinanceManagement()">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Quản lý tài chính</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showOrders()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Đơn hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/foodhub/staff-manager/lichlam.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Lịch làm</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-    <div class="logout-section">
-        <button class="logout-btn" onclick="handleLogout()">
+        <div class="logout-section">
+            <button class="logout-btn" onclick="handleLogout()">
             <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
         </button>
-    </div>
-</div>
-
-<!-- Main Content -->
-<div class="main-content" id="mainContent">
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="d-flex align-items-center">
-            <h4 class="mb-0" id="pageTitle">Dashboard</h4>
         </div>
-        <div class="d-flex align-items-center">
-            <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="d-flex align-items-center">
+                <h4 class="mb-0" id="pageTitle">Dashboard</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                     <i class="fas fa-user-circle me-2"></i>Admin
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                </ul>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
             </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-3">Chào mừng đến với FoodHub Admin</h2>
+                        <p class="mb-0">Quản lý toàn bộ hệ thống nhà hàng của bạn một cách hiệu quả và dễ dàng.</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-utensils" style="font-size: 4rem; color: var(--primary);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <!-- Customer Management Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-users me-2"></i>Quản lý khách hàng</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-users management-icon"></i>
+                        <div class="stats-number">1,234</div>
+                        <p class="text-muted mb-3">Tổng số khách hàng</p>
+                        <button class="btn btn-manage" onclick="showCustomerManagement()">
+                        <i class="fas fa-cog me-2"></i>Quản lý
+                    </button>
+                    </div>
+                </div>
+
+                <!-- Staff Management Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-tie me-2"></i>Quản lý nhân viên</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-tie management-icon"></i>
+                        <div class="stats-number" id="userCount"><span class="stats-loading"></span></div>
+                        <p class="text-muted mb-3">Tổng số nhân viên</p>
+                        <button class="btn btn-manage" onclick="showStaffManagement()">
+                        <i class="fas fa-cog me-2"></i>Quản lý
+                    </button>
+                    </div>
+                </div>
+
+                <!-- Menu Management Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-utensils me-2"></i>Quản lý món ăn</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-utensils management-icon"></i>
+                        <div class="stats-number" id="menuItemCount"><span class="stats-loading"></span></div>
+                        <p class="text-muted mb-3">Tổng số món ăn</p>
+                        <button class="btn btn-manage" onclick="showMenuManagement()">
+                        <i class="fas fa-cog me-2"></i>Quản lý
+                    </button>
+                    </div>
+                </div>
+
+                <!-- Finance Management Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-money-bill-wave me-2"></i>Quản lý tài chính</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-money-bill-wave management-icon"></i>
+                        <div class="stats-number">₫2.5M</div>
+                        <p class="text-muted mb-3">Doanh thu hôm nay</p>
+                        <button class="btn btn-manage" onclick="showFinanceManagement()">
+                        <i class="fas fa-cog me-2"></i>Quản lý
+                    </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-feed">
+                <h5 class="mb-4"><i class="fas fa-bell me-2 text-primary"></i>Hoạt động gần đây</h5>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-success text-white">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div>
+                        <strong>Đơn hàng mới #1234</strong>
+                        <p class="text-muted mb-0">Khách hàng Nguyễn Văn A đã đặt 2 món - 5 phút trước</p>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-primary text-white">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <strong>Khách hàng mới</strong>
+                        <p class="text-muted mb-0">Trần Thị B đã đăng ký tài khoản - 15 phút trước</p>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-warning text-white">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <strong>Cảnh báo tồn kho</strong>
+                        <p class="text-muted mb-0">Món "Phở Bò" sắp hết nguyên liệu - 30 phút trước</p>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon bg-info text-white">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <strong>Đánh giá mới</strong>
+                        <p class="text-muted mb-0">Lê Văn C đã đánh giá 5 sao - 1 giờ trước</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="dynamicContent" style="display: none;">
+            <!-- Content will be loaded here dynamically -->
         </div>
     </div>
 
-    <!-- Dashboard Content -->
-    <div id="dashboardContent">
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2 class="mb-3">Chào mừng đến với FoodHub Admin</h2>
-                    <p class="mb-0">Quản lý toàn bộ hệ thống nhà hàng của bạn một cách hiệu quả và dễ dàng.</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <i class="fas fa-utensils" style="font-size: 4rem; color: var(--primary);"></i>
-                </div>
-            </div>
-        </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Axios for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-        <!-- Dashboard Cards -->
-        <div class="dashboard-cards">
-            <!-- Customer Management Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-users me-2"></i>Quản lý khách hàng</h5>
-                </div>
-                <div class="card-body text-center">
-                    <i class="fas fa-users management-icon"></i>
-                    <div class="stats-number">1,234</div>
-                    <p class="text-muted mb-3">Tổng số khách hàng</p>
-                    <button class="btn btn-manage" onclick="showCustomerManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
-                </div>
-            </div>
+    <script>
+    
+        let currentCharts = [];
 
-            <!-- Staff Management Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-user-tie me-2"></i>Quản lý nhân viên</h5>
-                </div>
-                <div class="card-body text-center">
-                    <i class="fas fa-user-tie management-icon"></i>
-                    <div class="stats-number" id="userCount"><span class="stats-loading"></span></div>
-                    <p class="text-muted mb-3">Tổng số nhân viên</p>
-                    <button class="btn btn-manage" onclick="showStaffManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
-                </div>
-            </div>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
 
-            <!-- Menu Management Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-utensils me-2"></i>Quản lý món ăn</h5>
-                </div>
-                <div class="card-body text-center">
-                    <i class="fas fa-utensils management-icon"></i>
-                    <div class="stats-number" id="menuItemCount"><span class="stats-loading"></span></div>
-                    <p class="text-muted mb-3">Tổng số món ăn</p>
-                    <button class="btn btn-manage" onclick="showMenuManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
-                </div>
-            </div>
-
-            <!-- Finance Management Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-money-bill-wave me-2"></i>Quản lý tài chính</h5>
-                </div>
-                <div class="card-body text-center">
-                    <i class="fas fa-money-bill-wave management-icon"></i>
-                    <div class="stats-number">₫2.5M</div>
-                    <p class="text-muted mb-3">Doanh thu hôm nay</p>
-                    <button class="btn btn-manage" onclick="showFinanceManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="activity-feed">
-            <h5 class="mb-4"><i class="fas fa-bell me-2 text-primary"></i>Hoạt động gần đây</h5>
-
-            <div class="activity-item">
-                <div class="activity-icon bg-success text-white">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <div>
-                    <strong>Đơn hàng mới #1234</strong>
-                    <p class="text-muted mb-0">Khách hàng Nguyễn Văn A đã đặt 2 món - 5 phút trước</p>
-                </div>
-            </div>
-
-            <div class="activity-item">
-                <div class="activity-icon bg-primary text-white">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <div>
-                    <strong>Khách hàng mới</strong>
-                    <p class="text-muted mb-0">Trần Thị B đã đăng ký tài khoản - 15 phút trước</p>
-                </div>
-            </div>
-
-            <div class="activity-item">
-                <div class="activity-icon bg-warning text-white">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div>
-                    <strong>Cảnh báo tồn kho</strong>
-                    <p class="text-muted mb-0">Món "Phở Bò" sắp hết nguyên liệu - 30 phút trước</p>
-                </div>
-            </div>
-
-            <div class="activity-item">
-                <div class="activity-icon bg-info text-white">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div>
-                    <strong>Đánh giá mới</strong>
-                    <p class="text-muted mb-0">Lê Văn C đã đánh giá 5 sao - 1 giờ trước</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dynamic Content Area -->
-    <div id="dynamicContent" style="display: none;">
-        <!-- Content will be loaded here dynamically -->
-    </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<!-- Axios for API calls -->
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-<script>
-    function showMenuManagement() {
-        window.location.href = "/foodhub/menu-manager/menu.html";
-    }
-    function showStaffManagement(){
-        window.location.href = "/foodhub/staff-manager/staffList.html";
-    }
-    let currentCharts = [];
-
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('expanded');
-    }
-
-    function setActiveNav(element) {
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        element.classList.add('active');
-    }
-
-    function destroyCurrentCharts() {
-        currentCharts.forEach(chart => {
-            if (chart) {
-                chart.destroy();
-            }
-        });
-        currentCharts = [];
-    }
-
-    function handleLogout() {
-        if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
-            document.body.style.opacity = '0.5';
-            document.body.style.transition = 'opacity 0.5s';
-
-            setTimeout(() => {
-                alert('Đã đăng xuất thành công!');
-                document.body.style.opacity = '1';
-            }, 1000);
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
         }
-    }
 
-    function showDashboard() {
-        destroyCurrentCharts();
-        document.getElementById('pageTitle').textContent = 'Dashboard';
-        document.getElementById('dashboardContent').style.display = 'block';
-        document.getElementById('dynamicContent').style.display = 'none';
-
-        // Fetch menu item count
-        fetchMenuItemCount();
-        // Fetch user count
-        fetchuserCount();
-        // Set active nav
-        setActiveNav(document.querySelector('[onclick="showDashboard()"]'));
-    }
-
-    function fetchMenuItemCount() {
-        const menuItemCountElement = document.getElementById('menuItemCount');
-        menuItemCountElement.innerHTML = '<span class="stats-loading"></span>'; // Show loading spinner
-
-        axios.get('/foodhub/menu-items/count')
-            .then(response => {
-                if (response.data.code === 1000) {
-                    const totalItems = response.data.result || 0;
-                    menuItemCountElement.textContent = totalItems.toLocaleString(); // Format with commas
-                } else {
-                    menuItemCountElement.textContent = 'N/A'; // Display N/A if API fails
-                    showNotification(response.data.message || 'Không thể tải số lượng món ăn!', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching menu item count:', error);
-                menuItemCountElement.textContent = 'N/A'; // Display N/A on error
-                showNotification('Lỗi khi tải số lượng món ăn. Vui lòng thử lại!', 'error');
+        function setActiveNav(element) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
             });
-    }
-    function fetchuserCount() {
-        const userCountElement = document.getElementById('userCount');
-        userCountElement.innerHTML = '<span class="stats-loading"></span>'; // Show loading spinner
+            element.classList.add('active');
+        }
 
-        axios.get('/foodhub/users/count')
-            .then(response => {
-                if (response.data.code === 1000) {
-                    const totalItems = response.data.result || 0;
-                    userCountElement.textContent = totalItems.toLocaleString(); // Format with commas
-                } else {
-                    userCountElement.textContent = 'N/A'; // Display N/A if API fails
-                    showNotification(response.data.message || 'Không thể tải số lượng món ăn!', 'error');
+        function destroyCurrentCharts() {
+            currentCharts.forEach(chart => {
+                if (chart) {
+                    chart.destroy();
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching menu item count:', error);
-                userCountElement.textContent = 'N/A'; // Display N/A on error
-                showNotification('Lỗi khi tải số lượng món ăn. Vui lòng thử lại!', 'error');
             });
-    }
+            currentCharts = [];
+        }
 
+        function handleLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+                document.body.style.opacity = '0.5';
+                document.body.style.transition = 'opacity 0.5s';
 
-    function createCharts() {
-        // Revenue Chart
-        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-        const revenueChart = new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-                datasets: [{
-                    label: 'Doanh thu (VNĐ)',
-                    data: [1200000, 1500000, 1800000, 2100000, 2500000, 2800000, 2200000],
-                    borderColor: '#FEA116',
-                    backgroundColor: 'rgba(254, 161, 22, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
+                setTimeout(() => {
+                    alert('Đã đăng xuất thành công!');
+                    document.body.style.opacity = '1';
+                }, 1000);
+            }
+        }
+
+        function showDashboard() {
+            destroyCurrentCharts();
+            document.getElementById('pageTitle').textContent = 'Dashboard';
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('dynamicContent').style.display = 'none';
+
+            // Fetch menu item count
+            fetchMenuItemCount();
+            // Fetch user count
+            fetchuserCount();
+            // Set active nav
+            setActiveNav(document.querySelector('[onclick="showDashboard()"]'));
+        }
+
+        function fetchMenuItemCount() {
+            const menuItemCountElement = document.getElementById('menuItemCount');
+            menuItemCountElement.innerHTML = '<span class="stats-loading"></span>'; // Show loading spinner
+
+            axios.get('http://localhost:8080/menu-items/count')
+                .then(response => {
+                    if (response.data.code === 1000) {
+                        const totalItems = response.data.result || 0;
+                        menuItemCountElement.textContent = totalItems.toLocaleString(); // Format with commas
+                    } else {
+                        menuItemCountElement.textContent = 'N/A'; // Display N/A if API fails
+                        showNotification(response.data.message || 'Không thể tải số lượng món ăn!', 'error');
                     }
+                })
+                .catch(error => {
+                    console.error('Error fetching menu item count:', error);
+                    menuItemCountElement.textContent = 'N/A'; // Display N/A on error
+                    showNotification('Lỗi khi tải số lượng món ăn. Vui lòng thử lại!', 'error');
+                });
+        }
+
+        function fetchuserCount() {
+            const userCountElement = document.getElementById('userCount');
+            userCountElement.innerHTML = '<span class="stats-loading"></span>'; // Show loading spinner
+
+            axios.get('http://localhost:8080/users/count')
+                .then(response => {
+                    if (response.data.code === 1000) {
+                        const totalItems = response.data.result || 0;
+                        userCountElement.textContent = totalItems.toLocaleString(); // Format with commas
+                    } else {
+                        userCountElement.textContent = 'N/A'; // Display N/A if API fails
+                        showNotification(response.data.message || 'Không thể tải số lượng món ăn!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching menu item count:', error);
+                    userCountElement.textContent = 'N/A'; // Display N/A on error
+                    showNotification('Lỗi khi tải số lượng món ăn. Vui lòng thử lại!', 'error');
+                });
+        }
+
+
+        function createCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: [1200000, 1500000, 1800000, 2100000, 2500000, 2800000, 2200000],
+                        borderColor: '#FEA116',
+                        backgroundColor: 'rgba(254, 161, 22, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return new Intl.NumberFormat('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND'
-                                }).format(value);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    }).format(value);
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-        currentCharts.push(revenueChart);
-    }
+            });
+            currentCharts.push(revenueChart);
+        }
 
-    // Hiển thị thông báo
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed notification-enter`;
-        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        notification.innerHTML = `
+        // Hiển thị thông báo
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed notification-enter`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 5000);
-    }
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
 
-    // Khởi tạo dashboard khi tải trang
-    document.addEventListener('DOMContentLoaded', showDashboard);
-</script>
+        // Khởi tạo dashboard khi tải trang
+        document.addEventListener('DOMContentLoaded', showDashboard);
+    </script>
 </body>
+
 </html>

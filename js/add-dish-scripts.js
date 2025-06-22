@@ -1,5 +1,5 @@
-const apiMenuUrl = '/foodhub/menu-items';
-const apiCategoryUrl = '/foodhub/categories';
+const apiMenuUrl = 'http://localhost:8080/menu-items';
+const apiCategoryUrl = 'http://localhost:8080/categories';
 let selectedImageBase64 = null;
 
 function fetchCategories() {
@@ -21,7 +21,6 @@ function fetchCategories() {
         })
         .catch(error => {
             console.error('Lỗi khi tải danh mục:', error);
-            const errorMessage = error.response?.data?.message || 'Không thể tải danh mục do lỗi kết nối!';
             showNotification(errorMessage, 'error');
         });
 }
@@ -112,8 +111,6 @@ document.getElementById('addDishForm').addEventListener('submit', function(e) {
             showNotification(response.data.message, 'error');
         }
     }).catch(error => {
-        console.error('Error details:', error.response?.data);
-        const errorMessage = error.response?.data?.message || 'Không thể tạo món ăn. Vui lòng thử lại!';
         showNotification(errorMessage, 'error');
     });
 });

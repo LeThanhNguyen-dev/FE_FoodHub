@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -152,16 +151,24 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
+        .table-wrapper {
+            overflow-x: auto; /* Thêm cuộn ngang khi nội dung tràn */
+            -webkit-overflow-scrolling: touch; /* Cải thiện cuộn trên thiết bị di động */
+        }
+
         .table {
             width: 100%;
+            min-width: 800px; /* Đặt chiều rộng tối thiểu để tránh co lại quá mức */
             border-collapse: separate;
             border-spacing: 0;
+            table-layout: fixed; /* Giữ layout cố định */
         }
 
         .table th,
         .table td {
             padding: 1rem;
             vertical-align: middle;
+            word-break: break-word; /* Ngắt từ khi cần thiết */
         }
 
         .table th {
@@ -171,21 +178,39 @@
             text-align: left;
         }
 
+        .table th:last-child {
+            min-width: 200px; /* Tăng chiều rộng cột Hành động */
+        }
+
+        .table td:last-child {
+            min-width: 200px; /* Đảm bảo cột Hành động không bị thu hẹp */
+        }
+
+        .table th:nth-child(6), /* Cột Địa chỉ */
+        .table td:nth-child(6) {
+            max-width: 150px; /* Giới hạn chiều rộng cột Địa chỉ */
+            overflow-wrap: break-word; /* Ngắt từ dài */
+        }
+
         .table tbody tr:hover {
             background: var(--light);
         }
 
         .btn-edit,
-        .btn-deactivate {
+        .btn-deactivate,
+        .btn-restore {
             padding: 0.5rem 1rem;
             border-radius: 10px;
             font-size: 0.9rem;
             transition: all 0.3s;
+            white-space: nowrap; /* Ngăn nút bị ngắt dòng */
         }
 
         .btn-edit {
             background: var(--info);
             color: white;
+            margin-right: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .btn-edit:hover {
@@ -201,6 +226,23 @@
         .btn-deactivate:hover {
             background: #dc2626;
             color: white;
+        }
+
+        .btn-restore {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-restore:hover {
+            background: #059669;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            white-space: nowrap;
         }
 
         .modal-content {
@@ -313,6 +355,11 @@
                 display: block;
                 overflow-x: auto;
             }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -411,25 +458,27 @@
                 <i class="fas fa-plus me-2"></i>Thêm khách hàng
             </button>
         </div>
-        <div id="loadingSpinner" class="loading-spinner">
-            <div class="spinner"></div>
+        <div class="table-wrapper"> <!-- Wrapper cho bảng -->
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <table class="table" id="userTable" style="display: none;">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên người dùng</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Địa chỉ</th>
+                    <th>Số điện thoại</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody id="userTableBody"></tbody>
+            </table>
         </div>
-        <div id="errorMessage" class="error-message" style="display: none;"></div>
-        <table class="table" id="userTable" style="display: none;">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tên người dùng</th>
-                <th>Email</th>
-                <th>Vai trò</th>
-                <th>Trạng thái</th>
-                <th>Địa chỉ</th>
-                <th>Số điện thoại</th>
-                <th>Hành động</th>
-            </tr>
-            </thead>
-            <tbody id="userTableBody"></tbody>
-        </table>
     </div>
 
     <!-- User Modal -->
@@ -461,6 +510,8 @@
                                 <option value="CUSTOMER">Khách hàng</option>
                                 <option value="WAITER">Nhân viên phục vụ</option>
                                 <option value="ADMIN">Quản trị viên</option>
+                                <option value="CASHIER">Nhân viên thu ngân</option>
+                                <option value="CHEF">Đầu bếp</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -501,6 +552,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    const BASE_API_URL = 'http://localhost:8080/users';
     let currentUserId = null;
 
     function toggleSidebar() {
@@ -518,7 +570,7 @@
                 alert('Đã đăng xuất thành công!');
                 document.body.style.opacity = '1';
                 localStorage.removeItem('token');
-                // window.location.href = '/login'; // Uncomment for actual redirect
+                // window.location.href = '/login';
             }, 1000);
         }
     }
@@ -550,13 +602,13 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const response = await fetch('/foodhub/users', { headers });
+            const response = await fetch(BASE_API_URL, { headers });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Không thể tải danh sách người dùng: ${response.status} ${errorText}`);
             }
-            const users = await response.json();
-            console.log('Fetched users:', users);
+            const apiResponse = await response.json();
+            const users = apiResponse.result || [];
 
             if (!Array.isArray(users)) {
                 throw new Error('Dữ liệu trả về không phải là mảng');
@@ -574,17 +626,23 @@
                     <td>${user.id || 'N/A'}</td>
                     <td>${user.username || 'N/A'}</td>
                     <td>${user.email || 'N/A'}</td>
-                    <td>${formatRole(user.roleName) || 'N/A'}</td>
+                    <td>${formatRole(user.roleName?.name) || 'N/A'}</td>
                     <td>${user.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}</td>
                     <td>${user.address || 'N/A'}</td>
                     <td>${user.phone || 'N/A'}</td>
                     <td>
-                        <button class="btn btn-edit me-2" onclick="openUserForm(${user.id})">
-                            <i class="fas fa-edit"></i> Sửa
-                        </button>
-                        <button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">
-                            <i class="fas fa-ban"></i> Vô hiệu hóa
-                        </button>
+                        <div class="action-buttons">
+                            <button class="btn btn-edit" onclick="openUserForm(${user.id})">
+                                <i class="fas fa-edit"></i> Sửa
+                            </button>
+                            ${user.status === 'ACTIVE' ?
+                                `<button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">
+                                    <i class="fas fa-ban"></i> Vô hiệu hóa
+                                </button>` :
+                                `<button class="btn btn-restore" onclick="restoreUser(${user.id})">
+                                    <i class="fas fa-undo"></i> Khôi phục
+                                </button>`}
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -613,6 +671,7 @@
 
     async function openUserForm(id = null) {
         currentUserId = id;
+        const userModal = new bootstrap.Modal(document.getElementById('userModal'));
         document.getElementById('userModalLabel').textContent = id ? 'Chỉnh sửa người dùng' : 'Thêm người dùng';
         document.getElementById('userForm').reset();
         document.getElementById('userId').value = '';
@@ -625,8 +684,9 @@
             document.getElementById('roleName').value = 'CUSTOMER';
             document.getElementById('isAuthUser').checked = false;
             document.getElementById('oauthProvider').value = '';
-            document.getElementById('password').value = ''; // Reset password field for new user
+            document.getElementById('password').value = '';
         }
+        userModal.show();
     }
 
     async function fetchUser(id) {
@@ -636,18 +696,18 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const response = await fetch(`/foodhub/api/users/${id}`, { headers });
+            const response = await fetch(`${BASE_API_URL}/${id}`, { headers });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Không thể tải thông tin người dùng: ${response.status} ${errorText}`);
             }
-            const user = await response.json();
-            console.log('Fetched user:', user);
+            const apiResponse = await response.json();
+            const user = apiResponse.result || {};
 
             document.getElementById('userId').value = user.id || '';
             document.getElementById('username').value = user.username || '';
             document.getElementById('email').value = user.email || '';
-            document.getElementById('roleName').value = user.roleName || 'CUSTOMER';
+            document.getElementById('roleName').value = user.roleName?.name || 'CUSTOMER';
             document.getElementById('status').value = user.status || 'ACTIVE';
             document.getElementById('address').value = user.address || '';
             document.getElementById('phone').value = user.phone || '';
@@ -662,7 +722,6 @@
     async function saveUser() {
         const id = document.getElementById('userId').value;
         const userData = {
-            id: id ? parseInt(id) : undefined,
             username: document.getElementById('username').value.trim(),
             email: document.getElementById('email').value.trim(),
             password: document.getElementById('password').value.trim() || undefined,
@@ -674,20 +733,17 @@
             oauthProvider: document.getElementById('oauthProvider').value.trim() || null
         };
 
-        // Validate required fields
         if (!userData.username || !userData.email || (!id && !userData.password)) {
             alert('Vui lòng điền đầy đủ các trường bắt buộc (Tên người dùng, Email, Mật khẩu)');
             return;
         }
 
-        // Validate roleName
         const validRoles = ['CUSTOMER', 'WAITER', 'ADMIN', 'CASHIER', 'CHEF'];
         if (!validRoles.includes(userData.roleName)) {
             alert('Vai trò không hợp lệ');
             return;
         }
 
-        // Validate status
         if (!['ACTIVE', 'INACTIVE'].includes(userData.status)) {
             alert('Trạng thái không hợp lệ');
             return;
@@ -700,7 +756,7 @@
                 'Accept': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             };
-            const url = id ? `/foodhub/api/users/${id}` : '/foodhub/api/users';
+            const url = id ? `${BASE_API_URL}/${id}` : BASE_API_URL;
             const method = id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
@@ -729,7 +785,7 @@
                     'Accept': 'application/json',
                     ...(token && { 'Authorization': `Bearer ${token}` })
                 };
-                const response = await fetch(`/foodhub/api/users/${id}/deactivate`, {
+                const response = await fetch(`${BASE_API_URL}/${id}/deactivate`, {
                     method: 'PUT',
                     headers
                 });
@@ -746,7 +802,31 @@
         }
     }
 
-    // Load users on page load
+    async function restoreUser(id) {
+        if (confirm('Bạn có chắc chắn muốn khôi phục người dùng này?')) {
+            try {
+                const token = localStorage.getItem('token');
+                const headers = {
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                };
+                const response = await fetch(`${BASE_API_URL}/${id}/restore`, {
+                    method: 'PUT',
+                    headers
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Không thể khôi phục người dùng: ${response.status} ${errorText}`);
+                }
+                loadUsers();
+                alert('Khôi phục người dùng thành công!');
+            } catch (error) {
+                console.error('Restore user error:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', loadUsers);
 </script>
 </body>

@@ -4,9 +4,11 @@ let selectedQuantity = 1;
 let isFavorite = false;
 let customerNote = '';
 let relatedFoods = [];
+let isUpdatingExistingItem = false; // Flag to track if we're updating existing item
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:8080/menu-items';
+const BACKEND_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = `${BACKEND_BASE_URL}/menu-items`;
 
 // Default placeholder for images
 const DEFAULT_EMOJI = '🍽️';
@@ -19,6 +21,15 @@ function getUrlParameter(name) {
 
 // Get food item ID from URL
 const itemId = getUrlParameter('itemId');
+const tableNumber = getUrlParameter('tableNumber');
+
+// Initialize table number display
+function initializeTableNumber() {
+    const tableNumberElement = document.getElementById('tableNumber');
+    if (tableNumberElement) {
+        tableNumberElement.textContent = tableNumber || 'N/A';
+    }
+}
 
 // Show/hide loading spinner
 function showLoading(show) {
@@ -51,6 +62,83 @@ function showError(message) {
 
 function hideError() {
     document.getElementById('errorMessage').classList.add('d-none');
+}
+
+// Check if item exists in cart and update UI accordingly
+function checkAndUpdateCartStatus() {
+    if (!currentFood || typeof cartManager === 'undefined') return;
+
+    const existingItem = cartManager.getItem(currentFood.id);
+
+    if (existingItem) {
+        // Item exists in cart - switch to update mode
+        isUpdatingExistingItem = true;
+        selectedQuantity = existingItem.quantity;
+        customerNote = existingItem.note || '';
+
+        // Update UI elements
+        document.getElementById('selectedQuantity').textContent = selectedQuantity;
+        document.getElementById('customerNote').value = customerNote;
+        updateNoteCounter();
+
+        // Change button text and style
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
+        addToCartBtn.classList.remove('btn-primary');
+        addToCartBtn.classList.add('btn-warning');
+
+        // Show update indicator
+        showUpdateModeIndicator();
+    } else {
+        // Item doesn't exist - switch to add mode
+        isUpdatingExistingItem = false;
+        selectedQuantity = 1;
+        customerNote = '';
+
+        // Update UI elements
+        document.getElementById('selectedQuantity').textContent = selectedQuantity;
+        document.getElementById('customerNote').value = customerNote;
+        updateNoteCounter();
+
+        // Reset button text and style
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        addToCartBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Thêm vào giỏ hàng';
+        addToCartBtn.classList.remove('btn-warning');
+        addToCartBtn.classList.add('btn-primary');
+
+        // Hide update indicator
+        hideUpdateModeIndicator();
+    }
+
+    updateQuantityDisplay();
+}
+
+// Show update mode indicator
+function showUpdateModeIndicator() {
+    // Create or show update indicator
+    let indicator = document.getElementById('updateModeIndicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'updateModeIndicator';
+        indicator.className = 'alert alert-warning d-flex align-items-center mb-3';
+        indicator.innerHTML = `
+            <i class="fas fa-edit me-2"></i>
+            <span>Bạn đang chỉnh sửa món ăn có sẵn trong giỏ hàng</span>
+        `;
+
+        // Insert before the customer notes section
+        const customerNotesSection = document.querySelector('.customer-notes');
+        customerNotesSection.parentNode.insertBefore(indicator, customerNotesSection);
+    }
+    indicator.classList.remove('d-none');
+}
+
+// Hide update mode indicator
+function hideUpdateModeIndicator() {
+    const indicator = document.getElementById('updateModeIndicator');
+    if (indicator) {
+        indicator.classList.add('d-none');
+    }
 }
 
 // Load food detail from API
@@ -86,7 +174,7 @@ async function loadFoodDetail() {
             };
 
             renderFoodDetail();
-            updateQuantityDisplay();
+            checkAndUpdateCartStatus(); // Check cart status after loading food detail
             loadRelatedFoods();
         } else {
             throw new Error('Invalid API response format');
@@ -103,13 +191,13 @@ async function loadRelatedFoods() {
     try {
         // First, we need to get the categoryId of current food
         // Assuming currentFood has categoryId or we need to extract it
-        
+
         let categoryId = null;
-        
+
         // Method 1: If currentFood already has categoryId
         if (currentFood.categoryId) {
             categoryId = currentFood.categoryId;
-        } 
+        }
         // Method 2: If we need to get categoryId from the current food detail
         else {
             // Get current food detail to extract categoryId
@@ -132,17 +220,17 @@ async function loadRelatedFoods() {
 
         // Get items from same category using the filtered endpoint
         const response = await fetch(`${API_BASE_URL}?size=6&categoryId=${categoryId}`);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        
+
         if (data && data.result && data.result.content) {
             // Filter out current food and only get available items
-            const sameCategoryItems = data.result.content.filter(item => 
-                item.id !== currentFood.id && 
+            const sameCategoryItems = data.result.content.filter(item =>
+                item.id !== currentFood.id &&
                 item.status === 'AVAILABLE'
             );
 
@@ -152,15 +240,15 @@ async function loadRelatedFoods() {
                 const priceDiffB = Math.abs(b.price - currentFood.price);
                 return priceDiffA - priceDiffB;
             });
-            
+
             // Map to our format
             relatedFoods = sameCategoryItems.map(item => ({
                 id: item.id,
                 name: item.name,
                 price: item.price,
                 image: item.imageUrl,
-                category: item.categoryNames && item.categoryNames.length > 0 
-                    ? Array.from(item.categoryNames)[0] 
+                category: item.categoryNames && item.categoryNames.length > 0
+                    ? Array.from(item.categoryNames)[0]
                     : 'Khác'
             }));
 
@@ -172,56 +260,10 @@ async function loadRelatedFoods() {
     }
 }
 
-// Alternative version if currentFood already has categoryId
-// async function loadRelatedFoodsSimple() {
-//     try {
-//         // This assumes currentFood.categoryId is available
-//         if (!currentFood.categoryId) {
-//             console.warn('Current food does not have categoryId');
-//             relatedFoods = [];
-//             renderRelatedFoods();
-//             return;
-//         }
-
-//         // Get items from same category
-//         const response = await fetch(`${API_BASE_URL}?size=7&categoryId=${currentFood.categoryId}`);
-        
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! status: ${response.status}`);
-//         }
-
-//         const data = await response.json();
-        
-//         if (data && data.result && data.result.content) {
-//             // Filter out current food and get up to 6 items
-//             relatedFoods = data.result.content
-//                 .filter(item => 
-//                     item.id !== currentFood.id && 
-//                     item.status === 'AVAILABLE'
-//                 )
-//                 .slice(0, 6)
-//                 .map(item => ({
-//                     id: item.id,
-//                     name: item.name,
-//                     price: item.price,
-//                     image: item.imageUrl,
-//                     category: item.categoryNames && item.categoryNames.length > 0 
-//                         ? Array.from(item.categoryNames)[0] 
-//                         : 'Khác'
-//                 }));
-
-//             renderRelatedFoods();
-//         }
-//     } catch (error) {
-//         console.error('Error loading related foods:', error);
-//         renderRelatedFoodsError();
-//     }
-// }
-
 // Render related foods
 function renderRelatedFoods() {
     const container = document.getElementById('relatedFoodsContainer');
-    
+
     if (relatedFoods.length === 0) {
         container.innerHTML = `
             <div class="text-center py-4 text-muted">
@@ -235,10 +277,10 @@ function renderRelatedFoods() {
     const foodsHTML = relatedFoods.map(food => `
         <div class="related-food-item" onclick="viewFoodDetail(${food.id})">
             <div class="related-food-image">
-                ${food.image && !food.image.startsWith('data:') ? 
-                    `<img src="${food.image}" alt="${food.name}" onerror="this.outerHTML='<div class=\\'placeholder-image-small\\'><i class=\\'fas fa-utensils\\'></i></div>'">` :
-                    `<div class="placeholder-image-small"><i class="fas fa-utensils"></i></div>`
-                }
+                ${food.image && !food.image.startsWith('data:') ?
+            `<img src="${food.image}" alt="${food.name}" onerror="this.outerHTML='<div class=\\'placeholder-image-small\\'><i class=\\'fas fa-utensils\\'></i></div>'">` :
+            `<div class="placeholder-image-small"><i class="fas fa-utensils"></i></div>`
+        }
             </div>
             <div class="related-food-info">
                 <h6 class="related-food-name">${food.name}</h6>
@@ -299,7 +341,6 @@ function renderFoodDetail() {
     if (currentFood.status === 'AVAILABLE') {
         statusBadge.innerHTML = '<span class="badge bg-success">Còn hàng</span>';
         addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Thêm vào giỏ hàng';
     } else {
         statusBadge.innerHTML = '<span class="badge bg-danger">Hết hàng</span>';
         addToCartBtn.disabled = true;
@@ -391,14 +432,13 @@ function updateQuantityDisplay() {
     increaseBtn.disabled = selectedQuantity >= 30;
 }
 
-// Cart Functions - Updated to use CartManager
+// Cart Functions - Updated to handle both add and update
 function addToCart() {
     if (!currentFood || currentFood.status !== 'AVAILABLE') {
         showToast('Món ăn này hiện không có sẵn', 'error');
         return;
     }
 
-    // Check if cartManager is available
     if (typeof cartManager === 'undefined') {
         console.error('CartManager not found');
         showToast('Lỗi hệ thống. Vui lòng tải lại trang.', 'error');
@@ -406,37 +446,56 @@ function addToCart() {
     }
 
     try {
-        // Create item object for cartManager
         const item = {
             id: currentFood.id,
             name: currentFood.name,
             price: currentFood.price,
             image: currentFood.image,
-            category: currentFood.category
+            category: currentFood.category,
         };
 
-        // Add item to cart using cartManager
-        cartManager.addItem(item, selectedQuantity);
+        if (isUpdatingExistingItem) {
+            // Update existing item
+            cartManager.updateItem(currentFood.id, selectedQuantity, customerNote.trim());
 
-        // Store customer note separately if needed (since cartManager doesn't support notes)
-        if (customerNote.trim()) {
-            // You could extend cartManager to support notes, or handle notes separately
-            // For now, we'll show the note in the toast
-            showToast(`Đã thêm ${selectedQuantity} ${currentFood.name} vào giỏ hàng${customerNote ? ` (Ghi chú: ${customerNote})` : ''}`);
+            showToast(`Đã cập nhật ${currentFood.name} trong giỏ hàng${customerNote ? ` (Ghi chú: ${customerNote})` : ''}`);
+
+            // Show success animation on button
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã cập nhật!';
+            addToCartBtn.disabled = true;
+
+            setTimeout(() => {
+                addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
+                addToCartBtn.disabled = false;
+            }, 1500);
+
         } else {
-            showToast(`Đã thêm ${selectedQuantity} ${currentFood.name} vào giỏ hàng`);
+            // Add new item
+            cartManager.addItem(item, selectedQuantity, customerNote.trim());
+
+            showToast(`Đã thêm ${selectedQuantity} ${currentFood.name} vào giỏ hàng${customerNote ? ` (Ghi chú: ${customerNote})` : ''}`);
+
+            // Switch to update mode after adding
+            isUpdatingExistingItem = true;
+
+            // Update button appearance
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã thêm!';
+            addToCartBtn.disabled = true;
+
+            setTimeout(() => {
+                addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
+                addToCartBtn.classList.remove('btn-primary');
+                addToCartBtn.classList.add('btn-warning');
+                addToCartBtn.disabled = false;
+                showUpdateModeIndicator();
+            }, 1500);
         }
 
-        // Reset quantity and note
-        selectedQuantity = 1;
-        customerNote = '';
-        document.getElementById('customerNote').value = '';
-        updateQuantityDisplay();
-        updateNoteCounter();
-
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        showToast('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+        console.error('Error with cart operation:', error);
+        showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
     }
 }
 
@@ -486,22 +545,32 @@ function goBack() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function () {
+    initializeTableNumber();
+
     // Wait for cartManager to be available
     const checkCartManager = () => {
         if (typeof cartManager !== 'undefined' && typeof formatPrice !== 'undefined') {
             // Load food detail after cartManager is ready
             loadFoodDetail();
-            
+
             // Initialize quantity display
             updateQuantityDisplay();
-            
+
+            // ===== THAY ĐỔI CHÍNH Ở ĐÂY =====
+            // Đăng ký callback để cập nhật UI khi cart thay đổi (giống như viewfoodlist.js)
+            cartManager.addCallback(() => {
+                if (currentFood) {
+                    checkAndUpdateCartStatus();
+                }
+            });
+
             console.log('Food Detail App initialized with CartManager');
         } else {
             // Retry after a short delay
             setTimeout(checkCartManager, 100);
         }
     };
-    
+
     checkCartManager();
 
     // Handle escape key to close modal (if cart modal exists)
@@ -526,6 +595,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    document.addEventListener('dblclick', function (e) {
+        e.preventDefault();
+    }, { passive: false });
+
+    // Chặn double-tap zoom trên mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (e) {
+        const now = new Date().getTime();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
 });
 
 // Add CSS animations
@@ -598,8 +680,6 @@ style.textContent = `
         transition: all 0.3s ease;
     }
     
-    
-    
     .favorite-btn:hover {
         transform: scale(1.1);
     }
@@ -623,5 +703,16 @@ style.textContent = `
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
+    
+    #updateModeIndicator {
+        border-left: 4px solid #ffc107;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    }
 `;
 document.head.appendChild(style);
+

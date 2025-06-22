@@ -1,4 +1,4 @@
-let currentFilters = {
+let currentTableFilters = {
     tableNumber: '',
     status: ''
 };
@@ -10,7 +10,7 @@ let currentSort = {
 
 async function showTables(filters = {}, sort = {}) {
     // Cập nhật filter và sort hiện tại
-    currentFilters = { ...currentFilters, ...filters };
+    currentTableFilters = { ...currentTableFilters, ...filters };
     currentSort = { ...currentSort, ...sort };
 
     // Update page title and toggle visibility
@@ -44,7 +44,7 @@ async function showTables(filters = {}, sort = {}) {
                             <div class="filter-group">
                                 <label class="filter-label">Số bàn:</label>
                                 <input type="text" id="filterTableNumber" class="form-control filter-input" 
-                                       placeholder="Nhập số bàn..." value="${currentFilters.tableNumber}"
+                                       placeholder="Nhập số bàn..." value="${currentTableFilters.tableNumber}"
                                        onchange="applyTableFilters()">
                             </div>
                             
@@ -52,9 +52,9 @@ async function showTables(filters = {}, sort = {}) {
                                 <label class="filter-label">Trạng thái:</label>
                                 <select id="filterStatus" class="form-select filter-select" onchange="applyTableFilters()">
                                     <option value="">Tất cả trạng thái</option>
-                                    <option value="AVAILABLE" ${currentFilters.status === 'AVAILABLE' ? 'selected' : ''}>Trống</option>
-                                    <option value="OCCUPIED" ${currentFilters.status === 'OCCUPIED' ? 'selected' : ''}>Có khách</option>
-                                    <option value="RESERVED" ${currentFilters.status === 'RESERVED' ? 'selected' : ''}>Đặt trước</option>
+                                    <option value="AVAILABLE" ${currentTableFilters.status === 'AVAILABLE' ? 'selected' : ''}>Trống</option>
+                                    <option value="OCCUPIED" ${currentTableFilters.status === 'OCCUPIED' ? 'selected' : ''}>Có khách</option>
+                                    <option value="RESERVED" ${currentTableFilters.status === 'RESERVED' ? 'selected' : ''}>Đặt trước</option>
                                 </select>
                             </div>
 
@@ -142,12 +142,12 @@ async function showTables(filters = {}, sort = {}) {
         // Build query parameters
         const queryParams = new URLSearchParams();
 
-        if (currentFilters.tableNumber && currentFilters.tableNumber.trim()) {
-            queryParams.append('tableNumber', currentFilters.tableNumber.trim());
+        if (currentTableFilters.tableNumber && currentTableFilters.tableNumber.trim()) {
+            queryParams.append('tableNumber', currentTableFilters.tableNumber.trim());
         }
 
-        if (currentFilters.status && currentFilters.status.trim()) {
-            queryParams.append('status', currentFilters.status.trim());
+        if (currentTableFilters.status && currentTableFilters.status.trim()) {
+            queryParams.append('status', currentTableFilters.status.trim());
         }
 
         const queryString = queryParams.toString();
@@ -216,7 +216,7 @@ function applySorting() {
         order: sortOrder
     };
 
-    showTables(currentFilters, sort);
+    showTables(currentTableFilters, sort);
 }
 
 // Hàm sắp xếp tables phía client
@@ -255,7 +255,7 @@ function applySortingToTables(tables) {
 
 // Hàm xóa bộ lọc
 function clearTableFilters() {
-    currentFilters = {
+    currentTableFilters = {
         tableNumber: '',
         status: ''
     };
@@ -416,141 +416,141 @@ function renderTablesByArea(tablesByArea) {
 const filterSortStyle = document.createElement('style');
 filterSortStyle.textContent = `
     .filter-sort-section {
-        margin: 0 1rem 2rem 1rem;
+        margin: 0 1rem 2rem 1rem !important;
     }
     
     .filter-sort-container {
-        background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        border: 2px solid rgba(0, 102, 204, 0.1);
+        background: white !important;
+        border-radius: 20px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+        border: 2px solid rgba(0, 102, 204, 0.1) !important;
     }
     
     .filter-title {
-        color: var(--waiter-blue);
-        margin-bottom: 1rem;
-        font-weight: 600;
+        color: var(--waiter-blue) !important;
+        margin-bottom: 1rem !important;
+        font-weight: 600 !important;
     }
     
     .filter-controls {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+        gap: 1rem !important;
+        margin-bottom: 1.5rem !important;
     }
     
     .filter-group {
-        display: flex;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: column !important;
     }
     
     .filter-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--dark);
-        margin-bottom: 0.5rem;
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        color: var(--dark) !important;
+        margin-bottom: 0.5rem !important;
     }
     
     .filter-input,
     .filter-select {
-        border-radius: 10px;
-        border: 2px solid rgba(0, 102, 204, 0.2);
-        padding: 0.5rem 0.75rem;
-        transition: all 0.3s ease;
+        border-radius: 10px !important;
+        border: 2px solid rgba(0, 102, 204, 0.2) !important;
+        padding: 0.5rem 0.75rem !important;
+        transition: all 0.3s ease !important;
     }
     
     .filter-input:focus,
     .filter-select:focus {
-        border-color: var(--waiter-blue);
-        box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
-        outline: none;
+        border-color: var(--waiter-blue) !important;
+        box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25) !important;
+        outline: none !important;
     }
     
     .filter-actions {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-        flex-wrap: wrap;
+        display: flex !important;
+        gap: 0.5rem !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
     }
     
     .filter-actions .btn {
-        border-radius: 10px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        border-radius: 10px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
     }
     
     .filter-status-alert {
-        border-radius: 15px;
-        border: none;
-        background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 202, 240, 0.05));
-        border-left: 4px solid var(--info);
-        margin-bottom: 1.5rem;
+        border-radius: 15px !important;
+        border: none !important;
+        background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 202, 240, 0.05)) !important;
+        border-left: 4px solid var(--info) !important;
+        margin-bottom: 1.5rem !important;
     }
     
     .sort-info {
-        text-align: center;
-        padding: 0.5rem;
-        background: rgba(0, 102, 204, 0.05);
-        border-radius: 10px;
-        border: 1px solid rgba(0, 102, 204, 0.1);
+        text-align: center !important;
+        padding: 0.5rem !important;
+        background: rgba(0, 102, 204, 0.05) !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(0, 102, 204, 0.1) !important;
     }
     
     /* Responsive design for filter section */
     @media (max-width: 768px) {
         .filter-sort-section {
-            margin: 0 0.5rem 1.5rem 0.5rem;
+            margin: 0 0.5rem 1.5rem 0.5rem !important;
         }
         
         .filter-sort-container {
-            padding: 1rem;
-            border-radius: 15px;
+            padding: 1rem !important;
+            border-radius: 15px !important;
         }
         
         .filter-controls {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+            margin-bottom: 1rem !important;
         }
         
         .filter-actions {
-            justify-content: stretch;
+            justify-content: stretch !important;
         }
         
         .filter-actions .btn {
-            flex: 1;
-            min-width: 120px;
+            flex: 1 !important;
+            min-width: 120px !important;
         }
     }
     
     @media (max-width: 576px) {
         .filter-controls {
-            gap: 0.5rem;
+            gap: 0.5rem !important;
         }
         
         .filter-actions {
-            flex-direction: column;
+            flex-direction: column !important;
         }
         
         .filter-actions .btn {
-            width: 100%;
+            width: 100% !important;
         }
         
         .filter-title {
-            font-size: 1.1rem;
-            text-align: center;
+            font-size: 1.1rem !important;
+            text-align: center !important;
         }
     }
     
     /* Animation for filter changes */
     .tables-grid {
-        animation: fadeIn 0.3s ease;
+        animation: fadeIn 0.3s ease !important;
     }
     
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0 !important; transform: translateY(10px) !important; }
+        to { opacity: 1 !important; transform: translateY(0) !important; }
     }
 `;
 document.head.appendChild(filterSortStyle);
@@ -724,7 +724,7 @@ async function viewTableOrders(tableId) {
         }
 
         // Hiển thị thông tin đơn hàng
-        displayTableOrder(order, tableId);
+        displayOrderDetails(order);
 
     } catch (error) {
         console.error('Error fetching table orders:', error);
@@ -784,28 +784,6 @@ function showOrderModal(html) {
     modalContainer.innerHTML = html;
     modalContainer.style.display = 'block';
 }
-
-// Hàm tạo container modal nếu chưa có
-function createModalContainer() {
-    const modal = document.createElement('div');
-    modal.id = 'orderModal';
-    modal.className = 'modal';
-    modal.style.cssText = `
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        padding: 20px;
-        box-sizing: border-box;
-    `;
-    document.body.appendChild(modal);
-    return modal;
-}
-
 
 
 // Hàm thanh toán bàn
@@ -869,7 +847,7 @@ function refreshTables() {
     }
 
     // Refresh with current filters and sort
-    showTables(currentFilters, currentSort);
+    showTables(currentTableFilters, currentSort);
 }
 
 const style = document.createElement('style');

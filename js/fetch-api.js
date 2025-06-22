@@ -1,9 +1,4 @@
 const BACKEND_BASE_URL = "http://localhost:8080";
-function getContextPath() {
-    const path = window.location.pathname;
-    const firstSlashIndex = path.indexOf("/", 1);
-    return firstSlashIndex !== -1 ? path.substring(0, firstSlashIndex) : "";
-}
 
 async function RefreshToken() {
     const oldToken = localStorage.getItem("accessToken");
@@ -37,7 +32,6 @@ async function RefreshToken() {
 }
 
 async function apiFetch(endpoint, options = {}) {
-    const contextPath = getContextPath();
     const url = `${BACKEND_BASE_URL}${endpoint}`;
 
     const fetchWithToken = async () => {
@@ -50,6 +44,7 @@ async function apiFetch(endpoint, options = {}) {
                 ...(latestToken ? { 'Authorization': `Bearer ${latestToken}` } : {})
             }
         });
+        
     };
 
     let response = await fetchWithToken();
@@ -64,7 +59,9 @@ async function apiFetch(endpoint, options = {}) {
             throw new Error("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
         }
     }
-
+   if (options.method === 'DELETE' && (response.status === 200 || response.status === 204)) {
+        return { code: 1000, message: 'Xóa thành công' };
+    }
     if (!response.ok) {
         if (contentType.includes('application/json')) {
             const errorData = await response.json();

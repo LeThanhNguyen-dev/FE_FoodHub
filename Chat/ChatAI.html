@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini Chatbox - AI.html</title>
+    <title>Gemini Chatbox - AI</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,6 +40,21 @@
         .bot {
             background-color: #f1f8e9;
             text-align: left;
+        }
+
+        /* Thêm style cho danh sách và in đậm */
+        .bot ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+
+        .bot li {
+            margin-bottom: 5px;
+        }
+
+        .bot strong {
+            color: #1976d2;
         }
 
         input[type="text"] {
@@ -80,7 +95,7 @@
         input.value = "";
 
         try {
-            const response = await fetch("api/chat", {
+            const response = await fetch("http://localhost:8080/api/gemini/reply", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -88,12 +103,36 @@
                 body: JSON.stringify({ message: message })
             });
 
+            if (!response.ok) {
+                throw new Error("Yêu cầu không thành công: " + response.status);
+            }
+
             const data = await response.json();
-            appendMessage("Gemini", data.reply, "bot");
+            if (data.result && data.result.reply) {
+                const formattedReply = formatReply(data.result.reply);
+                appendMessage("Gemini", formattedReply, "bot");
+            } else {
+                appendMessage("Gemini", "Không có phản hồi hợp lệ.", "bot");
+            }
 
         } catch (err) {
-            appendMessage("Lỗi", "Không thể kết nối đến máy chủ.", "bot");
+            appendMessage("Lỗi", "Không thể kết nối đến máy chủ: " + err.message, "bot");
         }
+    }
+
+    function formatReply(text) {
+        // Thay thế **text** bằng <strong>text</strong> cho in đậm
+        let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        // Chuyển danh sách * item thành <ul><li>item</li></ul>
+        formatted = formatted.replace(/^\*\s(.+?)$/gm, '<li>$1</li>')
+                            .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+                            .replace(/<\/ul>\s*<ul>/g, '');
+
+        // Thêm đoạn giới thiệu và câu hỏi vào thẻ <p> để tách biệt
+        formatted = formatted.replace(/^(.+?)(?:\n|$)/, '<p>$1</p>');
+
+        return formatted;
     }
 
     function appendMessage(sender, text, type) {

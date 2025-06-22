@@ -128,10 +128,10 @@ async function loadOrders(isAutoRefresh = false) {
     try {
         isReloading = true;
 
-        // Don't show loading for auto refresh
-        if (!isAutoRefresh) {
+        // Chỉ hiển thị loading khi không có dữ liệu và không phải auto refresh
+        if (!isAutoRefresh && ordersData.length === 0) {
             const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid && ordersData.length === 0) {
+            if (ordersGrid) {
                 ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
             }
         }
@@ -236,15 +236,6 @@ function renderOrders(orders) {
         return;
     }
 
-    // Store existing cards to preserve scroll position
-    const existingCards = {};
-    ordersGrid.querySelectorAll('.order-card').forEach(card => {
-        const orderId = card.getAttribute('data-order-id');
-        if (orderId) {
-            existingCards[orderId] = card.cloneNode(true);
-        }
-    });
-
     const ordersHTML = activeOrders.map(order => {
         // Show only first 3 items
         const visibleItems = order.orderItems ? order.orderItems.slice(0, 3) : [];
@@ -273,7 +264,7 @@ function renderOrders(orders) {
         const totalItems = order.orderItems ? order.orderItems.length : 0;
 
         return `
-            <div class="order-card" data-order-id="${order.id}" style="animation: slideIn 0.3s ease;">
+            <div class="order-card" data-order-id="${order.id}">
                 <div class="order-header">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="order-number">
@@ -332,13 +323,10 @@ function renderOrders(orders) {
         `;
     }).join('');
 
-    // Smooth transition
-    ordersGrid.style.opacity = '0.7';
-    setTimeout(() => {
-        ordersGrid.innerHTML = ordersHTML;
-        ordersGrid.style.opacity = '1';
-    }, 100);
+    // Render trực tiếp không có hiệu ứng opacity
+    ordersGrid.innerHTML = ordersHTML;
 }
+
 
 // Update statistics with smooth animations
 function updateStats() {
@@ -463,7 +451,7 @@ function displayOrderDetails(orderData) {
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="updateOrderStatus(${id})">
+                    <button class="btn btn-primary" onclick="updateOrderItemsStatus(${id})">
                         Cập nhật trạng thái
                     </button>
                     <button class="btn btn-secondary" onclick="closeOrderDetails()">
@@ -669,7 +657,7 @@ async function updateOrderStatus(orderId, newStatus) {
     try {
         console.log(`Updating order ${orderId} to status: ${newStatus}`);
 
-        const data = await apiFetch(`/orders/${orderId}/status`, {
+        const data = await apiFetch(`/orders/status/${orderId}?status=${newStatus}`, {
             method: 'PUT',
             body: JSON.stringify({ status: newStatus })
         });
@@ -690,6 +678,247 @@ async function updateOrderStatus(orderId, newStatus) {
     }
 }
 
+async function updateOrderItemsStatus(orderId) {
+    try {
+        // Lấy thông tin đơn hàng hiện tại để hiển thị các order items
+        const orderData = await apiFetch(`/orders/${orderId}`, {
+            method: 'GET'
+        });
+
+        if (orderData && orderData.code === 0 && orderData.result) {
+            showOrderItemsStatusModal(orderData.result);
+        } else {
+            alert('Không thể lấy thông tin đơn hàng!');
+        }
+    } catch (error) {
+        console.error('Error fetching order for status update:', error);
+        alert('Có lỗi xảy ra khi lấy thông tin đơn hàng: ' + error.message);
+    }
+}
+
+function showOrderItemsStatusModal(orderData) {
+    const { id, orderItems } = orderData;
+
+    // Tạo HTML cho danh sách order items
+    const orderItemsOptions = orderItems.map(item => `
+        <div class="order-item-option" data-item-id="${item.id}">
+            <div class="item-info">
+                <input type="checkbox" id="item_${item.id}" value="${item.id}">
+                <label for="item_${item.id}">
+                    <strong>${item.menuItemName}</strong>
+                    <span class="item-details">SL: ${item.quantity} - Trạng thái hiện tại: 
+                        <span class="badge ${getStatusBadgeClass(item.status)}">${getStatusText(item.status)}</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+    `).join('');
+
+    // Tạo options cho status
+    const statusOptions = [
+        { value: 'PREPARING', text: 'Bắt đầu nấu' },
+        { value: 'READY', text: 'Hoàn thành' }
+    ];
+
+    const statusOptionsHtml = statusOptions.map(option => 
+        `<option value="${option.value}">${option.text}</option>`
+    ).join('');
+
+    const modalHtml = `
+        <div class="modal-overlay" onclick="closeStatusUpdateModal()">
+            <div class="modal-content status-update-modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Cập nhật trạng thái đơn hàng #${id}</h3>
+                    <button class="btn-close" onclick="closeStatusUpdateModal()">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label><strong>Chọn món ăn cần cập nhật:</strong></label>
+                        <div class="order-items-selection">
+                            <div class="select-all-option">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                <label for="selectAll"><strong>Chọn tất cả</strong></label>
+                            </div>
+                            ${orderItemsOptions}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newStatus"><strong>Trạng thái mới:</strong></label>
+                        <select id="newStatus" class="form-control">
+                            <option value="">-- Chọn trạng thái --</option>
+                            ${statusOptionsHtml}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="executeStatusUpdate()">
+                        Cập nhật trạng thái
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeStatusUpdateModal()">
+                        Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Thêm CSS cho modal status update
+    addStatusUpdateModalStyles();
+
+    // Hiển thị modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const itemCheckboxes = document.querySelectorAll('.order-item-option input[type="checkbox"]');
+    
+    itemCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+async function executeStatusUpdate() {
+    const selectedItems = Array.from(document.querySelectorAll('.order-item-option input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.value);
+    
+    const newStatus = document.getElementById('newStatus').value;
+
+    if (selectedItems.length === 0) {
+        alert('Vui lòng chọn ít nhất một món ăn!');
+        return;
+    }
+
+    if (!newStatus) {
+        alert('Vui lòng chọn trạng thái mới!');
+        return;
+    }
+
+    try {
+        // Hiển thị loading
+        const updateBtn = document.querySelector('.status-update-modal .btn-primary');
+        const originalText = updateBtn.innerHTML;
+        updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang cập nhật...';
+        updateBtn.disabled = true;
+
+        // Gọi API để cập nhật từng item
+        const updatePromises = selectedItems.map(itemId => 
+            apiFetch(`/orders/items/status/${itemId}?status=${newStatus}`, {
+                method: 'PUT'
+            })
+        );
+
+        const results = await Promise.all(updatePromises);
+        
+        // Kiểm tra kết quả
+        const failedUpdates = results.filter(result => result.code !== 0);
+        
+        if (failedUpdates.length === 0) {
+            alert(`Cập nhật trạng thái thành công cho ${selectedItems.length} món ăn!`);
+            closeStatusUpdateModal();
+            
+            // Refresh orders list và close order details modal
+            await loadOrders();
+            closeOrderDetails();
+        } else {
+            alert(`Có ${failedUpdates.length} món ăn không thể cập nhật. Vui lòng thử lại!`);
+        }
+
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        alert('Có lỗi xảy ra khi cập nhật trạng thái: ' + error.message);
+    } finally {
+        // Restore button
+        const updateBtn = document.querySelector('.status-update-modal .btn-primary');
+        if (updateBtn) {
+            updateBtn.innerHTML = 'Cập nhật trạng thái';
+            updateBtn.disabled = false;
+        }
+    }
+}
+
+// Hàm mới: Đóng modal cập nhật trạng thái
+function closeStatusUpdateModal() {
+    const modal = document.querySelector('.modal-overlay:has(.status-update-modal)');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Hàm mới: Thêm CSS cho modal cập nhật trạng thái
+function addStatusUpdateModalStyles() {
+    if (document.getElementById('statusUpdateModalStyles')) return;
+
+    const styles = `
+        <style id="statusUpdateModalStyles">
+        .status-update-modal {
+            max-width: 700px;
+        }
+        .order-items-selection {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .select-all-option {
+            padding: 10px;
+            border-bottom: 2px solid #007bff;
+            margin-bottom: 10px;
+        }
+        .select-all-option label {
+            color: #007bff;
+        }
+        .order-item-option {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+        .order-item-option:last-child {
+            border-bottom: none;
+        }
+        .order-item-option label {
+            display: block;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .order-item-option input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .item-details {
+            color: #666;
+            font-size: 14px;
+            display: block;
+            margin-top: 4px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        </style>
+    `;
+    document.head.insertAdjacentHTML('beforeend', styles);
+}
 // Show orders section
 // Filter and pagination state
 let currentFilters = {
@@ -918,12 +1147,6 @@ async function loadOrdersWithFilters() {
     try {
         isReloading = true;
 
-        // Show loading
-        const ordersGrid = document.getElementById('ordersGrid');
-        if (ordersGrid) {
-            ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
-        }
-
         // Build query parameters
         const params = new URLSearchParams();
 
@@ -979,6 +1202,7 @@ async function loadOrdersWithFilters() {
         isReloading = false;
     }
 }
+
 
 // Render pagination controls
 function renderPagination(pageData) {
@@ -1069,7 +1293,7 @@ function updatePaginationInfo(pageData) {
 }
 
 // Enhanced loadOrders function to work with filters
-async function loadOrders() {
+async function loadOrders(isAutoRefresh = false) {
     try {
         // Get filter values - với null checks
         const statusFilter = document.getElementById('statusFilter');
@@ -1088,10 +1312,12 @@ async function loadOrders() {
         const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
         const pageSize = pageSizeFilter ? pageSizeFilter.value || '10' : '10';
 
-        // Show loading
-        const ordersGrid = document.getElementById('ordersGrid');
-        if (ordersGrid) {
-            ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
+        // Chỉ show loading khi không có dữ liệu và không phải auto refresh
+        if (!isAutoRefresh && ordersData.length === 0) {
+            const ordersGrid = document.getElementById('ordersGrid');
+            if (ordersGrid) {
+                ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
+            }
         }
 
         // Build query parameters
@@ -1142,6 +1368,7 @@ async function loadOrders() {
         showErrorState(error.message);
     }
 }
+
 function updateSummary(orderPage) {
     const paginationInfo = document.getElementById('paginationInfo');
     if (!paginationInfo || !orderPage) return;
@@ -1243,6 +1470,7 @@ function showErrorState(errorMessage) {
         `;
     }
 }
+
 // Check if any filters are active
 function hasActiveFilters() {
     return currentFilters.status !== '' ||
