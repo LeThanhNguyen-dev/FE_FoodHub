@@ -7,161 +7,711 @@
     <title>FoodHub - Register</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --dark-green: #02052f;
-            --gold: #D4A017;
-            --light-gold: #F7E6A3;
-            --light-gray: #f8f9fa;
+            --primary-color: #0F172B;
+            --secondary-color: #1E293B;
+            --accent-color: #FEA116;
+            --accent-hover: #E6910E;
+            --accent-light: #FFF7E6;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --light-bg: #f7fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--light-gray);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--accent-light) 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--gray-700);
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
             align-items: center;
+            min-height: calc(100vh - 40px);
+        }
+
+        .brand-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .brand-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(254, 161, 22, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .brand-content h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .brand-content p {
+            font-size: 18px;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--gray-600);
+        }
+
+        .features-list .icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            flex-shrink: 0;
         }
 
         .register-section {
-            background: linear-gradient(180deg, #ffffff, #f1f3f5);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            max-width: 500px;
-            width: 100%;
+            background: var(--white);
+            padding: 48px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .register-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
         }
 
         .section-title {
-            font-family: 'Playfair Display', serif;
-            color: var(--dark-green);
-            font-size: 2rem;
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-color);
+            font-size: 32px;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 14px;
+            letter-spacing: 0.025em;
+        }
+
+        .input-wrapper {
+            position: relative;
         }
 
         .form-control {
-            border: 2px solid var(--dark-green);
-            border-radius: 10px;
-            transition: border-color 0.3s;
+            width: 100%;
+            padding: 16px 20px;
+            padding-left: 50px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: var(--gray-50);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
         }
 
         .form-control:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 5px rgba(212, 160, 23, 0.3);
+            outline: none;
+            border-color: var(--accent-color);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(254, 161, 22, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+            background-color: #fef2f2;
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success-color);
+            background-color: #f0fff4;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 18px;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-control:focus + .input-icon {
+            color: var(--accent-color);
+        }
+
+        .invalid-feedback,
+        .valid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            font-size: 14px;
+            padding-left: 4px;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+        }
+
+        .valid-feedback {
+            color: var(--success-color);
         }
 
         .btn-register {
-            background-color: var(--dark-green);
-            color: var(--gold);
-            border-radius: 25px;
-            font-weight: 600;
-            padding: 10px;
             width: 100%;
-            transition: background-color 0.3s, color 0.3s, transform 0.2s;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--accent-color);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-register:hover {
-            background-color: var(--gold);
-            color: var(--dark-green);
-            transform: scale(1.02);
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-color);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-register::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-register:hover::after {
+            left: 100%;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 8px 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            margin-top: 16px;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
         }
 
         .alert {
-            border-radius: 10px;
-            font-size: 0.9rem;
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: var(--accent-light);
+            color: var(--accent-hover);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #c53030;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #c05621;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+            gap: 12px;
+        }
+
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background-color: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        .step.completed {
+            background-color: var(--accent-color);
+        }
+
+        .otp-timer {
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: var(--gray-50);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        .d-block {
+            display: block !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                max-width: 600px;
+            }
+
+            .brand-section {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .brand-content h1 {
+                font-size: 32px;
+            }
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
             .register-section {
-                margin: 1rem;
-                padding: 1.5rem;
+                padding: 32px 24px;
             }
 
             .section-title {
-                font-size: 1.5rem;
+                font-size: 26px;
+            }
+
+            .brand-content h1 {
+                font-size: 28px;
+            }
+
+            .logo-text {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-section {
+                padding: 24px 20px;
+            }
+
+            .form-control {
+                padding: 14px 18px;
+                padding-left: 45px;
+                font-size: 16px;
+            }
+
+            .btn-register {
+                padding: 14px 20px;
+            }
+        }
+
+        /* Animation for form transitions */
+        .form-transition {
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Register Section -->
-    <section id="register" class="register-section">
-        <div class="container">
-            <h2 class="section-title" id="form-title">Create Your Account</h2>
+    <div class="main-container">
+        <!-- Phần thương hiệu -->
+        <div class="brand-section">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <h2 class="logo-text">FoodHub</h2>
+            </div>
+            <div class="brand-content">
+    <h1>FoodHub – Nhà hàng ẩm thực hiện đại & tinh tế</h1>
+    <p>Khám phá những món ngon đặc sắc, phục vụ trong không gian ấm cúng và đậm chất riêng.</p>
+    <ul class="features-list">
+        <li>
+            <span class="icon"><i class="bi bi-check"></i></span>
+            Giao hàng nhanh chóng
+        </li>
+        <li>
+            <span class="icon"><i class="bi bi-check"></i></span>
+            Hỗ trợ khách hàng 24/7
+        </li>
+    </ul>
+</div>
+
+        </div>
+
+        <!-- Form đăng ký -->
+        <div class="register-section">
+            <div class="progress-steps">
+                <div class="step active" id="step-1"></div>
+                <div class="step" id="step-2"></div>
+            </div>
+
+            <h2 class="section-title" id="form-title">Tạo tài khoản mới</h2>
+            <p class="section-subtitle" id="form-subtitle">Vui lòng nhập đầy đủ thông tin để bắt đầu</p>
+            
             <div id="alert-message"></div>
 
-            <!-- Register Form -->
-            <form id="register-form" class="d-block" novalidate>
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username"
-                        placeholder="Enter your username" required minlength="5" maxlength="255">
-                    <div class="invalid-feedback">Username must be 5-255 characters.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password"
-                        placeholder="Enter your password" required minlength="8" maxlength="255">
-                    <div class="invalid-feedback">Password must be at least 8 characters.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email"
-                        placeholder="Enter your email address" required maxlength="255">
-                    <div class="invalid-feedback">Please enter a valid email.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Phone</label>
-                    <input type="tel" class="form-control" id="phone" name="phone"
-                        placeholder="Enter your phone number (10 digits)" required pattern="[0-9]{10}">
-                    <div class="invalid-feedback">Phone must be exactly 10 digits.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter your address"
-                        required maxlength="255">
-                    <div class="invalid-feedback">Address is required.</div>
-                </div>
-                <!-- Hidden Role Field -->
-                <input type="hidden" id="roleName" name="roleName" value="CUSTOMER">
+            <h2 class="section-title" id="form-title">Tạo tài khoản mới</h2>
+<p class="section-subtitle" id="form-subtitle">Vui lòng nhập đầy đủ thông tin để bắt đầu</p>
 
-                <button type="submit" class="btn btn-register">Send OTP</button>
-            </form>
-
-            <!-- OTP Form -->
-            <form id="otp-form" class="d-none" novalidate>
-                <div class="mb-3">
-                    <label for="otp" class="form-label">OTP Code</label>
-                    <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter 6-digit OTP" required
-                        minlength="6" maxlength="6">
-                    <div class="invalid-feedback">OTP must be 6 digits.</div>
-                </div>
-                <button type="submit" class="btn btn-register">Verify OTP</button>
-                <button type="button" class="btn btn-link" onclick="resendOtp()">Resend OTP</button>
-            </form>
+<form id="register-form" class="d-block form-transition" novalidate>
+    <div class="form-group">
+        <label for="username" class="form-label">Tên đăng nhập</label>
+        <div class="input-wrapper">
+            <input type="text" class="form-control" id="username" name="username"
+                placeholder="Nhập tên đăng nhập" required minlength="5" maxlength="255">
+            <i class="bi bi-person input-icon"></i>
         </div>
-    </section>
+        <div class="invalid-feedback">Tên đăng nhập phải từ 5 đến 255 ký tự.</div>
+        <div class="valid-feedback">Tên đăng nhập hợp lệ!</div>
+    </div>
+
+    <div class="form-group">
+        <label for="password" class="form-label">Mật khẩu</label>
+        <div class="input-wrapper">
+            <input type="password" class="form-control" id="password" name="password"
+                placeholder="Nhập mật khẩu" required minlength="8" maxlength="255">
+            <i class="bi bi-lock input-icon"></i>
+        </div>
+        <div class="invalid-feedback">Mật khẩu phải từ 8 ký tự trở lên.</div>
+        <div class="valid-feedback">Mật khẩu đủ mạnh!</div>
+    </div>
+
+    <div class="form-group">
+        <label for="email" class="form-label">Địa chỉ Email</label>
+        <div class="input-wrapper">
+            <input type="email" class="form-control" id="email" name="email"
+                placeholder="Nhập địa chỉ email" required maxlength="255">
+            <i class="bi bi-envelope input-icon"></i>
+        </div>
+        <div class="invalid-feedback">Vui lòng nhập địa chỉ email hợp lệ.</div>
+        <div class="valid-feedback">Email hợp lệ!</div>
+    </div>
+
+    <div class="form-group">
+        <label for="phone" class="form-label">Số điện thoại</label>
+        <div class="input-wrapper">
+            <input type="tel" class="form-control" id="phone" name="phone"
+                placeholder="Nhập số điện thoại (10 chữ số)" required pattern="[0-9]{10}">
+            <i class="bi bi-telephone input-icon"></i>
+        </div>
+        <div class="invalid-feedback">Số điện thoại phải đủ 10 chữ số.</div>
+        <div class="valid-feedback">Số điện thoại hợp lệ!</div>
+    </div>
+
+    <div class="form-group">
+        <label for="address" class="form-label">Địa chỉ</label>
+        <div class="input-wrapper">
+            <input type="text" class="form-control" id="address" name="address" 
+                placeholder="Nhập địa chỉ đầy đủ" required maxlength="255">
+            <i class="bi bi-geo-alt input-icon"></i>
+        </div>
+        <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
+        <div class="valid-feedback">Địa chỉ hợp lệ!</div>
+    </div>
+
+    <input type="hidden" id="roleName" name="roleName" value="CUSTOMER">
+
+    <button type="submit" class="btn btn-register" id="register-btn">
+        <span class="btn-text">Gửi mã xác thực</span>
+    </button>
+</form>
+
+
+            <form id="otp-form" class="d-none form-transition" novalidate>
+    <div class="form-group">
+        <label for="otp" class="form-label">Mã xác thực</label>
+        <div class="input-wrapper">
+            <input type="text" class="form-control" id="otp" name="otp" 
+                placeholder="Nhập mã xác thực gồm 6 chữ số" required minlength="6" maxlength="6"
+                style="text-align: center; font-size: 20px; font-weight: 600; letter-spacing: 4px;">
+            <i class="bi bi-shield-check input-icon"></i>
+        </div>
+        <div class="invalid-feedback">Mã OTP phải gồm 6 chữ số.</div>
+        <div class="valid-feedback">Định dạng OTP hợp lệ!</div>
+    </div>
+
+    <button type="submit" class="btn btn-register" id="verify-btn">
+        <span class="btn-text">Xác nhận & Tạo tài khoản</span>
+    </button>
+    
+    <button type="button" class="btn btn-link" onclick="resendOtp()">
+        <i class="bi bi-arrow-clockwise"></i> Gửi lại mã xác thực
+    </button>
+
+    <div id="otp-timer" class="otp-timer"></div>
+</form>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_BASE_URL = 'http://localhost:8080/auth';
+        let otpTimer;
+
+        // Real-time validation
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', function() {
+                validateField(this);
+            });
+            
+            input.addEventListener('blur', function() {
+                validateField(this);
+            });
+        });
+
+      function validateField(field) {
+    const formGroup = field.closest('.form-group');
+    const validFeedback = formGroup.querySelector('.valid-feedback');
+    const invalidFeedback = formGroup.querySelector('.invalid-feedback');
+    const value = field.value.trim();
+
+    // Reset class & ẩn feedback
+    field.classList.remove('is-valid', 'is-invalid');
+    validFeedback.style.display = 'none';
+    invalidFeedback.style.display = 'none';
+
+    // Nếu chưa nhập gì => không hiện gì cả
+    if (value === '') {
+        return;
+    }
+
+    // Nếu hợp lệ
+    if (field.checkValidity()) {
+        field.classList.add('is-valid');
+        validFeedback.style.display = 'block';
+    } else {
+        field.classList.add('is-invalid');
+        invalidFeedback.style.display = 'block';
+    }
+}
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
-            form.classList.add('was-validated');
-            if (!form.checkValidity()) return;
+            const submitBtn = document.getElementById('register-btn');
+            
+            // Validate all fields
+            let isFormValid = true;
+            form.querySelectorAll('.form-control').forEach(field => {
+                validateField(field);
+                if (!field.checkValidity()) {
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) return;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading-spinner"></div><span class="btn-text">Sending OTP...</span>';
 
             const formData = new FormData(form);
             const data = {
@@ -183,26 +733,51 @@
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || `HTTP error! Status: ${response.status}`);
 
-                showNotification('success', result.message || 'OTP sent to your email!');
+                showNotification('success', result.message || 'Verification code sent to your email!');
+                
+                // Update progress
+                document.getElementById('step-1').classList.add('completed');
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+                
+                // Switch forms
                 form.classList.add('d-none');
                 document.getElementById('otp-form').classList.remove('d-none');
-                document.getElementById('form-title').textContent = 'Verify OTP';
+                document.getElementById('form-title').textContent = 'Verify Your Email';
+                document.getElementById('form-subtitle').textContent = 'Enter the 6-digit code sent to your email';
+                
                 startOtpTimer();
+                
+                // Focus on OTP input
+                setTimeout(() => {
+                    document.getElementById('otp').focus();
+                }, 300);
+                
             } catch (error) {
                 const errorMessage =
-                    error.message.includes('USER_EXISTED') ? 'Username already exists.' :
-                        error.message.includes('EMAIL_EXISTS') ? 'Email already exists.' :
-                            error.message.includes('INVALID_ROLE') ? 'Invalid role selected.' :
-                                error.message;
+                    error.message.includes('USER_EXISTED') ? 'Username already exists. Please choose a different one.' :
+                    error.message.includes('EMAIL_EXISTS') ? 'Email already exists. Please use a different email.' :
+                    error.message.includes('INVALID_ROLE') ? 'Invalid role selected.' :
+                    error.message || 'Something went wrong. Please try again.';
                 showNotification('danger', errorMessage);
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="btn-text">Send OTP Code</span>';
             }
         });
 
         document.getElementById('otp-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
-            form.classList.add('was-validated');
+            const submitBtn = document.getElementById('verify-btn');
+            
+            validateField(document.getElementById('otp'));
             if (!form.checkValidity()) return;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading-spinner"></div><span class="btn-text">Verifying...</span>';
 
             const formData = new FormData(form);
             const data = {
@@ -220,20 +795,39 @@
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || `HTTP error! Status: ${response.status}`);
 
-                showNotification('success', 'Registration successful! Redirecting to login...');
-                setTimeout(() => window.location.href = 'login.html', 2000);
+                // Update progress
+                document.getElementById('step-2').classList.add('completed');
+                
+                showNotification('success', 'Account created successfully! Redirecting to login...');
+                
+                // Clear timer
+                if (otpTimer) clearInterval(otpTimer);
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
             } catch (error) {
                 const errorMessage =
-                    error.message.includes('INVALID_OTP') ? 'Invalid OTP.' :
-                        error.message.includes('OTP_EXPIRED') ? 'OTP expired.' :
-                            error.message.includes('OTP_NOT_FOUND') ? 'OTP not found.' :
-                                error.message;
+                    error.message.includes('INVALID_OTP') ? 'Invalid verification code. Please check and try again.' :
+                    error.message.includes('OTP_EXPIRED') ? 'Verification code has expired. Please request a new one.' :
+                    error.message.includes('OTP_NOT_FOUND') ? 'Verification code not found. Please request a new one.' :
+                    error.message || 'Verification failed. Please try again.';
                 showNotification('danger', errorMessage);
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="btn-text">Verify & Create Account</span>';
             }
         });
 
         async function resendOtp() {
             const email = document.getElementById('email').value;
+            const resendBtn = event.target;
+            
+            resendBtn.disabled = true;
+            resendBtn.innerHTML = '<div class="loading-spinner"></div> Sending...';
+            
             try {
                 const response = await fetch(`${API_BASE_URL}/send-otp`, {
                     method: 'POST',
@@ -241,48 +835,165 @@
                     body: JSON.stringify({
                         email,
                         username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value,
                         roleName: document.getElementById('roleName').value
                     })
                 });
+                
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Failed to resend OTP');
-                showNotification('success', 'New OTP sent to your email!');
+                
+                showNotification('success', 'New verification code sent to your email!');
                 startOtpTimer();
+                
             } catch (error) {
-                showNotification('danger', 'Failed to resend OTP.');
+                showNotification('danger', 'Failed to resend verification code. Please try again.');
+            } finally {
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Resend verification code';
             }
         }
 
         function startOtpTimer() {
-            let timeLeft = 300;
-            const timerDisplay = document.createElement('div');
-            timerDisplay.className = 'text-center mt-2 text-gray-600';
-            document.getElementById('otp-form').appendChild(timerDisplay);
-            const interval = setInterval(() => {
+            if (otpTimer) clearInterval(otpTimer);
+            
+            let timeLeft = 300; // 5 minutes
+            const timerDisplay = document.getElementById('otp-timer');
+            
+            const updateTimer = () => {
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
-                timerDisplay.textContent = `OTP expires in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                timeLeft--;
-                if (timeLeft < 0) {
-                    clearInterval(interval);
-                    timerDisplay.textContent = 'OTP expired. Please resend.';
+                timerDisplay.innerHTML = `
+                    <i class="bi bi-clock"></i> 
+                    Code expires in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}
+                `;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    timerDisplay.innerHTML = `
+                        <i class="bi bi-exclamation-triangle text-warning"></i> 
+                        Code expired. Please request a new one.
+                    `;
+                    timerDisplay.style.borderColor = 'var(--warning-color)';
+                    timerDisplay.style.backgroundColor = '#fffbeb';
+                    return;
                 }
-            }, 1000);
+                
+                timeLeft--;
+            };
+            
+            updateTimer();
+            otpTimer = setInterval(updateTimer, 1000);
         }
 
         function showNotification(type, message) {
             const alertMessage = document.getElementById('alert-message');
+            const iconMap = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-info-circle-fill'
+            };
+            
             alertMessage.innerHTML = `
                 <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="${iconMap[type]} me-2"></i>
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `;
+            
+            // Auto dismiss after 5 seconds
             setTimeout(() => {
                 const alert = alertMessage.querySelector('.alert');
-                if (alert) alert.remove();
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
             }, 5000);
+            
+            // Scroll to top to show notification
+            alertMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+
+        // Format phone number input
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+            e.target.value = value;
+        });
+
+        // OTP input formatting
+        document.getElementById('otp').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 6) {
+                value = value.slice(0, 6);
+            }
+            e.target.value = value;
+        });
+
+        // Auto-submit OTP when 6 digits are entered
+        document.getElementById('otp').addEventListener('input', function(e) {
+            if (e.target.value.length === 6) {
+                setTimeout(() => {
+                    document.getElementById('otp-form').dispatchEvent(new Event('submit'));
+                }, 500);
+            }
+        });
+
+        // Enhanced password strength indicator
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthIndicator = document.createElement('div');
+            strengthIndicator.className = 'password-strength mt-2';
+            
+            // Remove existing indicator
+            const existing = e.target.parentNode.parentNode.querySelector('.password-strength');
+            if (existing) existing.remove();
+            
+            if (password.length > 0) {
+                let strength = 0;
+                const checks = [
+                    password.length >= 8,
+                    /[a-z]/.test(password),
+                    /[A-Z]/.test(password),
+                    /[0-9]/.test(password),
+                    /[^A-Za-z0-9]/.test(password)
+                ];
+                
+                strength = checks.filter(Boolean).length;
+                
+                const levels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+                const colors = ['#f56565', '#ed8936', '#ecc94b', '#48bb78', '#38a169'];
+                
+                strengthIndicator.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1" style="height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
+                            <div style="width: ${(strength / 5) * 100}%; height: 100%; background: ${colors[strength - 1] || colors[0]}; transition: all 0.3s ease;"></div>
+                        </div>
+                        <small style="color: ${colors[strength - 1] || colors[0]}; font-weight: 500;">
+                            ${levels[strength - 1] || levels[0]}
+                        </small>
+                    </div>
+                `;
+                
+                e.target.parentNode.parentNode.appendChild(strengthIndicator);
+            }
+        });
+
+        // Add loading states and better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scroll behavior
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Add form animation on load
+            setTimeout(() => {
+                document.querySelector('.register-section').style.animation = 'fadeIn 0.6s ease';
+            }, 100);
+        });
     </script>
 </body>
 
