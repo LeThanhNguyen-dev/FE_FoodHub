@@ -673,3 +673,116 @@ a.cart-button,
 .cart-button:not(:hover) {
     transform: translateY(0) !important;
 }
+
+
+
+
+
+.add-items-banner {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #333;
+}
+
+.banner-left {
+    display: flex;
+    align-items: center;
+}
+
+.banner-icon {
+    display: none;
+}
+
+.banner-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+#currentOrderId {
+    font-weight: 600;
+    color: #333;
+}
+
+.btn {
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-cancel-add-items {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 16px;
+    border: none;
+    font-size: 13px;
+}
+
+.btn-cancel-add-items:hover {
+    background-color: #c82333;
+}
+
+.btn-cancel-add-items:active {
+    transform: translateY(0);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .banner-content {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .banner-left {
+        justify-content: center;
+    }
+}
+
+/* Demo styles */
+.demo-controls {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.demo-btn {
+    background-color: #4a90e2;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: background-color 0.2s ease;
+}
+
+.demo-btn:hover {
+    background-color: #357abd;
+}

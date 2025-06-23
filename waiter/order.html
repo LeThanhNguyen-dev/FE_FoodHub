@@ -17,25 +17,6 @@
   <template id="ordersPageTemplate">
     <div class="orders-container">
       <!-- Enhanced Header Section -->
-      <div class="orders-header">
-        <div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
-          <h3>
-            <i class="fas fa-clipboard-list"></i>
-            Tất cả đơn hàng
-          </h3>
-          <div class="orders-actions">
-            <button class="btn-orders-action btn-success" onclick="showMenu()">
-              <i class="fas fa-plus"></i>
-              Nhận đơn mới
-            </button>
-            <button class="btn-orders-action btn-outline-primary" onclick="refreshOrders()">
-              <i class="fas fa-sync-alt"></i>
-              Làm mới
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Filter and Sort Section -->
       <div class="orders-filter-section card mb-3">
         <div class="card-body">
@@ -130,15 +111,30 @@
           <!-- Filter Actions -->
           <div class="row mt-3">
             <div class="col-12">
-              <div class="d-flex gap-2 justify-content-end">
-                <button class="btn btn-outline-secondary" onclick="clearFilters()">
-                  <i class="fas fa-times me-1"></i>
-                  Xóa bộ lọc
-                </button>
-                <button class="btn btn-primary" onclick="applyOrderFilters()">
-                  <i class="fas fa-search me-1"></i>
-                  Áp dụng
-                </button>
+              <div class="d-flex gap-2 justify-content-between flex-wrap">
+                <!-- Action Buttons (moved from header) -->
+                <div class="d-flex gap-2">
+                  <button class="btn btn-success" onclick="showMenu()">
+                    <i class="fas fa-plus me-1"></i>
+                    Nhận đơn mới
+                  </button>
+                  <button class="btn btn-outline-primary" onclick="refreshOrders()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Làm mới
+                  </button>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times me-1"></i>
+                    Xóa bộ lọc
+                  </button>
+                  <button class="btn btn-primary" onclick="applyOrderFilters()">
+                    <i class="fas fa-search me-1"></i>
+                    Áp dụng
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -355,7 +351,7 @@
 
         <div class="modal-footer">
           <button class="btn btn-success" onclick="startAddItemsToOrder(`${id}`)">
-            <span>🍽️</span> Gọi thêm món
+            Gọi thêm món
           </button>
           <button class="btn btn-primary" onclick="updateOrderStatus(`${id}`)">
             Cập nhật trạng thái

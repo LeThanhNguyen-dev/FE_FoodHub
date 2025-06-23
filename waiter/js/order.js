@@ -1367,21 +1367,39 @@ function startAddItemsToOrder(orderId) {
         orderId: orderId,
         isAddingItems: true
     };
-    
+
     // Đóng modal chi tiết đơn hàng
     closeModal();
-    
+
+    // Reset cart trước khi chuyển sang chế độ thêm món
+    cart = [];
+
     // Chuyển đến trang menu
     showMenu();
-    
+
     // Hiển thị thông báo
-    showToast('Chế độ gọi thêm món được kích hoạt. Chọn món muốn thêm vào đơn hàng.', 'info');
-    
-    // Cập nhật giao diện để hiển thị trạng thái gọi thêm món
-    updateUIForAddItemsMode();
+    showNotification('Chế độ gọi thêm món được kích hoạt. Chọn món muốn thêm vào đơn hàng.', 'info');
 }
 
-
+function closeModal() {
+    try {
+        // Tìm và xóa modal overlay
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+        
+        // Xóa CSS modal để tránh conflict
+        const modalLink = document.querySelector('link[href="css/modal-style.css"]');
+        if (modalLink) {
+            modalLink.remove();
+        }
+        
+        console.log('Modal đã được đóng thành công');
+    } catch (error) {
+        console.error('Lỗi khi đóng modal:', error);
+    }
+}
 
 // Đóng modal
 function closeOrderDetails() {
