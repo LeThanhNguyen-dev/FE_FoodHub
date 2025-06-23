@@ -16,28 +16,53 @@
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
     <style>
-        .about-hero {
-            background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
-            background-size: cover;
-            background-position: center;
-            height: 50vh;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: white;
-        }
+        .hero {
+    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
 
-        .about-hero h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            color: var(--gold);
-        }
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+    z-index: 1;
+}
 
-        .about-hero p {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            color: var(--light-gold);
-        }
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #F7E6A3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem;
+    animation: fadeInDown 1s ease-out;
+}
+
+.hero p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+    color: #e0e0e0;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 1s ease-out 0.3s;
+    animation-fill-mode: both;
+}
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
@@ -144,15 +169,39 @@
                 padding-bottom: 75%; /* Tỷ lệ 4:3 cho màn hình nhỏ */
             }
         }
+        /* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
     </style>
 </head>
 <body>
     <!-- Thanh Điều Hướng -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
                 <i class="fa fa-utensils"></i>
-                <span>FoodHub</span> </a>
+                <span>FoodHub</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -170,22 +219,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
+    
+                    <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-                    <li class="nav-item d-none" id="user-nav-item">
+    
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
                                 <span id="username-display"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                                <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#">Xem Đơn Hàng</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item d-none" id="cart-nav-item">
+    
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
                             <i class="bi bi-cart"></i>
                             <span class="badge" id="cart-count">0</span>
@@ -194,14 +249,15 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
+
 
     <!-- Phần Giới Thiệu -->
-    <section class="about-hero">
+    
+    <section class="hero">
         <div class="container">
             <h1>Giới thiệu về FoodHub</h1>
             <p>Khám phá câu chuyện và niềm đam mê ẩm thực của chúng tôi.</p>
-            
         </div>
     </section>
 

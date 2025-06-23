@@ -13,34 +13,58 @@
         rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
     <style>
         .hero {
-            background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
-            background-size: cover;
-            background-position: center;
-            height: 50vh;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: white;
-        }
+    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
 
-        .hero h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            color: var(--gold);
-        }
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+    z-index: 1;
+}
 
-        .hero p {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            color: var(--light-gold);
-        }
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #F7E6A3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem;
+    animation: fadeInDown 1s ease-out;
+}
+
+.hero p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+    color: #e0e0e0;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 1s ease-out 0.3s;
+    animation-fill-mode: both;
+}
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
@@ -166,6 +190,10 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             animation: fadeIn 0.5s ease-in;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 450px;
         }
 
         .menu-card:hover {
@@ -183,7 +211,10 @@
         .menu-card .card-body {
             padding: 1.5rem;
             text-align: center;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
         }
 
         .menu-card .card-title {
@@ -200,6 +231,12 @@
             font-size: 0.9rem;
             margin-bottom: 1rem;
             line-height: 1.4;
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
         }
 
         .menu-card .card-price {
@@ -208,19 +245,6 @@
             font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 1rem;
-        }
-
-        .menu-card .badge {
-            position: absolute;
-            top: -5px;
-            right: 15px;
-            background-color: var(--gold);
-            color: var(--dark-green);
-            font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            z-index: 2;
         }
 
         .btn-order,
@@ -235,15 +259,23 @@
         }
 
         .btn-order {
-            background-color: var(--dark-green);
+            background-color: #1a3c34;
             color: white;
-            border: 2px solid var(--dark-green);
+            border: 2px solid #1a3c34;
         }
 
         .btn-order:hover {
             background-color: var(--gold);
-            color: var(--dark-green);
+            color: #1a3c34;
             border-color: var(--gold);
+        }
+
+        .btn-order:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #1a3c34;
+            border-color: #1a3c34;
+            color: white;
         }
 
         .btn-add-to-cart {
@@ -255,6 +287,14 @@
         .btn-add-to-cart:hover {
             background-color: var(--dark-green);
             color: white;
+        }
+
+        .btn-add-to-cart:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: transparent;
+            color: var(--dark-green);
+            border-color: var(--dark-green);
         }
 
         .pagination-container {
@@ -340,6 +380,29 @@
             }
         }
 
+        /* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
         @media (max-width: 992px) {
             .menu-layout {
                 flex-direction: column;
@@ -389,11 +452,13 @@
 
 <body>
     <!-- Thanh Điều Hướng -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
                 <i class="fa fa-utensils"></i>
-                <span>FoodHub</span> </a>
+                <span>FoodHub</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -411,22 +476,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
+    
+                    <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-                    <li class="nav-item d-none" id="user-nav-item">
+    
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
                                 <span id="username-display"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                                <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#">Xem Đơn Hàng</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item d-none" id="cart-nav-item">
+    
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
                             <i class="bi bi-cart"></i>
                             <span class="badge" id="cart-count">0</span>
@@ -435,10 +506,11 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
+
 
     <!-- Phần Chào Mừng -->
-    <section id="menu-hero" class="hero">
+    <section class="hero">
         <div class="container">
             <h1>Thực Đơn</h1>
             <p>Khám phá các món ăn ngon, được chế biến từ nguyên liệu tươi ngon với sự tận tâm.</p>
@@ -550,32 +622,32 @@
 
                 // Add "View All" button
                 categoryContainer.innerHTML += `
-                    <button class="category-btn active" data-category-id="all" onclick="selectCategory('all')">
-                        Xem Tất Cả
-                    </button>
-                `;
+                        <button class="category-btn active" data-category-id="all" onclick="selectCategory('all')">
+                            Xem Tất Cả
+                        </button>
+                    `;
 
                 categories.forEach(category => {
                     categoryContainer.innerHTML += `
-                        <button class="category-btn" data-category-id="${category.id}" onclick="selectCategory(${category.id})">
-                            ${category.name}
-                        </button>
-                    `;
+                            <button class="category-btn" data-category-id="${category.id}" onclick="selectCategory(${category.id})">
+                                ${category.name}
+                            </button>
+                        `;
                 });
 
                 // Create content containers
                 contentContainer.innerHTML = `
-                    <div id="category-all" class="menu-content active">
-                        <div class="loading-spinner">Đang tải...</div>
-                    </div>
-                `;
-
-                categories.forEach(category => {
-                    contentContainer.innerHTML += `
-                        <div id="category-${category.id}" class="menu-content">
+                        <div id="category-all" class="menu-content active">
                             <div class="loading-spinner">Đang tải...</div>
                         </div>
                     `;
+
+                categories.forEach(category => {
+                    contentContainer.innerHTML += `
+                            <div id="category-${category.id}" class="menu-content">
+                                <div class="loading-spinner">Đang tải...</div>
+                            </div>
+                        `;
                 });
 
                 // Load all items initially
@@ -654,11 +726,11 @@
 
             if (items.length === 0) {
                 container.innerHTML = `
-                    <div class="no-results">
-                        <h4>Không tìm thấy món ăn</h4>
-                        <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
-                    </div>
-                `;
+                        <div class="no-results">
+                            <h4>Không tìm thấy món ăn</h4>
+                            <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
+                        </div>
+                    `;
                 return;
             }
 
@@ -675,22 +747,22 @@
                 const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
 
                 html += `
-                    <div class="menu-card">
-                        <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
-                        <div class="card-body">
-                            <span class="badge">Có sẵn</span>
-                            <h5 class="card-title">${item.name}</h5>
-                            <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
-                            <p class="card-price">${price}</p>
-                            ${loggedIn ? `
-                                <div>
-                                    <button class="btn btn-order" onclick="orderItem(${JSON.stringify(item).replace(/"/g, '&quot;')})">Đặt món</button>
-                                    <button class="btn btn-add-to-cart" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">Thêm vào giỏ</button>
-                                </div>
-                            ` : ''}
+                        <div class="menu-card">
+                            <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                            <div class="card-body">
+                                <span class="badge">Có sẵn</span>
+                                <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
+                                <p class="card-price">${price}</p>
+                                ${loggedIn ? `
+                                    <div>
+                                        <button class="btn btn-order" onclick="orderItem(${JSON.stringify(item).replace(/"/g, '&quot;')})">Đặt món</button>
+                                        <button class="btn btn-add-to-cart" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">Thêm vào giỏ</button>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
             });
 
             html += '</div>';
@@ -709,10 +781,10 @@
 
             // Previous button
             paginationHTML += `
-                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>
-                    <i class="bi bi-chevron-left"></i> Trước
-                </button>
-            `;
+                    <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>
+                        <i class="bi bi-chevron-left"></i> Trước
+                    </button>
+                `;
 
             // Page numbers
             const maxVisiblePages = 5;
@@ -725,25 +797,25 @@
 
             for (let i = startPage; i <= endPage; i++) {
                 paginationHTML += `
-                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
-                        ${i + 1}
-                    </button>
-                `;
+                        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                            ${i + 1}
+                        </button>
+                    `;
             }
 
             // Next button
             paginationHTML += `
-                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
-                    Sau <i class="bi bi-chevron-right"></i>
-                </button>
-            `;
+                    <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
+                        Sau <i class="bi bi-chevron-right"></i>
+                    </button>
+                `;
 
             // Page info
             paginationHTML += `
-                <div class="pagination-info">
-                    Trang ${currentPage + 1} / ${totalPages}
-                </div>
-            `;
+                    <div class="pagination-info">
+                        Trang ${currentPage + 1} / ${totalPages}
+                    </div>
+                `;
 
             paginationHTML += '</div>';
             return paginationHTML;
@@ -796,7 +868,7 @@
             displayMenuItems(searchResults, currentCategory);
         }
 
-        
+
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {

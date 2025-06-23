@@ -73,13 +73,22 @@
 
         .hero h1 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            color: #FEA116;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #F7E6A3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem;
+    animation: fadeInDown 1s ease-out;
         }
 
         .hero p {
-            font-size: 1.1rem;
-            color: #FEA116;
+            font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+    color: #e0e0e0;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 1s ease-out 0.3s;
+    animation-fill-mode: both;
         }
 
         .hero-btn {
@@ -340,17 +349,42 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
     </style>
 </head>
 
 <body>
     <!-- Navigation -->
 <!-- Thanh Điều Hướng -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+<!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
             <i class="fa fa-utensils"></i>
-            <span>FoodHub</span>    </a>
+            <span>FoodHub</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -368,22 +402,28 @@
                 <li class="nav-item">
                     <a class="nav-link" href="contact.html">Liên Hệ</a>
                 </li>
+
+                <!-- Đăng nhập (hiện khi chưa login) -->
                 <li class="nav-item" id="auth-nav-item">
                     <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                 </li>
-                <li class="nav-item d-none" id="user-nav-item">
+
+                <!-- User đã login -->
+                <li class="nav-item" id="user-nav-item">
                     <div class="user-dropdown dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
                             <span id="username-display"></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                            <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
+                            <li><a class="dropdown-item" href="#">Xem Đơn Hàng</a></li>
                             <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
                         </ul>
                     </div>
                 </li>
-                <li class="nav-item d-none" id="cart-nav-item">
+
+                <!-- Giỏ hàng -->
+                <li class="nav-item" id="cart-nav-item">
                     <a class="nav-link cart-icon" href="cart.html">
                         <i class="bi bi-cart"></i>
                         <span class="badge" id="cart-count">0</span>
@@ -393,6 +433,7 @@
         </div>
     </div>
 </nav>
+
 
 <!-- Phần Chào Mừng -->
 <section id="hero-carousel" class="carousel slide hero" data-bs-ride="carousel">

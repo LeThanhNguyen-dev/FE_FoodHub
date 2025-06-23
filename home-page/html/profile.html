@@ -8,179 +8,526 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    .gradient-bg {
-      background: #0F172B;
+    :root {
+      --primary-orange: #FEA116;
+      --primary-dark: #0F172B;
+      --orange-hover: #E59014;
+      --orange-light: rgba(254, 161, 22, 0.1);
+      --orange-shadow: rgba(254, 161, 22, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%);
+      min-height: 100vh;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--primary-dark);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-orange);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--orange-hover);
+    }
+
+    /* Sidebar Animations */
+    .sidebar {
+      background: linear-gradient(180deg, var(--primary-dark) 0%, #1a2332 100%);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      border-right: 1px solid var(--primary-orange);
+    }
+
+    .sidebar-header {
+      font-family: 'Pacifico', cursive;
+      position: relative;
+      overflow: hidden;
+    }
+    
+
+    .sidebar-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
     }
 
     .sidebar-link {
-      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .sidebar-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--orange-light), transparent);
+      transition: left 0.6s;
+    }
+
+    .sidebar-link:hover::before {
+      left: 100%;
     }
 
     .sidebar-link:hover {
-      background-color: #FEA116;
-      transform: translateX(5px);
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+      transform: translateX(8px) scale(1.02);
+      box-shadow: 0 8px 25px var(--orange-shadow);
+      color: white !important;
     }
 
-    .content-area {
+    .sidebar-link.active {
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+      color: white !important;
+      box-shadow: 0 4px 15px var(--orange-shadow);
+    }
+
+    .sidebar-link i {
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-link:hover i {
+      transform: scale(1.2) rotate(5deg);
+    }
+
+    /* Main Content */
+    .main-content {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .main-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 50%, var(--orange-light) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--orange-light) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, var(--orange-light) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .content-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(254, 161, 22, 0.2);
+      border-radius: 20px;
+      box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(254, 161, 22, 0.1);
       transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn-orange {
-      background-color: #FEA116;
-      transition: all 0.3s ease;
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-orange), var(--orange-hover), var(--primary-orange));
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
     }
 
-    .btn-orange:hover {
-      background-color: #FEA116;
+    @keyframes shimmer {
+
+      0%,
+      100% {
+        background-position: -200% 0;
+      }
+
+      50% {
+        background-position: 200% 0;
+      }
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(254, 161, 22, 0.3);
+    }
+
+    /* Form Elements */
+    .form-group {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      color: var(--primary-dark);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+      transition: color 0.3s ease;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 16px 16px 48px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--primary-dark);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-orange);
+      background: rgba(255, 255, 255, 1);
+      box-shadow:
+        0 0 0 4px var(--orange-light),
+        0 8px 25px rgba(0, 0, 0, 0.1);
       transform: translateY(-2px);
     }
 
-    .frame {
-      background-color: #0F172B;;
-      border: 2px solid #FEA116;
+    .form-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      transition: all 0.3s ease;
+      z-index: 1;
     }
 
-    .input-focus {
+    .form-input:focus+.form-icon {
+      color: var(--primary-orange);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px var(--orange-shadow);
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 35px var(--orange-shadow);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-logout:hover {
+      box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Messages */
+    .message {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      border-left: 4px solid;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message-success {
+      background: rgba(34, 197, 94, 0.1);
+      color: #166534;
+      border-left-color: #22c55e;
+    }
+
+    .message-error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #991b1b;
+      border-left-color: #ef4444;
+    }
+
+    /* Order Content */
+    .order-content {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid var(--primary-orange);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .content-card {
+        margin: 20px;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Enhanced hover effects */
+    .interactive:hover {
+      cursor: pointer;
+    }
+
+    .glow-on-hover {
       transition: all 0.3s ease;
     }
 
-    .input-focus:focus {
-      border-color: #FEA116;
-      box-shadow: 0 0 8px #FEA116;
+    .glow-on-hover:hover {
+      box-shadow: 0 0 20px var(--orange-shadow);
     }
   </style>
 </head>
 
-<body class="gradient-bg min-h-screen flex font-sans">
+<body class="flex">
   <!-- Sidebar -->
-  <aside class="w-64 bg-[#0F172B] border-r-2 border-orange-500 shadow-lg flex flex-col justify-between">
+  <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
-      <div class="p-6 border-b border-orange-500">
-        <h2 class="text-2xl font-bold text-orange-500">User Dashboard</h2>
-        <p id="username-greeting" class="text-sm text-gray-300 mt-1">Welcome, User!</p>
+      <div class="sidebar-header p-6 relative z-10">
+        <h2 class="text-4xl font-bold text-white relative z-10">User Dashboard</h2>
+        <p id="username-greeting" class="text-xl text-white/80 mt-1 relative z-10">Welcome, User!</p>
       </div>
-      <nav class="mt-4">
+      <nav class="mt-6 px-3">
         <a href="#profile" id="profile-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
           <i class="fas fa-user mr-3"></i> Edit Profile
         </a>
         <a href="#password" id="password-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
           <i class="fas fa-key mr-3"></i> Change Password
         </a>
         <a href="#order-status" id="order-status-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
           <i class="fas fa-shipping-fast mr-3"></i> Order Status
         </a>
         <a href="#order-history" id="order-history-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
           <i class="fas fa-history mr-3"></i> Order History
         </a>
         <a href="home.html" id="home-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold">
           <i class="fas fa-home mr-3"></i> Back to Home
         </a>
       </nav>
     </div>
-    <div class="p-6 border-t border-orange-500">
-      <button id="logout-button"
-        class="w-full flex items-center justify-center btn-orange text-white py-2 px-4 rounded-lg font-semibold">
+    <div class="p-6">
+      <button id="logout-button" class="w-full btn-primary btn-logout flex items-center justify-center">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-8 overflow-auto">
-    <div id="content-area" class="content-area max-w-4xl mx-auto space-y-8">
+  <main class="main-content flex-1 p-8 overflow-auto relative z-10">
+    <div id="content-area" class="max-w-4xl mx-auto space-y-8">
       <!-- Profile Section -->
-      <div id="profile-section" class="frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Edit Profile</h2>
-        <div id="error-message" class="hidden bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center"></div>
-        <div id="success-message" class="hidden bg-green-100 text-green-700 p-3 rounded-lg mb-4 text-center"></div>
+      <div id="profile-section" class="content-card p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-user-edit mr-3 text-orange-500"></i>
+          Edit Profile
+        </h2>
+        <div id="error-message" class="hidden message message-error"></div>
+        <div id="success-message" class="hidden message message-success"></div>
+
         <div class="space-y-6">
-          <div class="relative">
-            <label for="username" class="block text-sm font-semibold text-orange-500 mb-1">Username</label>
-            <div class="flex items-center">
-              <i class="fas fa-user absolute ml-3 text-gray-300"></i>
-              <input type="text" id="username"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus" readonly>
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <div class="relative">
+              <input type="text" id="username" class="form-input" readonly>
+              <i class="fas fa-user form-icon"></i>
             </div>
           </div>
-          <div class="relative">
-            <label for="email" class="block text-sm font-semibold text-orange-500 mb-1">Email</label>
-            <div class="flex items-center">
-              <i class="fas fa-envelope absolute ml-3 text-gray-300"></i>
-              <input type="email" id="email"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <div class="relative">
+              <input type="email" id="email" class="form-input" placeholder="Enter your email">
+              <i class="fas fa-envelope form-icon"></i>
             </div>
           </div>
-          <div class="relative">
-            <label for="phone" class="block text-sm font-semibold text-orange-500 mb-1">Phone Number</label>
-            <div class="flex items-center">
-              <i class="fas fa-phone absolute ml-3 text-gray-300"></i>
-              <input type="tel" id="phone"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
+
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <div class="relative">
+              <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+              <i class="fas fa-phone form-icon"></i>
             </div>
           </div>
-          <div class="relative">
-            <label for="address" class="block text-sm font-semibold text-orange-500 mb-1">Address</label>
-            <div class="flex items-center">
-              <i class="fas fa-map-marker-alt absolute ml-3 text-gray-300"></i>
-              <input type="text" id="address"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
+
+          <div class="form-group">
+            <label for="address" class="form-label">Address</label>
+            <div class="relative">
+              <input type="text" id="address" class="form-input" placeholder="Enter your address">
+              <i class="fas fa-map-marker-alt form-icon"></i>
             </div>
           </div>
-          <button id="save-button"
-            class="w-full btn-orange text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center">
+
+          <button id="save-button" class="w-full btn-primary">
             <i class="fas fa-save mr-2"></i> Save Changes
           </button>
         </div>
       </div>
 
       <!-- Password Change Section -->
-      <div id="password-section" class="hidden frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Change Password</h2>
-        <div id="password-error-message" class="hidden bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center"></div>
-        <div id="password-success-message" class="hidden bg-green-100 text-green-700 p-3 rounded-lg mb-4 text-center">
-        </div>
+      <div id="password-section" class="hidden content-card p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-shield-alt mr-3 text-orange-500"></i>
+          Change Password
+        </h2>
+        <div id="password-error-message" class="hidden message message-error"></div>
+        <div id="password-success-message" class="hidden message message-success"></div>
+
         <div class="space-y-6">
-          <div class="relative">
-            <label for="old-password" class="block text-sm font-semibold text-orange-500 mb-1">Current Password</label>
-            <div class="flex items-center">
-              <i class="fas fa-lock absolute ml-3 text-gray-300"></i>
-              <input type="password" id="old-password"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
+          <div class="form-group">
+            <label for="old-password" class="form-label">Current Password</label>
+            <div class="relative">
+              <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
+              <i class="fas fa-lock form-icon"></i>
             </div>
           </div>
-          <div class="relative">
-            <label for="new-password" class="block text-sm font-semibold text-orange-500 mb-1">New Password</label>
-            <div class="flex items-center">
-              <i class="fas fa-key absolute ml-3 text-gray-300"></i>
-              <input type="password" id="new-password"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
+
+          <div class="form-group">
+            <label for="new-password" class="form-label">New Password</label>
+            <div class="relative">
+              <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+              <i class="fas fa-key form-icon"></i>
             </div>
           </div>
-          <button id="change-password-button"
-            class="w-full btn-orange text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center">
+
+          <button id="change-password-button" class="w-full btn-primary">
             <i class="fas fa-edit mr-2"></i> Change Password
           </button>
         </div>
       </div>
 
       <!-- Order Status Section -->
-      <div id="order-status-section" class="hidden frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Order Status</h2>
-        <div id="order-status-content" class="bg-gray-700 text-white p-4 rounded-lg">
-          <p>No active orders found.</p>
+      <div id="order-status-section" class="hidden content-card p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-truck mr-3 text-orange-500"></i>
+          Order Status
+        </h2>
+        <div id="order-status-content" class="order-content">
+          <div class="flex items-center justify-center py-8">
+            <div class="loading mr-3"></div>
+            <p>Loading order status...</p>
+          </div>
         </div>
       </div>
 
       <!-- Order History Section -->
-      <div id="order-history-section" class="hidden frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Order History</h2>
-        <div id="order-history-content" class="bg-gray-700 text-white p-4 rounded-lg">
-          <p>No order history available.</p>
+      <div id="order-history-section" class="hidden content-card p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-history mr-3 text-orange-500"></i>
+          Order History
+        </h2>
+        <div id="order-history-content" class="order-content">
+          <div class="flex items-center justify-center py-8">
+            <div class="loading mr-3"></div>
+            <p>Loading order history...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -258,6 +605,11 @@
         return;
       }
 
+      const saveBtn = document.getElementById('save-button');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<div class="loading mr-2"></div> Saving...';
+      saveBtn.disabled = true;
+
       const token = localStorage.getItem('accessToken');
       const payload = parseJwt(token);
       const userId = payload.id;
@@ -282,6 +634,9 @@
         showSuccess(data.message || 'Profile updated successfully!');
       } catch (error) {
         showError('Error updating: ' + error.message);
+      } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
       }
     }
 
@@ -302,6 +657,11 @@
         return;
       }
 
+      const changeBtn = document.getElementById('change-password-button');
+      const originalText = changeBtn.innerHTML;
+      changeBtn.innerHTML = '<div class="loading mr-2"></div> Changing...';
+      changeBtn.disabled = true;
+
       try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_BASE_URL}/users/change-password`, {
@@ -320,14 +680,20 @@
         document.getElementById('new-password').value = '';
       } catch (error) {
         showError('Error changing password: ' + error.message, 'password');
+      } finally {
+        changeBtn.innerHTML = originalText;
+        changeBtn.disabled = false;
       }
     }
 
     function switchSection(sectionId) {
+      // Hide all sections
       document.querySelectorAll('#content-area > div').forEach(div => div.classList.add('hidden'));
+      // Show selected section
       document.getElementById(sectionId).classList.remove('hidden');
-      document.querySelectorAll('nav a').forEach(link => link.classList.remove('bg-orange-500', 'text-white'));
-      document.getElementById(`${sectionId}-link`).classList.add('bg-orange-500', 'text-white');
+      // Update active link
+      document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
+      document.getElementById(`${sectionId}-link`).classList.add('active');
     }
 
     async function fetchOrderStatus() {
@@ -340,10 +706,16 @@
         const data = await response.json();
         const content = document.getElementById('order-status-content');
         content.innerHTML = data.result.length
-          ? data.result.map(order => `<div class="mb-4"><p>Order #${order.id}: ${order.status}</p></div>`).join('')
-          : '<p>No active orders found.</p>';
+          ? data.result.map(order => `
+              <div class="mb-4 p-4 bg-white/10 rounded-lg border border-orange-500/30">
+                <p class="font-semibold">Order #${order.id}</p>
+                <p class="text-orange-400">${order.status}</p>
+              </div>
+            `).join('')
+          : '<div class="text-center py-8"><i class="fas fa-inbox text-4xl text-orange-400 mb-4"></i><p>No active orders found.</p></div>';
       } catch (error) {
-        showError('Error fetching order status: ' + error.message);
+        document.getElementById('order-status-content').innerHTML =
+          `<div class="text-center py-8 text-red-400"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error: ${error.message}</p></div>`;
       }
     }
 
@@ -357,10 +729,17 @@
         const data = await response.json();
         const content = document.getElementById('order-history-content');
         content.innerHTML = data.result.length
-          ? data.result.map(order => `<div class="mb-4"><p>Order #${order.id}: ${order.status} - ${new Date(order.date).toLocaleDateString()}</p></div>`).join('')
-          : '<p>No order history available.</p>';
+          ? data.result.map(order => `
+              <div class="mb-4 p-4 bg-white/10 rounded-lg border border-orange-500/30">
+                <p class="font-semibold">Order #${order.id}</p>
+                <p class="text-orange-400">${order.status}</p>
+                <p class="text-sm text-gray-300">${new Date(order.date).toLocaleDateString()}</p>
+              </div>
+            `).join('')
+          : '<div class="text-center py-8"><i class="fas fa-history text-4xl text-orange-400 mb-4"></i><p>No order history available.</p></div>';
       } catch (error) {
-        showError('Error fetching order history: ' + error.message);
+        document.getElementById('order-history-content').innerHTML =
+          `<div class="text-center py-8 text-red-400"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error: ${error.message}</p></div>`;
       }
     }
 
@@ -374,20 +753,206 @@
       switchSection('profile-section');
     }
 
+    // Event Listeners
     document.getElementById('save-button').addEventListener('click', saveUserInfo);
     document.getElementById('change-password-button').addEventListener('click', changePassword);
     document.getElementById('logout-button').addEventListener('click', logout);
-    document.getElementById('profile-link').addEventListener('click', () => switchSection('profile-section'));
-    document.getElementById('password-link').addEventListener('click', () => switchSection('password-section'));
-    document.getElementById('order-status-link').addEventListener('click', () => {
+    document.getElementById('profile-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchSection('profile-section');
+    });
+    document.getElementById('password-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchSection('password-section');
+    });
+    document.getElementById('order-status-link').addEventListener('click', (e) => {
+      e.preventDefault();
       switchSection('order-status-section');
       fetchOrderStatus();
     });
-    document.getElementById('order-history-link').addEventListener('click', () => {
+    document.getElementById('order-history-link').addEventListener('click', (e) => {
+      e.preventDefault();
       switchSection('order-history-section');
       fetchOrderHistory();
     });
+
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', updateUI);
+
+    // Add keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            document.getElementById('profile-link').click();
+            break;
+          case '2':
+            e.preventDefault();
+            document.getElementById('password-link').click();
+            break;
+          case '3':
+            e.preventDefault();
+            document.getElementById('order-status-link').click();
+            break;
+          case '4':
+            e.preventDefault();
+            document.getElementById('order-history-link').click();
+            break;
+        }
+      }
+    });
+
+    // Add smooth scrolling and enhanced interactions
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Add form validation feedback
+    function validateForm(formType) {
+      const inputs = document.querySelectorAll(`#${formType}-section input[type="email"], #${formType}-section input[type="tel"]`);
+      let isValid = true;
+
+      inputs.forEach(input => {
+        const value = input.value.trim();
+        const inputGroup = input.closest('.form-group');
+
+        // Remove existing validation classes
+        input.classList.remove('border-red-400', 'border-green-400');
+
+        if (input.type === 'email' && value) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            input.classList.add('border-red-400');
+            isValid = false;
+          } else {
+            input.classList.add('border-green-400');
+          }
+        }
+
+        if (input.type === 'tel' && value) {
+          const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+          if (!phoneRegex.test(value.replace(/\s/g, ''))) {
+            input.classList.add('border-red-400');
+            isValid = false;
+          } else {
+            input.classList.add('border-green-400');
+          }
+        }
+      });
+
+      return isValid;
+    }
+
+    // Add real-time validation
+    document.getElementById('email').addEventListener('blur', () => validateForm('profile'));
+    document.getElementById('phone').addEventListener('blur', () => validateForm('profile'));
+
+    // Add password strength indicator
+    document.getElementById('new-password').addEventListener('input', function () {
+      const password = this.value;
+      const strengthBar = document.getElementById('password-strength');
+
+      if (!strengthBar) {
+        const strengthContainer = document.createElement('div');
+        strengthContainer.className = 'mt-2';
+        strengthContainer.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <div class="flex-1 bg-gray-200 rounded-full h-2">
+              <div id="password-strength" class="h-2 rounded-full transition-all duration-300"></div>
+            </div>
+            <span id="password-strength-text" class="text-sm font-medium"></span>
+          </div>
+        `;
+        this.closest('.form-group').appendChild(strengthContainer);
+      }
+
+      const strength = calculatePasswordStrength(password);
+      const strengthBar2 = document.getElementById('password-strength');
+      const strengthText = document.getElementById('password-strength-text');
+
+      switch (strength) {
+        case 0:
+          strengthBar2.style.width = '0%';
+          strengthBar2.className = 'h-2 rounded-full transition-all duration-300';
+          strengthText.textContent = '';
+          break;
+        case 1:
+          strengthBar2.style.width = '25%';
+          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-red-500';
+          strengthText.textContent = 'Weak';
+          strengthText.className = 'text-sm font-medium text-red-500';
+          break;
+        case 2:
+          strengthBar2.style.width = '50%';
+          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-yellow-500';
+          strengthText.textContent = 'Fair';
+          strengthText.className = 'text-sm font-medium text-yellow-500';
+          break;
+        case 3:
+          strengthBar2.style.width = '75%';
+          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-blue-500';
+          strengthText.textContent = 'Good';
+          strengthText.className = 'text-sm font-medium text-blue-500';
+          break;
+        case 4:
+          strengthBar2.style.width = '100%';
+          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-green-500';
+          strengthText.textContent = 'Strong';
+          strengthText.className = 'text-sm font-medium text-green-500';
+          break;
+      }
+    });
+
+    function calculatePasswordStrength(password) {
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+      return Math.min(score, 4);
+    }
+
+    // Add tooltips for navigation
+    const navLinks = document.querySelectorAll('.sidebar-link');
+    navLinks.forEach(link => {
+      link.setAttribute('title', link.textContent.trim() + ' (Alt + ' + (Array.from(navLinks).indexOf(link) + 1) + ')');
+    });
+
+    // Add loading states for async operations
+    function setLoadingState(elementId, isLoading) {
+      const element = document.getElementById(elementId);
+      if (isLoading) {
+        element.style.opacity = '0.7';
+        element.style.pointerEvents = 'none';
+      } else {
+        element.style.opacity = '1';
+        element.style.pointerEvents = 'auto';
+      }
+    }
+
+    // Enhanced error handling with retry functionality
+    function showErrorWithRetry(message, retryFunction, section = 'profile') {
+      const errorDiv = document.getElementById(section === 'password' ? 'password-error-message' : 'error-message');
+      errorDiv.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span>${message}</span>
+          ${retryFunction ? '<button onclick="' + retryFunction.name + '()" class="ml-4 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors">Retry</button>' : ''}
+        </div>
+      `;
+      errorDiv.classList.remove('hidden');
+      document.getElementById(section === 'password' ? 'password-success-message' : 'success-message').classList.add('hidden');
+    }
   </script>
 </body>
 

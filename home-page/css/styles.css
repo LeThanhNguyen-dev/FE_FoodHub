@@ -101,11 +101,12 @@ body {
 }
 
 .footer a {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Pacifico', cursive;
     color: var(--gold);
     text-decoration: none;
     margin: 0 1rem;
     transition: color 0.3s;
+    font-size: 20px;
 }
 
 .footer a:hover {
@@ -113,8 +114,9 @@ body {
 }
 
 .footer .contact-info {
-    font-family: 'Pacifico', cursive;
-    margin-top: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 0.5rem;
+    font-size: 20px;
 }
 
 /* Chuyển đổi mượt mà cho navbar */

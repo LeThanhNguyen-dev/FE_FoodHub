@@ -268,11 +268,13 @@
 
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
                 <i class="fa fa-utensils"></i>
-                <span>FoodHub</span> </a>
+                <span>FoodHub</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -290,22 +292,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
+    
+                    <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-                    <li class="nav-item d-none" id="user-nav-item">
+    
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
                                 <span id="username-display"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                                <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#">Xem Đơn Hàng</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item d-none" id="cart-nav-item">
+    
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
                             <i class="bi bi-cart"></i>
                             <span class="badge" id="cart-count">0</span>
@@ -314,7 +322,8 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
+
 
     <!-- Hero Section -->
     <section class="hero">
