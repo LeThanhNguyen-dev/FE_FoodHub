@@ -83,17 +83,17 @@ function setupEventListeners() {
     // Setup jump to page input event listener
     const jumpInput = document.getElementById('jumpToOrderPage');
     if (jumpInput) {
-        jumpInput.addEventListener('keypress', function(e) {
+        jumpInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 jumpToOrderPage();
             }
         });
     }
 
-    // Setup filter change listeners
+    // Setup filter change listeners - removed price filter elements and pageSizeOrderFilter
     const filterElements = [
-        'orderStatusFilter', 'tableNumberFilter', 'minPriceFilter',
-        'maxPriceFilter', 'sortByOrderFilter', 'sortDirectionOrderFilter', 'pageSizeOrderFilter'
+        'orderStatusFilter', 'tableNumberFilter',
+        'sortByOrderFilter', 'sortDirectionOrderFilter'
     ];
 
     filterElements.forEach(id => {
@@ -104,6 +104,7 @@ function setupEventListeners() {
     });
 }
 
+
 // Global variables for pagination
 let currentOrderPage = 0; // Backend uses 0-based pagination
 let totalOrderPages = 1;
@@ -113,29 +114,22 @@ let currentOrderForAddItems = null;
 // Load orders from API with filters and pagination
 async function loadOrders() {
     try {
-        // Get filter values - với null checks
+        // Get filter values - với null checks (removed price filters and pageSizeOrderFilter)
         const orderStatusFilter = document.getElementById('orderStatusFilter');
         const tableNumberFilter = document.getElementById('tableNumberFilter');
-        const minPriceFilter = document.getElementById('minPriceFilter');
-        const maxPriceFilter = document.getElementById('maxPriceFilter');
         const sortByOrderFilter = document.getElementById('sortByOrderFilter');
         const sortDirectionOrderFilter = document.getElementById('sortDirectionOrderFilter');
-        const pageSizeOrderFilter = document.getElementById('pageSizeOrderFilter');
 
         const status = orderStatusFilter ? orderStatusFilter.value : '';
         const tableNumber = tableNumberFilter ? tableNumberFilter.value : '';
-        const minPrice = minPriceFilter ? minPriceFilter.value : '';
-        const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
         const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
         const sortDirection = sortDirectionOrderFilter ? sortDirectionOrderFilter.value || 'DESC' : 'DESC';
-        const pageSize = pageSizeOrderFilter ? pageSizeOrderFilter.value || '10' : '10';
+        const pageSize = '20'; // Fixed page size
 
-        // Build query parameters
+        // Build query parameters (removed minPrice and maxPrice)
         const params = new URLSearchParams();
         if (status) params.append('status', status);
         if (tableNumber) params.append('tableNumber', tableNumber);
-        if (minPrice) params.append('minPrice', minPrice);
-        if (maxPrice) params.append('maxPrice', maxPrice);
         params.append('page', currentOrderPage.toString());
         params.append('size', pageSize);
         params.append('orderBy', sortBy);
@@ -173,6 +167,7 @@ async function loadOrders() {
     }
 }
 
+
 // Apply filters and reload data
 function applyOrderFilters() {
     currentOrderPage = 0; // Reset to first page when applying filters
@@ -184,14 +179,12 @@ function applyOrderFilters() {
 
 // Clear all filters
 function clearFilters() {
+    // Removed price filter elements and pageSizeOrderFilter from the array
     const filterElements = [
-        {id: 'orderStatusFilter', value: ''},
-        {id: 'tableNumberFilter', value: ''}, // Thay đổi từ tableIdFilter
-        {id: 'minPriceFilter', value: ''},
-        {id: 'maxPriceFilter', value: ''},
-        {id: 'sortByOrderFilter', value: 'createdAt'},
-        {id: 'sortDirectionOrderFilter', value: 'DESC'},
-        {id: 'pageSizeOrderFilter', value: '10'}
+        { id: 'orderStatusFilter', value: '' },
+        { id: 'tableNumberFilter', value: '' },
+        { id: 'sortByOrderFilter', value: 'createdAt' },
+        { id: 'sortDirectionOrderFilter', value: 'DESC' }
     ];
 
     filterElements.forEach(filter => {
@@ -203,6 +196,8 @@ function clearFilters() {
 
     applyOrderFilters();
 }
+
+
 
 // Render orders table
 function renderOrders(orders) {
@@ -296,7 +291,7 @@ function renderOrders(orders) {
 
 function createOrderActionButtons(order) {
     let buttons = '';
-    
+
     // Nút xác nhận cho đơn hàng PENDING
     if (order.status === 'PENDING') {
         buttons += `
@@ -307,7 +302,7 @@ function createOrderActionButtons(order) {
             </button>
         `;
     }
-    
+
     // Nút hoàn thành cho đơn hàng READY
     if (order.status === 'READY') {
         buttons += `
@@ -318,7 +313,7 @@ function createOrderActionButtons(order) {
             </button>
         `;
     }
-    
+
     // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
     if (order.status === 'COMPLETED') {
         buttons += `
@@ -330,7 +325,7 @@ function createOrderActionButtons(order) {
             </button>
         `;
     }
-    
+
     // Nút hủy đơn hàng - hiển thị cho các trạng thái có thể hủy
     if (['PENDING', 'CONFIRMED'].includes(order.status)) {
         buttons += `
@@ -341,7 +336,7 @@ function createOrderActionButtons(order) {
             </button>
         `;
     }
-    
+
     return buttons;
 }
 
@@ -577,9 +572,9 @@ function showOrderDetailsAndPaymentModal(order) {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         window.selectPaymentMethod = (method) => {
             document.body.removeChild(modal);
             delete window.selectPaymentMethod;
@@ -600,7 +595,7 @@ async function cancelOrder(orderId) {
             const originalHTML = cancelBtn.innerHTML;
             cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             cancelBtn.disabled = true;
-            
+
             // Restore button sau khi hoàn thành
             setTimeout(() => {
                 if (cancelBtn) {
@@ -617,7 +612,7 @@ async function cancelOrder(orderId) {
         if (response && response.code === 0) {
             // Hiển thị thông báo thành công
             showNotification('Đơn hàng đã được hủy thành công!', 'success');
-            
+
             // Refresh danh sách đơn hàng
             await loadOrders();
         } else {
@@ -644,7 +639,7 @@ async function confirmOrder(orderId) {
             const originalHTML = confirmBtn.innerHTML;
             confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             confirmBtn.disabled = true;
-            
+
             // Restore button sau khi hoàn thành
             setTimeout(() => {
                 if (confirmBtn) {
@@ -661,7 +656,7 @@ async function confirmOrder(orderId) {
         if (response && response.code === 0) {
             // Hiển thị thông báo thành công
             showNotification('Đơn hàng đã được xác nhận thành công!', 'success');
-            
+
             // Refresh danh sách đơn hàng
             await loadOrders();
         } else {
@@ -687,7 +682,7 @@ async function completeOrder(orderId) {
             const originalHTML = completeBtn.innerHTML;
             completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             completeBtn.disabled = true;
-            
+
             // Restore button sau khi hoàn thành
             setTimeout(() => {
                 if (completeBtn) {
@@ -704,7 +699,7 @@ async function completeOrder(orderId) {
         if (response && response.code === 0) {
             // Hiển thị thông báo thành công
             showNotification('Đơn hàng đã được hoàn thành!', 'success');
-            
+
             // Refresh danh sách đơn hàng
             await loadOrders();
         } else {
@@ -1287,25 +1282,25 @@ async function displayOrderDetails(orderData) {
         modalContent.querySelector('h3').textContent = `Chi tiết đơn hàng #${id}`;
         modalContent.querySelector('.badge').className = `badge ${getStatusBadgeClass(status)}`;
         modalContent.querySelector('.badge').textContent = getStatusText(status);
-        
+
         // Cập nhật từng info-row theo đúng thứ tự
         const infoRows = modalContent.querySelectorAll('.info-row');
-        
+
         // info-row[1]: Loại đơn (index 1)
         infoRows[1].querySelector('span:nth-child(2)').textContent = getOrderTypeText(orderType);
-        
+
         // info-row[2]: Thời gian tạo (index 2)
         infoRows[2].querySelector('span:nth-child(2)').textContent = formattedDateCreation;
-        
+
         // info-row[3]: Thời gian cập nhật (index 3)
         infoRows[3].querySelector('span:nth-child(2)').textContent = formattedDateUpdate;
-        
+
         // info-row[4]: Bàn (index 4)
         infoRows[4].querySelector('span:nth-child(2)').textContent = tableNumber || 'Mang về';
-        
+
         // info-row[5]: Khách hàng (index 5)
         infoRows[5].querySelector('span:nth-child(2)').textContent = username || 'Guest';
-        
+
         // info-row[6]: Ghi chú (index 6)
         infoRows[6].querySelector('span:nth-child(2)').textContent = note || 'Không có ghi chú';
 
@@ -1388,13 +1383,13 @@ function closeModal() {
         if (modal) {
             modal.remove();
         }
-        
+
         // Xóa CSS modal để tránh conflict
         const modalLink = document.querySelector('link[href="css/modal-style.css"]');
         if (modalLink) {
             modalLink.remove();
         }
-        
+
         console.log('Modal đã được đóng thành công');
     } catch (error) {
         console.error('Lỗi khi đóng modal:', error);
@@ -1581,7 +1576,7 @@ function executeStatusUpdate() {
 function toggleSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAll');
     const itemCheckboxes = document.querySelectorAll('.order-item-option input[type="checkbox"]');
-    
+
     itemCheckboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
     });
@@ -1590,7 +1585,7 @@ function toggleSelectAll() {
 async function executeStatusUpdate() {
     const selectedItems = Array.from(document.querySelectorAll('.order-item-option input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.value);
-    
+
     const newStatus = document.getElementById('newStatus').value;
 
     if (selectedItems.length === 0) {
@@ -1611,21 +1606,21 @@ async function executeStatusUpdate() {
         updateBtn.disabled = true;
 
         // Gọi API để cập nhật từng item
-        const updatePromises = selectedItems.map(itemId => 
+        const updatePromises = selectedItems.map(itemId =>
             apiFetch(`/orders/items/status/${itemId}?status=${newStatus}`, {
                 method: 'PUT'
             })
         );
 
         const results = await Promise.all(updatePromises);
-        
+
         // Kiểm tra kết quả
         const failedUpdates = results.filter(result => result.code !== 0);
-        
+
         if (failedUpdates.length === 0) {
             alert(`Cập nhật trạng thái thành công cho ${selectedItems.length} món ăn!`);
             closeStatusUpdateModal();
-            
+
             // Refresh orders list và close order details modal
             await loadOrders();
             closeOrderDetails();
@@ -1668,7 +1663,7 @@ function startSmartRefresh() {
 }
 
 // Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Chỉ gọi dashboard nếu không phải trang payment-result
     if (!window.location.pathname.includes('/payment-result')) {
         showDashboard();
@@ -1677,7 +1672,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Stop refresh when page is hidden
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         if (refreshInterval) clearInterval(refreshInterval);
     } else {
@@ -1728,12 +1723,12 @@ function pauseAutoRefreshTemporarily() {
     }
 }
 
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     stopAutoRefresh();
 });
 
 // Thêm event listener để dừng/khởi động auto refresh khi tab ẩn/hiện
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         stopAutoRefresh();
     } else {

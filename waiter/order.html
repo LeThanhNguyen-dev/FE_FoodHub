@@ -47,28 +47,8 @@
                 onchange="applyOrderFilters()">
             </div>
 
-            <!-- Min Price Filter -->
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="fas fa-money-bill me-1"></i>
-                Giá tối thiểu (VNĐ)
-              </label>
-              <input type="number" class="form-control" id="minPriceFilter" placeholder="0"
-                onchange="applyOrderFilters()">
-            </div>
-
-            <!-- Max Price Filter -->
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="fas fa-money-bill me-1"></i>
-                Giá tối đa (VNĐ)
-              </label>
-              <input type="number" class="form-control" id="maxPriceFilter" placeholder="1000000"
-                onchange="applyOrderFilters()">
-            </div>
-
             <!-- Sort Field -->
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label class="form-label">
                 <i class="fas fa-sort me-1"></i>
                 Sắp xếp theo
@@ -82,7 +62,7 @@
             </div>
 
             <!-- Sort Direction -->
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label class="form-label">
                 <i class="fas fa-sort-amount-down me-1"></i>
                 Thứ tự
@@ -93,19 +73,7 @@
               </select>
             </div>
 
-            <!-- Page Size -->
-            <div class="col-md-4">
-              <label class="form-label">
-                <i class="fas fa-list me-1"></i>
-                Số đơn/trang
-              </label>
-              <select class="form-select" id="pageSizeOrderFilter" onchange="applyOrderFilters()">
-                <option value="5">5 đơn</option>
-                <option value="10" selected>10 đơn</option>
-                <option value="20">20 đơn</option>
-                <option value="50">50 đơn</option>
-              </select>
-            </div>
+
           </div>
 
           <!-- Filter Actions -->
