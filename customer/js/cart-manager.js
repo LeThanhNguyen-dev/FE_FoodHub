@@ -578,7 +578,7 @@ class CartUIManager {
     };
 
     const tableNumber = getUrlParameter('tableNumber');
-    const BACKEND_BASE_URL = "http://localhost:8080";
+    const BACKEND_BASE_URL = "http://172.20.10.7:8080";
 
     if (this.cartManager.isEmpty()) {
         alert('Giỏ hàng trống!');

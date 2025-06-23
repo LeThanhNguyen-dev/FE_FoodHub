@@ -45,7 +45,7 @@
             const status = urlParams.get('status');
             const orderCode = urlParams.get('orderCode');
             const pendingOrderId = sessionStorage.getItem('pendingOrderId');
-
+            console.log('URL params:', { orderId, code, id, cancel, status, orderCode, pendingOrderId }); // Debug
             if (orderId && pendingOrderId && orderId === pendingOrderId) {
                 try {
                     const loadingElement = document.getElementById('loading');
@@ -65,6 +65,7 @@
                     };
 
                     // Gửi PUT request tới /payments/result
+
                     const data = await apiFetch('/payments/callback', {
                         method: 'PUT',
                         headers: {
@@ -72,6 +73,7 @@
                         },
                         body: JSON.stringify(payload)
                     });
+
 
                     if (data.code === 0) {
                         const paymentResult = data.result;
@@ -112,6 +114,8 @@
                     }
                 }
             } else {
+                console.error('Validation failed:', { orderId, pendingOrderId }); // Debug
+
                 document.getElementById('payment-message').innerHTML = 'Không tìm thấy thông tin thanh toán.';
                 document.getElementById('payment-message').className = 'cancelled';
             }

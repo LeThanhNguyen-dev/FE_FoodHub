@@ -9,6 +9,7 @@ let currentSort = {
 };
 
 async function showTables(filters = {}, sort = {}) {
+    hideCartSidebar();
     // Cập nhật filter và sort hiện tại
     currentTableFilters = { ...currentTableFilters, ...filters };
     currentSort = { ...currentSort, ...sort };

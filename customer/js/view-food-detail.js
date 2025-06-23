@@ -7,7 +7,7 @@ let relatedFoods = [];
 let isUpdatingExistingItem = false; // Flag to track if we're updating existing item
 
 // API Configuration
-const BACKEND_BASE_URL = "http://localhost:8080";
+const BACKEND_BASE_URL = "http://172.20.10.7:8080";
 const API_BASE_URL = `${BACKEND_BASE_URL}/menu-items`;
 
 // Default placeholder for images

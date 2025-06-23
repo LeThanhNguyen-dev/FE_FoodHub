@@ -118,7 +118,7 @@
             <div class="welcome-section">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h2 class="mb-3" id="welcomeMessage">Chào bạn!</h2>
+                        <h2 class="mb-3" id="welcomeMessage">Dashboard - Ca làm việc</h2>
                         <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
                         <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
                         <p class="mb-0" id="shiftArea"><i class="fas fa-map-marker-alt me-2"></i>Khu vực: Đang tải...
@@ -485,22 +485,9 @@
 
         // Function to display work schedule data
         function displayWorkSchedule(schedule) {
-            // Update welcome message using user info instead of schedule
+            // Simplified welcome message - no greeting or name
             const welcomeMessage = document.getElementById('welcomeMessage');
-            const currentHour = new Date().getHours();
-            let greeting = 'Chào bạn';
-
-            if (currentHour < 12) {
-                greeting = 'Chào buổi sáng';
-            } else if (currentHour < 18) {
-                greeting = 'Chào buổi chiều';
-            } else {
-                greeting = 'Chào buổi tối';
-            }
-
-            // Use display name from user info instead of schedule name
-            const displayName = currentUserInfo ? currentUserInfo.displayName : 'Nhân viên';
-            welcomeMessage.textContent = `${greeting}, ${displayName}!`;
+            welcomeMessage.textContent = 'Dashboard - Ca làm việc';
 
             // Update shift information
             document.getElementById('shiftDate').innerHTML =
@@ -580,6 +567,7 @@
         }
 
         function showDashboard() {
+            hideCartSidebar();
             if (!hasWorkSchedule) {
                 showNoWorkScheduleMessage();
                 return;

@@ -1,5 +1,6 @@
 // Function to show reports section
 async function showReports() {
+    hideCartSidebar();
     if (!hasWorkSchedule) {
         showNoWorkScheduleMessage();
         return;
