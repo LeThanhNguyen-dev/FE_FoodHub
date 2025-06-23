@@ -150,6 +150,24 @@
             </div>
         </div>
     </template>
+
+    <template id="confirmationPopupTemplate">
+    <div id="confirmationPopup" class="confirmation-popup-overlay">
+        <div class="confirmation-popup">
+            <div class="popup-header">
+                <h3 class="popup-title"></h3>
+                <button class="popup-close-btn" onclick="closeConfirmationPopup()">×</button>
+            </div>
+            <div class="popup-content">
+                <p class="popup-message"></p>
+            </div>
+            <div class="popup-actions">
+                <button class="popup-btn cancel-btn" onclick="closeConfirmationPopup()"></button>
+                <button class="popup-btn confirm-btn" id="confirmActionBtn"></button>
+            </div>
+        </div>
+    </div>
+</template>
 </body>
 
 </html>

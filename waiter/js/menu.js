@@ -441,12 +441,12 @@ function setupCartEventListeners() {
 function hideCartSidebar() {
     const cartSidebar = document.querySelector('.cart-sidebar');
     const cartOverlay = document.querySelector('.cart-overlay');
-    
+
     if (cartSidebar) cartSidebar.remove();
     if (cartOverlay) cartOverlay.remove();
-    
+
     document.body.classList.remove('cart-open');
-    
+
     // Xóa CSS cart khi đóng
     const cartLink = document.querySelector('link[href="css/cart-style.css"]');
     if (cartLink) cartLink.remove();
@@ -858,7 +858,13 @@ function updateCartSidebarContent() {
                 <div class="item-details">
                     <div class="item-name">${item.name}</div>
                     <div class="item-price">${formatPrice(item.price)}₫</div>
-                    ${item.note ? `<div class="item-note">Ghi chú: ${item.note}</div>` : '<div class="item-note" style="display: none;"></div>'}
+                    <div class="item-note-container">
+                        <input type="text" 
+                               class="item-note-input" 
+                               placeholder="Thêm ghi chú" 
+                               value="${item.note || ''}"
+                               style="width: 100%; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; margin-top: 4px;">
+                    </div>
                 </div>
                 <div class="item-controls">
                     <button class="remove-item-btn">×</button>
@@ -874,6 +880,7 @@ function updateCartSidebarContent() {
             const decreaseBtn = cartItemDiv.querySelector('.decrease');
             const increaseBtn = cartItemDiv.querySelector('.increase');
             const removeBtn = cartItemDiv.querySelector('.remove-item-btn');
+            const noteInput = cartItemDiv.querySelector('.item-note-input');
 
             if (decreaseBtn) {
                 decreaseBtn.onclick = (e) => {
@@ -893,6 +900,21 @@ function updateCartSidebarContent() {
                 removeBtn.onclick = (e) => {
                     e.preventDefault();
                     removeFromCart(index);
+                };
+            }
+
+            // Event listener cho note input
+            if (noteInput) {
+                noteInput.oninput = (e) => {
+                    updateCartItemNote(index, e.target.value);
+                };
+
+                // Prevent form submission when pressing Enter
+                noteInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        noteInput.blur();
+                    }
                 };
             }
 
@@ -920,11 +942,42 @@ function updateCartSidebarContent() {
             priceElement.textContent = `${formatPrice(item.price)}₫`;
         }
 
-        // Cập nhật ghi chú
-        const noteElement = cartItemDiv.querySelector('.item-note');
-        if (noteElement && item.note) {
-            noteElement.textContent = `Ghi chú: ${item.note}`;
-            noteElement.style.display = 'block';
+        // Thêm input note container
+        const itemDetails = cartItemDiv.querySelector('.item-details');
+        if (itemDetails) {
+            // Xóa note element cũ nếu có
+            const oldNoteElement = cartItemDiv.querySelector('.item-note');
+            if (oldNoteElement) {
+                oldNoteElement.remove();
+            }
+
+            // Tạo note input container mới
+            const noteContainer = document.createElement('div');
+            noteContainer.className = 'item-note-container';
+            noteContainer.style.marginTop = '4px';
+
+            const noteInput = document.createElement('input');
+            noteInput.type = 'text';
+            noteInput.className = 'item-note-input';
+            noteInput.placeholder = 'Thêm ghi chú cho món này...';
+            noteInput.value = item.note || '';
+            noteInput.style.cssText = 'width: 100%; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;';
+
+            // Event listeners cho note input
+            noteInput.oninput = (e) => {
+                updateCartItemNote(index, e.target.value);
+            };
+
+            // Prevent form submission when pressing Enter
+            noteInput.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    noteInput.blur();
+                }
+            };
+
+            noteContainer.appendChild(noteInput);
+            itemDetails.appendChild(noteContainer);
         }
 
         // Cập nhật số lượng
@@ -968,15 +1021,14 @@ function updateCartSidebarContent() {
     // 4. Cập nhật text và hành động của nút đặt hàng
     const checkoutBtn = document.querySelector('.checkout-btn');
     if (checkoutBtn) {
-        console.log('currentOrderForAddItems:', currentOrderForAddItems);
         if (currentOrderForAddItems) {
             checkoutBtn.textContent = 'Thêm vào đơn hàng';
-            checkoutBtn.onclick = confirmAddItemsToOrder;
+            checkoutBtn.onclick = confirmAddItems; // Sử dụng hàm xác nhận mới
         } else {
             checkoutBtn.textContent = 'Đặt món ngay';
-            checkoutBtn.onclick = submitOrder;
+            checkoutBtn.onclick = confirmNewOrder; // Sử dụng hàm xác nhận mới
         }
-        
+
         // Disable nút nếu giỏ hàng trống
         checkoutBtn.disabled = cart.length === 0;
     }
@@ -985,6 +1037,13 @@ function updateCartSidebarContent() {
     saveCartState();
 }
 
+// Hàm helper để cập nhật note của item trong cart
+function updateCartItemNote(index, note) {
+    if (cart[index]) {
+        cart[index].note = note.trim() || null;
+        saveCartState(); // Lưu trạng thái sau khi cập nhật note
+    }
+}
 
 // Hàm mới để xóa hết cart
 function clearCart() {
@@ -993,21 +1052,20 @@ function clearCart() {
 
     if (confirm(confirmMessage)) {
         cart.length = 0;
-        
+
         // Luôn cập nhật cart sidebar content
         updateCartSidebarContent();
-        
+
         // Cập nhật cart display nếu không trong chế độ thêm món
         if (!currentOrderForAddItems || !currentOrderForAddItems.isAddingItems) {
-            updateCartDisplay();
-            
+
             // Cập nhật nút reopen cart nếu có
             const reopenButton = document.getElementById('reopenCartBtn');
             if (reopenButton) {
                 reopenButton.querySelector('span').textContent = `Giỏ hàng (0)`;
             }
         }
-        
+
         showNotification(successMessage, 'info');
     }
 }
@@ -1021,8 +1079,7 @@ function removeFromCart(index) {
 
     // Cập nhật cart display nếu không trong chế độ thêm món
     if (!currentOrderForAddItems || !currentOrderForAddItems.isAddingItems) {
-        updateCartDisplay();
-        
+
         // Cập nhật nút reopen cart nếu có
         const reopenButton = document.getElementById('reopenCartBtn');
         if (reopenButton) {
@@ -1123,14 +1180,15 @@ async function confirmAddItemsToOrder() {
         note: orderNote,
         orderItems: cart.map(item => ({
             menuItemId: item.menuItemId,
-            quantity: item.quantity
+            quantity: item.quantity,
+            note: item.note || null // Thêm note cho từng món
         }))
     };
 
     try {
         const checkoutBtn = document.querySelector('.checkout-btn');
         const checkoutBtnText = document.getElementById('checkoutBtnText');
-        
+
         if (checkoutBtn) {
             checkoutBtn.disabled = true;
         }
@@ -1177,7 +1235,7 @@ async function confirmAddItemsToOrder() {
     } finally {
         const checkoutBtn = document.querySelector('.checkout-btn');
         const checkoutBtnText = document.getElementById('checkoutBtnText');
-        
+
         if (checkoutBtn) {
             checkoutBtn.disabled = false;
         }
@@ -1227,19 +1285,18 @@ function resetCartSidebarForNormalMode() {
 function updateCartQuantity(index, change) {
     if (index >= 0 && index < cart.length) {
         cart[index].quantity += change;
-        
+
         // Xóa món nếu số lượng <= 0
         if (cart[index].quantity <= 0) {
             cart.splice(index, 1);
         }
-        
+
         // Cập nhật giao diện
         updateCartSidebarContent();
-        
+
         // Cập nhật cart display nếu không trong chế độ thêm món
         if (!currentOrderForAddItems || !currentOrderForAddItems.isAddingItems) {
-            updateCartDisplay();
-            
+
             // Cập nhật nút reopen cart nếu có
             const reopenButton = document.getElementById('reopenCartBtn');
             if (reopenButton) {
@@ -1277,7 +1334,8 @@ async function submitOrder() {
             orderItems: cart.map(item => ({
                 menuItemId: item.menuItemId,
                 quantity: item.quantity,
-                status: "PENDING"
+                status: "PENDING",
+                note: item.note || null // Thêm note cho từng món
             }))
         };
 
@@ -1305,16 +1363,16 @@ async function submitOrder() {
         if (response.code === 0) {
             // Thành công
             const order = response.result;
-            let orderTypeText = selectedOrderType === 'DINE_IN' ? 'Ăn tại chỗ' : 
-                              selectedOrderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng';
-            
+            let orderTypeText = selectedOrderType === 'DINE_IN' ? 'Ăn tại chỗ' :
+                selectedOrderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng';
+
             let successMessage = `Đặt món thành công! Mã đơn hàng: ${order.id}`;
             if (selectedOrderType === 'DINE_IN' && selectedTable) {
                 successMessage += ` - ${orderTypeText} - Bàn ${selectedTable.tableNumber}`;
             } else {
                 successMessage += ` - ${orderTypeText}`;
             }
-            
+
             showNotification(successMessage, 'success');
 
             // Reset giỏ hàng và các biến global để chuẩn bị cho đơn hàng mới
@@ -1322,7 +1380,7 @@ async function submitOrder() {
             selectedOrderType = null;
             selectedTable = null;
             currentOrderForAddItems = null;
-            
+
             // Reset form inputs
             if (orderNoteInput) {
                 orderNoteInput.value = '';
@@ -1348,10 +1406,9 @@ async function submitOrder() {
             if (submitBtn) {
                 submitBtn.textContent = 'Đặt món';
             }
-            
+
             // Cập nhật display giỏ hàng để hiển thị trạng thái trống
-            updateCartDisplay();
-            
+
             // Cập nhật nội dung cart sidebar để hiển thị trạng thái reset
             if (typeof updateCartSidebarContent === 'function') {
                 updateCartSidebarContent();
@@ -1361,7 +1418,7 @@ async function submitOrder() {
             if (typeof showOrderDetails === 'function') {
                 showOrderDetails(order);
             }
-            
+
         } else {
             throw new Error(response.message || 'Đặt món thất bại');
         }
@@ -1407,11 +1464,10 @@ function restoreCartState() {
             selectedTable = cartState.selectedTable || null;
             currentOrderForAddItems = cartState.currentOrderForAddItems || null;
             isCartSidebarOpen = cartState.isCartSidebarOpen || false;
-            
+
             console.log('Cart state restored:', cartState);
-            
+
             // Cập nhật hiển thị giỏ hàng
-            updateCartDisplay();
             updateCartSidebarContent();
         }
     } catch (error) {
@@ -1440,7 +1496,7 @@ function closeCartSidebar() {
 function onPageChange() {
     // Lưu trạng thái cart khi chuyển trang
     saveCartState();
-    
+
     // Đóng cart sidebar nếu đang mở (tuỳ chọn)
     // closeCartSidebar();
 }
@@ -1449,3 +1505,211 @@ function onPageChange() {
 function initializeCartOnPageLoad() {
     restoreCartState();
 }
+
+
+async function showConfirmationPopup(title, message, confirmText, cancelText, onConfirm, onCancel) {
+    try {
+        // Xóa popup cũ nếu có
+        const existingPopup = document.getElementById('confirmationPopup');
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        // Fetch menu.html
+        const response = await fetch('/waiter/menu.html');
+        if (!response.ok) {
+            throw new Error('Không thể tải menu.html');
+        }
+        const htmlContent = await response.text();
+
+        // Parse HTML để lấy templates
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+
+        // Lấy template confirmationPopupTemplate
+        const templateElement = doc.getElementById('confirmationPopupTemplate');
+        if (!templateElement) {
+            throw new Error('Không tìm thấy template confirmationPopupTemplate');
+        }
+
+        // Clone template content
+        const popupTemplate = templateElement.content.cloneNode(true);
+
+        // Điền nội dung động vào template
+        const popupTitle = popupTemplate.querySelector('.popup-title');
+        const popupMessage = popupTemplate.querySelector('.popup-message');
+        const cancelBtn = popupTemplate.querySelector('.cancel-btn');
+        const confirmBtn = popupTemplate.querySelector('#confirmActionBtn');
+
+        if (popupTitle) popupTitle.textContent = title; // Dùng textContent để tránh XSS
+        if (popupMessage) popupMessage.innerHTML = message; // Dùng innerHTML để render HTML trong message
+        if (cancelBtn) cancelBtn.textContent = cancelText;
+        if (confirmBtn) confirmBtn.textContent = confirmText;
+
+        // Thêm popup vào body
+        document.body.appendChild(popupTemplate);
+
+        // Gắn event listeners
+        if (confirmBtn) {
+            confirmBtn.onclick = () => {
+                closeConfirmationPopup();
+                if (onConfirm) onConfirm();
+            };
+        }
+
+        // Đóng popup khi click overlay
+        const overlay = document.getElementById('confirmationPopup');
+        if (overlay) {
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    closeConfirmationPopup();
+                    if (onCancel) onCancel();
+                }
+            };
+        }
+
+        // Đóng popup với ESC
+        const handleEscKey = (e) => {
+            if (e.key === 'Escape') {
+                closeConfirmationPopup();
+                if (onCancel) onCancel();
+                document.removeEventListener('keydown', handleEscKey);
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+
+    } catch (error) {
+        console.error('Error showing confirmation popup:', error);
+    }
+}
+
+// 2. Hàm đóng popup
+function closeConfirmationPopup() {
+    const popup = document.getElementById('confirmationPopup');
+    if (popup) {
+        popup.remove();
+    }
+}
+
+// 3. Hàm thêm CSS styles cho popup
+
+// 4. Hàm tạo thông tin chi tiết đơn hàng cho popup
+// JavaScript - Hàm generateOrderSummary cải tiến
+function generateOrderSummary() {
+    if (cart.length === 0) return '';
+
+    let summary = '<div class="order-summary">';
+    summary += '<div class="order-summary-header">Chi tiết đơn hàng:</div>';
+
+    let totalAmount = 0;
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        totalAmount += itemTotal;
+
+        summary += `
+            <div class="order-item">
+                <div class="order-item-main">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-quantity">x${item.quantity}</span>
+                </div>
+                <div class="item-price">${formatPrice(itemTotal)}₫</div>
+            </div>
+        `;
+
+        // Hiển thị ghi chú nếu có
+        if (item.note && item.note.trim()) {
+            summary += `
+                <div class="order-item-note">
+                    <span class="note-label">Ghi chú:</span> ${item.note}
+                </div>
+            `;
+        }
+    });
+
+    summary += `
+        <div class="order-total">
+            <div class="total-label">Tổng cộng:</div>
+            <div class="total-amount">${formatPrice(totalAmount)}₫</div>
+        </div>
+    `;
+    summary += '</div>';
+
+    return summary;
+}
+
+// 5. Hàm xác nhận đặt món mới (thay thế cho submitOrder trực tiếp)
+function confirmNewOrder() {
+    if (!validateOrderInfo()) {
+        return;
+    }
+
+    if (cart.length === 0) {
+        showNotification('Giỏ hàng trống', 'warning');
+        return;
+    }
+
+    // Tạo thông tin xác nhận
+    let orderTypeText = selectedOrderType === 'DINE_IN' ? 'Ăn tại chỗ' :
+        selectedOrderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng';
+
+    let confirmMessage = `Bạn có chắc chắn muốn đặt món với loại đơn hàng: <strong>${orderTypeText}</strong>`;
+
+    if (selectedOrderType === 'DINE_IN' && selectedTable) {
+        confirmMessage += ` - Bàn <strong>${selectedTable.tableNumber}</strong>`;
+    }
+
+    confirmMessage += '?';
+
+    // Thêm chi tiết đơn hàng
+    const orderSummary = generateOrderSummary();
+    confirmMessage += orderSummary;
+
+    // Hiển thị popup xác nhận
+    showConfirmationPopup(
+        'Xác nhận đặt món',
+        confirmMessage,
+        'Đặt món',
+        'Hủy',
+        () => {
+            // Thực hiện đặt món
+            submitOrder();
+        },
+        () => {
+            // Hủy - không làm gì
+            console.log('Hủy đặt món');
+        }
+    );
+}
+
+// 6. Hàm xác nhận thêm món vào đơn hàng (thay thế cho confirmAddItemsToOrder trực tiếp)
+function confirmAddItems() {
+    if (!currentOrderForAddItems || cart.length === 0) {
+        showNotification('Không có món nào để thêm', 'warning');
+        return;
+    }
+
+    // Tạo thông tin xác nhận
+    let confirmMessage = `Bạn có chắc chắn muốn thêm ${cart.length} món vào đơn hàng <strong>#${currentOrderForAddItems.orderId}</strong>?`;
+
+    // Thêm chi tiết các món sẽ thêm
+    const orderSummary = generateOrderSummary();
+    confirmMessage += orderSummary;
+
+    // Hiển thị popup xác nhận
+    showConfirmationPopup(
+        'Xác nhận thêm món',
+        confirmMessage,
+        'Thêm món',
+        'Hủy',
+        () => {
+            // Thực hiện thêm món
+            confirmAddItemsToOrder();
+        },
+        () => {
+            // Hủy - không làm gì
+            console.log('Hủy thêm món');
+        }
+    );
+}
+
+
