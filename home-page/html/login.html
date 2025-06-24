@@ -15,7 +15,6 @@
       --gold: #D4A017;
       --light-gold: #F7E6A3;
     }
-
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: var(--dark-green);
@@ -302,12 +301,8 @@
         localStorage.setItem('accessToken', token);
         const payload = parseJwt(token);
         const scopes = payload?.scope?.split(" ");
-
-        
-            
-
             if (scopes.includes("ROLE_ADMIN")) {
-                window.location.href = 'adminDashboard/adminDashboard.html';
+                window.location.href = '/menu-manager/menu.html';
             } else if (scopes.includes("ROLE_WAITER")) {
                 window.location.href = '../../waiter/index.html';
             }else if (scopes.includes("ROLE_CHEF")) {

@@ -1,7 +1,15 @@
+/**
+ * Bảng màu được làm dịu lại để trông chuyên nghiệp hơn.
+ * Màu --dark được điều chỉnh để không quá tương phản.
+ * Màu --light được giữ nguyên cho nền.
+ */
 :root {
-    --primary: #FEA116;
-    --light: #F1F8FF;
-    --dark: #0F172B;
+    --primary: #FEA116; /* Giữ màu nhấn chính */
+    --light: #F8F9FA;   /* Màu nền sáng hơn một chút */
+    --dark: #1E293B;     /* Màu tối dịu hơn */
+    --secondary: #6C757D; /* Màu phụ cho văn bản */
+    --border-color: #DEE2E6; /* Màu viền nhất quán */
+
     --success: #10B981;
     --warning: #F59E0B;
     --danger: #EF4444;
@@ -9,14 +17,19 @@
 }
 
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Poppins', 'Nunito', sans-serif; /* Thêm 'Poppins' cho cảm giác hiện đại */
     background-color: var(--light);
+    color: #495057; /* Màu chữ mặc định */
 }
 
+/* =================================================================== */
+/* Sidebar & Layout - KHÔNG THAY ĐỔI THEO YÊU CẦU                  */
+/* =================================================================== */
 .main-content {
     margin-left: 280px;
-    transition: all 0.3s;
+    transition: all 0.3s ease-in-out;
     min-height: 100vh;
+    padding-bottom: 2rem;
 }
 
 .main-content.expanded {
@@ -24,169 +37,193 @@ body {
 }
 
 .top-bar {
-    background: #fff;
+    background: #FFFFFF;
     padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Shadow nhẹ nhàng hơn */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .toggle-sidebar {
     background: none;
     border: none;
     color: var(--dark);
-    font-size: 1.2rem;
+    font-size: 1.5rem; /* Kích thước icon lớn hơn */
+    cursor: pointer;
 }
 
+/* =================================================================== */
+/* Components - Thiết kế lại cho hiện đại và chuyên nghiệp hơn        */
+/* =================================================================== */
+
 .card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s;
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-color); /* Thay box-shadow bằng border */
+    border-radius: 12px; /* Bo góc nhẹ hơn */
+    box-shadow: none; /* Bỏ shadow mặc định */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(0); /* Bỏ hiệu ứng di chuyển */
+    border-color: var(--primary); /* Thay đổi màu viền khi hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Thêm shadow nhẹ khi hover */
 }
 
 .card-header {
-    background: linear-gradient(135deg, var(--primary), #ff8c00);
-    color: white;
-    padding: 1.5rem;
-    border: none;
+    background: #FFFFFF; /* Bỏ gradient, dùng nền trắng */
+    color: var(--dark); /* Màu chữ tối */
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color); /* Thêm đường kẻ phân cách */
 }
 
 .card-header h5 {
     margin: 0;
-    font-weight: 700;
+    font-weight: 600; /* Giảm độ đậm của font */
+    font-size: 1.1rem;
+}
+
+/* --- Buttons --- */
+.btn {
+    border-radius: 8px; /* Bo góc ít hơn cho cảm giác chắc chắn */
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+
+.btn:hover {
+    transform: translateY(-2px); /* Giữ hiệu ứng di chuyển nhẹ */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .btn-primary {
-    background: var(--primary);
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s;
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #FFFFFF;
 }
 
 .btn-primary:hover {
-    background: #e8960f;
-    transform: scale(1.05);
+    background-color: #e8960f;
+    border-color: #e8960f;
 }
 
 .btn-success {
-    background: var(--success);
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s;
+    background-color: var(--success);
+    border-color: var(--success);
+    color: #FFFFFF;
 }
 
 .btn-success:hover {
-    background: #0d9668;
-    transform: scale(1.05);
+    background-color: #0d9668;
+    border-color: #0d9668;
+}
+
+/* --- Table --- */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
 }
 
 .table {
     background: white;
-    border-radius: 15px;
-    overflow: hidden;
+    margin-bottom: 0; /* Bỏ margin-bottom mặc định */
 }
 
-.table th {
-    background: linear-gradient(135deg, var(--dark), #1e293b);
-    color: white;
+.table th, .table td {
+    padding: 1.25rem; /* Tăng padding cho thoáng */
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color); /* Dùng border-top thay thế */
+}
+
+.table thead th {
+    background: var(--light); /* Nền header bảng nhẹ nhàng */
+    color: var(--dark);
     font-weight: 600;
     border: none;
-    padding: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.table td {
-    padding: 1rem;
-    vertical-align: middle;
-    border-color: #eee;
+.table tbody tr:first-child td {
+    border-top: none; /* Bỏ border-top cho dòng đầu tiên */
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(254, 161, 22, 0.05);
+    background-color: rgba(254, 161, 22, 0.05); /* Hiệu ứng hover tinh tế */
 }
 
 .status-badge {
     display: inline-block;
-    padding: 6px 14px;
+    padding: 8px 16px; /* Tăng padding để badge lớn hơn */
     border-radius: 20px;
     font-weight: 600;
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-align: center;
-    min-width: 90px;
+    min-width: 120px; /* Tăng min-width để đảm bảo chữ không xuống dòng */
+    white-space: nowrap; /* Đảm bảo chữ không xuống dòng */
     transition: all 0.3s ease;
     border: 2px solid transparent;
 }
 
 .status-active {
-    background: linear-gradient(135deg, #10B981, #059669);
-    color: white;
-    border-color: #10B981;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.status-active:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--success);
+    color: var(--success);
 }
 
 .status-inactive {
-    background: linear-gradient(135deg, #EF4444, #DC2626);
-    color: white;
-    border-color: #EF4444;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+    color: var(--danger);
 }
 
-.status-inactive:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-}
-
-.action-buttons .btn {
-    margin: 0 2px;
-    border-radius: 8px;
-    transition: all 0.3s;
-}
-
-.action-buttons .btn:hover {
-    transform: translateY(-2px);
-}
-
+/* --- Forms --- */
 .form-control,
 .form-select {
-    border-radius: 10px;
-    border: 2px solid #eee;
-    transition: all 0.3s;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1rem;
+    transition: all 0.2s ease;
 }
 
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
+    box-shadow: 0 0 0 3px rgba(254, 161, 22, 0.15);
+    background-color: #fff;
+}
+
+/* =================================================================== */
+/* Other Components - Giữ nguyên hoặc tinh chỉnh nhẹ                   */
+/* =================================================================== */
+
+.action-buttons .btn {
+    margin: 0 2px;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem; /* Kích thước nhỏ hơn cho nút hành động */
 }
 
 .pagination .page-link {
     border-radius: 8px;
-    margin: 0 2px;
-    border: none;
-    color: var(--primary);
-    font-weight: 600;
+    margin: 0 3px;
+    border: 1px solid var(--border-color);
+    color: var(--secondary);
+    font-weight: 500;
 }
 
 .pagination .page-item.active .page-link {
-    background: rgba(254, 161, 22, 0.2);
+    background-color: var(--primary);
     border-color: var(--primary);
-    color: var(--primary);
+    color: #fff;
     font-weight: 600;
 }
 
@@ -197,8 +234,9 @@ body {
     z-index: 2000;
     min-width: 300px;
     animation: slideInRight 0.3s ease-out;
-    border-radius: 15px;
+    border-radius: 12px;
     border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
 }
 
 @keyframes slideInRight {
@@ -219,7 +257,7 @@ body {
 .empty-state {
     text-align: center;
     padding: 3rem;
-    color: #666;
+    color: var(--secondary);
 }
 
 .empty-state i {
@@ -228,21 +266,33 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Đặt width cố định cho cột trạng thái để đảm bảo không xuống dòng */
+.table th[data-status-column],
+.table td[data-status-column] {
+    width: 160px; /* Đặt width cố định cho cột trạng thái */
+    min-width: 160px;
+}
+
+/* =================================================================== */
+/* Responsive - Đảm bảo hoạt động tốt trên mobile                     */
+/* =================================================================== */
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0;
     }
     .status-badge {
-        font-size: 0.75rem;
-        padding: 4px 10px;
-        min-width: 80px;
+        font-size: 0.7rem;
+        padding: 6px 12px; /* Giảm padding trên mobile nhưng vẫn đủ lớn */
+        min-width: 100px; /* Giảm min-width trên mobile */
     }
     .action-buttons {
+        display: flex;
         flex-direction: column;
         gap: 5px;
+        align-items: stretch;
     }
     .action-buttons .btn {
+        width: 100%;
         margin: 0;
-        font-size: 0.8rem;
     }
 }

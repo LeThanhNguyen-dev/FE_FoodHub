@@ -87,6 +87,10 @@
                 <div class="card-body">
                     <form id="filterForm" class="row g-3">
                         <div class="col-md-3">
+                            <label for="keyword" class="form-label fw-bold">Tìm kiếm</label>
+                            <input type="text" id="keyword" class="form-control" placeholder="Nhập tên nhân viên...">
+                        </div>
+                        <div class="col-md-3">
                             <label for="roleFilter" class="form-label fw-bold">Vai trò</label>
                             <select id="roleFilter" class="form-select">
                                 <option value="">Tất cả</option>
@@ -98,8 +102,12 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="keyword" class="form-label fw-bold">Tìm kiếm</label>
-                            <input type="text" id="keyword" class="form-control" placeholder="Nhập tên nhân viên...">
+                            <label for="statusFilter" class="form-label fw-bold">Trạng thái</label>
+                            <select id="statusFilter" class="form-select">
+                                <option value="">Tất cả</option>
+                                <option value="ACTIVE">Hoạt động</option>
+                                <option value="INACTIVE">Không hoạt động</option>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <label for="sortBy" class="form-label fw-bold">Sắp xếp</label>
@@ -117,19 +125,7 @@
                 </div>
             </div>
 
-            <!-- Employee Table Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-list me-2"></i>Danh sách nhân viên</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Loading Spinner -->
-                    <div id="loadingSpinner" class="text-center py-5" style="display: none;">
-                        <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
-                            <span class="visually-hidden">Đang tải...</span>
-                        </div>
-                        <p class="mt-3 text-muted">Đang tải dữ liệu...</p>
-                    </div>
+            
             <!-- Employee Table Card -->
             <div class="card">
                 <div class="card-header">
@@ -163,23 +159,7 @@
                         </table>
                     </div>
                     <!-- Employee Table -->
-                    <div id="employeeTable" class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Tên nhân viên</th>
-                                    <th>Email</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Vai trò</th>
-                                    <th style="width: 130px;">Trạng thái</th>
-                                    <th style="width: 150px;">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="employeeTableBody">
-                                <!-- Data will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
+                  
 
                     <!-- Empty State -->
                     <div id="emptyState" class="empty-state" style="display: none;">
@@ -196,7 +176,7 @@
                         <p class="text-muted">Thử thay đổi bộ lọc để xem thêm nhân viên hoặc thêm nhân viên mới</p>
                     </div>
                 </div>
-            </div>
+            
 
             <!-- Pagination -->
             <nav class="mt-4">
@@ -273,6 +253,7 @@
         async function fetchEmployees() {
             showLoading();
             const roleFilter = document.getElementById('roleFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
             const keyword = document.getElementById('keyword').value.trim();
             const sortValue = document.getElementById('sortBy').value;
 
@@ -291,6 +272,7 @@
                 sortDirection: sortDirection
             });
             if (roleFilter) params.append('role', roleFilter);
+            if (statusFilter) params.append('status', statusFilter);
             if (keyword) params.append('keyword', keyword);
 
             try {

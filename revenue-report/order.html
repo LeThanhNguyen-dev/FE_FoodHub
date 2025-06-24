@@ -137,18 +137,24 @@
                     <!-- Order Table -->
                     <div id="orderTable" class="table-responsive">
                         <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th style="width: 60px;">STT</th>
-                                    <th onclick="sortTable('id')">Mã</th>
-                                    <th onclick="sortTable('createdAt')">Ngày đặt</th>
-                                    <th onclick="sortTable('username')">Khách hàng</th>
-                                    <th onclick="sortTable('totalAmount')">Tổng tiền</th>
-                                    <th>Loại đơn</th>
-                                    <th>Thanh toán</th>
-                                    <th style="width: 150px;">Thao tác</th>
-                                </tr>
-                            </thead>
+                           <thead>
+    <tr>
+        <th style="width: 60px;">STT</th>
+        <th onclick="sortTable('id')" style="cursor: pointer;">
+            Mã <span id="sort-id" class="sort-arrow"></span>
+        </th>
+        <th onclick="sortTable('createdAt')" style="cursor: pointer;">
+            Ngày đặt <span id="sort-createdAt" class="sort-arrow"></span>
+        </th>
+        <th>Khách hàng</th>
+        <th onclick="sortTable('totalAmount')" style="cursor: pointer;">
+            Tổng tiền <span id="sort-totalAmount" class="sort-arrow"></span>
+        </th>
+        <th>Loại đơn</th>
+        <th>Thanh toán</th>
+        <th style="width: 150px;">Thao tác</th>
+    </tr>
+</thead>
                             <tbody id="orderTableBody">
                                 <!-- Data will be loaded here -->
                             </tbody>
@@ -295,33 +301,34 @@
             const period = document.getElementById('period').value;
             let params = `page=${currentPage}&size=${pageSize}&orderBy=${sortBy}&sort=${sortDirection}`;
             
-            if (period === 'custom') {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                
-                if (!startDate || !endDate) {
-                    showNotification('Vui lòng chọn ngày bắt đầu và kết thúc.', 'error');
-                    return null;
-                }
-                
-                const startDateObj = new Date(startDate);
-                const endDateObj = new Date(endDate);
-                
-                if (startDateObj > endDateObj) {
-                    showNotification('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.', 'error');
-                    return null;
-                }
-                
-                const startISO = `${startDate}T00:00:00+07:00`;
-                const endISO = `${endDate}T23:59:59.999+07:00`;
-                
-                console.log('startISO:', startISO);
-                console.log('endISO:', endISO);
-                
-                params += `&period=custom&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
-            } else {
-                params += `&period=${period}`;
-            }
+           if (period === 'custom') {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        if (!startDate || !endDate) {
+            showNotification('Vui lòng chọn ngày bắt đầu và kết thúc.', 'error');
+            return null;
+        }
+        
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        
+        if (startDateObj > endDateObj) {
+            showNotification('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.', 'error');
+            return null;
+        }
+        
+        // SỬA: Đổi từ period=custom thành period=specific và format UTC
+        const startISO = `${startDate}T00:00:00Z`;
+        const endISO = `${endDate}T23:59:59Z`;
+        
+        console.log('startISO:', startISO);
+        console.log('endISO:', endISO);
+        
+        params += `&period=specific&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
+    } else {
+        params += `&period=${period}`;
+    }
             
             const search = document.getElementById('searchInput').value.trim();
             if (search) params += `&search=${encodeURIComponent(search)}`;
@@ -478,19 +485,21 @@
             const period = document.getElementById('period').value;
             let params = '';
             
-            if (period === 'custom') {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                
-                if (!startDate || !endDate) return;
-                
-                const startISO = `${startDate}T00:00:00+07:00`;
-                const endISO = `${endDate}T23:59:59.999+07:00`;
-                
-                params = `period=custom&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
-            } else {
-                params = `period=${period}`;
-            }
+          if (period === 'custom') {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        if (!startDate || !endDate) return;
+        
+        // SỬA: Đổi từ period=custom thành period=specific và format UTC
+        const startISO = `${startDate}T00:00:00Z`;
+        const endISO = `${endDate}T23:59:59Z`;
+        
+        params = `period=specific&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
+    } else {
+        params = `period=${period}`;
+    }
+
 
             try {
                 const data = await apiFetch(`/orders/summary?${params}`);
@@ -582,6 +591,7 @@
                                     font: {
                                         size: 12
                                     },
+                                    stepSize: 1,
                                     callback: value => value.toLocaleString('vi-VN')
                                 },
                                 grid: { 
@@ -638,32 +648,54 @@
         }
 
         function sortTable(column) {
-            if (sortBy === column) {
-                sortDirection = sortDirection === 'ASC' ? 'DESC' : 'ASC';
-            } else {
-                sortBy = column;
-                sortDirection = 'ASC';
-            }
-            fetchOrders();
-        }
+    // Xóa tất cả class sort cũ
+    document.querySelectorAll('.sort-arrow').forEach(arrow => {
+        arrow.className = 'sort-arrow';
+    });
+    
+    if (sortBy === column) {
+        sortDirection = sortDirection === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+        sortBy = column;
+        sortDirection = 'ASC';
+    }
+    
+    // Thêm class cho cột đang sort
+    const currentArrow = document.getElementById(`sort-${column}`);
+    if (currentArrow) {
+        currentArrow.className = `sort-arrow ${sortDirection.toLowerCase()}`;
+    }
+    
+    fetchOrders();
+}
 
-        function initPeriodFromQueryParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const period = urlParams.get('period') || 'month';
-            const specificDate = urlParams.get('specificDate');
-            
-            const periodSelect = document.getElementById('period');
-            periodSelect.value = period === 'specific' ? 'custom' : period;
-            
-            if (period === 'specific' && specificDate) {
-                document.getElementById('customDate').style.display = 'block';
-                document.getElementById('startDate').value = specificDate;
-                document.getElementById('endDate').value = specificDate;
-            } else {
-                document.getElementById('customDate').style.display = period === 'custom' ? 'block' : 'none';
-            }
-        }
-
+       function initPeriodFromQueryParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const period = urlParams.get('period') || 'month';
+    const specificDate = urlParams.get('specificDate');
+    const startDate = urlParams.get('startDate');
+    const endDate = urlParams.get('endDate');
+    
+    const periodSelect = document.getElementById('period');
+    
+    // SỬA: Xử lý trường hợp từ dashboard chuyển sang với period=custom
+    if (period === 'custom' && startDate && endDate && startDate === endDate) {
+        // Trường hợp từ dashboard specific date
+        periodSelect.value = 'custom';
+        document.getElementById('customDate').style.display = 'block';
+        document.getElementById('startDate').value = startDate;
+        document.getElementById('endDate').value = endDate;
+    } else if (period === 'specific' && specificDate) {
+        // Trường hợp cũ (để tương thích ngược)
+        periodSelect.value = 'custom';
+        document.getElementById('customDate').style.display = 'block';
+        document.getElementById('startDate').value = specificDate;
+        document.getElementById('endDate').value = specificDate;
+    } else {
+        periodSelect.value = period === 'specific' ? 'custom' : period;
+        document.getElementById('customDate').style.display = period === 'custom' ? 'block' : 'none';
+    }
+}
         async function updateData() {
             await Promise.all([fetchOrders(), updateChart()]);
         }
