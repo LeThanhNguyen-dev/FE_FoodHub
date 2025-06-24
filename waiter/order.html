@@ -19,95 +19,95 @@
       <!-- Enhanced Header Section -->
       <!-- Filter and Sort Section -->
       <div class="orders-filter-section card mb-3">
-        <div class="card-body">
-          <div class="row g-3">
-            <!-- Status Filter -->
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="fas fa-filter me-1"></i>
-                Trạng thái
-              </label>
-              <select class="form-select" id="orderStatusFilter" onchange="applyOrderFilters()">
-                <option value="">Tất cả trạng thái</option>
-                <option value="PENDING">Chờ xử lý</option>
-                <option value="CONFIRMED">Đã xác nhận</option>
-                <option value="READY">Sẵn sàng</option>
-                <option value="COMPLETED">Hoàn thành</option>
-                <option value="CANCELLED">Đã hủy</option>
-              </select>
-            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Status Filter -->
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            <i class="fas fa-filter me-1"></i>
+                            Trạng thái
+                        </label>
+                        <select class="form-select" id="orderStatusFilter" onchange="applyOrderFilters()">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="PENDING">Chờ xử lý</option>
+                            <option value="CONFIRMED">Đã xác nhận</option>
+                            <option value="READY">Sẵn sàng</option>
+                            <option value="COMPLETED">Hoàn thành</option>
+                            <option value="CANCELLED">Đã hủy</option>
+                        </select>
+                    </div>
 
-            <!-- Table Filter -->
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="fas fa-chair me-1"></i>
-                Bàn
-              </label>
-              <input type="text" class="form-control" id="tableNumberFilter" placeholder="Chọn bàn"
-                onchange="applyOrderFilters()">
-            </div>
+                    <!-- Table Filter - Updated to use dropdown -->
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            <i class="fas fa-chair me-1"></i>
+                            Bàn
+                        </label>
+                        <select class="form-select" id="tableNumberFilter" onchange="applyOrderFilters()">
+                            <option value="">Tất cả bàn</option>
+                            <!-- Options will be populated by generateTableOptions() -->
+                        </select>
+                    </div>
 
-            <!-- Sort Field -->
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="fas fa-sort me-1"></i>
-                Sắp xếp theo
-              </label>
-              <select class="form-select" id="sortByOrderFilter" onchange="applyOrderFilters()">
-                <option value="createdAt">Thời gian tạo</option>
-                <option value="totalAmount">Tổng tiền</option>
-                <option value="id">Mã đơn hàng</option>
-                <option value="status">Trạng thái</option>
-              </select>
-            </div>
+                    <!-- Sort Field -->
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            <i class="fas fa-sort me-1"></i>
+                            Sắp xếp theo
+                        </label>
+                        <select class="form-select" id="sortByOrderFilter" onchange="applyOrderFilters()">
+                            <option value="createdAt">Thời gian tạo</option>
+                            <option value="totalAmount">Tổng tiền</option>
+                            <option value="id">Mã đơn hàng</option>
+                            <option value="status">Trạng thái</option>
+                        </select>
+                    </div>
 
-            <!-- Sort Direction -->
-            <div class="col-md-3">
-              <label class="form-label">
-                <i class="fas fa-sort-amount-down me-1"></i>
-                Thứ tự
-              </label>
-              <select class="form-select" id="sortDirectionOrderFilter" onchange="applyOrderFilters()">
-                <option value="DESC">Giảm dần</option>
-                <option value="ASC">Tăng dần</option>
-              </select>
-            </div>
-
-
-          </div>
-
-          <!-- Filter Actions -->
-          <div class="row mt-3">
-            <div class="col-12">
-              <div class="d-flex gap-2 justify-content-between flex-wrap">
-                <!-- Action Buttons (moved from header) -->
-                <div class="d-flex gap-2">
-                  <button class="btn btn-success" onclick="showMenu()">
-                    <i class="fas fa-plus me-1"></i>
-                    Nhận đơn mới
-                  </button>
-                  <button class="btn btn-outline-primary" onclick="refreshOrders()">
-                    <i class="fas fa-sync-alt me-1"></i>
-                    Làm mới
-                  </button>
+                    <!-- Sort Direction -->
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            <i class="fas fa-sort-amount-down me-1"></i>
+                            Thứ tự
+                        </label>
+                        <select class="form-select" id="sortDirectionOrderFilter" onchange="applyOrderFilters()">
+                            <option value="DESC">Giảm dần</option>
+                            <option value="ASC">Tăng dần</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Filter Buttons -->
-                <div class="d-flex gap-2">
-                  <button class="btn btn-outline-secondary" onclick="clearFilters()">
-                    <i class="fas fa-times me-1"></i>
-                    Xóa bộ lọc
-                  </button>
-                  <button class="btn btn-primary" onclick="applyOrderFilters()">
-                    <i class="fas fa-search me-1"></i>
-                    Áp dụng
-                  </button>
+                <!-- Filter Actions -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="d-flex gap-2 justify-content-between flex-wrap">
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success" onclick="showMenu()">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Nhận đơn mới
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="refreshOrders()">
+                                    <i class="fas fa-sync-alt me-1"></i>
+                                    Làm mới
+                                </button>
+                            </div>
+
+                            <!-- Filter Buttons -->
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-1"></i>
+                                    Xóa bộ lọc
+                                </button>
+                                <button class="btn btn-primary" onclick="applyOrderFilters()">
+                                    <i class="fas fa-search me-1"></i>
+                                    Áp dụng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
 
       <!-- Results Summary -->
       <div class="orders-summary mb-3">

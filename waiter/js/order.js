@@ -79,18 +79,20 @@ function renderOrdersTemplate() {
 }
 
 // Setup event listeners after HTML is loaded
-function setupEventListeners() {
+async function setupEventListeners() {
+    console.log('=== setupEventListeners() được gọi ===');
+    
     // Setup jump to page input event listener
     const jumpInput = document.getElementById('jumpToOrderPage');
     if (jumpInput) {
-        jumpInput.addEventListener('keypress', function (e) {
+        jumpInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 jumpToOrderPage();
             }
         });
     }
 
-    // Setup filter change listeners - removed price filter elements and pageSizeOrderFilter
+    // Setup filter change listeners
     const filterElements = [
         'orderStatusFilter', 'tableNumberFilter',
         'sortByOrderFilter', 'sortDirectionOrderFilter'
@@ -100,9 +102,22 @@ function setupEventListeners() {
         const element = document.getElementById(id);
         if (element) {
             element.addEventListener('change', applyOrderFilters);
+            console.log(`Đã setup listener cho ${id}`);
+        } else {
+            console.warn(`Không tìm thấy element ${id}`);
         }
     });
+
+    // Gọi generateTableOptions trực tiếp để load danh sách bàn
+    try {
+        await generateTableOptions();
+    } catch (error) {
+        console.error('=== Lỗi khi load danh sách bàn ===', error);
+    }
 }
+
+
+
 
 
 // Global variables for pagination
@@ -114,22 +129,22 @@ let currentOrderForAddItems = null;
 // Load orders from API with filters and pagination
 async function loadOrders() {
     try {
-        // Get filter values - với null checks (removed price filters and pageSizeOrderFilter)
+        // Get filter values
         const orderStatusFilter = document.getElementById('orderStatusFilter');
         const tableNumberFilter = document.getElementById('tableNumberFilter');
         const sortByOrderFilter = document.getElementById('sortByOrderFilter');
         const sortDirectionOrderFilter = document.getElementById('sortDirectionOrderFilter');
 
         const status = orderStatusFilter ? orderStatusFilter.value : '';
-        const tableNumber = tableNumberFilter ? tableNumberFilter.value : '';
+        const tableNumber = tableNumberFilter ? tableNumberFilter.value : ''; // Đã là tableNumber
         const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
         const sortDirection = sortDirectionOrderFilter ? sortDirectionOrderFilter.value || 'DESC' : 'DESC';
-        const pageSize = '20'; // Fixed page size
+        const pageSize = '20';
 
-        // Build query parameters (removed minPrice and maxPrice)
+        // Build query parameters
         const params = new URLSearchParams();
         if (status) params.append('status', status);
-        if (tableNumber) params.append('tableNumber', tableNumber);
+        if (tableNumber) params.append('tableNumber', tableNumber); // Gửi tableNumber
         params.append('page', currentOrderPage.toString());
         params.append('size', pageSize);
         params.append('orderBy', sortBy);
@@ -140,7 +155,7 @@ async function loadOrders() {
             params.append('area', currentWorkSchedule.area);
         }
         if (currentWorkSchedule && currentWorkSchedule.startTime) {
-            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
+            params.append('startTime', currentWorkSchedule.startTime);
         }
 
         // Fetch orders with filters
@@ -166,6 +181,117 @@ async function loadOrders() {
         showErrorState(error.message);
     }
 }
+
+
+
+async function generateTableOptions() {
+    try {
+        
+        // Lấy element filter trước khi gọi API
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (!tableFilter) {
+            console.warn('Không tìm thấy element tableNumberFilter');
+            return '<option value="">Element không tồn tại</option>';
+        }
+
+        // Lưu giá trị hiện tại
+        const currentValue = tableFilter.value;
+        
+        // Hiển thị loading
+        tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
+        
+        // Gọi API /tables để lấy danh sách bàn
+        const data = await apiFetch('/tables', {
+            method: 'GET'
+        });
+        
+        
+        // Kiểm tra dữ liệu trả về
+        if (!data || !data.result || !Array.isArray(data.result)) {
+            console.error('Dữ liệu bàn không hợp lệ:', data);
+            tableFilter.innerHTML = '<option value="">Không có dữ liệu bàn</option>';
+            return '<option value="">Không có dữ liệu bàn</option>';
+        }
+        
+        // Tạo danh sách tùy chọn từ dữ liệu API - sử dụng tableNumber làm value
+        const options = data.result.map(table => {
+            console.log('Xử lý bàn:', table); // Debug log
+            return `<option value="${table.tableNumber}">Bàn ${table.tableNumber}</option>`;
+        }).join('');
+        
+        console.log('Options được tạo:', options); // Debug log
+        
+        // Cập nhật trực tiếp vào dropdown filter
+        const finalOptions = '<option value="">Tất cả bàn</option>' + options;
+        tableFilter.innerHTML = finalOptions;
+        
+        // Khôi phục giá trị đã chọn trước đó (nếu có)
+        if (currentValue) {
+            tableFilter.value = currentValue;
+            console.log('Đã khôi phục giá trị:', currentValue);
+        }
+        
+        console.log('Đã cập nhật dropdown filter thành công');
+        
+        // Trả về options cho các mục đích khác (như showCart)
+        return options;
+        
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách bàn:', error);
+        
+        // Cập nhật UI hiển thị lỗi
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (tableFilter) {
+            tableFilter.innerHTML = '<option value="">Lỗi tải danh sách bàn</option>';
+        }
+        
+        // Trả về option lỗi
+        return '<option value="">Lỗi tải danh sách bàn</option>';
+    }
+}
+
+
+
+async function loadTableOptions() {
+    try {
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (!tableFilter) {
+            console.warn('Không tìm thấy element tableNumberFilter');
+            return;
+        }
+
+        const currentValue = tableFilter.value; // Lưu giá trị hiện tại
+        console.log('Giá trị hiện tại của filter:', currentValue);
+        
+        // Thêm loading indicator
+        tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
+        
+        // Lấy danh sách bàn - await đúng cách như trong showCart()
+        const tableOptions = await generateTableOptions();
+        console.log('Table options nhận được:', tableOptions);
+        
+        // Cập nhật dropdown với danh sách bàn
+        const finalOptions = '<option value="">Tất cả bàn</option>' + tableOptions;
+        tableFilter.innerHTML = finalOptions;
+        
+        // Khôi phục giá trị đã chọn trước đó (nếu có)
+        if (currentValue) {
+            tableFilter.value = currentValue;
+            console.log('Đã khôi phục giá trị:', currentValue);
+        }
+        
+        console.log('Load table options thành công');
+        
+    } catch (error) {
+        console.error('Lỗi khi load danh sách bàn:', error);
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (tableFilter) {
+            tableFilter.innerHTML = '<option value="">Lỗi tải danh sách bàn</option>';
+        }
+    }
+}
+
+
 
 
 // Apply filters and reload data
@@ -1738,7 +1864,6 @@ document.addEventListener('visibilitychange', function () {
         }
     }
 });
-
 
 
 
