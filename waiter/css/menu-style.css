@@ -1005,3 +1005,62 @@ a.cart-button,
   cursor: not-allowed;
   transform: none;
 }
+
+
+.payment-method-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.payment-method-title {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.payment-method-option {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.payment-method-option:hover {
+    border-color: #ff7700;
+    background-color: #f8f9ff;
+}
+
+.payment-method-option input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.payment-method-option input[type="radio"]:checked + .payment-method-label {
+    color: #ff7700;
+    font-weight: 600;
+}
+
+.payment-method-option:has(input[type="radio"]:checked) {
+    border-color: #ff7700;
+    background-color: #f8f9ff;
+}
+
+.payment-method-label {
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}

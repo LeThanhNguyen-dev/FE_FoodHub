@@ -14,6 +14,7 @@ let cart = [];
 let isCartSidebarOpen = false;
 let selectedOrderType = null;
 let selectedTable = null;
+let selectedPaymentMethod = 'CASH';
 async function showMenu() {
     try {
         // Khôi phục trạng thái cart trước (chỉ khi không phải chế độ thêm món)
@@ -1264,23 +1265,6 @@ function resetCartSidebarForNormalMode() {
     }
 }
 
-
-
-
-// HÀM MỚI: Xóa món khỏi giỏ hàng
-// function removeFromCart(index) {
-//     cart.splice(index, 1);
-//     updateCartSidebarContent();
-//     // Refresh cart modal if open
-//     const modal = document.querySelector('.cart-modal');
-//     if (modal) {
-//         closeModal();
-//         if (cart.length > 0) {
-//             showCart();
-//         }
-//     }
-// }
-
 // HÀM MỚI: Cập nhật số lượng trong giỏ hàng
 function updateCartQuantity(index, change) {
     if (index >= 0 && index < cart.length) {
@@ -1335,13 +1319,24 @@ async function submitOrder() {
                 menuItemId: item.menuItemId,
                 quantity: item.quantity,
                 status: "PENDING",
-                note: item.note || null // Thêm note cho từng món
+                note: item.note || null
             }))
         };
 
         // Nếu là đơn ăn tại chỗ, thêm tableId
         if (selectedOrderType === 'DINE_IN' && selectedTable) {
             orderData.tableId = selectedTable.id;
+        }
+
+        // Nếu là đơn mang về hoặc giao hàng, thêm thông tin thanh toán
+        if (selectedOrderType === 'TAKEAWAY' || selectedOrderType === 'DELIVERY') {
+            // Lấy payment method ngay tại thời điểm này, trước khi gửi API
+            const paymentMethod = getSelectedPaymentMethod();
+            console.log('Payment method before API call:', paymentMethod); // Debug log
+            
+            orderData.payment = {
+                paymentMethod: paymentMethod
+            };
         }
 
         // Hiển thị loading
@@ -1371,9 +1366,26 @@ async function submitOrder() {
                 successMessage += ` - ${orderTypeText} - Bàn ${selectedTable.tableNumber}`;
             } else {
                 successMessage += ` - ${orderTypeText}`;
+                
+                // Thêm thông tin phương thức thanh toán vào thông báo
+                if (selectedOrderType === 'TAKEAWAY' || selectedOrderType === 'DELIVERY') {
+                    const paymentMethodText = orderData.payment?.paymentMethod === 'BANKING' ? 'Chuyển khoản' : 'Tiền mặt';
+                    successMessage += ` - ${paymentMethodText}`;
+                }
             }
 
             showNotification(successMessage, 'success');
+
+            // Kiểm tra nếu là thanh toán chuyển khoản và có paymentUrl
+            console.log("payment method: ", order.payment?.paymentMethod);
+            console.log("payment url: ", order.payment?.paymentUrl);
+            if (order.payment && order.payment.paymentMethod === 'BANKING' && order.payment.paymentUrl) {
+                // Hiển thị thông báo chuyển hướng
+                showNotification('Đang chuyển hướng đến trang thanh toán...', 'info');
+                sessionStorage.setItem('pendingOrderId', order.id);
+                // Delay một chút để user đọc được thông báo, sau đó chuyển hướng
+                window.location.href = paymentResult.paymentUrl;
+            }
 
             // Reset giỏ hàng và các biến global để chuẩn bị cho đơn hàng mới
             cart = [];
@@ -1407,8 +1419,6 @@ async function submitOrder() {
                 submitBtn.textContent = 'Đặt món';
             }
 
-            // Cập nhật display giỏ hàng để hiển thị trạng thái trống
-
             // Cập nhật nội dung cart sidebar để hiển thị trạng thái reset
             if (typeof updateCartSidebarContent === 'function') {
                 updateCartSidebarContent();
@@ -1435,6 +1445,9 @@ async function submitOrder() {
         }
     }
 }
+
+
+
 
 function saveCartState() {
     try {
@@ -1506,9 +1519,11 @@ function initializeCartOnPageLoad() {
     restoreCartState();
 }
 
-
 async function showConfirmationPopup(title, message, confirmText, cancelText, onConfirm, onCancel) {
     try {
+        // Reset payment method về default
+        selectedPaymentMethod = 'CASH';
+        
         // Xóa popup cũ nếu có
         const existingPopup = document.getElementById('confirmationPopup');
         if (existingPopup) {
@@ -1540,16 +1555,34 @@ async function showConfirmationPopup(title, message, confirmText, cancelText, on
         const popupMessage = popupTemplate.querySelector('.popup-message');
         const cancelBtn = popupTemplate.querySelector('.cancel-btn');
         const confirmBtn = popupTemplate.querySelector('#confirmActionBtn');
+        const paymentMethodSection = popupTemplate.querySelector('#paymentMethodSection');
 
-        if (popupTitle) popupTitle.textContent = title; // Dùng textContent để tránh XSS
-        if (popupMessage) popupMessage.innerHTML = message; // Dùng innerHTML để render HTML trong message
+        if (popupTitle) popupTitle.textContent = title;
+        if (popupMessage) popupMessage.innerHTML = message;
         if (cancelBtn) cancelBtn.textContent = cancelText;
         if (confirmBtn) confirmBtn.textContent = confirmText;
+
+        // Hiển thị phần chọn phương thức thanh toán nếu là TAKEAWAY hoặc DELIVERY
+        if (paymentMethodSection && (selectedOrderType === 'TAKEAWAY' || selectedOrderType === 'DELIVERY')) {
+            paymentMethodSection.style.display = 'block';
+        }
 
         // Thêm popup vào body
         document.body.appendChild(popupTemplate);
 
-        // Gắn event listeners
+        // QUAN TRỌNG: Gắn event listeners cho payment method sau khi đã append vào DOM
+        const popup = document.getElementById('confirmationPopup');
+        if (popup) {
+            const paymentRadios = popup.querySelectorAll('input[name="paymentMethod"]');
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    selectedPaymentMethod = this.value;
+                    console.log('Payment method changed to:', selectedPaymentMethod);
+                });
+            });
+        }
+
+        // Gắn event listeners cho buttons
         if (confirmBtn) {
             confirmBtn.onclick = () => {
                 closeConfirmationPopup();
@@ -1582,6 +1615,11 @@ async function showConfirmationPopup(title, message, confirmText, cancelText, on
         console.error('Error showing confirmation popup:', error);
     }
 }
+
+
+
+
+
 
 // 2. Hàm đóng popup
 function closeConfirmationPopup() {
@@ -1632,10 +1670,21 @@ function generateOrderSummary() {
             <div class="total-amount">${formatPrice(totalAmount)}₫</div>
         </div>
     `;
+
+    if (selectedOrderType === 'DINE_IN' && selectedTable) {
+        summary += `
+            <div class="table-info">
+                <div class="table-label">Bàn:</div>
+                <div class="table-value">${selectedTable.tableNumber}</div>
+            </div>
+        `;
+    }
+
     summary += '</div>';
 
     return summary;
 }
+
 
 // 5. Hàm xác nhận đặt món mới (thay thế cho submitOrder trực tiếp)
 function confirmNewOrder() {
@@ -1712,4 +1761,7 @@ function confirmAddItems() {
     );
 }
 
-
+function getSelectedPaymentMethod() {
+    console.log('Getting selected payment method:', selectedPaymentMethod);
+    return selectedPaymentMethod;
+}

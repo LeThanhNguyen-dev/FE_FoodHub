@@ -157,9 +157,10 @@ async function loadOrders() {
         if (currentWorkSchedule && currentWorkSchedule.startTime) {
             params.append('startTime', currentWorkSchedule.startTime);
         }
-
+        console.log("area: ", currentWorkSchedule.area);
+        console.log("start time: ", currentWorkSchedule.startTime);
         // Fetch orders with filters
-        const data = await apiFetch(`/orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders/waiter/work-shift-orders?${params.toString()}`, {
             method: 'GET'
         });
 
@@ -532,53 +533,7 @@ async function checkoutOrder(order) {
         }
     }
 }
-async function handlePaymentCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('orderId');
-    const status = urlParams.get('status');
-    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
 
-    // Kiểm tra xem có phải redirect từ PayOS không
-    if (orderId && pendingOrderId && orderId === pendingOrderId) {
-        try {
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'block';
-            }
-
-            // Gọi API /payments/callback với query string
-            const response = await apiFetch(`/payments/callback?${urlParams.toString()}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.code === 0) {
-                const paymentResult = response.result;
-                if (paymentResult.status === 'PAID') {
-                    alert(`Thanh toán thành công!\nSố tiền: ${paymentResult.amount.toLocaleString('vi-VN')} VND\nMã giao dịch: ${paymentResult.transactionId}`);
-                } else if (paymentResult.status === 'CANCELLED') {
-                    alert('Thanh toán đã bị hủy.');
-                } else {
-                    alert(`Trạng thái thanh toán: ${paymentResult.status}`);
-                }
-                await loadOrders();
-            } else {
-                throw new Error(response.message || 'Lỗi khi xử lý kết quả thanh toán');
-            }
-        } catch (error) {
-            console.error('Error handling callback:', error);
-            alert('Có lỗi khi xử lý kết quả thanh toán: ' + error.message);
-        } finally {
-            sessionStorage.removeItem('pendingOrderId');
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
-        }
-    }
-}
 
 
 // Helper function để hiển thị modal với thông tin đơn hàng và chọn phương thức thanh toán
@@ -1649,16 +1604,7 @@ async function showOrderItemsStatusModal(orderData) {
     }
 }
 
-// Hàm hỗ trợ (giả định đã tồn tại)
-function getStatusBadgeClass(status) {
-    switch (status) {
-        case 'PENDING': return 'badge-pending';
-        case 'CONFIRMED': return 'badge-confirmed';
-        case 'COMPLETED': return 'badge-completed';
-        case 'CANCELLED': return 'badge-cancelled';
-        default: return '';
-    }
-}
+
 
 function getStatusText(status) {
     switch (status) {
@@ -1864,7 +1810,6 @@ document.addEventListener('visibilitychange', function () {
         }
     }
 });
-
 
 
 

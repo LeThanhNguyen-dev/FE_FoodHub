@@ -606,14 +606,7 @@ function getTableStatusIcon(status) {
 }
 
 // Hàm xác định class badge cho trạng thái
-function getStatusBadgeClass(status) {
-    const classes = {
-        'AVAILABLE': 'bg-success',
-        'OCCUPIED': 'bg-primary',
-        'RESERVED': 'bg-warning'
-    };
-    return classes[status] || 'bg-secondary';
-}
+
 
 // Hàm kiểm tra xem có cần hiển thị cảnh báo khẩn cấp không
 function shouldShowUrgent(table) {

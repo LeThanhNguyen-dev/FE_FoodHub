@@ -159,6 +159,20 @@
                 </div>
                 <div class="popup-content">
                     <p class="popup-message"></p>
+                    <!-- Thêm phần chọn phương thức thanh toán -->
+                    <div id="paymentMethodSection" class="payment-method-section" style="display: none;">
+                        <h4 class="payment-method-title">Chọn phương thức thanh toán:</h4>
+                        <div class="payment-methods">
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="CASH" checked>
+                                <span class="payment-method-label">💵 Tiền mặt</span>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="BANKING">
+                                <span class="payment-method-label">🏦 Chuyển khoản</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="popup-actions">
                     <button class="popup-btn cancel-btn" onclick="closeConfirmationPopup()"></button>
