@@ -9,10 +9,13 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
     :root {
-      --primary-orange: #FEA116;
-      --primary-dark: #0F172B;
+      --primary-blue: #1E3A8A;
+      --accent-orange: #FEA116;
+      --blue-hover: #1E40AF;
       --orange-hover: #E59014;
+      --blue-light: rgba(30, 58, 138, 0.1);
       --orange-light: rgba(254, 161, 22, 0.1);
+      --blue-shadow: rgba(30, 58, 138, 0.3);
       --orange-shadow: rgba(254, 161, 22, 0.3);
     }
 
@@ -24,7 +27,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%);
+      background: linear-gradient(135deg, var(--primary-blue) 0%, #1e293b 100%);
       min-height: 100vh;
     }
 
@@ -34,11 +37,11 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: var(--primary-dark);
+      background: var(--primary-blue);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: var(--primary-orange);
+      background: var(--accent-orange);
       border-radius: 4px;
     }
 
@@ -48,9 +51,9 @@
 
     /* Sidebar Animations */
     .sidebar {
-      background: linear-gradient(180deg, var(--primary-dark) 0%, #1a2332 100%);
+      background: linear-gradient(180deg, var(--primary-blue) 0%, #1a2332 100%);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-      border-right: 1px solid var(--primary-orange);
+      border-right: 1px solid var(--accent-orange);
     }
 
     .sidebar-header {
@@ -58,7 +61,6 @@
       position: relative;
       overflow: hidden;
     }
-    
 
     .sidebar-header::before {
       content: '';
@@ -95,14 +97,14 @@
     }
 
     .sidebar-link:hover {
-      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
       transform: translateX(8px) scale(1.02);
       box-shadow: 0 8px 25px var(--orange-shadow);
       color: white !important;
     }
 
     .sidebar-link.active {
-      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
       color: white !important;
       box-shadow: 0 4px 15px var(--orange-shadow);
     }
@@ -130,20 +132,20 @@
       right: 0;
       bottom: 0;
       background:
-        radial-gradient(circle at 20% 50%, var(--orange-light) 0%, transparent 50%),
+        radial-gradient(circle at 20% 50%, var(--blue-light) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, var(--orange-light) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, var(--orange-light) 0%, transparent 50%);
+        radial-gradient(circle at 40% 80%, var(--blue-light) 0%, transparent 50%);
       pointer-events: none;
     }
 
     .content-card {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(254, 161, 22, 0.2);
+      border: 1px solid var(--blue-light);
       border-radius: 20px;
       box-shadow:
         0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(254, 161, 22, 0.1);
+        0 0 0 1px var(--blue-light);
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
@@ -156,28 +158,21 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, var(--primary-orange), var(--orange-hover), var(--primary-orange));
+      background: linear-gradient(90deg, var(--primary-blue), var(--blue-hover), var(--primary-blue));
       background-size: 200% 100%;
       animation: shimmer 3s ease-in-out infinite;
     }
 
     @keyframes shimmer {
-
-      0%,
-      100% {
-        background-position: -200% 0;
-      }
-
-      50% {
-        background-position: 200% 0;
-      }
+      0%, 100% { background-position: -200% 0; }
+      50% { background-position: 200% 0; }
     }
 
     .content-card:hover {
       transform: translateY(-5px);
       box-shadow:
         0 30px 60px rgba(0, 0, 0, 0.15),
-        0 0 0 1px rgba(254, 161, 22, 0.3);
+        0 0 0 1px var(--blue-shadow);
     }
 
     /* Form Elements */
@@ -188,7 +183,7 @@
 
     .form-label {
       display: block;
-      color: var(--primary-dark);
+      color: var(--primary-blue);
       font-weight: 600;
       font-size: 14px;
       margin-bottom: 8px;
@@ -199,19 +194,19 @@
       width: 100%;
       padding: 16px 16px 16px 48px;
       background: rgba(255, 255, 255, 0.8);
-      border: 2px solid #e2e8f0;
+      border: 2px solid var(--blue-light);
       border-radius: 12px;
       font-size: 16px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color: var(--primary-dark);
+      color: var(--primary-blue);
     }
 
     .form-input:focus {
       outline: none;
-      border-color: var(--primary-orange);
+      border-color: var(--primary-blue);
       background: rgba(255, 255, 255, 1);
       box-shadow:
-        0 0 0 4px var(--orange-light),
+        0 0 0 4px var(--blue-light),
         0 8px 25px rgba(0, 0, 0, 0.1);
       transform: translateY(-2px);
     }
@@ -221,19 +216,19 @@
       left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      color: #94a3b8;
+      color: var(--primary-blue);
       transition: all 0.3s ease;
       z-index: 1;
     }
 
     .form-input:focus+.form-icon {
-      color: var(--primary-orange);
+      color: var(--accent-orange);
       transform: translateY(-50%) scale(1.1);
     }
 
     /* Buttons */
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-hover) 100%);
       color: white;
       border: none;
       padding: 16px 32px;
@@ -244,7 +239,7 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
-      box-shadow: 0 8px 25px var(--orange-shadow);
+      box-shadow: 0 8px 25px var(--blue-shadow);
     }
 
     .btn-primary::before {
@@ -254,7 +249,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
       transition: left 0.6s;
     }
 
@@ -264,7 +259,7 @@
 
     .btn-primary:hover {
       transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 15px 35px var(--orange-shadow);
+      box-shadow: 0 15px 35px var(--blue-shadow);
     }
 
     .btn-primary:active {
@@ -292,15 +287,8 @@
     }
 
     @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .message-success {
@@ -313,16 +301,6 @@
       background: rgba(239, 68, 68, 0.1);
       color: #991b1b;
       border-left-color: #ef4444;
-    }
-
-    /* Order Content */
-    .order-content {
-      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%);
-      color: white;
-      padding: 24px;
-      border-radius: 16px;
-      border: 1px solid var(--primary-orange);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     /* Responsive Design */
@@ -348,6 +326,14 @@
       .content-card {
         margin: 20px;
       }
+
+      .form-container {
+        flex-direction: column;
+      }
+
+      .profile-form, .password-form {
+        width: 100%;
+      }
     }
 
     /* Loading Animation */
@@ -362,9 +348,7 @@
     }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      to { transform: rotate(360deg); }
     }
 
     /* Enhanced hover effects */
@@ -377,7 +361,7 @@
     }
 
     .glow-on-hover:hover {
-      box-shadow: 0 0 20px var(--orange-shadow);
+      box-shadow: 0 0 20px var(--blue-shadow);
     }
   </style>
 </head>
@@ -391,25 +375,21 @@
         <p id="username-greeting" class="text-xl text-white/80 mt-1 relative z-10">Welcome, User!</p>
       </div>
       <nav class="mt-6 px-3">
-        <a href="#profile" id="profile-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
+        <a href="profile.html" id="profile-link"
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2 active">
           <i class="fas fa-user mr-3"></i> Edit Profile
         </a>
-        <a href="#password" id="password-link"
+        <a href="ordertrack.html" id="order-track-link"
           class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-key mr-3"></i> Change Password
+          <i class="fas fa-truck mr-3"></i> Order Tracking
         </a>
-        <a href="#order-status" id="order-status-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-shipping-fast mr-3"></i> Order Status
-        </a>
-        <a href="#order-history" id="order-history-link"
+        <a href="orderHistory.html" id="order-history-link"
           class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
           <i class="fas fa-history mr-3"></i> Order History
         </a>
         <a href="home.html" id="home-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold">
-          <i class="fas fa-home mr-3"></i> Back to Home
+          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
+          <i class="fas fa-home mr-3"></i> Back to Home Page
         </a>
       </nav>
     </div>
@@ -431,102 +411,75 @@
         </h2>
         <div id="error-message" class="hidden message message-error"></div>
         <div id="success-message" class="hidden message message-success"></div>
-
-        <div class="space-y-6">
-          <div class="form-group">
-            <label for="username" class="form-label">Username</label>
-            <div class="relative">
-              <input type="text" id="username" class="form-input" readonly>
-              <i class="fas fa-user form-icon"></i>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="email" class="form-label">Email Address</label>
-            <div class="relative">
-              <input type="email" id="email" class="form-input" placeholder="Enter your email">
-              <i class="fas fa-envelope form-icon"></i>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="phone" class="form-label">Phone Number</label>
-            <div class="relative">
-              <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
-              <i class="fas fa-phone form-icon"></i>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="address" class="form-label">Address</label>
-            <div class="relative">
-              <input type="text" id="address" class="form-input" placeholder="Enter your address">
-              <i class="fas fa-map-marker-alt form-icon"></i>
-            </div>
-          </div>
-
-          <button id="save-button" class="w-full btn-primary">
-            <i class="fas fa-save mr-2"></i> Save Changes
-          </button>
-        </div>
-      </div>
-
-      <!-- Password Change Section -->
-      <div id="password-section" class="hidden content-card p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-          <i class="fas fa-shield-alt mr-3 text-orange-500"></i>
-          Change Password
-        </h2>
         <div id="password-error-message" class="hidden message message-error"></div>
         <div id="password-success-message" class="hidden message message-success"></div>
 
-        <div class="space-y-6">
-          <div class="form-group">
-            <label for="old-password" class="form-label">Current Password</label>
-            <div class="relative">
-              <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
-              <i class="fas fa-lock form-icon"></i>
+        <div class="form-container flex gap-8">
+          <!-- Password Change Form -->
+          <div class="password-form w-1/2">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-shield-alt mr-3 text-orange-500"></i>
+              Change Password
+            </h3>
+            <div class="space-y-6">
+              <div class="form-group">
+                <label for="old-password" class="form-label">Current Password</label>
+                <div class="relative">
+                  <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
+                  <i class="fas fa-lock form-icon"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="new-password" class="form-label">New Password</label>
+                <div class="relative">
+                  <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+                  <i class="fas fa-key form-icon"></i>
+                </div>
+              </div>
+              <button id="change-password-button" class="w-full btn-primary">
+                <i class="fas fa-edit mr-2"></i> Change Password
+              </button>
             </div>
           </div>
-
-          <div class="form-group">
-            <label for="new-password" class="form-label">New Password</label>
-            <div class="relative">
-              <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
-              <i class="fas fa-key form-icon"></i>
+          <!-- Profile Edit Form -->
+          <div class="profile-form w-1/2">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-user-edit mr-3 text-orange-500"></i>
+              Profile Information
+            </h3>
+            <div class="space-y-6">
+              <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <div class="relative">
+                  <input type="text" id="username" class="form-input" readonly>
+                  <i class="fas fa-user form-icon"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <div class="relative">
+                  <input type="email" id="email" class="form-input" placeholder="Enter your email">
+                  <i class="fas fa-envelope form-icon"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="phone" class="form-label">Phone Number</label>
+                <div class="relative">
+                  <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+                  <i class="fas fa-phone form-icon"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="address" class="form-label">Address</label>
+                <div class="relative">
+                  <input type="text" id="address" class="form-input" placeholder="Enter your address">
+                  <i class="fas fa-map-marker-alt form-icon"></i>
+                </div>
+              </div>
+              <button id="save-button" class="w-full btn-primary">
+                <i class="fas fa-save mr-2"></i> Save Changes
+              </button>
             </div>
-          </div>
-
-          <button id="change-password-button" class="w-full btn-primary">
-            <i class="fas fa-edit mr-2"></i> Change Password
-          </button>
-        </div>
-      </div>
-
-      <!-- Order Status Section -->
-      <div id="order-status-section" class="hidden content-card p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-          <i class="fas fa-truck mr-3 text-orange-500"></i>
-          Order Status
-        </h2>
-        <div id="order-status-content" class="order-content">
-          <div class="flex items-center justify-center py-8">
-            <div class="loading mr-3"></div>
-            <p>Loading order status...</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Order History Section -->
-      <div id="order-history-section" class="hidden content-card p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-          <i class="fas fa-history mr-3 text-orange-500"></i>
-          Order History
-        </h2>
-        <div id="order-history-content" class="order-content">
-          <div class="flex items-center justify-center py-8">
-            <div class="loading mr-3"></div>
-            <p>Loading order history...</p>
           </div>
         </div>
       </div>
@@ -686,63 +639,6 @@
       }
     }
 
-    function switchSection(sectionId) {
-      // Hide all sections
-      document.querySelectorAll('#content-area > div').forEach(div => div.classList.add('hidden'));
-      // Show selected section
-      document.getElementById(sectionId).classList.remove('hidden');
-      // Update active link
-      document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
-      document.getElementById(`${sectionId}-link`).classList.add('active');
-    }
-
-    async function fetchOrderStatus() {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_BASE_URL}/orders/status`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!response.ok) throw new Error('Failed to fetch order status');
-        const data = await response.json();
-        const content = document.getElementById('order-status-content');
-        content.innerHTML = data.result.length
-          ? data.result.map(order => `
-              <div class="mb-4 p-4 bg-white/10 rounded-lg border border-orange-500/30">
-                <p class="font-semibold">Order #${order.id}</p>
-                <p class="text-orange-400">${order.status}</p>
-              </div>
-            `).join('')
-          : '<div class="text-center py-8"><i class="fas fa-inbox text-4xl text-orange-400 mb-4"></i><p>No active orders found.</p></div>';
-      } catch (error) {
-        document.getElementById('order-status-content').innerHTML =
-          `<div class="text-center py-8 text-red-400"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error: ${error.message}</p></div>`;
-      }
-    }
-
-    async function fetchOrderHistory() {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_BASE_URL}/orders/history`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!response.ok) throw new Error('Failed to fetch order history');
-        const data = await response.json();
-        const content = document.getElementById('order-history-content');
-        content.innerHTML = data.result.length
-          ? data.result.map(order => `
-              <div class="mb-4 p-4 bg-white/10 rounded-lg border border-orange-500/30">
-                <p class="font-semibold">Order #${order.id}</p>
-                <p class="text-orange-400">${order.status}</p>
-                <p class="text-sm text-gray-300">${new Date(order.date).toLocaleDateString()}</p>
-              </div>
-            `).join('')
-          : '<div class="text-center py-8"><i class="fas fa-history text-4xl text-orange-400 mb-4"></i><p>No order history available.</p></div>';
-      } catch (error) {
-        document.getElementById('order-history-content').innerHTML =
-          `<div class="text-center py-8 text-red-400"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error: ${error.message}</p></div>`;
-      }
-    }
-
     function updateUI() {
       if (!isLoggedIn()) {
         showError('Please login to access dashboard!');
@@ -750,83 +646,23 @@
         return;
       }
       fetchUserInfo();
-      switchSection('profile-section');
     }
 
     // Event Listeners
     document.getElementById('save-button').addEventListener('click', saveUserInfo);
     document.getElementById('change-password-button').addEventListener('click', changePassword);
     document.getElementById('logout-button').addEventListener('click', logout);
-    document.getElementById('profile-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      switchSection('profile-section');
-    });
-    document.getElementById('password-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      switchSection('password-section');
-    });
-    document.getElementById('order-status-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      switchSection('order-status-section');
-      fetchOrderStatus();
-    });
-    document.getElementById('order-history-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      switchSection('order-history-section');
-      fetchOrderHistory();
-    });
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', updateUI);
 
-    // Add keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.altKey) {
-        switch (e.key) {
-          case '1':
-            e.preventDefault();
-            document.getElementById('profile-link').click();
-            break;
-          case '2':
-            e.preventDefault();
-            document.getElementById('password-link').click();
-            break;
-          case '3':
-            e.preventDefault();
-            document.getElementById('order-status-link').click();
-            break;
-          case '4':
-            e.preventDefault();
-            document.getElementById('order-history-link').click();
-            break;
-        }
-      }
-    });
-
-    // Add smooth scrolling and enhanced interactions
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
-
     // Add form validation feedback
     function validateForm(formType) {
-      const inputs = document.querySelectorAll(`#${formType}-section input[type="email"], #${formType}-section input[type="tel"]`);
+      const inputs = document.querySelectorAll(`.${formType}-form input[type="email"], .${formType}-form input[type="tel"], .${formType}-form input[type="password"]`);
       let isValid = true;
 
       inputs.forEach(input => {
         const value = input.value.trim();
-        const inputGroup = input.closest('.form-group');
-
-        // Remove existing validation classes
         input.classList.remove('border-red-400', 'border-green-400');
 
         if (input.type === 'email' && value) {
@@ -848,6 +684,16 @@
             input.classList.add('border-green-400');
           }
         }
+
+        if (input.type === 'password' && input.id === 'new-password' && value) {
+          const strength = calculatePasswordStrength(value);
+          if (strength < 3) {
+            input.classList.add('border-red-400');
+            isValid = false;
+          } else {
+            input.classList.add('border-green-400');
+          }
+        }
       });
 
       return isValid;
@@ -856,6 +702,7 @@
     // Add real-time validation
     document.getElementById('email').addEventListener('blur', () => validateForm('profile'));
     document.getElementById('phone').addEventListener('blur', () => validateForm('profile'));
+    document.getElementById('new-password').addEventListener('blur', () => validateForm('password'));
 
     // Add password strength indicator
     document.getElementById('new-password').addEventListener('input', function () {
@@ -926,7 +773,7 @@
     // Add tooltips for navigation
     const navLinks = document.querySelectorAll('.sidebar-link');
     navLinks.forEach(link => {
-      link.setAttribute('title', link.textContent.trim() + ' (Alt + ' + (Array.from(navLinks).indexOf(link) + 1) + ')');
+      link.setAttribute('title', link.textContent.trim());
     });
 
     // Add loading states for async operations

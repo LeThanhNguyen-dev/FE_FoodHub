@@ -144,7 +144,7 @@
         }
 
         .form-control {
-            border: 2px solid var(--border-light);
+            border: 1px solid #fff ;
             border-radius: 12px;
             padding: 0.9rem 1.2rem;
             font-size: 0.95rem;
@@ -154,7 +154,7 @@
         }
 
         .form-control:focus {
-            border-color: var(--light-green);
+            border-color: 2px solid #fff ;
             box-shadow: 0 0 0 0.2rem rgba(58, 119, 99, 0.15);
             background: var(--warm-white);
             transform: translateY(-1px);
@@ -283,21 +283,26 @@
 
         /* Input Icons */
         .input-group-custom {
-            position: relative;
-        }
+    position: relative;
+    margin-bottom: 1.5rem;
+}
 
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            z-index: 2;
-        }
+.input-icon {
+    position: absolute;
+    top: 70%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: #ccc;
+    font-size: 1rem;
+    pointer-events: none;
+}
 
-        .form-control.with-icon {
-            padding-left: 3rem;
-        }
+.form-control.with-icon {
+    padding-left: 2.5rem;
+    height: 48px; /* đảm bảo cùng chiều cao để icon canh giữa tốt */
+    display: flex;
+    align-items: center;
+}
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -497,21 +502,19 @@
                         </div>
 
                         <div class="form-group-full">
-                            <label class="form-label">Phương Thức Thanh Toán</label>
-                            <div class="payment-card">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="payment-method"
-                                        id="online-payment" value="online" checked>
-                                    <label class="form-check-label" for="online-payment">
-                                        <i class="fas fa-credit-card me-2"></i>
-                                        Thanh toán Online (VNPay, Momo, Banking)
-                                    </label>
-                                </div>
-                                <p class="payment-description">
-                                    Bạn sẽ được chuyển hướng đến cổng thanh toán an toàn để hoàn tất giao dịch.
-                                </p>
-                            </div>
-                        </div>
+    <label class="form-label">Phương Thức Thanh Toán</label>
+    <div class="payment-card">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment-method" id="online-payment" value="ONLINE" checked>
+            <label class="form-check-label" for="online-payment">
+                <i class="fas fa-credit-card me-2"></i>
+                Thanh toán Online (VNPay, Momo, Banking)
+            </label>
+        </div>
+        <p class="payment-description">
+            Bạn sẽ được chuyển hướng đến cổng thanh toán an toàn để hoàn tất giao dịch.
+        </p>
+    </div>
 
                         <div class="order-summary">
                             <div class="summary-title">
@@ -550,8 +553,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/auth.js"></script>
     <script>
-        // Hàm lấy thông tin người dùng
-        async function fetchUserInfo() {
+    // Định nghĩa API_BASE_URL (thay thế bằng URL thực tế của backend)
+     // Cập nhật URL backend của bạn
+
+    // Hàm lấy thông tin người dùng
+    async function fetchUserInfo() {
             try {
                 const usernameInput = document.getElementById('username');
                 const emailInput = document.getElementById('email');
@@ -630,88 +636,158 @@
             }
         }
 
-        // Xử lý submit form với loading
-        function handleFormSubmission(e) {
-            e.preventDefault();
+    // Xử lý submit form với loading
+    async function handleFormSubmission(e) {
+        e.preventDefault();
 
-            const username = document.getElementById('username')?.value;
-            const email = document.getElementById('email')?.value;
-            const phone = document.getElementById('phone')?.value;
-            const address = document.getElementById('address')?.value;
+        const username = document.getElementById('username')?.value;
+        const email = document.getElementById('email')?.value;
+        const phone = document.getElementById('phone')?.value;
+        const address = document.getElementById('address')?.value;
+        const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
 
-            if (!username || !email || !phone || !address) {
-                alert('Vui lòng điền đầy đủ thông tin.');
-                return;
-            }
-
-            // Hiển thị loading
-            const submitBtn = document.querySelector('.btn-checkout');
-            const spinner = document.querySelector('.loading-spinner');
-            const btnText = submitBtn.innerHTML;
-
-            spinner.style.display = 'inline-block';
-            submitBtn.disabled = true;
-            submitBtn.style.opacity = '0.7';
-
-            // Giả lập xử lý
-            setTimeout(() => {
-                alert('Đang chuyển đến trang thanh toán...');
-                localStorage.removeItem('cart');
-                window.location.href = 'https://payment.example.com';
-            }, 2000);
+        if (!username || !email || !phone || !address || !paymentMethod) {
+            alert('Vui lòng điền đầy đủ thông tin.');
+            return;
         }
 
-        // Khởi tạo trang
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM đã tải, đang khởi tạo trang');
+        // Hiển thị loading
+        const submitBtn = document.querySelector('.btn-checkout');
+        const spinner = document.querySelector('.loading-spinner');
+        const btnText = submitBtn.innerHTML;
 
-            if (typeof updateUI === 'function') {
-                updateUI();
-            } else {
-                console.warn('Hàm updateUI không được định nghĩa');
+        spinner.style.display = 'inline-block';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.7';
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                throw new Error('Vui lòng đăng nhập để tiếp tục.');
             }
 
-            fetchUserInfo();
+            const payload = parseJwt(token);
+            if (!payload || !payload.id) {
+                throw new Error('Token không hợp lệ hoặc không tìm thấy ID người dùng.');
+            }
 
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                throw new Error('Giỏ hàng trống. Vui lòng thêm món ăn trước khi đặt hàng.');
+            }
+
+            // Map cart items to orderItems
+            const orderItems = cart.map(item => ({
+                menuItemId: item.id, // Giả sử item.id là menuItemId
+                quantity: item.quantity
+            }));
+
+            const orderRequest = {
+                userId: payload.id,
+                orderType: 'DELIVERY', // Giả sử checkout dành cho giao hàng
+                tableId: null, // Không cần cho DELIVERY
+                orderItems: orderItems,
+                payment: {
+                    paymentMethod: paymentMethod // ONLINE hoặc CASH
+                }
+            };
+
+            console.log('Sending order request:', orderRequest);
+
+            const response = await fetch(`${API_BASE_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderRequest)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Lỗi khi tạo đơn hàng.');
+            }
+
+            const data = await response.json();
+            const orderResponse = data.result;
+
+            // Xóa giỏ hàng sau khi đặt hàng thành công
+            localStorage.removeItem('cart');
+
+            // Gọi updateCartCount nếu tồn tại (từ auth.js)
             if (typeof updateCartCount === 'function') {
                 updateCartCount();
             }
 
-            // Tính và hiển thị tổng tiền
-            try {
-                const cart = JSON.parse(localStorage.getItem('cart')) || [];
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const totalAmountElement = document.getElementById('total-amount');
-                if (totalAmountElement) {
-                    totalAmountElement.textContent = total.toLocaleString('vi-VN') + ' VND';
-                } else {
-                    console.warn('Không tìm thấy element tổng tiền');
-                }
-            } catch (error) {
-                console.error('Lỗi tính tổng tiền:', error.message);
-            }
-
-            // Gắn sự kiện submit form
-            const checkoutForm = document.getElementById('checkout-form');
-            if (checkoutForm) {
-                checkoutForm.addEventListener('submit', handleFormSubmission);
+            // Xử lý redirect cho thanh toán online
+            if (paymentMethod === 'ONLINE' && orderResponse.payment?.paymentUrl) {
+                alert('Đang chuyển đến trang thanh toán...');
+                window.location.href = orderResponse.payment.paymentUrl;
             } else {
-                console.error('Không tìm thấy form thanh toán');
+                alert('Đặt hàng thành công! Bạn sẽ nhận được xác nhận sớm.');
+                window.location.href = 'order-confirmation.html'; // Trang xác nhận đơn hàng
             }
+        } catch (error) {
+            console.error('Lỗi khi gửi đơn hàng:', error.message);
+            alert(`Lỗi: ${error.message}`);
+        } finally {
+            spinner.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+        }
+    }
 
-            // Thêm hiệu ứng focus cho inputs
-            const inputs = document.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function () {
-                    this.parentElement.style.transform = 'translateY(-2px)';
-                });
+    // Khởi tạo trang
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM đã tải, đang khởi tạo trang');
 
-                input.addEventListener('blur', function () {
-                    this.parentElement.style.transform = 'translateY(0)';
-                });
+        if (typeof updateUI === 'function') {
+            updateUI();
+        } else {
+            console.warn('Hàm updateUI không được định nghĩa');
+        }
+
+        fetchUserInfo();
+
+        if (typeof updateCartCount === 'function') {
+            updateCartCount();
+        }
+
+        // Tính và hiển thị tổng tiền
+        try {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalAmountElement = document.getElementById('total-amount');
+            if (totalAmountElement) {
+                totalAmountElement.textContent = total.toLocaleString('vi-VN') + ' VND';
+            } else {
+                console.warn('Không tìm thấy element tổng tiền');
+            }
+        } catch (error) {
+            console.error('Lỗi tính tổng tiền:', error.message);
+        }
+
+        // Gắn sự kiện submit form
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', handleFormSubmission);
+        } else {
+            console.error('Không tìm thấy form thanh toán');
+        }
+
+        // Thêm hiệu ứng focus cho inputs
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function () {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+
+            input.addEventListener('blur', function () {
+                this.parentElement.style.transform = 'translateY(0)';
             });
         });
-    </script>
+    });
+</script>
 </body>
 
 </html>
