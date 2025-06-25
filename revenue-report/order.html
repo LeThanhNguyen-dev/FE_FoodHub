@@ -229,6 +229,7 @@
         const pageSize = 10;
         let sortBy = 'createdAt';
         let sortDirection = 'ASC';
+        let totalAmountAllPages = 0;
 
         async function loadSidebar() {
             try {
@@ -287,15 +288,28 @@
             }).replace(/\//g, '/');
         }
 
-        function formatPaymentMethod(method) {
-            if (!method || method === 'N/A') return 'Chưa xác định';
-            switch (method) {
-                case 'CASH': return 'CASH';
-                case 'CARD': return 'Thẻ';
-                case 'QR_CODE': return 'QR Code';
-                default: return method;
-            }
-        }
+       function formatPaymentMethod(method) {
+    // Kiểm tra null/undefined hoặc giá trị rỗng
+    if (!method || method.trim() === '') {
+        return 'Chưa xác định';
+    }
+    
+    // Xử lý các phương thức thanh toán
+    switch (method.toUpperCase()) {
+        case 'CASH': 
+            return 'CASH';
+        case 'CARD': 
+            return 'Thẻ';
+        case 'BANKING': 
+            return 'BANKING';
+        case 'VNPAY': 
+            return 'VNPAY';
+        case 'QR_CODE': 
+            return 'QR Code';
+        default: 
+            return method; // Trả về giá trị gốc nếu không khớp với case nào
+    }
+}
 
         function getQueryParams() {
             const period = document.getElementById('period').value;
@@ -348,31 +362,55 @@
             console.log('Final query params:', params);
             return params;
         }
+        async function fetchTotalAmount() {
+    const params = getQueryParams();
+    if (!params) return 0;
+    
+    try {
+        // Gọi API với size rất lớn để lấy tất cả đơn hàng
+        const allOrdersParams = params.replace(`page=${currentPage}&size=${pageSize}`, 'page=0&size=10000');
+        const response = await apiFetch(`/orders/completed/filtered?${allOrdersParams}`);
+        
+        if (response.code === 0 && response.result.content) {
+            return response.result.content.reduce((total, order) => total + order.totalAmount, 0);
+        }
+        return 0;
+    } catch (error) {
+        console.error('Lỗi tính tổng tiền:', error);
+        return 0;
+    }
+}
 
         async function fetchOrders() {
-            showLoading();
-            const params = getQueryParams();
-            if (!params) return;
+    showLoading();
+    const params = getQueryParams();
+    if (!params) return;
 
-            try {
-                const response = await apiFetch(`/orders/completed/filtered?${params}`);
-                hideLoading();
-                if (response.code === 0) {
-                    const data = response.result;
-                    renderOrderTable(data.content, data.totalElements);
-                    renderPagination(data.totalPages, data.number);
-                } else {
-                    showNotification(response.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
-                    document.getElementById('emptyState').style.display = 'block';
-                    document.getElementById('orderTableBody').innerHTML = '';
-                }
-            } catch (error) {
-                hideLoading();
-                showNotification(error.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
-                document.getElementById('emptyState').style.display = 'block';
-                document.getElementById('orderTableBody').innerHTML = '';
-            }
+    try {
+        // THÊM: Tính tổng tiền từ tất cả trang
+        const totalAmountPromise = fetchTotalAmount();
+        const ordersPromise = apiFetch(`/orders/completed/filtered?${params}`);
+        
+        const [totalAmount, response] = await Promise.all([totalAmountPromise, ordersPromise]);
+        totalAmountAllPages = totalAmount; // LUU TỔNG TIỀN
+        
+        hideLoading();
+        if (response.code === 0) {
+            const data = response.result;
+            renderOrderTable(data.content, data.totalElements);
+            renderPagination(data.totalPages, data.number);
+        } else {
+            showNotification(response.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('orderTableBody').innerHTML = '';
         }
+    } catch (error) {
+        hideLoading();
+        showNotification(error.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('orderTableBody').innerHTML = '';
+    }
+}
 
         function renderOrderTable(orders, totalElements = 0) {
             const tbody = document.getElementById('orderTableBody');
@@ -385,40 +423,49 @@
                 totalOrdersElement.className = 'total-orders-info alert alert-info mb-3';
                 orderTableCard.querySelector('.card-body').insertBefore(totalOrdersElement, orderTableCard.querySelector('#loadingSpinner'));
             }
-            
-            totalOrdersElement.innerHTML = `
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Tổng số đơn hàng:</strong> ${totalElements.toLocaleString('vi-VN')} đơn
-            `;
-            
-            if (!orders || orders.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
-                tbody.innerHTML = '';
-                return;
-            }
 
-            document.getElementById('emptyState').style.display = 'none';
-            tbody.innerHTML = orders.map((order, index) => {
-                const stt = currentPage * pageSize + index + 1;
-                return `
-                    <tr>
-                        <td><div class="text-center fw-bold">${stt}</div></td>
-                        <td><div class="fw-bold">${order.id}</div></td>
-                        <td><div>${formatDate(order.createdAt)}</div></td>
-                        <td><div>${order.username || 'Khách lẻ'}</div></td>
-                        <td><div class="fw-bold text-success">${formatCurrency(order.totalAmount)}</div></td>
-                        <td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
-                        <td><div>${formatPaymentMethod(order.paymentMethod)}</div></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-outline-primary btn-sm" onclick="showOrderDetail(${order.id})" title="Xem chi tiết">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            
+           totalOrdersElement.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <i class="fas fa-shopping-cart me-2"></i>
+                <strong>Tổng số đơn hàng:</strong> ${totalElements.toLocaleString('vi-VN')} đơn
+            </div>
+            <div class="col-md-6">
+                <i class="fas fa-money-bill-wave me-2"></i>
+                <strong>Tổng doanh thu:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
+            </div>
+        </div>
+    `;
+    
+    if (!orders || orders.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        tbody.innerHTML = '';
+        return;
+    }
+
+               document.getElementById('emptyState').style.display = 'none';
+    tbody.innerHTML = orders.map((order, index) => {
+        const stt = currentPage * pageSize + index + 1;
+        return `
+            <tr>
+                <td><div class="text-center fw-bold">${stt}</div></td>
+                <td><div class="fw-bold">${order.id}</div></td>
+                <td><div>${formatDate(order.createdAt)}</div></td>
+                <td><div>${order.username || 'Khách lẻ'}</div></td>
+                <td><div class="fw-bold text-success">${formatCurrency(order.totalAmount)}</div></td>
+                <td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
+                <td><div>${formatPaymentMethod(order.paymentMethod)}</div></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline-primary btn-sm" onclick="showOrderDetail(${order.id})" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
         }
 
         function renderPagination(totalPages, currentPageIndex) {
@@ -618,6 +665,7 @@
             try {
                 const data = await apiFetch(`/orders/${orderId}`);
                 const order = data.result;
+        
                 document.getElementById('orderDetailModalLabel').textContent = `Chi tiết đơn hàng ${order.id}`;
                 document.getElementById('orderDetails').innerHTML = `
                     <div class="col-md-6">
@@ -629,7 +677,7 @@
                         <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
                         <p><strong>Loại đơn:</strong> ${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</p>
                         <p><strong>Bàn:</strong> ${order.tableNumber || 'N/A'}</p>
-                        <p><strong>Phương thức thanh toán:</strong> ${formatPaymentMethod(order.paymentMethod)}</p>
+                        <p><strong>Phương thức thanh toán:</strong> ${formatPaymentMethod(order.payment.paymentMethod)}</p>
                     </div>
                 `;
                 document.getElementById('itemsTableBody').innerHTML = order.orderItems.map(item => `
