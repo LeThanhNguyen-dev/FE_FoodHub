@@ -447,37 +447,37 @@
     }
 
     async function fetchOrders(page = 0) {
-  if (!isLoggedIn()) {
-    showError('Please login to view order history!');
-    window.location.href = 'login.html';
-    return;
-  }
+      if (!isLoggedIn()) {
+        showError('Please login to view order history!');
+        window.location.href = 'login.html';
+        return;
+      }
 
-  setLoadingState('orders-list', true);
-  try {
-    const token = localStorage.getItem('accessToken');
-    const payload = parseJwt(token);
-    console.log('Token:', token);
-    console.log('User ID:', payload.id);
-    const response = await fetch(`${API_BASE_URL}/orders/user/${payload.id}?page=${page}&size=${pageSize}&orderBy=createdAt&sort=DESC`, {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    console.log('Response status:', response.status);
-    const data = await response.json();
-    console.log('Response data:', data);
-    if (!response.ok) throw new Error(data.message || 'Failed to fetch orders');
-    const orders = data.result.content;
-    const totalPages = data.result.totalPages;
-    currentPage = page;
+      setLoadingState('orders-list', true);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        console.log('Token:', token);
+        console.log('User ID:', payload.id);
+        const response = await fetch(`${API_BASE_URL}/orders/user/${payload.id}?page=${page}&size=${pageSize}&orderBy=createdAt&sort=DESC`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+        if (!response.ok) throw new Error(data.message || 'Failed to fetch orders');
+        const orders = data.result.content;
+        const totalPages = data.result.totalPages;
+        currentPage = page;
 
-    renderOrders(orders);
-    updatePagination(totalPages);
-  } catch (error) {
-    showError('Error fetching orders: ' + error.message);
-  } finally {
-    setLoadingState('orders-list', false);
-  }
-}
+        renderOrders(orders);
+        updatePagination(totalPages);
+      } catch (error) {
+        showError('Error fetching orders: ' + error.message);
+      } finally {
+        setLoadingState('orders-list', false);
+      }
+    }
 
     function renderOrders(orders) {
       const ordersList = document.getElementById('orders-list');
@@ -499,6 +499,7 @@
           <p class="text-gray-600 mb-2"><strong>Status:</strong> ${order.status}</p>
           <p class="text-gray-600 mb-2"><strong>Type:</strong> ${order.orderType}</p>
           <p class="text-gray-600 mb-2"><strong>Total:</strong> $${order.totalAmount.toFixed(2)}</p>
+          ${order.paymentStatus ? `<p class="text-gray-600 mb-2"><strong>Payment Status:</strong> ${order.paymentStatus}</p>` : ''}
           ${order.tableNumber ? `<p class="text-gray-600 mb-2"><strong>Table:</strong> ${order.tableNumber}</p>` : ''}
           ${order.note ? `<p class="text-gray-600 mb-2"><strong>Note:</strong> ${order.note}</p>` : ''}
           <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Items</h4>

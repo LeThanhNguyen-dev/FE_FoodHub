@@ -37,85 +37,56 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderId = urlParams.get('orderId');
-            const code = urlParams.get('code');
-            const id = urlParams.get('id');
-            const cancel = urlParams.get('cancel') === 'true'; // Chuyển thành boolean
-            const status = urlParams.get('status');
-            const orderCode = urlParams.get('orderCode');
-            const pendingOrderId = sessionStorage.getItem('pendingOrderId');
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId');
+    const messageElement = document.getElementById('payment-message');
+    const loadingElement = document.getElementById('loading');
 
-            if (orderId && pendingOrderId && orderId === pendingOrderId) {
-                try {
-                    const loadingElement = document.getElementById('loading');
-                    const messageElement = document.getElementById('payment-message');
-                    if (loadingElement) {
-                        loadingElement.style.display = 'block';
-                    }
+    if (orderId) {
+        try {
+            if (loadingElement) loadingElement.style.display = 'block';
 
-                    // Tạo payload cho request PUT
-                    const payload = {
-                        orderId: parseInt(orderId),
-                        code,
-                        id,
-                        cancel,
-                        status,
-                        orderCode: parseInt(orderCode)
-                    };
+            // Gửi PUT request tới /payments/callback
+            const payload = {
+                orderId: parseInt(orderId),
+                code: urlParams.get('code'),
+                id: urlParams.get('id'),
+                cancel: urlParams.get('cancel') === 'true',
+                status: urlParams.get('status'),
+                orderCode: parseInt(urlParams.get('orderCode'))
+            };
 
-                    // Gửi PUT request tới /payments/result
-                    const data = await apiFetch('/payments/callback', {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
+            await apiFetch('/payments/callback', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-                    if (data.code === 0) {
-                        const paymentResult = data.result;
-                        let messageClass = '';
-                        let message = '';
-
-                        if (paymentResult.status === 'PAID') {
-                            messageClass = 'success';
-                            message = `Thanh toán thành công!<br>Số tiền: ${paymentResult.amount.toLocaleString('vi-VN')} VND<br>Mã giao dịch: ${paymentResult.transactionId}`;
-                        } else if (paymentResult.status === 'CANCELLED') {
-                            messageClass = 'cancelled';
-                            message = 'Thanh toán đã bị hủy.';
-                        } else {
-                            messageClass = 'unknown';
-                            message = `Trạng thái thanh toán: ${paymentResult.status}`;
-                        }
-
-                        messageElement.innerHTML = message;
-                        messageElement.className = messageClass;
-
-                        // Cập nhật danh sách đơn hàng nếu có
-                        if (typeof loadOrders === 'function') {
-                            await loadOrders();
-                        }
-                    } else {
-                        messageElement.innerHTML = 'Có lỗi khi xử lý kết quả thanh toán.';
-                        messageElement.className = 'cancelled';
-                    }
-                } catch (error) {
-                    console.error('Error handling payment result:', error);
-                    document.getElementById('payment-message').innerHTML = 'Có lỗi khi xử lý kết quả thanh toán: ' + error.message;
-                    document.getElementById('payment-message').className = 'cancelled';
-                } finally {
-                    sessionStorage.removeItem('pendingOrderId');
-                    const loadingElement = document.getElementById('loading');
-                    if (loadingElement) {
-                        loadingElement.style.display = 'none';
-                    }
-                }
+            // Kiểm tra trạng thái thanh toán
+            const response = await apiFetch(`/payments/status/${orderId}`);
+            if (response.status === 'PAID') {
+                messageElement.innerHTML = `Thanh toán thành công!<br>Số tiền: ${response.amount.toLocaleString('vi-VN')} VND<br>Mã giao dịch: ${response.transactionId}`;
+                messageElement.className = 'success';
+            } else if (response.status === 'CANCELLED' || response.status === 'FAILED') {
+                messageElement.innerHTML = 'Thanh toán không thành công hoặc đã bị hủy.';
+                messageElement.className = 'cancelled';
             } else {
-                document.getElementById('payment-message').innerHTML = 'Không tìm thấy thông tin thanh toán.';
-                document.getElementById('payment-message').className = 'cancelled';
+                messageElement.innerHTML = `Trạng thái thanh toán: ${response.status}`;
+                messageElement.className = 'unknown';
             }
-        });
+        } catch (error) {
+            console.error('Error checking payment status:', error);
+            messageElement.innerHTML = 'Không thể xác nhận trạng thái thanh toán. Vui lòng kiểm tra lại sau hoặc liên hệ hỗ trợ.';
+            messageElement.className = 'cancelled';
+        } finally {
+            sessionStorage.removeItem('pendingOrderId');
+            if (loadingElement) loadingElement.style.display = 'none';
+        }
+    } else {
+        messageElement.innerHTML = 'Không tìm thấy thông tin thanh toán.';
+        messageElement.className = 'cancelled';
+    }
+});
     </script>
     <script src="../js/fetch-api.js"></script>
 </body>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Tracking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #1E3A8A;
+      --accent-orange: #FEA116;
+      --blue-hover: #1E40AF;
+      --orange-hover: #E59014;
+      --blue-light: rgba(30, 58, 138, 0.1);
+      --orange-light: rgba(254, 161, 22, 0.1);
+      --blue-shadow: rgba(30, 58, 138, 0.3);
+      --orange-shadow: rgba(254, 161, 22, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, #1e293b 100%);
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--primary-blue);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-orange);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--orange-hover);
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, var(--primary-blue) 0%, #1a2332 100%);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+      border-right: 1px solid var(--accent-orange);
+    }
+
+    .sidebar-header {
+      font-family: 'Pacifico', cursive;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .sidebar-link {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .sidebar-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--orange-light), transparent);
+      transition: left 0.6s;
+    }
+
+    .sidebar-link:hover::before {
+      left: 100%;
+    }
+
+    .sidebar-link:hover {
+      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
+      transform: translateX(8px) scale(1.02);
+      box-shadow: 0 8px 25px var(--orange-shadow);
+      color: white !important;
+    }
+
+    .sidebar-link.active {
+      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
+      color: white !important;
+      box-shadow: 0 4px 15px var(--orange-shadow);
+    }
+
+    .sidebar-link i {
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-link:hover i {
+      transform: scale(1.2) rotate(5deg);
+    }
+
+    .main-content {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .main-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 50%, var(--blue-light) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--orange-light) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, var(--blue-light) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .content-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--blue-light);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--blue-light);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--blue-hover), var(--primary-blue));
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: -200% 0; }
+      50% { background-position: 200% 0; }
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 15), 0 1px var(--blue-shadow);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-hover) 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px var(--blue-shadow);
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 35px var(--blue-shadow);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-logout:hover {
+      box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+    }
+
+    .message {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      border-left: 4px solid;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .message-success {
+      background: rgba(34, 197, 94, 0.1);
+      color: #166534;
+      border-left-color: #22c55e;
+    }
+
+    .message-error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #991b1b;
+      border-left-color: #ef4444;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -30px;
+      top: 0;
+      width: 12px;
+      height: 12px;
+      background: var(--primary-blue);
+      border-radius: 50%;
+      border: 2px solid var(--accent-orange);
+    }
+
+    .timeline-item.active::before {
+      background: var(--accent-orange);
+      box-shadow: 0 0 10px var(--orange-shadow);
+    }
+
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 12px;
+      width: 4px;
+      height: calc(100% - 12px);
+      background: var(--primary-blue);
+    }
+
+    .timeline-item:last-child::after {
+      display: none;
+    }
+
+    .timeline-item.active .timeline-content {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .content-card {
+        margin: 20px;
+      }
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="flex">
+  <aside class="sidebar w-80 flex flex-col justify-between">
+    <div>
+      <div class="sidebar-header p-6 relative z-10">
+        <h2 class="text-4xl font-bold text-white relative z-10">Order Tracking</h2>
+        <p id="username-greeting" class="text-xl text-white/80 mt-1 relative z-10">Welcome, User!</p>
+      </div>
+      <nav class="mt-6 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
+          <i class="fas fa-user mr-3"></i> Edit Profile
+        </a>
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2 active">
+          <i class="fas fa-truck mr-3"></i> Order Tracking
+        </a>
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
+          <i class="fas fa-history mr-3"></i> Order History
+        </a>
+        <a href="home.html" id="home-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
+          <i class="fas fa-home mr-3"></i> Back to Home Page
+        </a>
+      </nav>
+    </div>
+    <div class="p-6">
+      <button id="logout-button" class="w-full btn-primary btn-logout flex items-center justify-center">
+        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content flex-1 p-8 overflow-auto relative z-10">
+    <div id="content-area" class="max-w-5xl mx-auto space-y-8">
+      <div id="order-tracking-section" class="content-card p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-truck mr-3 text-orange-500"></i>
+          Order Tracking
+        </h2>
+        <div id="error-message" class="hidden message message-error"></div>
+        <div id="success-message" class="hidden message message-success"></div>
+
+        <div class="mb-6">
+          <label for="order-select" class="block text-gray-600 font-medium mb-2">Chọn đơn hàng để theo dõi</label>
+          <select id="order-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+            <option value="">Chọn một đơn hàng</option>
+          </select>
+        </div>
+
+        <div id="order-details" class="hidden space-y-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="order-title" class="text-xl font-semibold text-gray-800"></h3>
+            <span id="order-date" class="text-sm text-gray-600"></span>
+          </div>
+          <p id="order-status" class="text-gray-600 mb-2"></p>
+          <p id="order-type" class="text-gray-600 mb-2"></p>
+          <p id="order-total" class="text-gray-600 mb-2"></p>
+          <p id="order-payment-status" class="text-gray-600 mb-2"></p>
+          <p id="order-table" class="text-gray-600 mb-2 hidden"></p>
+          <p id="order-note" class="text-gray-600 mb-2 hidden"></p>
+
+          <div class="timeline">
+            <div class="timeline-item" data-status="PENDING">
+              <div class="timeline-content">
+                <p class="font-medium">Đặt hàng</p>
+                <p class="text-sm text-gray-500">Đơn hàng của bạn đã được đặt.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="CONFIRMED">
+              <div class="timeline-content">
+                <p class="font-medium">Xác nhận</p>
+                <p class="text-sm text-gray-500">Đơn hàng đã được nhà hàng xác nhận.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="PREPARING">
+              <div class="timeline-content">
+                <p class="font-medium">Đang chuẩn bị</p>
+                <p class="text-sm text-gray-500">Đơn hàng đang được chuẩn bị.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="READY">
+              <div class="timeline-content">
+                <p class="font-medium">Sẵn sàng</p>
+                <p class="text-sm text-gray-500">Đơn hàng sẵn sàng để giao hoặc nhận.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="DELIVERING">
+              <div class="timeline-content">
+                <p class="font-medium">Đang giao</p>
+                <p class="text-sm text-gray-500">Đơn hàng đang được giao.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="COMPLETED">
+              <div class="timeline-content">
+                <p class="font-medium">Đã giao</p>
+                <p class="text-sm text-gray-500">Đơn hàng đã được giao.</p>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Món</h4>
+          <div id="order-items" class="space-y-4"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080';
+    let currentPage = 0;
+    const pageSize = 20;
+    let pollingInterval = null;
+
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error("Token không hợp lệ:", e);
+        return null;
+      }
+    }
+
+    function isLoggedIn() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.warn("Không tìm thấy accessToken trong localStorage");
+        return false;
+      }
+      const payload = parseJwt(token);
+      if (!payload) return false;
+      const isExpired = payload.exp * 1000 <= Date.now();
+      if (isExpired) console.warn("Token đã hết hạn:", payload.exp);
+      return payload && !isExpired;
+    }
+
+    function updateUI() {
+      const token = localStorage.getItem('accessToken');
+      const payload = token ? parseJwt(token) : null;
+      const usernameGreeting = document.getElementById('username-greeting');
+      if (isLoggedIn() && usernameGreeting) {
+        const email = payload.sub || 'Customer';
+        usernameGreeting.textContent = `Welcome, ${email}!`;
+        console.log("Cập nhật UI với user:", email);
+      } else if (usernameGreeting) {
+        usernameGreeting.textContent = 'Welcome, Guest!';
+        console.log("Cập nhật UI cho guest");
+      }
+    }
+
+    function logout() {
+      console.log("Đăng xuất: Xóa token và dừng polling");
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('cart');
+      stopPolling();
+      window.location.href = 'login.html';
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.textContent = message;
+      errorDiv.classList.remove('hidden');
+      document.getElementById('success-message').classList.add('hidden');
+      console.error("Hiển thị lỗi:", message);
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      successDiv.textContent = message;
+      successDiv.classList.remove('hidden');
+      document.getElementById('error-message').classList.add('hidden');
+      console.log("Hiển thị thông báo thành công:", message);
+    }
+
+    function setLoadingState(elementId, isLoading) {
+      const element = document.getElementById(elementId);
+      if (isLoading) {
+        element.style.opacity = '0.7';
+        element.style.pointerEvents = 'none';
+      } else {
+        element.style.opacity = '1';
+        element.style.pointerEvents = 'auto';
+      }
+    }
+
+    async function fetchUserOrders() {
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập để theo dõi đơn hàng!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      setLoadingState('order-select', true);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id || payload.sub;
+        if (!userId) {
+          throw new Error("Không tìm thấy userId trong JWT payload");
+        }
+        console.log('Fetching orders for user ID:', userId);
+        const response = await fetch(`${API_BASE_URL}/orders/user/${userId}?page=${currentPage}&size=${pageSize}&orderBy=createdAt`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          let errorMessage = 'Lỗi khi lấy danh sách đơn hàng';
+          try {
+            const error = await response.json();
+            errorMessage = error.message || errorMessage;
+          } catch (e) {
+            // Không parse được JSON
+          }
+          if (response.status === 401) {
+            showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            logout();
+          } else if (response.status === 403) {
+            showError('Bạn không có quyền xem các đơn hàng này.');
+          } else if (response.status === 404) {
+            showError('Người dùng không tồn tại.');
+          } else {
+            showError(errorMessage);
+          }
+          console.error(`Lỗi API: ${response.status} - ${errorMessage}`);
+          return;
+        }
+        const data = await response.json();
+        console.log("Dữ liệu đơn hàng:", data);
+        renderOrderSelect(data.result.content);
+      } catch (error) {
+        showError('Lỗi khi lấy danh sách đơn hàng: ' + error.message);
+        console.error('Fetch error:', error);
+      } finally {
+        setLoadingState('order-select', false);
+      }
+    }
+
+    function renderOrderSelect(orders) {
+      const orderSelect = document.getElementById('order-select');
+      orderSelect.innerHTML = '<option value="">Chọn một đơn hàng</option>';
+      orders.forEach(order => {
+        const option = document.createElement('option');
+        option.value = order.id;
+        option.textContent = `Order #${order.id} - ${new Date(order.createdAt).toLocaleDateString()}`;
+        orderSelect.appendChild(option);
+      });
+      console.log("Đã render danh sách đơn hàng:", orders.length);
+    }
+
+    async function fetchOrderDetails(orderId) {
+      if (!orderId) {
+        console.log("Không có orderId, bỏ qua fetchOrderDetails");
+        return;
+      }
+      setLoadingState('order-details', true);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          let errorMessage = 'Lỗi khi lấy chi tiết đơn hàng';
+          try {
+            const error = await response.json();
+            errorMessage = error.message || errorMessage;
+          } catch (e) {
+            // Không parse được JSON
+          }
+          if (response.status === 401) {
+            showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            logout();
+          } else if (response.status === 403) {
+            showError('Bạn không có quyền xem đơn hàng này.');
+          } else {
+            showError(errorMessage);
+          }
+          console.error(`Lỗi API chi tiết đơn hàng: ${response.status} - ${errorMessage}`);
+          return;
+        }
+        const data = await response.json();
+        console.log("Chi tiết đơn hàng:", data.result);
+        renderOrder(data.result);
+        showSuccess(`Đơn hàng #${data.result.id} đã được cập nhật: ${data.result.status}`);
+      } catch (error) {
+        showError('Lỗi khi lấy chi tiết đơn hàng: ' + error.message);
+        console.error('Fetch error chi tiết:', error);
+      } finally {
+        setLoadingState('order-details', false);
+      }
+    }
+
+    function renderOrder(order) {
+      document.getElementById('order-details').classList.remove('hidden');
+      document.getElementById('order-title').textContent = `Đơn hàng #${order.id}`;
+      document.getElementById('order-date').textContent = new Date(order.createdAt).toLocaleDateString();
+      document.getElementById('order-status').textContent = `Trạng thái: ${order.status}`;
+      document.getElementById('order-type').textContent = `Loại: ${order.orderType}`;
+      document.getElementById('order-total').textContent = `Tổng tiền: $${order.totalAmount.toFixed(2)}`;
+      document.getElementById('order-payment-status').textContent = order.paymentStatus ? `Trạng thái thanh toán: ${order.paymentStatus}` : '';
+      document.getElementById('order-table').textContent = order.tableId ? `Bàn: ${order.tableNumber || order.tableId}` : '';
+      document.getElementById('order-table').classList.toggle('hidden', !order.tableId);
+      document.getElementById('order-note').textContent = order.note ? `Ghi chú: ${order.note}` : '';
+      document.getElementById('order-note').classList.toggle('hidden', !order.note);
+
+      const timelineItems = document.querySelectorAll('.timeline-item');
+      timelineItems.forEach(item => {
+        const status = item.getAttribute('data-status');
+        item.classList.toggle('active', order.status === status || isStatusReached(order.status, status));
+      });
+
+      const orderItems = document.getElementById('order-items');
+      orderItems.innerHTML = order.orderItems?.map(item => `
+        <div class="content-card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h5 class="font-semibold text-gray-800">${item.menuItemName || 'Unknown Item'}</h5>
+            <span class="text-sm text-gray-600">x${item.quantity}</span>
+          </div>
+          <p class="text-gray-600">Giá: $${item.price.toFixed(2)}</p>
+          <p class="text-gray-600">Trạng thái: ${item.status}</p>
+          ${item.note ? `<p class="text-gray-600">Ghi chú: ${item.note}</p>` : ''}
+        </div>
+      `).join('') || '<p class="text-gray-600">Không có món ăn nào.</p>';
+      console.log("Đã render chi tiết đơn hàng:", order.id);
+    }
+
+    function isStatusReached(currentStatus, targetStatus) {
+      const statusOrder = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERING', 'COMPLETED'];
+      return statusOrder.indexOf(currentStatus) >= statusOrder.indexOf(targetStatus);
+    }
+
+    function startPolling() {
+      stopPolling(); // Ensure no duplicate intervals
+      pollingInterval = setInterval(() => {
+        const orderSelect = document.getElementById('order-select');
+        const orderId = orderSelect.value;
+        if (orderId) {
+          console.log(`Polling order details for order ID: ${orderId}`);
+          fetchOrderDetails(orderId);
+        } else {
+          console.log("No order selected, skipping poll");
+        }
+      }, 30000); // 30 seconds
+      console.log("Started polling every 30 seconds");
+    }
+
+    function stopPolling() {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+        console.log("Stopped polling");
+      }
+    }
+
+    document.getElementById('logout-button').addEventListener('click', logout);
+
+    document.getElementById('order-select').addEventListener('change', (e) => {
+      const orderId = e.target.value;
+      console.log("Đã chọn đơn hàng ID:", orderId);
+      stopPolling(); // Stop polling when changing order
+      if (orderId) {
+        fetchOrderDetails(orderId);
+        startPolling(); // Start polling for the new order
+      } else {
+        document.getElementById('order-details').classList.add('hidden');
+        console.log("Ẩn chi tiết đơn hàng do không chọn đơn hàng");
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("Khởi tạo trang ordertrack.html");
+      updateUI();
+      if (isLoggedIn()) {
+        fetchUserOrders();
+      } else {
+        showError('Vui lòng đăng nhập để theo dõi đơn hàng!');
+        window.location.href = 'login.html';
+      }
+    });
+
+    const navLinks = document.querySelectorAll('.sidebar-link');
+    navLinks.forEach(link => {
+      link.setAttribute('title', link.textContent.trim());
+    });
+  </script>
+</body>
+</html>
