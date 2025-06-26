@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    :root {
-      --primary-blue: #1E3A8A;
-      --accent-orange: #FEA116;
-      --blue-hover: #1E40AF;
-      --orange-hover: #E59014;
-      --blue-light: rgba(30, 58, 138, 0.1);
-      --orange-light: rgba(254, 161, 22, 0.1);
-      --blue-shadow: rgba(30, 58, 138, 0.3);
-      --orange-shadow: rgba(254, 161, 22, 0.3);
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -26,240 +14,229 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary-blue) 0%, #1e293b 100%);
-      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
     }
 
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--primary-blue);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--accent-orange);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--orange-hover);
-    }
-
-    /* Sidebar Animations */
     .sidebar {
-      background: linear-gradient(180deg, var(--primary-blue) 0%, #1a2332 100%);
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-      border-right: 1px solid var(--accent-orange);
+      background-color: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-header {
-      font-family: 'Pacifico', cursive;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sidebar-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .sidebar-link {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
       margin: 4px 12px;
-      border-radius: 12px;
-    }
-
-    .sidebar-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--orange-light), transparent);
-      transition: left 0.6s;
-    }
-
-    .sidebar-link:hover::before {
-      left: 100%;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
     }
 
     .sidebar-link:hover {
-      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
-      transform: translateX(8px) scale(1.02);
-      box-shadow: 0 8px 25px var(--orange-shadow);
-      color: white !important;
+      background-color: #f1f5f9;
+      color: #334155;
     }
 
     .sidebar-link.active {
-      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
-      color: white !important;
-      box-shadow: 0 4px 15px var(--orange-shadow);
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .sidebar-link.active:hover {
+      background-color: #2563eb;
     }
 
     .sidebar-link i {
-      transition: transform 0.3s ease;
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
     }
 
-    .sidebar-link:hover i {
-      transform: scale(1.2) rotate(5deg);
-    }
-
-    /* Main Content */
     .main-content {
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      background-color: #f8fafc;
       min-height: 100vh;
-      position: relative;
-    }
-
-    .main-content::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(circle at 20% 50%, var(--blue-light) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--orange-light) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, var(--blue-light) 0%, transparent 50%);
-      pointer-events: none;
     }
 
     .content-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--blue-light);
-      border-radius: 20px;
-      box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 0 1px var(--blue-light);
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .content-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-blue), var(--blue-hover), var(--primary-blue));
-      background-size: 200% 100%;
-      animation: shimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { background-position: -200% 0; }
-      50% { background-position: 200% 0; }
     }
 
     .content-card:hover {
-      transform: translateY(-5px);
-      box-shadow:
-        0 30px 60px rgba(0, 0, 0, 0.15),
-        0 0 0 1px var(--blue-shadow);
+      box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
     }
 
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-hover) 100%);
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 16px;
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-primary:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .btn-logout {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn-logout:hover {
+      background-color: #dc2626;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
+      animation: slideInFromTop 0.5s ease-out;
+    }
+
+    .message-success {
+      background-color: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .message-error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+      animation: pulse 2s infinite;
+    }
+
+    #orders-list .content-card {
+      padding: 16px;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: slideInFromLeft 0.5s ease-out forwards;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 8px 25px var(--blue-shadow);
     }
 
-    .btn-primary::before {
+    #orders-list .content-card:nth-child(1) { animation-delay: 0.1s; }
+    #orders-list .content-card:nth-child(2) { animation-delay: 0.2s; }
+    #orders-list .content-card:nth-child(3) { animation-delay: 0.3s; }
+    #orders-list .content-card:nth-child(4) { animation-delay: 0.4s; }
+
+    #orders-list .content-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
-      transition: left 0.6s;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
     }
 
-    .btn-primary:hover::before {
+    #orders-list .content-card:hover::before {
       left: 100%;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 15px 35px var(--blue-shadow);
+    #orders-list h5 {
+      color: #1f2937;
+      font-weight: 600;
+      font-size: 16px;
     }
 
-    .btn-primary:active {
-      transform: translateY(-1px) scale(0.98);
+    #orders-list p,
+    #orders-list span {
+      color: #6b7280;
+      font-size: 14px;
     }
 
-    .btn-logout {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    @keyframes slideInFromTop {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .btn-logout:hover {
-      box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+    @keyframes slideInFromLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
-    /* Messages */
-    .message {
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      border-left: 4px solid;
-      backdrop-filter: blur(10px);
-      animation: slideIn 0.3s ease-out;
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message-success {
-      background: rgba(34, 197, 94, 0.1);
-      color: #166534;
-      border-left-color: #22c55e;
-    }
-
-    .message-error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #991b1b;
-      border-left-color: #ef4444;
-    }
-
-    /* Responsive Design */
     @media (max-width: 768px) {
       .sidebar {
-        width: 100%;
         position: fixed;
         top: 0;
-        left: -100%;
+        left: -280px;
         height: 100vh;
+        width: 280px;
         z-index: 1000;
         transition: left 0.3s ease;
       }
@@ -273,98 +250,75 @@
       }
 
       .content-card {
-        margin: 20px;
+        margin: 16px;
       }
     }
 
-    /* Loading Animation */
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
     .loading {
       display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Enhanced hover effects */
-    .interactive:hover {
-      cursor: pointer;
-    }
-
-    .glow-on-hover {
-      transition: all 0.3s ease;
-    }
-
-    .glow-on-hover:hover {
-      box-shadow: 0 0 20px var(--blue-shadow);
     }
   </style>
 </head>
-
 <body class="flex">
-  <!-- Sidebar -->
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
+
   <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
-      <div class="sidebar-header p-6 relative z-10">
-        <h2 class="text-4xl font-bold text-white relative z-10">Order History</h2>
-        <p id="username-greeting" class="text-xl text-white/80 mt-1 relative z-10">Welcome, User!</p>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold text-gray-900">Dashboard</h2>
+        <p id="username-greeting" class="text-sm text-gray-500 mt-1">Welcome, User!</p>
       </div>
-      <nav class="mt-6 px-3">
-        <a href="profile.html" id="profile-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-user mr-3"></i> Edit Profile
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link">
+          <i class="fas fa-user"></i> Edit Profile
         </a>
-        <a href="ordertrack.html" id="order-track-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-truck mr-3"></i> Order Tracking
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
+          <i class="fas fa-truck"></i> Order Tracking
         </a>
-        <a href="orderHistory.html" id="order-history-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2 active">
-          <i class="fas fa-history mr-3"></i> Order History
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link active">
+          <i class="fas fa-history"></i> Order History
         </a>
-        <a href="home.html" id="home-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-home mr-3"></i> Back to Home Page
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Back to Home
         </a>
       </nav>
     </div>
     <div class="p-6">
-      <button id="logout-button" class="w-full btn-primary btn-logout flex items-center justify-center">
+      <button id="logout-button" class="w-full btn btn-logout">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout
       </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <main class="main-content flex-1 p-8 overflow-auto relative z-10">
+  <main class="main-content flex-1 p-6 overflow-auto">
     <div id="content-area" class="max-w-5xl mx-auto space-y-8">
-      <!-- Order History Section -->
-      <div id="order-history-section" class="content-card p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-          <i class="fas fa-history mr-3 text-orange-500"></i>
-          Order History
-        </h2>
+      <div id="order-history-section" class="content-card p-6">
+        <div class="section-header">
+          <h2><i class="fas fa-history"></i> Order History</h2>
+        </div>
         <div id="error-message" class="hidden message message-error"></div>
         <div id="success-message" class="hidden message message-success"></div>
 
-        <!-- Orders List -->
-        <div id="orders-list" class="space-y-6">
-          <!-- Orders will be populated here -->
-        </div>
+        <div id="orders-list" class="space-y-4"></div>
 
-        <!-- Pagination -->
         <div id="pagination" class="flex justify-between items-center mt-6">
-          <button id="prev-page" class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          <button id="prev-page" class="btn btn-primary disabled:bg-gray-400" disabled>
             <i class="fas fa-chevron-left mr-2"></i> Previous
           </button>
           <span id="page-info" class="text-gray-600 font-medium"></span>
-          <button id="next-page" class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+          <button id="next-page" class="btn btn-primary disabled:bg-gray-400">
             Next <i class="fas fa-chevron-right ml-2"></i>
           </button>
         </div>
@@ -375,7 +329,8 @@
   <script>
     const API_BASE_URL = 'http://localhost:8080';
     let currentPage = 0;
-    const pageSize = 20;
+    const pageSize = 3;
+    let isFetching = false; // Biến theo dõi trạng thái tải
 
     function parseJwt(token) {
       try {
@@ -385,19 +340,57 @@
           '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         return JSON.parse(jsonPayload);
       } catch (e) {
-        console.error("Invalid token:", e);
+        console.error("Token không hợp lệ:", e);
         return null;
       }
     }
 
     function isLoggedIn() {
       const token = localStorage.getItem('accessToken');
-      if (!token) return false;
+      if (!token) {
+        console.warn("Không tìm thấy accessToken trong localStorage");
+        return false;
+      }
       const payload = parseJwt(token);
-      return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
+      if (!payload) return false;
+      const isExpired = payload.exp * 1000 <= Date.now();
+      if (isExpired) console.warn("Token đã hết hạn:", payload.exp);
+      return payload && !isExpired;
+    }
+
+    async function fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id || payload.sub;
+        if (!userId) throw new Error("Không tìm thấy userId trong JWT payload");
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch user info');
+        const data = await response.json();
+        return data.result.username || 'User';
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        return 'User';
+      }
+    }
+
+    async function updateUI() {
+      const token = localStorage.getItem('accessToken');
+      const usernameGreeting = document.getElementById('username-greeting');
+      if (isLoggedIn() && usernameGreeting) {
+        const username = await fetchUserInfo();
+        usernameGreeting.textContent = `Welcome, ${username}!`;
+        console.log("Cập nhật UI với username:", username);
+      } else if (usernameGreeting) {
+        usernameGreeting.textContent = 'Welcome, User!';
+        console.log("Cập nhật UI cho guest");
+      }
     }
 
     function logout() {
+      console.log("Đăng xuất: Xóa token");
       localStorage.removeItem('accessToken');
       localStorage.removeItem('cart');
       window.location.href = 'login.html';
@@ -408,6 +401,7 @@
       errorDiv.textContent = message;
       errorDiv.classList.remove('hidden');
       document.getElementById('success-message').classList.add('hidden');
+      console.error("Hiển thị lỗi:", message);
     }
 
     function showSuccess(message) {
@@ -415,6 +409,7 @@
       successDiv.textContent = message;
       successDiv.classList.remove('hidden');
       document.getElementById('error-message').classList.add('hidden');
+      console.log("Hiển thị thông báo thành công:", message);
     }
 
     function setLoadingState(elementId, isLoading) {
@@ -428,54 +423,68 @@
       }
     }
 
-    async function fetchUserInfo() {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const payload = parseJwt(token);
-        const userId = payload.id;
-
-        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!response.ok) throw new Error('Failed to fetch user info');
-        const data = await response.json();
-        const user = data.result;
-        document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
-      } catch (error) {
-        showError('Error fetching user info: ' + error.message);
-      }
-    }
-
     async function fetchOrders(page = 0) {
+      if (isFetching) return; // Ngăn gọi API nếu đang tải
+      isFetching = true; // Đánh dấu đang tải
+
       if (!isLoggedIn()) {
-        showError('Please login to view order history!');
+        showError('Vui lòng đăng nhập để xem lịch sử đơn hàng!');
         window.location.href = 'login.html';
+        isFetching = false;
         return;
       }
 
       setLoadingState('orders-list', true);
+      setLoadingState('pagination', true); // Vô hiệu hóa nút phân trang
+
       try {
         const token = localStorage.getItem('accessToken');
         const payload = parseJwt(token);
-        console.log('Token:', token);
-        console.log('User ID:', payload.id);
-        const response = await fetch(`${API_BASE_URL}/orders/user/${payload.id}?page=${page}&size=${pageSize}&orderBy=createdAt&sort=DESC`, {
-          headers: { 'Authorization': 'Bearer ' + token }
+        const userId = payload.id || payload.sub;
+        if (!userId) {
+          throw new Error("Không tìm thấy userId trong JWT payload");
+        }
+        console.log('Fetching orders for user ID:', userId);
+        const response = await fetch(`${API_BASE_URL}/orders/user/${userId}?page=${page}&size=${pageSize}&orderBy=createdAt&sort=DESC`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
-        console.log('Response status:', response.status);
+        if (!response.ok) {
+          let errorMessage = 'Lỗi khi lấy danh sách đơn hàng';
+          try {
+            const error = await response.json();
+            errorMessage = error.message || errorMessage;
+          } catch (e) {
+            // Không parse được JSON
+          }
+          if (response.status === 401) {
+            showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            logout();
+          } else if (response.status === 403) {
+            showError('Bạn không có quyền xem các đơn hàng này.');
+          } else if (response.status === 404) {
+            showError('Người dùng không tồn tại.');
+          } else {
+            showError(errorMessage);
+          }
+          console.error(`Lỗi API: ${response.status} - ${errorMessage}`);
+          return;
+        }
         const data = await response.json();
-        console.log('Response data:', data);
-        if (!response.ok) throw new Error(data.message || 'Failed to fetch orders');
-        const orders = data.result.content;
-        const totalPages = data.result.totalPages;
-        currentPage = page;
-
-        renderOrders(orders);
-        updatePagination(totalPages);
+        console.log("Dữ liệu đơn hàng:", data);
+        renderOrders(data.result.content);
+        updatePagination(data.result.totalPages);
+        currentPage = page; // Cập nhật currentPage sau khi thành công
+        showSuccess('Danh sách đơn hàng đã được cập nhật.');
       } catch (error) {
-        showError('Error fetching orders: ' + error.message);
+        showError('Lỗi khi lấy danh sách đơn hàng: ' + error.message);
+        console.error('Fetch error:', error);
       } finally {
+        isFetching = false; // Kết thúc trạng thái tải
         setLoadingState('orders-list', false);
+        setLoadingState('pagination', false); // Kích hoạt lại nút phân trang
       }
     }
 
@@ -484,40 +493,41 @@
       ordersList.innerHTML = '';
 
       if (orders.length === 0) {
-        ordersList.innerHTML = '<p class="text-gray-600">No orders found.</p>';
+        ordersList.innerHTML = '<p class="text-gray-600">Không tìm thấy đơn hàng nào.</p>';
         return;
       }
 
       orders.forEach(order => {
         const orderCard = document.createElement('div');
-        orderCard.className = 'content-card p-6 mb-4';
+        orderCard.className = 'content-card p-4';
         orderCard.innerHTML = `
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold text-gray-800">Order #${order.id}</h3>
-            <span class="text-sm text-gray-600">${new Date(order.createdAt).toLocaleString()}</span>
+          <div class="flex justify-between items-center mb-2">
+            <h5 class="font-semibold text-gray-800">Đơn hàng #${order.id}</h5>
+            <span class="text-sm text-gray-600">${new Date(order.createdAt).toLocaleDateString()}</span>
           </div>
-          <p class="text-gray-600 mb-2"><strong>Status:</strong> ${order.status}</p>
-          <p class="text-gray-600 mb-2"><strong>Type:</strong> ${order.orderType}</p>
-          <p class="text-gray-600 mb-2"><strong>Total:</strong> $${order.totalAmount.toFixed(2)}</p>
-          ${order.paymentStatus ? `<p class="text-gray-600 mb-2"><strong>Payment Status:</strong> ${order.paymentStatus}</p>` : ''}
-          ${order.tableNumber ? `<p class="text-gray-600 mb-2"><strong>Table:</strong> ${order.tableNumber}</p>` : ''}
-          ${order.note ? `<p class="text-gray-600 mb-2"><strong>Note:</strong> ${order.note}</p>` : ''}
-          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Items</h4>
-          <ul class="space-y-2">
-            ${order.orderItems.map(item => `
-              <li class="flex justify-between items-center">
+          <p class="text-gray-600">Trạng thái: ${order.status}</p>
+          <p class="text-gray-600">Loại: ${order.orderType}</p>
+          <p class="text-gray-600">Tổng tiền: $${order.totalAmount.toFixed(2)}</p>
+          ${order.paymentStatus ? `<p class="text-gray-600">Trạng thái thanh toán: ${order.paymentStatus}</p>` : ''}
+          ${order.tableId ? `<p class="text-gray-600">Bàn: ${order.tableNumber || order.tableId}</p>` : ''}
+          ${order.note ? `<p class="text-gray-600">Ghi chú: ${order.note}</p>` : ''}
+          <h6 class="font-semibold text-gray-800 mt-4 mb-2 text-sm">Món</h6>
+          <div class="space-y-2">
+            ${order.orderItems?.map(item => `
+              <div class="flex justify-between items-center">
                 <div>
-                  <span class="font-medium">${item.menuItemName}</span>
+                  <span class="font-medium">${item.menuItemName || 'Unknown Item'}</span>
                   <span class="text-gray-600"> (x${item.quantity})</span>
-                  ${item.note ? `<p class="text-sm text-gray-600">Note: ${item.note}</p>` : ''}
+                  ${item.note ? `<p class="text-sm text-gray-600">Ghi chú: ${item.note}</p>` : ''}
                 </div>
                 <span class="text-gray-600">$${item.price.toFixed(2)}</span>
-              </li>
-            `).join('')}
-          </ul>
+              </div>
+            `).join('') || '<p class="text-gray-600">Không có món ăn nào.</p>'}
+          </div>
         `;
         ordersList.appendChild(orderCard);
       });
+      console.log("Đã render danh sách đơn hàng:", orders.length);
     }
 
     function updatePagination(totalPages) {
@@ -525,33 +535,58 @@
       const prevButton = document.getElementById('prev-page');
       const nextButton = document.getElementById('next-page');
 
-      pageInfo.textContent = `Page ${currentPage + 1} of ${totalPages}`;
+      pageInfo.textContent = `Trang ${currentPage + 1} / ${totalPages}`;
       prevButton.disabled = currentPage === 0;
       nextButton.disabled = currentPage >= totalPages - 1;
     }
 
-    // Event Listeners
-    document.getElementById('logout-button').addEventListener('click', logout);
-    document.getElementById('prev-page').addEventListener('click', () => fetchOrders(currentPage - 1));
-    document.getElementById('next-page').addEventListener('click', () => fetchOrders(currentPage + 1));
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
 
-    // Initialize on page load
+    document.getElementById('logout-button').addEventListener('click', logout);
+
+    document.getElementById('prev-page').addEventListener('click', () => {
+      if (currentPage > 0 && !isFetching) {
+        fetchOrders(currentPage - 1);
+      }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+      if (!isFetching) {
+        fetchOrders(currentPage + 1);
+      }
+    });
+
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      if (window.innerWidth <= 768 &&
+          !sidebar.contains(e.target) &&
+          !menuBtn.contains(e.target) &&
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
+      console.log("Khởi tạo trang orderHistory.html");
+      updateUI();
       if (isLoggedIn()) {
-        fetchUserInfo();
         fetchOrders();
       } else {
-        showError('Please login to view order history!');
+        showError('Vui lòng đăng nhập để xem lịch sử đơn hàng!');
         window.location.href = 'login.html';
       }
     });
 
-    // Add tooltips for navigation
     const navLinks = document.querySelectorAll('.sidebar-link');
     navLinks.forEach(link => {
       link.setAttribute('title', link.textContent.trim());
     });
   </script>
 </body>
-
 </html>

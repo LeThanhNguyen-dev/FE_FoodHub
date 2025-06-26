@@ -7,17 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    :root {
-      --primary-blue: #1E3A8A;
-      --accent-orange: #FEA116;
-      --blue-hover: #1E40AF;
-      --orange-hover: #E59014;
-      --blue-light: rgba(30, 58, 138, 0.1);
-      --orange-light: rgba(254, 161, 22, 0.1);
-      --blue-shadow: rgba(30, 58, 138, 0.3);
-      --orange-shadow: rgba(254, 161, 22, 0.3);
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -25,276 +14,500 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary-blue) 0%, #1e293b 100%);
-      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
     }
 
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--primary-blue);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--accent-orange);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--orange-hover);
-    }
-
+    /* Sidebar */
     .sidebar {
-      background: linear-gradient(180deg, var(--primary-blue) 0%, #1a2332 100%);
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-      border-right: 1px solid var(--accent-orange);
+      background-color: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-header {
-      font-family: 'Pacifico', cursive;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sidebar-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .sidebar-link {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
       margin: 4px 12px;
-      border-radius: 12px;
-    }
-
-    .sidebar-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--orange-light), transparent);
-      transition: left 0.6s;
-    }
-
-    .sidebar-link:hover::before {
-      left: 100%;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
     }
 
     .sidebar-link:hover {
-      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
-      transform: translateX(8px) scale(1.02);
-      box-shadow: 0 8px 25px var(--orange-shadow);
-      color: white !important;
+      background-color: #f1f5f9;
+      color: #334155;
     }
 
     .sidebar-link.active {
-      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
-      color: white !important;
-      box-shadow: 0 4px 15px var(--orange-shadow);
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .sidebar-link.active:hover {
+      background-color: #2563eb;
     }
 
     .sidebar-link i {
-      transition: transform 0.3s ease;
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
     }
 
-    .sidebar-link:hover i {
-      transform: scale(1.2) rotate(5deg);
-    }
-
+    /* Main Content */
     .main-content {
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      background-color: #f8fafc;
       min-height: 100vh;
-      position: relative;
-    }
-
-    .main-content::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(circle at 20% 50%, var(--blue-light) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--orange-light) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, var(--blue-light) 0%, transparent 50%);
-      pointer-events: none;
     }
 
     .content-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--blue-light);
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--blue-light);
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .content-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-blue), var(--blue-hover), var(--primary-blue));
-      background-size: 200% 100%;
-      animation: shimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { background-position: -200% 0; }
-      50% { background-position: 200% 0; }
     }
 
     .content-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 15), 0 1px var(--blue-shadow);
+      box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Form Elements */
+    .form-label {
+      display: block;
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      color: #1f2937;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-hover) 100%);
+      background-color: #3b82f6;
       color: white;
-      border: none;
-      padding: 16px 32px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 25px var(--blue-shadow);
-    }
-
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--orange), transparent);
-      transition: left 0.6s;
-    }
-
-    .btn-primary:hover::before {
-      left: 100%;
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 15px 35px var(--blue-shadow);
+      background-color: #2563eb;
     }
 
-    .btn-primary:active {
-      transform: translateY(-1px) scale(0.98);
+    .btn-primary:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
     }
 
     .btn-logout {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+      background-color: #ef4444;
+      color: white;
     }
 
     .btn-logout:hover {
-      box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+      background-color: #dc2626;
     }
 
+    /* Messages */
     .message {
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      border-left: 4px solid;
-      backdrop-filter: blur(10px);
-      animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: none; }
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
+      animation: slideInFromTop 0.5s ease-out;
     }
 
     .message-success {
-      background: rgba(34, 197, 94, 0.1);
+      background-color: #f0fdf4;
       color: #166534;
-      border-left-color: #22c55e;
+      border-color: #bbf7d0;
     }
 
     .message-error {
-      background: rgba(239, 68, 68, 0.1);
+      background-color: #fef2f2;
       color: #991b1b;
-      border-left-color: #ef4444;
+      border-color: #fecaca;
     }
 
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+      animation: pulse 2s infinite;
+    }
+
+    /* Enhanced Horizontal Timeline */
     .timeline {
+      display: flex;
       position: relative;
-      padding-left: 40px;
+      margin: 40px 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to right, #e2e8f0, #cbd5e1);
+      border-radius: 2px;
+      z-index: 1;
+    }
+
+    .timeline::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(to right, #3b82f6, #2563eb, #1d4ed8);
+      border-radius: 2px;
+      transition: width 1s ease-in-out;
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     }
 
     .timeline-item {
+      flex: 1;
       position: relative;
-      margin-bottom: 20px;
+      text-align: center;
+      z-index: 3;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
     }
+
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+    .timeline-item:nth-child(6) { animation-delay: 0.6s; }
 
     .timeline-item::before {
       content: '';
       position: absolute;
-      left: -30px;
-      top: 0;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 12px;
       height: 12px;
-      background: var(--primary-blue);
+      background: #e2e8f0;
       border-radius: 50%;
-      border: 2px solid var(--accent-orange);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px #e2e8f0;
+      transition: all 0.5s ease;
+      z-index: 4;
     }
 
     .timeline-item.active::before {
-      background: var(--accent-orange);
-      box-shadow: 0 0 10px var(--orange-shadow);
+      background: #3b82f6;
+      box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
+      animation: pulseGlow 2s infinite;
+      transform: translateX(-50%) scale(1.2);
     }
 
-    .timeline-item::after {
-      content: '';
+    .timeline-item.active::after {
+      content: '✓';
       position: absolute;
-      left: -26px;
-      top: 12px;
-      width: 4px;
-      height: calc(100% - 12px);
-      background: var(--primary-blue);
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      z-index: 5;
+      animation: checkmarkPop 0.5s ease-out;
     }
 
-    .timeline-item:last-child::after {
-      display: none;
+    .timeline-content {
+      margin-top: 32px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
     }
 
     .timeline-item.active .timeline-content {
-      color: var(--accent-orange);
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .timeline-content p:first-child {
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-content p:last-child {
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+    .timeline-item.active .timeline-content p:first-child {
+      color: #3b82f6;
       font-weight: 600;
     }
 
+    /* Order Items Enhanced */
+    #order-items .content-card {
+      padding: 16px;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: slideInFromLeft 0.5s ease-out forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #order-items .content-card:nth-child(1) { animation-delay: 0.1s; }
+    #order-items .content-card:nth-child(2) { animation-delay: 0.2s; }
+    #order-items .content-card:nth-child(3) { animation-delay: 0.3s; }
+    #order-items .content-card:nth-child(4) { animation-delay: 0.4s; }
+
+    #order-items .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    #order-items .content-card:hover::before {
+      left: 100%;
+    }
+
+    #order-items h5 {
+      color: #1f2937;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    #order-items p,
+    #order-items span {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    /* Order Details Animation */
+    #order-details {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    #order-details:not(.hidden) {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(59, 130, 246, 0.3);
+      border-radius: 50%;
+      border-top-color: #3b82f6;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    /* Pulse Animation for Status Updates */
+    .status-pulse {
+      animation: statusPulse 1s ease-in-out;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInFromTop {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 0 2px #3b82f6, 0 0 25px rgba(59, 130, 246, 0.8);
+      }
+    }
+
+    @keyframes checkmarkPop {
+      0% {
+        transform: translateX(-50%) scale(0);
+      }
+      50% {
+        transform: translateX(-50%) scale(1.2);
+      }
+      100% {
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes statusPulse {
+      0% {
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+      50% {
+        background-color: rgba(59, 130, 246, 0.3);
+      }
+      100% {
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+    }
+
+    /* Progress Bar Animation */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background-color: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8);
+      border-radius: 3px;
+      transition: width 1s ease-in-out;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
       .sidebar {
-        width: 100%;
         position: fixed;
         top: 0;
-        left: -100%;
+        left: -280px;
         height: 100vh;
+        width: 280px;
         z-index: 1000;
         transition: left 0.3s ease;
       }
@@ -308,67 +521,108 @@
       }
 
       .content-card {
-        margin: 20px;
+        margin: 16px;
+      }
+
+      .timeline {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 40px;
+      }
+
+      .timeline::before {
+        top: 0;
+        left: 16px;
+        width: 4px;
+        height: 100%;
+      }
+
+      .timeline::after {
+        top: 0;
+        left: 16px;
+        width: 4px;
+        height: 0;
+      }
+
+      .timeline-item {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+
+      .timeline-item::before {
+        left: 12px;
+        top: 0;
+        transform: none;
+      }
+
+      .timeline-content {
+        margin-top: 0;
+        margin-left: 24px;
       }
     }
 
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    /* Loading state */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
     }
   </style>
 </head>
 <body class="flex">
+  <!-- Mobile menu button -->
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
+
   <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
-      <div class="sidebar-header p-6 relative z-10">
-        <h2 class="text-4xl font-bold text-white relative z-10">Order Tracking</h2>
-        <p id="username-greeting" class="text-xl text-white/80 mt-1 relative z-10">Welcome, User!</p>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold text-gray-900">Dashboard</h2>
+        <p id="username-greeting" class="text-sm text-gray-500 mt-1">Welcome, User!</p>
       </div>
-      <nav class="mt-6 px-3">
-        <a href="profile.html" id="profile-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-user mr-3"></i> Edit Profile
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link">
+          <i class="fas fa-user"></i> Edit Profile
         </a>
-        <a href="ordertrack.html" id="order-track-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2 active">
-          <i class="fas fa-truck mr-3"></i> Order Tracking
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link active">
+          <i class="fas fa-truck"></i> Order Tracking
         </a>
-        <a href="orderHistory.html" id="order-history-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-history mr-3"></i> Order History
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
+          <i class="fas fa-history"></i> Order History
         </a>
-        <a href="home.html" id="home-link" class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-home mr-3"></i> Back to Home Page
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Back to Home
         </a>
       </nav>
     </div>
     <div class="p-6">
-      <button id="logout-button" class="w-full btn-primary btn-logout flex items-center justify-center">
+      <button id="logout-button" class="w-full btn btn-logout">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout
       </button>
     </div>
   </aside>
 
-  <main class="main-content flex-1 p-8 overflow-auto relative z-10">
+  <main class="main-content flex-1 p-6 overflow-auto">
     <div id="content-area" class="max-w-5xl mx-auto space-y-8">
-      <div id="order-tracking-section" class="content-card p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-          <i class="fas fa-truck mr-3 text-orange-500"></i>
-          Order Tracking
-        </h2>
+      <div id="order-tracking-section" class="content-card p-6">
+        <div class="section-header">
+          <h2><i class="fas fa-truck"></i> Order Tracking</h2>
+        </div>
         <div id="error-message" class="hidden message message-error"></div>
         <div id="success-message" class="hidden message message-success"></div>
 
         <div class="mb-6">
-          <label for="order-select" class="block text-gray-600 font-medium mb-2">Chọn đơn hàng để theo dõi</label>
-          <select id="order-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <label for="order-select" class="form-label">Chọn đơn hàng để theo dõi</label>
+          <select id="order-select" class="w-full">
             <option value="">Chọn một đơn hàng</option>
           </select>
         </div>
@@ -378,6 +632,12 @@
             <h3 id="order-title" class="text-xl font-semibold text-gray-800"></h3>
             <span id="order-date" class="text-sm text-gray-600"></span>
           </div>
+          
+          <!-- Progress Bar -->
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+          </div>
+
           <p id="order-status" class="text-gray-600 mb-2"></p>
           <p id="order-type" class="text-gray-600 mb-2"></p>
           <p id="order-total" class="text-gray-600 mb-2"></p>
@@ -463,16 +723,33 @@
       return payload && !isExpired;
     }
 
-    function updateUI() {
+    async function fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id || payload.sub;
+        if (!userId) throw new Error("Không tìm thấy userId trong JWT payload");
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch user info');
+        const data = await response.json();
+        return data.result.username || 'User';
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        return 'User';
+      }
+    }
+
+    async function updateUI() {
       const token = localStorage.getItem('accessToken');
-      const payload = token ? parseJwt(token) : null;
       const usernameGreeting = document.getElementById('username-greeting');
       if (isLoggedIn() && usernameGreeting) {
-        const email = payload.sub || 'Customer';
-        usernameGreeting.textContent = `Welcome, ${email}!`;
-        console.log("Cập nhật UI với user:", email);
+        const username = await fetchUserInfo();
+        usernameGreeting.textContent = `Welcome, ${username}!`;
+        console.log("Cập nhật UI với username:", username);
       } else if (usernameGreeting) {
-        usernameGreeting.textContent = 'Welcome, Guest!';
+        usernameGreeting.textContent = 'Welcome, User!';
         console.log("Cập nhật UI cho guest");
       }
     }
@@ -663,7 +940,7 @@
     }
 
     function startPolling() {
-      stopPolling(); // Ensure no duplicate intervals
+      stopPolling();
       pollingInterval = setInterval(() => {
         const orderSelect = document.getElementById('order-select');
         const orderId = orderSelect.value;
@@ -673,7 +950,7 @@
         } else {
           console.log("No order selected, skipping poll");
         }
-      }, 30000); // 30 seconds
+      }, 30000);
       console.log("Started polling every 30 seconds");
     }
 
@@ -685,18 +962,37 @@
       }
     }
 
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
+
     document.getElementById('logout-button').addEventListener('click', logout);
 
     document.getElementById('order-select').addEventListener('change', (e) => {
       const orderId = e.target.value;
       console.log("Đã chọn đơn hàng ID:", orderId);
-      stopPolling(); // Stop polling when changing order
+      stopPolling();
       if (orderId) {
         fetchOrderDetails(orderId);
-        startPolling(); // Start polling for the new order
+        startPolling();
       } else {
         document.getElementById('order-details').classList.add('hidden');
         console.log("Ẩn chi tiết đơn hàng do không chọn đơn hàng");
+      }
+    });
+
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target) && 
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
       }
     });
 
@@ -716,5 +1012,5 @@
       link.setAttribute('title', link.textContent.trim());
     });
   </script>
-</body>
+  </body>
 </html>

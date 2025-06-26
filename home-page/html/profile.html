@@ -8,17 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    :root {
-      --primary-blue: #1E3A8A;
-      --accent-orange: #FEA116;
-      --blue-hover: #1E40AF;
-      --orange-hover: #E59014;
-      --blue-light: rgba(30, 58, 138, 0.1);
-      --orange-light: rgba(254, 161, 22, 0.1);
-      --blue-shadow: rgba(30, 58, 138, 0.3);
-      --orange-shadow: rgba(254, 161, 22, 0.3);
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -26,291 +15,208 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary-blue) 0%, #1e293b 100%);
-      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
     }
 
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--primary-blue);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--accent-orange);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--orange-hover);
-    }
-
-    /* Sidebar Animations */
+    /* Sidebar */
     .sidebar {
-      background: linear-gradient(180deg, var(--primary-blue) 0%, #1a2332 100%);
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-      border-right: 1px solid var(--accent-orange);
+      background-color: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-header {
-      font-family: 'Pacifico', cursive;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sidebar-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .sidebar-link {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
       margin: 4px 12px;
-      border-radius: 12px;
-    }
-
-    .sidebar-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--orange-light), transparent);
-      transition: left 0.6s;
-    }
-
-    .sidebar-link:hover::before {
-      left: 100%;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
     }
 
     .sidebar-link:hover {
-      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
-      transform: translateX(8px) scale(1.02);
-      box-shadow: 0 8px 25px var(--orange-shadow);
-      color: white !important;
+      background-color: #f1f5f9;
+      color: #334155;
     }
 
     .sidebar-link.active {
-      background: linear-gradient(135deg, var(--accent-orange) 0%, var(--orange-hover) 100%);
-      color: white !important;
-      box-shadow: 0 4px 15px var(--orange-shadow);
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .sidebar-link.active:hover {
+      background-color: #2563eb;
     }
 
     .sidebar-link i {
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar-link:hover i {
-      transform: scale(1.2) rotate(5deg);
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
     }
 
     /* Main Content */
     .main-content {
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      background-color: #f8fafc;
       min-height: 100vh;
-      position: relative;
-    }
-
-    .main-content::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(circle at 20% 50%, var(--blue-light) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--orange-light) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, var(--blue-light) 0%, transparent 50%);
-      pointer-events: none;
     }
 
     .content-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--blue-light);
-      border-radius: 20px;
-      box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 0 1px var(--blue-light);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .content-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-blue), var(--blue-hover), var(--primary-blue));
-      background-size: 200% 100%;
-      animation: shimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { background-position: -200% 0; }
-      50% { background-position: 200% 0; }
-    }
-
-    .content-card:hover {
-      transform: translateY(-5px);
-      box-shadow:
-        0 30px 60px rgba(0, 0, 0, 0.15),
-        0 0 0 1px var(--blue-shadow);
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
     }
 
     /* Form Elements */
-    .form-group {
-      position: relative;
-      margin-bottom: 24px;
-    }
-
     .form-label {
       display: block;
-      color: var(--primary-blue);
-      font-weight: 600;
+      color: #374151;
+      font-weight: 500;
       font-size: 14px;
-      margin-bottom: 8px;
-      transition: color 0.3s ease;
+      margin-bottom: 6px;
     }
 
     .form-input {
       width: 100%;
-      padding: 16px 16px 16px 48px;
-      background: rgba(255, 255, 255, 0.8);
-      border: 2px solid var(--blue-light);
-      border-radius: 12px;
-      font-size: 16px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color: var(--primary-blue);
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      color: #1f2937;
     }
 
     .form-input:focus {
       outline: none;
-      border-color: var(--primary-blue);
-      background: rgba(255, 255, 255, 1);
-      box-shadow:
-        0 0 0 4px var(--blue-light),
-        0 8px 25px rgba(0, 0, 0, 0.1);
-      transform: translateY(-2px);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
-    .form-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--primary-blue);
-      transition: all 0.3s ease;
-      z-index: 1;
-    }
-
-    .form-input:focus+.form-icon {
-      color: var(--accent-orange);
-      transform: translateY(-50%) scale(1.1);
+    .form-input:disabled {
+      background-color: #f9fafb;
+      color: #6b7280;
     }
 
     /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-hover) 100%);
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 16px;
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 25px var(--blue-shadow);
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }
 
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
-      transition: left 0.6s;
-    }
-
-    .btn-primary:hover::before {
-      left: 100%;
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 15px 35px var(--blue-shadow);
+      background-color: #2563eb;
     }
 
-    .btn-primary:active {
-      transform: translateY(-1px) scale(0.98);
+    .btn-primary:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
     }
 
-    .btn-logout {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
     }
 
-    .btn-logout:hover {
-      box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+    .btn-danger:hover {
+      background-color: #dc2626;
     }
 
     /* Messages */
     .message {
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      border-left: 4px solid;
-      backdrop-filter: blur(10px);
-      animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
     }
 
     .message-success {
-      background: rgba(34, 197, 94, 0.1);
+      background-color: #f0fdf4;
       color: #166534;
-      border-left-color: #22c55e;
+      border-color: #bbf7d0;
     }
 
     .message-error {
-      background: rgba(239, 68, 68, 0.1);
+      background-color: #fef2f2;
       color: #991b1b;
-      border-left-color: #ef4444;
+      border-color: #fecaca;
     }
 
-    /* Responsive Design */
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header h3 {
+      color: #374151;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    /* Grid Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
       .sidebar {
-        width: 100%;
         position: fixed;
         top: 0;
-        left: -100%;
+        left: -280px;
         height: 100vh;
+        width: 280px;
         z-index: 1000;
         transition: left 0.3s ease;
       }
@@ -323,163 +229,188 @@
         margin-left: 0;
       }
 
+      .mobile-menu-btn {
+        display: block;
+      }
+
       .content-card {
-        margin: 20px;
-      }
-
-      .form-container {
-        flex-direction: column;
-      }
-
-      .profile-form, .password-form {
-        width: 100%;
+        margin: 16px;
       }
     }
 
-    /* Loading Animation */
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
+    /* Loading state */
     .loading {
       display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
+      animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* Enhanced hover effects */
-    .interactive:hover {
-      cursor: pointer;
+    /* Input with icon */
+    .input-with-icon {
+      position: relative;
     }
 
-    .glow-on-hover {
-      transition: all 0.3s ease;
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 14px;
     }
 
-    .glow-on-hover:hover {
-      box-shadow: 0 0 20px var(--blue-shadow);
+    .input-with-icon .form-input {
+      padding-left: 40px;
+    }
+
+    /* Password strength indicator */
+    .password-strength {
+      margin-top: 8px;
+    }
+
+    .strength-bar {
+      width: 100%;
+      height: 4px;
+      background-color: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .strength-text {
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
     }
   </style>
 </head>
 
 <body class="flex">
+  <!-- Mobile menu button -->
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
+
   <!-- Sidebar -->
   <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
-      <div class="sidebar-header p-6 relative z-10">
-        <h2 class="text-4xl font-bold text-white relative z-10">User Dashboard</h2>
-        <p id="username-greeting" class="text-xl text-white/80 mt-1 relative z-10">Welcome, User!</p>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold text-gray-900">Dashboard</h2>
+        <p id="username-greeting" class="text-sm text-gray-500 mt-1">Welcome back!</p>
       </div>
-      <nav class="mt-6 px-3">
-        <a href="profile.html" id="profile-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2 active">
-          <i class="fas fa-user mr-3"></i> Edit Profile
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link active">
+          <i class="fas fa-user"></i> Edit Profile
         </a>
-        <a href="ordertrack.html" id="order-track-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-truck mr-3"></i> Order Tracking
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
+          <i class="fas fa-truck"></i> Order Tracking
         </a>
-        <a href="orderHistory.html" id="order-history-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-history mr-3"></i> Order History
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
+          <i class="fas fa-history"></i> Order History
         </a>
-        <a href="home.html" id="home-link"
-          class="sidebar-link flex items-center px-4 py-3 text-orange-400 font-semibold mb-2">
-          <i class="fas fa-home mr-3"></i> Back to Home Page
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Back to Home
         </a>
       </nav>
     </div>
     <div class="p-6">
-      <button id="logout-button" class="w-full btn-primary btn-logout flex items-center justify-center">
+      <button id="logout-button" class="w-full btn btn-danger">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="main-content flex-1 p-8 overflow-auto relative z-10">
-    <div id="content-area" class="max-w-4xl mx-auto space-y-8">
+  <main class="main-content flex-1 p-6 overflow-auto">
+    <div class="max-w-6xl mx-auto">
       <!-- Profile Section -->
-      <div id="profile-section" class="content-card p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-          <i class="fas fa-user-edit mr-3 text-orange-500"></i>
-          Edit Profile
-        </h2>
+      <div class="content-card p-6">
+        <div class="section-header">
+          <h2><i class="fas fa-user-edit"></i>Edit Profile</h2>
+        </div>
+
+        <!-- Messages -->
         <div id="error-message" class="hidden message message-error"></div>
         <div id="success-message" class="hidden message message-success"></div>
         <div id="password-error-message" class="hidden message message-error"></div>
         <div id="password-success-message" class="hidden message message-success"></div>
 
-        <div class="form-container flex gap-8">
-          <!-- Password Change Form -->
-          <div class="password-form w-1/2">
-            <h3 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-shield-alt mr-3 text-orange-500"></i>
-              Change Password
-            </h3>
-            <div class="space-y-6">
-              <div class="form-group">
-                <label for="old-password" class="form-label">Current Password</label>
-                <div class="relative">
-                  <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
-                  <i class="fas fa-lock form-icon"></i>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="new-password" class="form-label">New Password</label>
-                <div class="relative">
-                  <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
-                  <i class="fas fa-key form-icon"></i>
-                </div>
-              </div>
-              <button id="change-password-button" class="w-full btn-primary">
-                <i class="fas fa-edit mr-2"></i> Change Password
-              </button>
+        <div class="form-grid">
+          <!-- Profile Information -->
+          <div>
+            <div class="section-header">
+              <h3><i class="fas fa-user"></i>Profile Information</h3>
             </div>
+            
+            <div class="form-group">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" id="username" class="form-input" readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" id="email" class="form-input" placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" id="address" class="form-input" placeholder="Enter your address">
+            </div>
+
+            <button id="save-button" class="btn btn-primary w-full">
+              <i class="fas fa-save mr-2"></i> Save Changes
+            </button>
           </div>
-          <!-- Profile Edit Form -->
-          <div class="profile-form w-1/2">
-            <h3 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-user-edit mr-3 text-orange-500"></i>
-              Profile Information
-            </h3>
-            <div class="space-y-6">
-              <div class="form-group">
-                <label for="username" class="form-label">Username</label>
-                <div class="relative">
-                  <input type="text" id="username" class="form-input" readonly>
-                  <i class="fas fa-user form-icon"></i>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="email" class="form-label">Email Address</label>
-                <div class="relative">
-                  <input type="email" id="email" class="form-input" placeholder="Enter your email">
-                  <i class="fas fa-envelope form-icon"></i>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="phone" class="form-label">Phone Number</label>
-                <div class="relative">
-                  <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
-                  <i class="fas fa-phone form-icon"></i>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="address" class="form-label">Address</label>
-                <div class="relative">
-                  <input type="text" id="address" class="form-input" placeholder="Enter your address">
-                  <i class="fas fa-map-marker-alt form-icon"></i>
-                </div>
-              </div>
-              <button id="save-button" class="w-full btn-primary">
-                <i class="fas fa-save mr-2"></i> Save Changes
-              </button>
+
+          <!-- Change Password -->
+          <div>
+            <div class="section-header">
+              <h3><i class="fas fa-lock"></i>Change Password</h3>
             </div>
+            
+            <div class="form-group">
+              <label for="old-password" class="form-label">Current Password</label>
+              <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+              <label for="new-password" class="form-label">New Password</label>
+              <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+              <div id="password-strength-container" class="password-strength hidden">
+                <div class="strength-bar">
+                  <div id="strength-fill" class="strength-fill"></div>
+                </div>
+                <div id="strength-text" class="strength-text"></div>
+              </div>
+            </div>
+
+            <button id="change-password-button" class="btn btn-primary w-full">
+              <i class="fas fa-key mr-2"></i> Change Password
+            </button>
           </div>
         </div>
       </div>
@@ -648,118 +579,7 @@
       fetchUserInfo();
     }
 
-    // Event Listeners
-    document.getElementById('save-button').addEventListener('click', saveUserInfo);
-    document.getElementById('change-password-button').addEventListener('click', changePassword);
-    document.getElementById('logout-button').addEventListener('click', logout);
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', updateUI);
-
-    // Add form validation feedback
-    function validateForm(formType) {
-      const inputs = document.querySelectorAll(`.${formType}-form input[type="email"], .${formType}-form input[type="tel"], .${formType}-form input[type="password"]`);
-      let isValid = true;
-
-      inputs.forEach(input => {
-        const value = input.value.trim();
-        input.classList.remove('border-red-400', 'border-green-400');
-
-        if (input.type === 'email' && value) {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value)) {
-            input.classList.add('border-red-400');
-            isValid = false;
-          } else {
-            input.classList.add('border-green-400');
-          }
-        }
-
-        if (input.type === 'tel' && value) {
-          const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-          if (!phoneRegex.test(value.replace(/\s/g, ''))) {
-            input.classList.add('border-red-400');
-            isValid = false;
-          } else {
-            input.classList.add('border-green-400');
-          }
-        }
-
-        if (input.type === 'password' && input.id === 'new-password' && value) {
-          const strength = calculatePasswordStrength(value);
-          if (strength < 3) {
-            input.classList.add('border-red-400');
-            isValid = false;
-          } else {
-            input.classList.add('border-green-400');
-          }
-        }
-      });
-
-      return isValid;
-    }
-
-    // Add real-time validation
-    document.getElementById('email').addEventListener('blur', () => validateForm('profile'));
-    document.getElementById('phone').addEventListener('blur', () => validateForm('profile'));
-    document.getElementById('new-password').addEventListener('blur', () => validateForm('password'));
-
-    // Add password strength indicator
-    document.getElementById('new-password').addEventListener('input', function () {
-      const password = this.value;
-      const strengthBar = document.getElementById('password-strength');
-
-      if (!strengthBar) {
-        const strengthContainer = document.createElement('div');
-        strengthContainer.className = 'mt-2';
-        strengthContainer.innerHTML = `
-          <div class="flex items-center space-x-2">
-            <div class="flex-1 bg-gray-200 rounded-full h-2">
-              <div id="password-strength" class="h-2 rounded-full transition-all duration-300"></div>
-            </div>
-            <span id="password-strength-text" class="text-sm font-medium"></span>
-          </div>
-        `;
-        this.closest('.form-group').appendChild(strengthContainer);
-      }
-
-      const strength = calculatePasswordStrength(password);
-      const strengthBar2 = document.getElementById('password-strength');
-      const strengthText = document.getElementById('password-strength-text');
-
-      switch (strength) {
-        case 0:
-          strengthBar2.style.width = '0%';
-          strengthBar2.className = 'h-2 rounded-full transition-all duration-300';
-          strengthText.textContent = '';
-          break;
-        case 1:
-          strengthBar2.style.width = '25%';
-          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-red-500';
-          strengthText.textContent = 'Weak';
-          strengthText.className = 'text-sm font-medium text-red-500';
-          break;
-        case 2:
-          strengthBar2.style.width = '50%';
-          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-yellow-500';
-          strengthText.textContent = 'Fair';
-          strengthText.className = 'text-sm font-medium text-yellow-500';
-          break;
-        case 3:
-          strengthBar2.style.width = '75%';
-          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-blue-500';
-          strengthText.textContent = 'Good';
-          strengthText.className = 'text-sm font-medium text-blue-500';
-          break;
-        case 4:
-          strengthBar2.style.width = '100%';
-          strengthBar2.className = 'h-2 rounded-full transition-all duration-300 bg-green-500';
-          strengthText.textContent = 'Strong';
-          strengthText.className = 'text-sm font-medium text-green-500';
-          break;
-      }
-    });
-
+    // Password strength checker
     function calculatePasswordStrength(password) {
       let score = 0;
       if (password.length >= 8) score++;
@@ -770,36 +590,77 @@
       return Math.min(score, 4);
     }
 
-    // Add tooltips for navigation
-    const navLinks = document.querySelectorAll('.sidebar-link');
-    navLinks.forEach(link => {
-      link.setAttribute('title', link.textContent.trim());
-    });
+    function updatePasswordStrength(password) {
+      const container = document.getElementById('password-strength-container');
+      const fill = document.getElementById('strength-fill');
+      const text = document.getElementById('strength-text');
 
-    // Add loading states for async operations
-    function setLoadingState(elementId, isLoading) {
-      const element = document.getElementById(elementId);
-      if (isLoading) {
-        element.style.opacity = '0.7';
-        element.style.pointerEvents = 'none';
-      } else {
-        element.style.opacity = '1';
-        element.style.pointerEvents = 'auto';
+      if (!password) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      const strength = calculatePasswordStrength(password);
+      const percentage = (strength / 4) * 100;
+
+      fill.style.width = percentage + '%';
+
+      switch (strength) {
+        case 0:
+        case 1:
+          fill.style.backgroundColor = '#ef4444';
+          text.textContent = 'Weak';
+          text.style.color = '#ef4444';
+          break;
+        case 2:
+          fill.style.backgroundColor = '#f59e0b';
+          text.textContent = 'Fair';
+          text.style.color = '#f59e0b';
+          break;
+        case 3:
+          fill.style.backgroundColor = '#3b82f6';
+          text.textContent = 'Good';
+          text.style.color = '#3b82f6';
+          break;
+        case 4:
+          fill.style.backgroundColor = '#10b981';
+          text.textContent = 'Strong';
+          text.style.color = '#10b981';
+          break;
       }
     }
 
-    // Enhanced error handling with retry functionality
-    function showErrorWithRetry(message, retryFunction, section = 'profile') {
-      const errorDiv = document.getElementById(section === 'password' ? 'password-error-message' : 'error-message');
-      errorDiv.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span>${message}</span>
-          ${retryFunction ? '<button onclick="' + retryFunction.name + '()" class="ml-4 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors">Retry</button>' : ''}
-        </div>
-      `;
-      errorDiv.classList.remove('hidden');
-      document.getElementById(section === 'password' ? 'password-success-message' : 'success-message').classList.add('hidden');
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
     }
+
+    // Event Listeners
+    document.getElementById('save-button').addEventListener('click', saveUserInfo);
+    document.getElementById('change-password-button').addEventListener('click', changePassword);
+    document.getElementById('logout-button').addEventListener('click', logout);
+    document.getElementById('new-password').addEventListener('input', (e) => {
+      updatePasswordStrength(e.target.value);
+    });
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target) && 
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', updateUI);
   </script>
 </body>
 
