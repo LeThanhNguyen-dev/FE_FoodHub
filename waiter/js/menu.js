@@ -1384,7 +1384,7 @@ async function submitOrder() {
                 showNotification('Đang chuyển hướng đến trang thanh toán...', 'info');
                 sessionStorage.setItem('pendingOrderId', order.id);
                 // Delay một chút để user đọc được thông báo, sau đó chuyển hướng
-                window.location.href = paymentResult.paymentUrl;
+                window.location.href = order.payment.paymentUrl;
             }
 
             // Reset giỏ hàng và các biến global để chuẩn bị cho đơn hàng mới
@@ -1670,15 +1670,6 @@ function generateOrderSummary() {
             <div class="total-amount">${formatPrice(totalAmount)}₫</div>
         </div>
     `;
-
-    if (selectedOrderType === 'DINE_IN' && selectedTable) {
-        summary += `
-            <div class="table-info">
-                <div class="table-label">Bàn:</div>
-                <div class="table-value">${selectedTable.tableNumber}</div>
-            </div>
-        `;
-    }
 
     summary += '</div>';
 

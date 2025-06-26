@@ -37,7 +37,7 @@ async function loadShiftReport() {
         const area = currentWorkSchedule.area;
         const startTime = currentWorkSchedule.startTime;
         
-        const data = await apiFetch(`/orders/work-shift-orders?area=${encodeURIComponent(area)}&startTime=${encodeURIComponent(startTime)}&size=100`, {
+        const data = await apiFetch(`/orders/waiter/work-shift-orders?area=${encodeURIComponent(area)}&startTime=${encodeURIComponent(startTime)}&size=100`, {
             method: 'GET',
         });
 

@@ -1,94 +1,14 @@
-let currentTableFilters = {
-    tableNumber: '',
-    status: ''
-};
-
-let currentSort = {
-    field: 'tableNumber',
-    order: 'asc'
-};
-
-async function showTables(filters = {}, sort = {}) {
+async function showTables() {
     hideCartSidebar();
-    // Cập nhật filter và sort hiện tại
-    currentTableFilters = { ...currentTableFilters, ...filters };
-    currentSort = { ...currentSort, ...sort };
 
     // Update page title and toggle visibility
     document.getElementById('pageTitle').textContent = 'Quản lý bàn';
     document.getElementById('dashboardContent').style.display = 'none';
     document.getElementById('dynamicContent').style.display = 'block';
 
-    // Render the tables management HTML với filter/sort controls
+    // Render the tables management HTML
     document.getElementById('dynamicContent').innerHTML = `
         <div class="container-fluid p-4">
-            <!-- Header Section -->
-            <div class="welcome-section">
-                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                    <div class="header-info">
-                        <h2 class="mb-2"><i class="fas fa-chair me-3"></i>Quản lý bàn</h2>
-                        <p class="mb-0 opacity-75">Theo dõi và quản lý trạng thái các bàn trong nhà hàng</p>
-                    </div>
-                    <button class="btn btn-light btn-action refresh-btn" onclick="refreshTables()" 
-                            style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3);">
-                        <i class="fas fa-sync-alt me-2"></i><span class="btn-text">Làm mới</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Filter and Sort Section -->
-            <div class="filter-sort-section">
-                <div class="filter-sort-container">
-                    <div class="filter-section">
-                        <h5 class="filter-title"><i class="fas fa-filter me-2"></i>Lọc và Sắp xếp</h5>
-                        <div class="filter-controls">
-                            <div class="filter-group">
-                                <label class="filter-label">Số bàn:</label>
-                                <input type="text" id="filterTableNumber" class="form-control filter-input" 
-                                       placeholder="Nhập số bàn..." value="${currentTableFilters.tableNumber}"
-                                       onchange="applyTableFilters()">
-                            </div>
-                            
-                            <div class="filter-group">
-                                <label class="filter-label">Trạng thái:</label>
-                                <select id="filterStatus" class="form-select filter-select" onchange="applyTableFilters()">
-                                    <option value="">Tất cả trạng thái</option>
-                                    <option value="AVAILABLE" ${currentTableFilters.status === 'AVAILABLE' ? 'selected' : ''}>Trống</option>
-                                    <option value="OCCUPIED" ${currentTableFilters.status === 'OCCUPIED' ? 'selected' : ''}>Có khách</option>
-                                    <option value="RESERVED" ${currentTableFilters.status === 'RESERVED' ? 'selected' : ''}>Đặt trước</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Sắp xếp:</label>
-                                <select id="sortField" class="form-select filter-select" onchange="applySorting()">
-                                    <option value="tableNumber" ${currentSort.field === 'tableNumber' ? 'selected' : ''}>Theo số bàn</option>
-                                    <option value="status" ${currentSort.field === 'status' ? 'selected' : ''}>Theo trạng thái</option>
-                                    <option value="area" ${currentSort.field === 'area' ? 'selected' : ''}>Theo khu vực</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Thứ tự:</label>
-                                <select id="sortOrder" class="form-select filter-select" onchange="applySorting()">
-                                    <option value="asc" ${currentSort.order === 'asc' ? 'selected' : ''}>Tăng dần</option>
-                                    <option value="desc" ${currentSort.order === 'desc' ? 'selected' : ''}>Giảm dần</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="filter-actions">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="clearTableFilters()">
-                                <i class="fas fa-times me-1"></i>Xóa bộ lọc
-                            </button>
-                            <button class="btn btn-primary btn-sm" onclick="refreshTables()">
-                                <i class="fas fa-sync-alt me-1"></i>Làm mới
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Table Status Summary Cards -->
             <div class="dashboard-cards">
                 <div class="card">
@@ -147,26 +67,16 @@ async function showTables(filters = {}, sort = {}) {
         } else {
             throw new Error('Không tìm thấy thông tin khu vực của nhân viên.');
         }
-        if (currentTableFilters.tableNumber && currentTableFilters.tableNumber.trim()) {
-            queryParams.append('tableNumber', currentTableFilters.tableNumber.trim());
-        }
-
-        if (currentTableFilters.status && currentTableFilters.status.trim()) {
-            queryParams.append('status', currentTableFilters.status.trim());
-        }
 
         const queryString = queryParams.toString();
         const url = queryString ? `/tables?${queryString}` : '/tables';
 
-        // Fetch tables using fetch API with filters
+        // Fetch tables using fetch API
         const data = await apiFetch(url, {
             method: 'GET'
         });
 
         let tables = data.result || [];
-
-        // Apply client-side sorting (since backend might not support sorting yet)
-        tables = applySortingToTables(tables);
 
         // Update summary statistics
         updateTableStatistics(tables);
@@ -176,8 +86,6 @@ async function showTables(filters = {}, sort = {}) {
 
         // Render tables by area
         renderTablesByArea(tablesByArea);
-
-        // Show filter status if any filters are applied
 
     } catch (error) {
         console.error('Error fetching tables:', error);
@@ -198,97 +106,6 @@ async function showTables(filters = {}, sort = {}) {
         tablesLink.classList.add('active');
     }
 }
-
-function applyTableFilters() {
-    const tableNumber = document.getElementById('filterTableNumber').value;
-    const status = document.getElementById('filterStatus').value;
-
-    const filters = {
-        tableNumber: tableNumber,
-        status: status
-    };
-
-    showTables(filters, currentSort);
-}
-
-// Hàm áp dụng sắp xếp
-function applySorting() {
-    const sortField = document.getElementById('sortField').value;
-    const sortOrder = document.getElementById('sortOrder').value;
-
-    const sort = {
-        field: sortField,
-        order: sortOrder
-    };
-
-    showTables(currentTableFilters, sort);
-}
-
-// Hàm sắp xếp tables phía client
-function applySortingToTables(tables) {
-    return tables.sort((a, b) => {
-        let valueA, valueB;
-
-        switch (currentSort.field) {
-            case 'tableNumber':
-                // Sort by table number with natural sorting (A1, A2, A10, B1, etc.)
-                valueA = a.tableNumber;
-                valueB = b.tableNumber;
-                return currentSort.order === 'asc'
-                    ? valueA.localeCompare(valueB, undefined, { numeric: true, sensitivity: 'base' })
-                    : valueB.localeCompare(valueA, undefined, { numeric: true, sensitivity: 'base' });
-
-            case 'status':
-                // Sort by status priority: OCCUPIED -> RESERVED -> AVAILABLE
-                const statusPriority = { 'OCCUPIED': 3, 'RESERVED': 2, 'AVAILABLE': 1 };
-                valueA = statusPriority[a.status] || 0;
-                valueB = statusPriority[b.status] || 0;
-                return currentSort.order === 'asc' ? valueA - valueB : valueB - valueA;
-
-            case 'area':
-                valueA = a.area;
-                valueB = b.area;
-                return currentSort.order === 'asc'
-                    ? valueA.localeCompare(valueB)
-                    : valueB.localeCompare(valueA);
-
-            default:
-                return 0;
-        }
-    });
-}
-
-// Hàm xóa bộ lọc
-function clearTableFilters() {
-    currentTableFilters = {
-        tableNumber: '',
-        status: ''
-    };
-
-    currentSort = {
-        field: 'tableNumber',
-        order: 'asc'
-    };
-
-    // Reset form values
-    if (document.getElementById('filterTableNumber')) {
-        document.getElementById('filterTableNumber').value = '';
-    }
-    if (document.getElementById('filterStatus')) {
-        document.getElementById('filterStatus').value = '';
-    }
-    if (document.getElementById('sortField')) {
-        document.getElementById('sortField').value = 'tableNumber';
-    }
-    if (document.getElementById('sortOrder')) {
-        document.getElementById('sortOrder').value = 'asc';
-    }
-
-    showTables();
-}
-
-// Hàm hiển thị trạng thái bộ lọc
-
 
 // Hàm cập nhật thống kê bàn
 function updateTableStatistics(tables) {
@@ -320,24 +137,6 @@ function renderTablesByArea(tablesByArea) {
     const container = document.getElementById('tablesContainer');
     let html = '<h3 class="mb-4 section-title"><i class="fas fa-map-marker-alt me-2 text-primary"></i>Sơ đồ bàn theo khu vực</h3>';
 
-    // Add sorting info
-    const sortFieldText = {
-        'tableNumber': 'số bàn',
-        'status': 'trạng thái',
-        'area': 'khu vực'
-    };
-
-    const sortOrderText = currentSort.order === 'asc' ? 'tăng dần' : 'giảm dần';
-
-    html += `
-        <div class="sort-info mb-3">
-            <small class="text-muted">
-                <i class="fas fa-sort me-1"></i>
-                Đang sắp xếp theo ${sortFieldText[currentSort.field]} (${sortOrderText})
-            </small>
-        </div>
-    `;
-
     Object.keys(tablesByArea).sort().forEach(area => {
         html += `
             <div class="area-section mb-5">
@@ -359,7 +158,6 @@ function renderTablesByArea(tablesByArea) {
                 <div class="tables-grid">
         `;
 
-        // Tables are already sorted, no need to sort again here
         tablesByArea[area].forEach(table => {
             const statusClass = getTableStatusClass(table.status);
             const statusText = getTableStatusText(table.status);
@@ -417,149 +215,6 @@ function renderTablesByArea(tablesByArea) {
     container.innerHTML = html;
 }
 
-// CSS cho filter và sort section
-const filterSortStyle = document.createElement('style');
-filterSortStyle.textContent = `
-    .filter-sort-section {
-        margin: 0 1rem 2rem 1rem !important;
-    }
-    
-    .filter-sort-container {
-        background: white !important;
-        border-radius: 20px !important;
-        padding: 1.5rem !important;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
-        border: 2px solid rgba(0, 102, 204, 0.1) !important;
-    }
-    
-    .filter-title {
-        color: var(--waiter-blue) !important;
-        margin-bottom: 1rem !important;
-        font-weight: 600 !important;
-    }
-    
-    .filter-controls {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-        gap: 1rem !important;
-        margin-bottom: 1.5rem !important;
-    }
-    
-    .filter-group {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    
-    .filter-label {
-        font-size: 0.9rem !important;
-        font-weight: 500 !important;
-        color: var(--dark) !important;
-        margin-bottom: 0.5rem !important;
-    }
-    
-    .filter-input,
-    .filter-select {
-        border-radius: 10px !important;
-        border: 2px solid rgba(0, 102, 204, 0.2) !important;
-        padding: 0.5rem 0.75rem !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .filter-input:focus,
-    .filter-select:focus {
-        border-color: var(--waiter-blue) !important;
-        box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25) !important;
-        outline: none !important;
-    }
-    
-    .filter-actions {
-        display: flex !important;
-        gap: 0.5rem !important;
-        justify-content: center !important;
-        flex-wrap: wrap !important;
-    }
-    
-    .filter-actions .btn {
-        border-radius: 10px !important;
-        padding: 0.5rem 1rem !important;
-        font-weight: 500 !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .filter-status-alert {
-        border-radius: 15px !important;
-        border: none !important;
-        background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 202, 240, 0.05)) !important;
-        border-left: 4px solid var(--info) !important;
-        margin-bottom: 1.5rem !important;
-    }
-    
-    .sort-info {
-        text-align: center !important;
-        padding: 0.5rem !important;
-        background: rgba(0, 102, 204, 0.05) !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(0, 102, 204, 0.1) !important;
-    }
-    
-    /* Responsive design for filter section */
-    @media (max-width: 768px) {
-        .filter-sort-section {
-            margin: 0 0.5rem 1.5rem 0.5rem !important;
-        }
-        
-        .filter-sort-container {
-            padding: 1rem !important;
-            border-radius: 15px !important;
-        }
-        
-        .filter-controls {
-            grid-template-columns: 1fr !important;
-            gap: 0.75rem !important;
-            margin-bottom: 1rem !important;
-        }
-        
-        .filter-actions {
-            justify-content: stretch !important;
-        }
-        
-        .filter-actions .btn {
-            flex: 1 !important;
-            min-width: 120px !important;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .filter-controls {
-            gap: 0.5rem !important;
-        }
-        
-        .filter-actions {
-            flex-direction: column !important;
-        }
-        
-        .filter-actions .btn {
-            width: 100% !important;
-        }
-        
-        .filter-title {
-            font-size: 1.1rem !important;
-            text-align: center !important;
-        }
-    }
-    
-    /* Animation for filter changes */
-    .tables-grid {
-        animation: fadeIn 0.3s ease !important;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0 !important; transform: translateY(10px) !important; }
-        to { opacity: 1 !important; transform: translateY(0) !important; }
-    }
-`;
-document.head.appendChild(filterSortStyle);
-
 // Hàm tạo thống kê cho từng khu vực
 function getAreaStats(tables) {
     const available = tables.filter(t => t.status === 'AVAILABLE').length;
@@ -604,9 +259,6 @@ function getTableStatusIcon(status) {
     };
     return icons[status] || 'fas fa-chair';
 }
-
-// Hàm xác định class badge cho trạng thái
-
 
 // Hàm kiểm tra xem có cần hiển thị cảnh báo khẩn cấp không
 function shouldShowUrgent(table) {
@@ -730,9 +382,6 @@ async function viewTableOrders(tableId) {
     }
 }
 
-// Hàm hiển thị thông tin đơn hàng (đã được sửa để xử lý một đơn hàng duy nhất)
-// Hàm hiển thị thông tin đơn hàng (đã được cập nhật với CSS mới)
-
 // Thêm CSS animation cho fade out
 const fadeOutStyle = document.createElement('style');
 fadeOutStyle.textContent = `
@@ -742,9 +391,6 @@ fadeOutStyle.textContent = `
     }
 `;
 document.head.appendChild(fadeOutStyle);
-
-
-
 
 // Đóng modal khi nhấn ESC
 document.addEventListener('keydown', function(event) {
@@ -783,47 +429,12 @@ function showOrderModal(html) {
     modalContainer.style.display = 'block';
 }
 
-
-
 // Hàm xem chi tiết đặt bàn
 function viewReservation(tableId) {
     // TODO: Implement view reservation functionality
     showNotification('Chức năng xem chi tiết đặt bàn sẽ được cập nhật sau!', 'info');
 }
 
-// Hàm hiển thị thông báo
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} notification-toast`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        border-radius: 10px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        animation: slideInRight 0.3s ease;
-        max-width: 90vw;
-        word-wrap: break-word;
-    `;
-    notification.innerHTML = `
-        <i class="fas fa-info-circle me-2"></i>
-        ${message}
-    `;
-
-    document.body.appendChild(notification);
-
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
 
 // Hàm làm mới danh sách bàn
 function refreshTables() {
@@ -837,8 +448,8 @@ function refreshTables() {
         }, 1000);
     }
 
-    // Refresh with current filters and sort
-    showTables(currentTableFilters, currentSort);
+    // Refresh tables
+    showTables();
 }
 
 const style = document.createElement('style');

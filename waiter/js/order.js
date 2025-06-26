@@ -835,109 +835,6 @@ function getNotificationIcon(type) {
     return icons[type] || 'fa-info-circle';
 }
 
-// NEW FUNCTION: Thêm CSS cho notification
-function addNotificationStyles() {
-    if (document.getElementById('notificationStyles')) return;
-
-    const styles = `
-        <style id="notificationStyles">
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            min-width: 300px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 1050;
-        }
-        .notification.show {
-            transform: translateX(0);
-        }
-        .notification-success {
-            background: linear-gradient(135deg, #28a745, #20c997);
-        }
-        .notification-error {
-            background: linear-gradient(135deg, #dc3545, #e74c3c);
-        }
-        .notification-warning {
-            background: linear-gradient(135deg, #ffc107, #f39c12);
-            color: #333;
-        }
-        .notification-info {
-            background: linear-gradient(135deg, #17a2b8, #3498db);
-        }
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .notification-content i {
-            font-size: 18px;
-        }
-        .action-btn-group {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .action-btn {
-            padding: 6px 8px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-            min-width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .action-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn-success:hover:not(:disabled) {
-            background: #218838;
-        }
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background: #0056b3;
-        }
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-        }
-        .btn-info:hover:not(:disabled) {
-            background: #138496;
-        }
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-danger:hover:not(:disabled) {
-            background: #c82333;
-        }
-        </style>
-    `;
-    document.head.insertAdjacentHTML('beforeend', styles);
-}
 
 
 
@@ -1356,6 +1253,16 @@ async function displayOrderDetails(orderData) {
             itemNode.querySelector('.item-details').textContent = `SL: ${item.quantity} × ${formatCurrency(item.price)}`;
             itemNode.querySelector('.item-status .badge').className = `badge ${getStatusBadgeClass(item.status)}`;
             itemNode.querySelector('.item-status .badge').textContent = getStatusText(item.status);
+            
+            // Thêm ghi chú cho item nếu có
+            const itemNoteElement = itemNode.querySelector('.item-note');
+            if (item.note && item.note.trim() !== '') {
+                itemNoteElement.textContent = `Ghi chú: ${item.note}`;
+                itemNoteElement.style.display = 'block';
+            } else {
+                itemNoteElement.style.display = 'none';
+            }
+            
             return itemNode.querySelector('.order-item').outerHTML;
         }).join('');
 
@@ -1435,6 +1342,7 @@ async function displayOrderDetails(orderData) {
         `);
     }
 }
+
 
 
 function startAddItemsToOrder(orderId) {

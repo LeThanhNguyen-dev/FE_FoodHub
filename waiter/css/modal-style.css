@@ -121,15 +121,13 @@
 
 /* Order Total (dùng cho displayOrderDetails) */
 .order-total {
-    text-align: center;
-    font-size: 18px;
-    margin-top: 20px;
-    padding: 15px;
-    background: #fff;
-    border-radius: 4px;
-    font-weight: 700;
-    color: black;
-    border: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 16px 0;
+  border-top: 2px solid 
+#f0f0f0;
 }
 
 /* Badge (dùng chung cho cả hai) */

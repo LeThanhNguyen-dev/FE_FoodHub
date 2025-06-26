@@ -320,27 +320,7 @@ body {
     margin-left: auto !important;
 }
 
-.remove-item-btn {
-    background: none !important;
-    border: 1px solid #ddd !important;
-    color: #666 !important;
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 50% !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 16px !important;
-    transition: all 0.2s ease !important;
-    order: 2 !important;
-}
 
-.remove-item-btn:hover {
-    background: #dc3545 !important;
-    color: white !important;
-    border-color: #dc3545 !important;
-}
 
 /* Quantity controls - layout ngang */
 .quantity-controls {
@@ -364,6 +344,10 @@ body {
     font-size: 16px !important;
     font-weight: 600 !important;
     transition: all 0.2s ease !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+    font-family: monospace !important;
 }
 
 .quantity-btn:hover {
@@ -375,6 +359,10 @@ body {
     background: #f8f9fa !important;
     color: #666 !important;
     border: 1px solid #ddd !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+    font-family: monospace !important;
 }
 
 .quantity-btn.decrease:hover {
@@ -391,6 +379,29 @@ body {
     color: #333 !important;
 }
 
+.remove-item-btn {
+    width: 28px !important;
+    height: 28px !important;
+    border: none !important;
+    background: #dc3545 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+}
+
+
+.remove-item-btn:hover {
+    background: #c82333 !important;
+    transform: scale(1.05) !important;
+}
 /* Order Form Section - Ẩn phần này vì đã chuyển lên header */
 .order-form-section {
     display: none !important;

@@ -152,63 +152,37 @@ async function loadOrders(isAutoRefresh = false) {
             ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
         }
 
-        // Luôn luôn sử dụng API có pagination và sorting để đảm bảo tính năng hoạt động đúng
-        // Chỉ dùng API đơn giản khi là auto refresh và không có bất kỳ thay đổi nào
-        const useSimpleAPI = isAutoRefresh && !status && !tableId && 
-                            sortBy === 'createdAt' && sortDirection === 'DESC' && 
-                            (!currentPage || currentPage === 0);
-
-        let data;
+        // Luôn sử dụng API có pagination và sorting
+        const params = new URLSearchParams();
         
-        if (useSimpleAPI) {
-            // Simple request chỉ cho auto refresh khi mặc định hoàn toàn
-            console.log('Fetching orders from simple API for auto refresh...');
-            data = await apiFetch('/orders', { method: 'GET' });
-        } else {
-            // Luôn dùng API có pagination cho tất cả các trường hợp khác
-            const params = new URLSearchParams();
-            
-            // Thêm filters nếu có
-            if (status) params.append('status', status);
-            if (tableId) params.append('tableId', tableId);
-            
-            // Luôn thêm pagination và sorting parameters
-            params.append('page', (currentPage || 0).toString());
-            params.append('size', pageSize);
-            params.append('sortBy', sortBy);
-            params.append('sort', sortDirection);
+        // Thêm filters nếu có
+        if (status) params.append('status', status);
+        if (tableId) params.append('tableId', tableId);
+        
+        // Luôn thêm pagination và sorting parameters
+        params.append('page', (currentPage || 0).toString());
+        params.append('size', pageSize);
+        params.append('sortBy', sortBy);
+        params.append('sort', sortDirection);
 
-            console.log('Fetching orders with pagination and sorting:', params.toString());
-            data = await apiFetch(`/orders?${params.toString()}`, { method: 'GET' });
-        }
+        console.log('Fetching orders with pagination and sorting:', params.toString());
+        const data = await apiFetch(`/orders?${params.toString()}`, { method: 'GET' });
 
         console.log('API Response:', data);
 
         if (data.code === 0 && data.result) {
-            let orders;
+            // Paginated response
+            const orderPage = data.result;
+            const orders = orderPage.content || [];
             
-            if (data.result.content) {
-                // Paginated response
-                const orderPage = data.result;
-                orders = orderPage.content || [];
-                
-                // Update pagination info
-                if (typeof totalPages !== 'undefined') totalPages = orderPage.totalPages || 0;
-                if (typeof totalElements !== 'undefined') totalElements = orderPage.totalElements || 0;
-                if (typeof currentPage !== 'undefined') currentPage = orderPage.number || 0;
-                
-                // Update additional components if functions exist
-                if (typeof updateSummary === 'function') updateSummary(orderPage);
-                if (typeof updatePagination === 'function') updatePagination();
-            } else {
-                // Simple response (array) - chỉ cho auto refresh
-                orders = Array.isArray(data.result) ? data.result : [data.result];
-                
-                // Reset pagination info for simple response
-                if (typeof totalPages !== 'undefined') totalPages = 1;
-                if (typeof totalElements !== 'undefined') totalElements = orders.length;
-                if (typeof currentPage !== 'undefined') currentPage = 0;
-            }
+            // Update pagination info
+            if (typeof totalPages !== 'undefined') totalPages = orderPage.totalPages || 0;
+            if (typeof totalElements !== 'undefined') totalElements = orderPage.totalElements || 0;
+            if (typeof currentPage !== 'undefined') currentPage = orderPage.number || 0;
+            
+            // Update additional components if functions exist
+            if (typeof updateSummary === 'function') updateSummary(orderPage);
+            if (typeof updatePagination === 'function') updatePagination();
 
             // Check if data has changed for auto refresh
             if (isAutoRefresh && typeof hasOrdersChanged === 'function' && !hasOrdersChanged(orders, ordersData)) {
@@ -240,7 +214,6 @@ async function loadOrders(isAutoRefresh = false) {
         isReloading = false;
     }
 }
-
 
 // Render orders with smooth animations
 function renderOrders(orders) {
@@ -677,7 +650,29 @@ document.head.insertAdjacentHTML('beforeend', `
 // Update order status
 async function updateOrderStatus(orderId, newStatus) {
     try {
+        // Tạo message xác nhận dựa trên status
+        const statusMessages = {
+            'PENDING': 'chờ xử lý',
+            'CONFIRMED': 'xác nhận',
+            'PREPARING': 'đang chuẩn bị',
+            'READY': 'sẵn sàng',
+            'SERVED': 'đã phục vụ',
+            'COMPLETED': 'hoàn thành',
+            'CANCELLED': 'hủy'
+        };
+
+        const statusText = statusMessages[newStatus] || newStatus.toLowerCase();
+        const confirmMessage = `Bạn có chắc chắn muốn chuyển đơn hàng #${orderId} sang trạng thái "${statusText}"?`;
+
+        // Hiển thị alert xác nhận
+        if (!confirm(confirmMessage)) {
+            return; // User cancelled, exit function
+        }
+
         console.log(`Updating order ${orderId} to status: ${newStatus}`);
+
+        // Hiển thị notification đang xử lý
+        showNotification(`Đang cập nhật trạng thái đơn hàng #${orderId}...`, 'info');
 
         const data = await apiFetch(`/orders/status/${orderId}?status=${newStatus}`, {
             method: 'PUT',
@@ -686,17 +681,24 @@ async function updateOrderStatus(orderId, newStatus) {
 
         if (data && data.code === 0) {
             console.log('Order status updated successfully');
+            
+            // Hiển thị notification thành công
+            showNotification(`Đã cập nhật đơn hàng #${orderId} sang trạng thái "${statusText}" thành công!`, 'success');
+            
             // Reload orders to reflect changes
             await loadOrders(true); // Use auto-refresh mode
+            
             // Close modal if open
             closeOrderDetails();
         } else {
-            throw new Error('Failed to update order status');
+            throw new Error(data?.message || 'Failed to update order status');
         }
 
     } catch (error) {
         console.error('Error updating order status:', error);
-        alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng: ' + error.message);
+        
+        // Hiển thị notification lỗi
+        showNotification(`Có lỗi xảy ra khi cập nhật trạng thái đơn hàng #${orderId}: ${error.message}`, 'error');
     }
 }
 
@@ -1502,3 +1504,45 @@ document.addEventListener('visibilitychange', function() {
         startSmartRefresh();
     }
 });
+
+
+function showNotification(message, type = 'info') {
+    // Tạo notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+
+    // Thêm vào body
+    document.body.appendChild(notification);
+
+    // Hiện notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+
+    // Tự động ẩn sau 3 giây
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// NEW FUNCTION: Lấy icon cho notification
+function getNotificationIcon(type) {
+    const icons = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-circle',
+        'warning': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle'
+    };
+    return icons[type] || 'fa-info-circle';
+}
