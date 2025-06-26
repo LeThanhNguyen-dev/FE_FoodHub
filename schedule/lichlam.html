@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -20,7 +21,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/sidebar.css">
-      <link rel="stylesheet" href="/css/lichlam.css">
+    <link rel="stylesheet" href="/css/lichlam.css">
 </head>
 
 <body>
@@ -119,48 +120,50 @@
             </div>
         </div>
     </div>
-     <div class="modal" id="shiftInfoModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">Thông Tin Ca Làm Việc</h2>
-            <button type="button" class="close-btn" onclick="closeShiftInfoModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="shift-info-content">
-            <div class="info-item">
-                <strong>Tên nhân viên:</strong>
-                <span id="infoEmployeeName"></span>
+
+    <div class="modal" id="shiftInfoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Thông Tin Ca Làm Việc</h2>
+                <button type="button" class="close-btn" onclick="closeShiftInfoModal()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="info-item">
-                <strong>Vị trí:</strong>
-                <span id="infoRole"></span>
+            <div class="shift-info-content">
+                <div class="info-item">
+                    <strong>Tên nhân viên:</strong>
+                    <span id="infoEmployeeName"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Vị trí:</strong>
+                    <span id="infoRole"></span>
+                </div>
+                <div class="info-item" id="infoAreaItem" style="display: none;">
+                    <strong>Khu vực:</strong>
+                    <span id="infoArea"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Ca làm việc:</strong>
+                    <span id="infoShift"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Thời gian:</strong>
+                    <span id="infoTime"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Ngày làm việc:</strong>
+                    <span id="infoDate"></span>
+                </div>
             </div>
-            <div class="info-item" id="infoAreaItem" style="display: none;">
-                <strong>Khu vực:</strong>
-                <span id="infoArea"></span>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeShiftInfoModal()">Hủy</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteFromInfo()">
+                    <i class="fas fa-trash me-2"></i>Xóa Ca
+                </button>
             </div>
-            <div class="info-item">
-                <strong>Ca làm việc:</strong>
-                <span id="infoShift"></span>
-            </div>
-            <div class="info-item">
-                <strong>Thời gian:</strong>
-                <span id="infoTime"></span>
-            </div>
-            <div class="info-item">
-                <strong>Ngày làm việc:</strong>
-                <span id="infoDate"></span>
-            </div>
-        </div>
-        <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="closeShiftInfoModal()">Hủy</button>
-            <button type="button" class="btn btn-danger" onclick="confirmDeleteFromInfo()">
-                <i class="fas fa-trash me-2"></i>Xóa Ca
-            </button>
         </div>
     </div>
-</div>
+
     <button class="add-shift-btn" onclick="openModal()">+</button>
 
     <div class="modal" id="shiftModal">
@@ -370,7 +373,10 @@
                     const currentDay = new Date(weekStart);
                     currentDay.setDate(weekStart.getDate() + i);
                     const dateStr = `${currentDay.getFullYear()}-${String(currentDay.getMonth() + 1).padStart(2, '0')}-${String(currentDay.getDate()).padStart(2, '0')}`;
-                    const dayShifts = shifts.filter(shift => shift.date === dateStr);
+                    const dayShifts = shifts.filter(shift => {
+                        const shiftDate = new Date(shift.date).toISOString().split('T')[0];
+                        return shiftDate === dateStr;
+                    });
 
                     const groupedShifts = {
                         morning: dayShifts.filter(s => s.shift.toLowerCase() === 'morning'),
@@ -384,13 +390,12 @@
                             shiftsHtml += `
                                 <div class="shift-group">
                                     <div class="shift-header">${shiftType === 'morning' ? 'Ca Sáng' : shiftType === 'afternoon' ? 'Ca Chiều' : 'Ca Tối'}</div>
-                                   
-${groupedShifts[shiftType].map(shift => `
-    <div class="employee-card ${shift.role.toLowerCase()}" onclick="showShiftInfo(${shift.id}, '${shift.name}', '${shift.role}', '${shift.area || ''}', '${shift.date}', '${shift.shift}', '${shift.startTime || getShiftTime(shift.shift).start}', '${shift.endTime || getShiftTime(shift.shift).end}')">
-        <span class="employee-name">${shift.name}</span>
-        ${shift.area ? `<span class="area-tag">${shift.area}</span>` : ''}
-    </div>
-`).join('')}
+                                    ${groupedShifts[shiftType].map(shift => `
+                                        <div class="employee-card ${shift.role.toLowerCase()}" onclick="showShiftInfo(${shift.id}, '${shift.name}', '${shift.role}', '${shift.area || ''}', '${shift.date}', '${shift.shift}', '${formatTime(shift.startTime)}', '${formatTime(shift.endTime)}')">
+                                            <span class="employee-name">${shift.name}</span>
+                                            ${shift.area ? `<span class="area-tag">${shift.area}</span>` : ''}
+                                        </div>
+                                    `).join('')}
                                 </div>
                             `;
                         }
@@ -498,99 +503,90 @@ ${groupedShifts[shiftType].map(shift => `
             }
         }
 
-       // Thay thế hàm confirmRemoveShift
-function showShiftInfo(shiftId, employeeName, role, area, shiftDate, shiftType, startTime, endTime) {
-    // Lưu thông tin ca làm việc để sử dụng khi xóa
-    window.currentShiftInfo = {
-        id: shiftId,
-        name: employeeName,
-        role: role,
-        area: area,
-        date: shiftDate,
-        shift: shiftType,
-        startTime: startTime,
-        endTime: endTime
-    };
-    
-    // Hiển thị thông tin
-    document.getElementById('infoEmployeeName').textContent = employeeName;
-    document.getElementById('infoRole').textContent = getRoleDisplayName(role);
-    document.getElementById('infoShift').textContent = getShiftDisplayName(shiftType);
-    document.getElementById('infoTime').textContent = `${startTime} - ${endTime}`;
-    document.getElementById('infoDate').textContent = formatDate(shiftDate);
-    
-    // Hiển thị area chỉ khi role là waiter
-    const areaItem = document.getElementById('infoAreaItem');
-    if (role.toLowerCase() === 'waiter' && area) {
-        document.getElementById('infoArea').textContent = area;
-        areaItem.style.display = 'flex';
-    } else {
-        areaItem.style.display = 'none';
-    }
-    
-    // Hiển thị modal
-    document.getElementById('shiftInfoModal').classList.add('show');
+        function showShiftInfo(shiftId, employeeName, role, area, shiftDate, shiftType, startTime, endTime) {
+            window.currentShiftInfo = {
+                id: shiftId,
+                name: employeeName,
+                role: role,
+                area: area,
+                date: shiftDate,
+                shift: shiftType,
+                startTime: startTime,
+                endTime: endTime
+            };
+
+            document.getElementById('infoEmployeeName').textContent = employeeName;
+            document.getElementById('infoRole').textContent = getRoleDisplayName(role);
+            document.getElementById('infoShift').textContent = getShiftDisplayName(shiftType);
+            document.getElementById('infoTime').textContent = `${startTime} - ${endTime}`;
+            document.getElementById('infoDate').textContent = formatDate(shiftDate);
+
+            const areaItem = document.getElementById('infoAreaItem');
+            if (role.toLowerCase() === 'waiter' && area) {
+                document.getElementById('infoArea').textContent = area;
+                areaItem.style.display = 'flex';
+            } else {
+                areaItem.style.display = 'none';
+            }
+
+            document.getElementById('shiftInfoModal').classList.add('show');
+        }
+
+        function closeShiftInfoModal() {
+            document.getElementById('shiftInfoModal').classList.remove('show');
+        }
+
+        function confirmDeleteFromInfo() {
+            const shiftInfo = window.currentShiftInfo;
+            if (!shiftInfo) return;
+
+            const shiftDateObj = new Date(shiftInfo.date);
+            const today = new Date();
+            if (shiftDateObj.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0)) {
+                showAlert('Không thể xóa ca làm việc trong quá khứ.', 'Lỗi', 'error');
+                return;
+            }
+
+            closeShiftInfoModal();
+
+            showConfirm(
+                `Bạn có chắc muốn xóa ca làm việc của "${shiftInfo.name}" không?`,
+                'Xác nhận xóa ca',
+                () => removeShift(shiftInfo.id),
+                () => {}
+            );
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        }
+
+       function formatTime(timeStr) {
+    const date = new Date(timeStr);
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
 }
 
-function closeShiftInfoModal() {
-    document.getElementById('shiftInfoModal').classList.remove('show');
-}
+        function getRoleDisplayName(role) {
+            const roleMap = {
+                'chef': 'Bếp trưởng',
+                'waiter': 'Phục vụ',
+                'cashier': 'Thu ngân',
+                'manager': 'Quản lý'
+            };
+            return roleMap[role.toLowerCase()] || role;
+        }
 
-function confirmDeleteFromInfo() {
-    const shiftInfo = window.currentShiftInfo;
-    if (!shiftInfo) return;
-    
-    const shiftDateObj = new Date(shiftInfo.date);
-    const today = new Date();
-    if (shiftDateObj.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0)) {
-        showAlert('Không thể xóa ca làm việc trong quá khứ.', 'Lỗi', 'error');
-        return;
-    }
-    
-    // Đóng popup thông tin trước
-    closeShiftInfoModal();
-    
-    // Hiển thị popup xác nhận xóa
-    showConfirm(
-        `Bạn có chắc muốn xóa ca làm việc của "${shiftInfo.name}" không?`,
-        'Xác nhận xóa ca',
-        () => removeShift(shiftInfo.id),
-        () => {}
-    );
-}
-
-// Hàm helper
-function getRoleDisplayName(role) {
-    const roleMap = {
-        'chef': 'Bếp trưởng',
-        'waiter': 'Phục vụ',
-        'cashier': 'Thu ngân',
-        'manager': 'Quản lý'
-    };
-    return roleMap[role.toLowerCase()] || role;
-}
-
-function getShiftDisplayName(shift) {
-    const shiftMap = {
-        'morning': 'Ca Sáng',
-        'afternoon': 'Ca Chiều',
-        'night': 'Ca Tối'
-    };
-    return shiftMap[shift.toLowerCase()] || shift;
-}
-
-function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-}
-function getShiftTime(shiftType) {
-    const times = {
-        'morning': { start: '08:30', end: '12:30' },
-        'afternoon': { start: '12:30', end: '17:30' },
-        'night': { start: '17:30', end: '22:30' }
-    };
-    return times[shiftType.toLowerCase()] || { start: '', end: '' };
-}
+        function getShiftDisplayName(shift) {
+            const shiftMap = {
+                'morning': 'Ca Sáng',
+                'afternoon': 'Ca Chiều',
+                'night': 'Ca Tối'
+            };
+            return shiftMap[shift.toLowerCase()] || shift;
+        }
 
         async function removeShift(shiftId) {
             try {
@@ -606,16 +602,19 @@ function getShiftTime(shiftType) {
                 showAlert(error.message || 'Lỗi kết nối. Vui lòng thử lại.', 'Lỗi', 'error');
             }
         }
+
         document.getElementById('shiftInfoModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('shiftInfoModal')) closeShiftInfoModal();
-});
+            if (e.target === document.getElementById('shiftInfoModal')) closeShiftInfoModal();
+        });
 
         document.getElementById('customPopup').addEventListener('click', e => {
             if (e.target === document.getElementById('customPopup')) closePopup();
         });
+
         document.getElementById('shiftModal').addEventListener('click', e => {
             if (e.target === document.getElementById('shiftModal')) closeModal();
         });
+
         document.getElementById('employeeRole').addEventListener('change', updateEmployeeList);
         document.getElementById('shiftForm').addEventListener('submit', addShift);
 

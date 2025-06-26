@@ -433,10 +433,22 @@
             </div>
             <div class="col-md-6">
                 <i class="fas fa-money-bill-wave me-2"></i>
-                <strong>Tổng doanh thu:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
+               <strong>Tổng tiền:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
+<i class="fas fa-exclamation-circle text-warning ms-1" 
+   data-bs-toggle="tooltip" 
+   data-bs-placement="top" 
+   title="Lưu ý: Doanh thu của cửa hàng được xác định dựa trên các giao dịch thanh toán thành công, nên có thể không hoàn toàn khớp với tổng tiền của các đơn hàng."
+   style="cursor: help;"></i>
             </div>
         </div>
     `;
+    // Khởi tạo tooltip
+setTimeout(() => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}, 100);
     
     if (!orders || orders.length === 0) {
         document.getElementById('emptyState').style.display = 'block';
@@ -665,7 +677,6 @@
             try {
                 const data = await apiFetch(`/orders/${orderId}`);
                 const order = data.result;
-        
                 document.getElementById('orderDetailModalLabel').textContent = `Chi tiết đơn hàng ${order.id}`;
                 document.getElementById('orderDetails').innerHTML = `
                     <div class="col-md-6">

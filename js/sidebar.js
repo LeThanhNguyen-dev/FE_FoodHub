@@ -61,6 +61,10 @@ function setActiveNavLink() {
                 link.classList.add('active');
                 console.log('Active: revenue-report', href);
             }
+             else if (currentPath.startsWith('revenue-report/transaction.html') && href.includes('revenue-report/transaction.html')) {
+                link.classList.add('active');
+                console.log('Active: revenue-report', href);
+            }
             else if (currentPath.startsWith('schedule/') && href.includes('schedule/')) {
                 link.classList.add('active');
                 console.log('Active: schedule', href);
