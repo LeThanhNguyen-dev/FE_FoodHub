@@ -1,30 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoodHub Admin - Quản lý hệ thống</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
-
-    <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
-
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
-
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/sidebar.css">
     <style>
-         :root {
+        :root {
             --primary: #FEA116;
             --light: #F1F8FF;
             --dark: #0F172B;
@@ -33,85 +25,32 @@
             --danger: #EF4444;
             --info: #3B82F6;
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Nunito', sans-serif;
             background-color: var(--light);
-        }
-        
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 280px;
-            background: var(--dark);
-            transition: all 0.3s;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        
-        .sidebar .brand {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar .brand h3 {
-            color: var(--primary);
+            min-height: 100vh;
+            padding: 0;
             margin: 0;
-            font-family: 'Pacifico', cursive;
+            color: #121826;
         }
-        
-        .sidebar .brand small {
-            color: #fff;
-            font-style: italic;
-        }
-        
-        .sidebar-nav {
-            padding: 1rem 0;
-            flex: 1;
-        }
-        
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-            border-radius: 0;
-        }
-        
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(254, 161, 22, 0.1);
-            color: var(--primary);
-        }
-        
-        .nav-link i {
-            width: 20px;
-            margin-right: 1rem;
-            text-align: center;
-        }
-        
+
         .main-content {
             margin-left: 280px;
             transition: all 0.3s;
             min-height: 100vh;
         }
-        
+
         .main-content.expanded {
             margin-left: 70px;
         }
-        
+
         .top-bar {
             background: #fff;
             padding: 1rem 2rem;
@@ -120,50 +59,60 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
         .dashboard-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            padding: 2rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px;
         }
-        
+
         .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s;
-            overflow: hidden;
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        
+
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transform: scale(1.03);
+            cursor: pointer;
         }
-        
+
         .card-header {
-            background: linear-gradient(135deg, var(--primary), #ff8c00);
-            color: white;
-            padding: 1.5rem;
-            border: none;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
         }
-        
+
         .card-header h5 {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 600;
             margin: 0;
-            font-weight: 700;
         }
-        
+
         .card-body {
-            padding: 2rem;
+            padding: 0;
         }
-        
+
         .stats-number {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+            color: #121826;
+            margin-bottom: 5px;
         }
-        
+
         .btn-manage {
             background: var(--primary);
             border: none;
@@ -172,267 +121,109 @@
             color: white;
             font-weight: 600;
             transition: all 0.3s;
+            width: 100%;
         }
-        
+
         .btn-manage:hover {
             background: #e8960f;
-            transform: scale(1.05);
             color: white;
         }
-        
-        .toggle-sidebar {
-            background: none;
-            border: none;
-            color: var(--dark);
-            font-size: 1.2rem;
-        }
-        
+
         .welcome-section {
-            background: linear-gradient(135deg, var(--dark), #1e293b);
-            color: white;
-            padding: 3rem 2rem;
-            margin: 2rem;
-            border-radius: 15px;
+            background: #f9fafb;
+            padding: 2rem;
+            margin: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
+        .welcome-section h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
         .management-icon {
             font-size: 3rem;
             color: var(--primary);
             margin-bottom: 1rem;
         }
-        
-        .activity-feed {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-        
-        .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-        
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-        }
-        
-        .logout-section {
-            padding: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: auto;
-        }
-        
-        .logout-btn {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            border: none;
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            width: 100%;
-            font-weight: 600;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .logout-btn:hover {
-            background: linear-gradient(135deg, #c82333, #a71e2a);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
-            color: white;
-        }
-        
-        .logout-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .logout-btn:hover::before {
-            left: 100%;
-        }
-        /* Chart containers */
-        
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin-bottom: 2rem;
-        }
-        
-        .report-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 1rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-        
-        .chart-title {
-            color: var(--dark);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+
+        .error {
             text-align: center;
+            padding: 15px;
+            color: #f87171;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            margin: 15px 20px;
         }
-        
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
             .main-content {
                 margin-left: 0;
             }
             .dashboard-cards {
                 grid-template-columns: 1fr;
-                padding: 1rem;
             }
-            .chart-container {
-                height: 300px;
+            .welcome-section h2 {
+                font-size: 1.5rem;
             }
-        }
-        /* Animation for loading charts */
-        
-        .chart-loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 400px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-        /* Loading spinner for stats */
-        
-        .stats-loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-            vertical-align: middle;
         }
     </style>
 </head>
-
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar d-flex flex-column" id="sidebar">
-        <div class="brand text-center">
-            <h3><i class="fa fa-utensils me-2"></i>FoodHub</h3>
-            <small class="d-block">Admin Panel</small>
-        </div>
-
-        <nav class="sidebar-nav flex-fill">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a href="#" class="nav-link active" onclick="showDashboard()">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link" onclick="showCustomerManagement()">
-                        <i class="fas fa-users"></i>
-                        <span>Quản lý khách hàng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="../Staff-manager/staffList.html" class="nav-link" onclick="showStaffManagement()">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Quản lý nhân viên</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="../menu-manager/menu.html" class="nav-link" onclick="showMenuManagement()">
-                        <i class="fas fa-utensils"></i>
-                        <span>Quản lý món ăn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showFinanceManagement()">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Quản lý tài chính</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showOrders()">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Đơn hàng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/foodhub/staff-manager/lichlam.html" class="nav-link">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Lịch làm</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <div class="logout-section">
-            <button class="logout-btn" onclick="handleLogout()">
-            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-        </button>
-        </div>
-    </div>
+    <!-- Sidebar Include -->
+    <div id="sidebar-container"></div>
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="d-flex align-items-center">
-                <h4 class="mb-0" id="pageTitle">Dashboard</h4>
+                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0" id="pageTitle"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h4>
             </div>
             <div class="d-flex align-items-center">
                 <div class="dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-user-circle me-2"></i>Admin
-                </button>
+                        <i class="fas fa-user-circle me-2"></i>Admin
+                    </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
                         <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                     </ul>
                 </div>
@@ -449,7 +240,7 @@
                         <p class="mb-0">Quản lý toàn bộ hệ thống nhà hàng của bạn một cách hiệu quả và dễ dàng.</p>
                     </div>
                     <div class="col-md-4 text-center">
-                        <i class="fas fa-utensils" style="font-size: 4rem; color: var(--primary);"></i>
+                        <i class="fas fa-utensils management-icon"></i>
                     </div>
                 </div>
             </div>
@@ -463,11 +254,11 @@
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-users management-icon"></i>
-                        <div class="stats-number">1,234</div>
+                        <div class="stats-number" id="customerCount"><span class="loading-spinner"></span>Đang tải...</div>
                         <p class="text-muted mb-3">Tổng số khách hàng</p>
                         <button class="btn btn-manage" onclick="showCustomerManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
+                            <i class="fas fa-cog me-2"></i>Quản lý
+                        </button>
                     </div>
                 </div>
 
@@ -478,11 +269,11 @@
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-user-tie management-icon"></i>
-                        <div class="stats-number" id="userCount"><span class="stats-loading"></span></div>
+                        <div class="stats-number" id="userCount"><span class="loading-spinner"></span>Đang tải...</div>
                         <p class="text-muted mb-3">Tổng số nhân viên</p>
                         <button class="btn btn-manage" onclick="showStaffManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
+                            <i class="fas fa-cog me-2"></i>Quản lý
+                        </button>
                     </div>
                 </div>
 
@@ -493,11 +284,11 @@
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-utensils management-icon"></i>
-                        <div class="stats-number" id="menuItemCount"><span class="stats-loading"></span></div>
+                        <div class="stats-number" id="menuItemCount"><span class="loading-spinner"></span>Đang tải...</div>
                         <p class="text-muted mb-3">Tổng số món ăn</p>
                         <button class="btn btn-manage" onclick="showMenuManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
+                            <i class="fas fa-cog me-2"></i>Quản lý
+                        </button>
                     </div>
                 </div>
 
@@ -508,107 +299,97 @@
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-money-bill-wave management-icon"></i>
-                        <div class="stats-number">₫2.5M</div>
+                        <div class="stats-number" id="todayRevenue"><span class="loading-spinner"></span>Đang tải...</div>
                         <p class="text-muted mb-3">Doanh thu hôm nay</p>
                         <button class="btn btn-manage" onclick="showFinanceManagement()">
-                        <i class="fas fa-cog me-2"></i>Quản lý
-                    </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="activity-feed">
-                <h5 class="mb-4"><i class="fas fa-bell me-2 text-primary"></i>Hoạt động gần đây</h5>
-
-                <div class="activity-item">
-                    <div class="activity-icon bg-success text-white">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div>
-                        <strong>Đơn hàng mới #1234</strong>
-                        <p class="text-muted mb-0">Khách hàng Nguyễn Văn A đã đặt 2 món - 5 phút trước</p>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-icon bg-primary text-white">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <div>
-                        <strong>Khách hàng mới</strong>
-                        <p class="text-muted mb-0">Trần Thị B đã đăng ký tài khoản - 15 phút trước</p>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-icon bg-warning text-white">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div>
-                        <strong>Cảnh báo tồn kho</strong>
-                        <p class="text-muted mb-0">Món "Phở Bò" sắp hết nguyên liệu - 30 phút trước</p>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-icon bg-info text-white">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div>
-                        <strong>Đánh giá mới</strong>
-                        <p class="text-muted mb-0">Lê Văn C đã đánh giá 5 sao - 1 giờ trước</p>
+                            <i class="fas fa-cog me-2"></i>Quản lý
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Dynamic Content Area -->
-        <div id="dynamicContent" style="display: none;">
-            <!-- Content will be loaded here dynamically -->
-        </div>
+        <div id="dynamicContent" style="display: none;"></div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <!-- Axios for API calls -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+    <script src="/js/fetch-api.js"></script>
+    <script src="/js/sidebar.js"></script>
     <script>
-    
-        let currentCharts = [];
+        // Hàm tải sidebar
+        async function loadSidebar() {
+            try {
+                const response = await fetch('/components/sidebar.html');
+                if (!response.ok) throw new Error('Không thể tải sidebar');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                setActiveNavLink();
+            } catch (error) {
+                console.error('Lỗi khi tải sidebar:', error);
+                showNotification('Lỗi tải sidebar!', 'error');
+                document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+            }
+        }
 
+        // Hàm định dạng tiền tệ
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Hàm hiển thị thông báo
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '10000';
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 4000);
+        }
+
+        // Hàm ẩn thông báo lỗi
+        function hideError() {
+            const existingError = document.querySelector('.notification.alert-danger');
+            if (existingError) existingError.remove();
+        }
+
+        // Hàm toggle sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
-
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
         }
 
+        // Hàm set active nav
         function setActiveNav(element) {
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            element.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            } else {
+                console.warn('Không tìm thấy phần tử nav để set active.');
+            }
         }
 
-        function destroyCurrentCharts() {
-            currentCharts.forEach(chart => {
-                if (chart) {
-                    chart.destroy();
-                }
-            });
-            currentCharts = [];
-        }
-
+        // Hàm đăng xuất
         function handleLogout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
                 document.body.style.opacity = '0.5';
                 document.body.style.transition = 'opacity 0.5s';
-
                 setTimeout(() => {
                     alert('Đã đăng xuất thành công!');
                     document.body.style.opacity = '1';
@@ -616,123 +397,165 @@
             }
         }
 
+        // Hàm hiển thị dashboard
         function showDashboard() {
-            destroyCurrentCharts();
-            document.getElementById('pageTitle').textContent = 'Dashboard';
+            document.getElementById('pageTitle').innerHTML = '<i class="fas fa-tachometer-alt me-2"></i>Dashboard';
             document.getElementById('dashboardContent').style.display = 'block';
             document.getElementById('dynamicContent').style.display = 'none';
-
-            // Fetch menu item count
-            fetchMenuItemCount();
-            // Fetch user count
-            fetchuserCount();
-            // Set active nav
-            setActiveNav(document.querySelector('[onclick="showDashboard()"]'));
+            const navElement = document.querySelector('[onclick="showDashboard()"]');
+            if (navElement) {
+                setActiveNav(navElement);
+            }
+            fetchDashboardData();
         }
 
-        function fetchMenuItemCount() {
-            const menuItemCountElement = document.getElementById('menuItemCount');
-            menuItemCountElement.innerHTML = '<span class="stats-loading"></span>'; // Show loading spinner
-
-            axios.get('http://localhost:8080/menu-items/count')
-                .then(response => {
-                    if (response.data.code === 1000) {
-                        const totalItems = response.data.result || 0;
-                        menuItemCountElement.textContent = totalItems.toLocaleString(); // Format with commas
-                    } else {
-                        menuItemCountElement.textContent = 'N/A'; // Display N/A if API fails
-                        showNotification(response.data.message || 'Không thể tải số lượng món ăn!', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching menu item count:', error);
-                    menuItemCountElement.textContent = 'N/A'; // Display N/A on error
-                    showNotification('Lỗi khi tải số lượng món ăn. Vui lòng thử lại!', 'error');
-                });
+        // Hàm điều hướng
+        function showMenuManagement() {
+            window.location.href = "/menu-manager/menu.html";
         }
 
-        function fetchuserCount() {
+        function showStaffManagement() {
+            window.location.href = "/staff-manager/staffList.html";
+        }
+
+        function showFinanceManagement() {
+            window.location.href = "/revenue-report/revenue-report.html";
+        }
+
+        function showCustomerManagement() {
+            window.location.href = "/customer-manager/customerList.html";
+        }
+
+        function showOrders() {
+            window.location.href = "/orders.html";
+        }
+
+        // Hàm fetch số lượng khách hàng
+        async function fetchCustomerCount() {
+            const customerCountElement = document.getElementById('customerCount');
+            customerCountElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+            const timeoutId = setTimeout(() => {
+                customerCountElement.textContent = 'N/A';
+                showNotification('Không thể tải số lượng khách hàng. Hết thời gian chờ.', 'error');
+            }, 10000);
+
+            try {
+                const response = await apiFetch('/users/countCustomers');
+                console.log('Phản hồi khách hàng:', response);
+                if (response.code !== 1000) throw new Error(response.message || 'Không thể tải số lượng khách hàng!');
+                const count = typeof response.result === 'object' ? response.result.count : response.result;
+                customerCountElement.textContent = count.toLocaleString('vi-VN');
+                hideError();
+            } catch (error) {
+                console.error('Lỗi fetchCustomerCount:', error);
+                customerCountElement.textContent = 'N/A';
+                showNotification(error.message, 'error');
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        // Hàm fetch số lượng nhân viên
+        async function fetchUserCount() {
             const userCountElement = document.getElementById('userCount');
-            userCountElement.innerHTML = '<span class="stats-loading"></span>'; // Show loading spinner
+            userCountElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+            const timeoutId = setTimeout(() => {
+                userCountElement.textContent = 'N/A';
+                showNotification('Không thể tải số lượng nhân viên. Hết thời gian chờ.', 'error');
+            }, 10000);
 
-            axios.get('http://localhost:8080/users/count')
-                .then(response => {
-                    if (response.data.code === 1000) {
-                        const totalItems = response.data.result || 0;
-                        userCountElement.textContent = totalItems.toLocaleString(); // Format with commas
-                    } else {
-                        userCountElement.textContent = 'N/A'; // Display N/A if API fails
-                        showNotification(response.data.message || 'Không thể tải số lượng món ăn!', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching menu item count:', error);
-                    userCountElement.textContent = 'N/A'; // Display N/A on error
-                    showNotification('Lỗi khi tải số lượng món ăn. Vui lòng thử lại!', 'error');
-                });
+            try {
+                const response = await apiFetch('/users/countEmployees');
+                console.log('Phản hồi nhân viên:', response);
+                if (response.code !== 1000) throw new Error(response.message || 'Không thể tải số lượng nhân viên!');
+                const count = typeof response.result === 'object' ? response.result.count : response.result;
+                userCountElement.textContent = count.toLocaleString('vi-VN');
+                hideError();
+            } catch (error) {
+                console.error('Lỗi fetchUserCount:', error);
+                userCountElement.textContent = 'N/A';
+                showNotification(error.message, 'error');
+            } finally {
+                clearTimeout(timeoutId);
+            }
         }
 
+        // Hàm fetch số lượng món ăn
+        async function fetchMenuItemCount() {
+            const menuItemCountElement = document.getElementById('menuItemCount');
+            menuItemCountElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+            const timeoutId = setTimeout(() => {
+                menuItemCountElement.textContent = 'N/A';
+                showNotification('Không thể tải số lượng món ăn. Hết thời gian chờ.', 'error');
+            }, 10000);
 
-        function createCharts() {
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            const revenueChart = new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-                    datasets: [{
-                        label: 'Doanh thu (VNĐ)',
-                        data: [1200000, 1500000, 1800000, 2100000, 2500000, 2800000, 2200000],
-                        borderColor: '#FEA116',
-                        backgroundColor: 'rgba(254, 161, 22, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return new Intl.NumberFormat('vi-VN', {
-                                        style: 'currency',
-                                        currency: 'VND'
-                                    }).format(value);
-                                }
-                            }
-                        }
-                    }
-                }
+            try {
+                const response = await apiFetch('/menu-items/count');
+                console.log('Phản hồi món ăn:', response);
+                if (response.code !== 1000) throw new Error(response.message || 'Không thể tải số lượng món ăn!');
+                const count = typeof response.result === 'object' ? response.result.count : response.result;
+                menuItemCountElement.textContent = count.toLocaleString('vi-VN');
+                hideError();
+            } catch (error) {
+                console.error('Lỗi fetchMenuItemCount:', error);
+                menuItemCountElement.textContent = 'N/A';
+                showNotification(error.message, 'error');
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        // Hàm fetch doanh thu hôm nay
+        async function fetchTodayRevenue() {
+            const revenueElement = document.getElementById('todayRevenue');
+            revenueElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+            const timeoutId = setTimeout(() => {
+                revenueElement.textContent = formatCurrency(0);
+                showNotification('Không thể tải doanh thu hôm nay. Hết thời gian chờ.', 'error');
+            }, 10000);
+
+            try {
+                const response = await apiFetch('/dashboard?period=today');
+                console.log('Phản hồi doanh thu:', response);
+                if (response.code !== 1000) throw new Error(response.message || 'Không thể tải doanh thu hôm nay!');
+                revenueElement.textContent = formatCurrency(response.result.revenue);
+                hideError();
+            } catch (error) {
+                console.error('Lỗi fetchTodayRevenue:', error);
+                revenueElement.textContent = formatCurrency(0);
+                showNotification(error.message, 'error');
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        // Hàm tải dữ liệu dashboard
+        async function fetchDashboardData() {
+            console.log('Bắt đầu tải dữ liệu dashboard...');
+            fetchCustomerCount().catch(error => console.error('Lỗi fetchCustomerCount:', error));
+            fetchUserCount().catch(error => console.error('Lỗi fetchUserCount:', error));
+            fetchMenuItemCount().catch(error => console.error('Lỗi fetchMenuItemCount:', error));
+            fetchTodayRevenue().catch(error => console.error('Lỗi fetchTodayRevenue:', error));
+            console.log('Đã gửi tất cả yêu cầu fetch.');
+        }
+
+        // Sự kiện DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Kiểm tra DOM
+            console.log('Kiểm tra DOM:', {
+                customerCount: document.getElementById('customerCount'),
+                userCount: document.getElementById('userCount'),
+                menuItemCount: document.getElementById('menuItemCount'),
+                todayRevenue: document.getElementById('todayRevenue')
             });
-            currentCharts.push(revenueChart);
-        }
 
-        // Hiển thị thông báo
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed notification-enter`;
-            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 5000);
-        }
+            // Xóa accessToken
+            localStorage.removeItem("accessToken");
+            console.log("Đã xóa accessToken:", localStorage.getItem("accessToken"));
 
-        // Khởi tạo dashboard khi tải trang
-        document.addEventListener('DOMContentLoaded', showDashboard);
+            loadSidebar();
+            showDashboard();
+        });
     </script>
 </body>
-
 </html>

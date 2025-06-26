@@ -58,7 +58,7 @@
                         <span class="loading-spinner"></span>Đang tải...
                     </div>
                 </div>
-                <div class="stat-card orders" onclick="window.location.href='/orders.html?period=' + document.getElementById('periodSelect').value">
+                <div class="stat-card orders" onclick="navigateToOrders()">
                     <div class="stat-header">
                         <div class="stat-label">Đơn hàng</div>
                     </div>
@@ -227,6 +227,18 @@
             }
         }
 
+        function navigateToOrders() {
+            const period = document.getElementById('periodSelect').value;
+            let url = 'order.html?period=' + encodeURIComponent(period);
+            if (period === 'specific') {
+                const specificDate = document.getElementById('specificDateInput').value;
+                if (specificDate) {
+                    url += '&specificDate=' + encodeURIComponent(specificDate);
+                }
+            }
+            window.location.href = url;
+        }
+
         function getChartConfig(chartId, data) {
             const period = document.getElementById('periodSelect').value;
             const comparisonLabel = period === 'today' || period === 'specific' ? 'Hôm qua' :
@@ -257,92 +269,83 @@
                         responsive: true,
                         plugins: {
                             legend: { display: false },
-                            // Thay thế toàn bộ phần tooltip trong revenueChart config:
-tooltip: {
-    enabled: true,
-    mode: 'index',
-    intersect: false,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    titleColor: '#fff',
-    bodyColor: '#fff',
-    borderColor: '#3b82f6',
-    borderWidth: 1,
-    callbacks: {
-        title: function(context) {
-            const label = context[0].label;
-            const period = document.getElementById('periodSelect').value;
-            
-            console.log('Tooltip label:', label, 'Period:', period); // Debug log
-            
-            // Chỉ xử lý cho period 'week'
-            if (period === 'week') {
-                // Map các label có thể có
-                const dayMap = {
-                    'Thứ 2': 1,
-                    'Thứ 3': 2, 
-                    'Thứ 4': 3,
-                    'Thứ 5': 4,
-                    'Thứ 6': 5,
-                    'Thứ 7': 6,
-                    'Chủ nhật': 0,
-                    'CN': 0,
-                    'T2': 1,
-                    'T3': 2,
-                    'T4': 3,
-                    'T5': 4,
-                    'T6': 5,
-                    'T7': 6
-                };
-                
-                console.log('Available dayMap keys:', Object.keys(dayMap)); // Debug log
-                
-                if (dayMap.hasOwnProperty(label)) {
-                    try {
-                        const today = new Date();
-                        const currentDay = today.getDay(); // 0 = Chủ nhật, 1 = Thứ 2, ...
-                        const targetDay = dayMap[label];
-                        
-                        console.log('Current day:', currentDay, 'Target day:', targetDay); // Debug log
-                        
-                        // Tính thứ 2 của tuần hiện tại
-                        const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
-                        const mondayOfCurrentWeek = new Date(today);
-                        mondayOfCurrentWeek.setDate(today.getDate() + mondayOffset);
-                        
-                        // Tính ngày của thứ được chọn
-                        const targetDate = new Date(mondayOfCurrentWeek);
-                        if (targetDay === 0) {
-                            // Chủ nhật = thứ 2 + 6 ngày
-                            targetDate.setDate(mondayOfCurrentWeek.getDate() + 6);
-                        } else {
-                            // Các thứ khác = thứ 2 + (targetDay - 1) ngày
-                            targetDate.setDate(mondayOfCurrentWeek.getDate() + (targetDay - 1));
-                        }
-                        
-                        const day = targetDate.getDate().toString().padStart(2, '0');
-                        const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
-                        
-                        const result = `${label} (${day}/${month})`;
-                        console.log('Tooltip result:', result); // Debug log
-                        return result;
-                        
-                    } catch (error) {
-                        console.error('Error in tooltip calculation:', error);
-                        return label;
-                    }
-                } else {
-                    console.log('Label not found in dayMap:', label);
-                }
-            }
-            
-            // Với các period khác hoặc label không match, trả về label gốc
-            return label;
-        },
-        label: function(context) {
-            return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
-        }
-    }
-}
+                            tooltip: {
+                                enabled: true,
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#3b82f6',
+                                borderWidth: 1,
+                                callbacks: {
+                                    title: function(context) {
+                                        const label = context[0].label;
+                                        const period = document.getElementById('periodSelect').value;
+                                        
+                                        console.log('Tooltip label:', label, 'Period:', period); // Debug log
+                                        
+                                        if (period === 'week') {
+                                            const dayMap = {
+                                                'Thứ 2': 1,
+                                                'Thứ 3': 2, 
+                                                'Thứ 4': 3,
+                                                'Thứ 5': 4,
+                                                'Thứ 6': 5,
+                                                'Thứ 7': 6,
+                                                'Chủ nhật': 0,
+                                                'CN': 0,
+                                                'T2': 1,
+                                                'T3': 2,
+                                                'T4': 3,
+                                                'T5': 4,
+                                                'T6': 5,
+                                                'T7': 6
+                                            };
+                                            
+                                            console.log('Available dayMap keys:', Object.keys(dayMap)); // Debug log
+                                            
+                                            if (dayMap.hasOwnProperty(label)) {
+                                                try {
+                                                    const today = new Date();
+                                                    const currentDay = today.getDay(); // 0 = Chủ nhật, 1 = Thứ 2, ...
+                                                    const targetDay = dayMap[label];
+                                                    
+                                                    console.log('Current day:', currentDay, 'Target day:', targetDay); // Debug log
+                                                    
+                                                    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+                                                    const mondayOfCurrentWeek = new Date(today);
+                                                    mondayOfCurrentWeek.setDate(today.getDate() + mondayOffset);
+                                                    
+                                                    const targetDate = new Date(mondayOfCurrentWeek);
+                                                    if (targetDay === 0) {
+                                                        targetDate.setDate(mondayOfCurrentWeek.getDate() + 6);
+                                                    } else {
+                                                        targetDate.setDate(mondayOfCurrentWeek.getDate() + (targetDay - 1));
+                                                    }
+                                                    
+                                                    const day = targetDate.getDate().toString().padStart(2, '0');
+                                                    const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+                                                    
+                                                    const result = `${label} (${day}/${month})`;
+                                                    console.log('Tooltip result:', result); // Debug log
+                                                    return result;
+                                                    
+                                                } catch (error) {
+                                                    console.error('Error in tooltip calculation:', error);
+                                                    return label;
+                                                }
+                                            } else {
+                                                console.log('Label not found in dayMap:', label);
+                                            }
+                                        }
+                                        return label;
+                                    },
+                                    label: function(context) {
+                                        return `Doanh thu: ${formatCurrency(context.parsed.y)}`;
+                                    }
+                                }
+                            }
                         },
                         scales: {
                             x: { ticks: { color: '#374151' }, grid: { color: '#e5e7eb' } },
