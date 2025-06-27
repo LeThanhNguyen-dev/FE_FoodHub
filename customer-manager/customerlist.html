@@ -68,10 +68,18 @@
                     <h5><i class="fas fa-filter me-2"></i>Bộ lọc và Tìm kiếm</h5>
                 </div>
                 <div class="card-body">
-                    <form id="filterForm" class="row g-3">
+                    <div class="row g-3">
                         <div class="col-md-4">
                             <label for="keyword" class="form-label fw-bold">Tìm kiếm</label>
                             <input type="text" id="keyword" class="form-control" placeholder="Nhập tên khách hàng...">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="statusFilter" class="form-label fw-bold">Trạng thái</label>
+                            <select id="statusFilter" class="form-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="ACTIVE">Hoạt động</option>
+                                <option value="INACTIVE">Không hoạt động</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label for="sortBy" class="form-label fw-bold">Sắp xếp</label>
@@ -80,12 +88,7 @@
                                 <option value="username_desc">Tên Z-A</option>
                             </select>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-search me-2"></i>Tìm kiếm
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
 
@@ -197,6 +200,7 @@
         async function fetchCustomers() {
             showLoading();
             const keyword = document.getElementById('keyword').value.trim();
+            const statusFilter = document.getElementById('statusFilter').value;
             const sortValue = document.getElementById('sortBy').value;
 
             let sortBy = 'username';
@@ -212,7 +216,9 @@
                 size: pageSize,
                 sortDirection: sortDirection
             });
+            
             if (keyword) params.append('keyword', keyword);
+            if (statusFilter) params.append('status', statusFilter);
 
             try {
                 const response = await apiFetch(`/users/customers?${params.toString()}`, { method: 'GET' });
@@ -424,18 +430,49 @@
             window.location.href = `/customer-manager/edit-customer.html?id=${id}`;
         }
 
-        // Gắn sự kiện submit cho filterForm
+        // Debounce function để tránh gọi API quá nhiều lần khi gõ
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Hàm xử lý khi filter/sort thay đổi
+        function handleFilterChange() {
+            currentPage = 0; // Reset về trang đầu khi lọc
+            fetchCustomers();
+        }
+
+        // Debounced version cho input search
+        const debouncedHandleFilterChange = debounce(handleFilterChange, 500);
+
+        // Gắn sự kiện cho các elements
         document.addEventListener('DOMContentLoaded', () => {
             loadSidebar();
             fetchCustomers();
 
-            const filterForm = document.getElementById('filterForm');
-            if (filterForm) {
-                filterForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    currentPage = 0; // Reset về trang đầu khi lọc
-                    fetchCustomers();
-                });
+            // Sự kiện cho ô tìm kiếm (debounce 500ms)
+            const keywordInput = document.getElementById('keyword');
+            if (keywordInput) {
+                keywordInput.addEventListener('input', debouncedHandleFilterChange);
+            }
+
+            // Sự kiện cho dropdown trạng thái (thực hiện ngay lập tức)
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', handleFilterChange);
+            }
+
+            // Sự kiện cho dropdown sắp xếp (thực hiện ngay lập tức)
+            const sortBy = document.getElementById('sortBy');
+            if (sortBy) {
+                sortBy.addEventListener('change', handleFilterChange);
             }
         });
     </script>

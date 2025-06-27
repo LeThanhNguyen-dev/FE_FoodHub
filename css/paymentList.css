@@ -1,27 +1,25 @@
-/**
- * Bảng màu được làm dịu lại để trông chuyên nghiệp hơn.
- * Màu --dark được điều chỉnh để không quá tương phản.
- * Màu --light được giữ nguyên cho nền.
- */
+
 :root {
-    --primary: #FEA116; /* Giữ màu nhấn chính */
-    --light: #F8F9FA;   /* Màu nền sáng hơn một chút */
-    --dark: #1E293B;     /* Màu tối dịu hơn */
-    --secondary: #6C757D; /* Màu phụ cho văn bản */
-    --border-color: #DEE2E6; /* Màu viền nhất quán */
+    --primary: #FEA116;
+    --light: #F8F9FA;
+    --dark: #1E293B;
+    --secondary: #6C757D;
+    --border-color: #DEE2E6;
     --success: #10B981;
     --warning: #F59E0B;
     --danger: #EF4444;
     --info: #3B82F6;
+    --pending: #FBBF24; /* Màu vàng sáng cho PENDING */
+    --unknown: #6B7280; /* Màu xám cho UNKNOWN */
 }
 
 body {
-    font-family: 'Poppins', 'Nunito', sans-serif; /* Thêm 'Poppins' cho cảm giác hiện đại */
+    font-family: 'Poppins', 'Nunito', sans-serif;
     background-color: var(--light);
-    color: #495057; /* Màu chữ mặc định */
+    color: #495057;
 }
 
-/* Sidebar & Layout */
+/* Layout */
 .main-content {
     margin-left: 280px;
     transition: all 0.3s ease-in-out;
@@ -62,7 +60,6 @@ body {
 }
 
 .card:hover {
-    transform: translateY(0);
     border-color: var(--primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -105,17 +102,6 @@ body {
     border-color: #e8960f;
 }
 
-.btn-success {
-    background-color: var(--success);
-    border-color: var(--success);
-    color: #FFFFFF;
-}
-
-.btn-success:hover {
-    background-color: #0d9668;
-    border-color: #0d9668;
-}
-
 /* Table */
 .table-container {
     background: white;
@@ -130,9 +116,10 @@ body {
 }
 
 .table th, .table td {
-    padding: 1.25rem;
+    padding: 0.75rem; /* Giảm padding để gọn hơn */
     vertical-align: middle;
     border-top: 1px solid var(--border-color);
+    font-size: 0.85rem; /* Giảm kích thước chữ */
 }
 
 .table thead th {
@@ -140,7 +127,7 @@ body {
     color: var(--dark);
     font-weight: 600;
     border: none;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -153,31 +140,61 @@ body {
     background-color: rgba(254, 161, 22, 0.05);
 }
 
+/* Status Badge */
 .status-badge {
     display: inline-block;
     padding: 8px 16px;
     border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.8rem;
+    font-weight: 700; /* Tăng độ đậm */
+    font-size: 0.9rem; /* Tăng kích thước chữ để nổi bật */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     text-align: center;
     min-width: 120px;
-    white-space: nowrap;
-    transition: all 0.3s ease;
     border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Thêm bóng nhẹ */
 }
 
-.status-active {
-    background: rgba(16, 185, 129, 0.1);
+.status-paid {
+    background: rgba(16, 185, 129, 0.2);
     border-color: var(--success);
     color: var(--success);
 }
 
-.status-inactive {
-    background-color: rgba(239, 68, 68, 0.1);
+.status-pending {
+    background: rgba(251, 191, 36, 0.2);
+    border-color: var(--pending);
+    color: var(--pending);
+}
+
+.status-unpaid {
+    background: rgba(239, 68, 68, 0.2);
     border-color: var(--danger);
     color: var(--danger);
+}
+
+.status-cancelled {
+    background: rgba(107, 114, 128, 0.2);
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.status-failed {
+    background: rgba(234, 88, 12, 0.2);
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.status-refunded {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: var(--info);
+    color: var(--info);
+}
+
+.status-unknown {
+    background: rgba(107, 114, 128, 0.2);
+    border-color: var(--unknown);
+    color: var(--unknown);
 }
 
 /* Forms */
@@ -233,17 +250,21 @@ body {
     color: #6b7280;
     background: transparent;
 }
+
 .sort-arrow {
     margin-left: 5px;
     color: #6c757d;
 }
+
 .sort-arrow:after {
     content: '↕';
 }
+
 .sort-arrow.asc:after {
     content: '↑';
     color: #007bff;
 }
+
 .sort-arrow.desc:after {
     content: '↓';
     color: #007bff;
@@ -290,15 +311,15 @@ body {
 
 .modal-content {
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 25, 0.2);
 }
 
 .modal-header {
     background: linear-gradient(135deg, var(--primary), #ff8c00);
     color: white;
     border: none;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
 .modal-title {
@@ -309,16 +330,16 @@ body {
 .table th[data-status-column],
 .table td[data-status-column] {
     width: 160px;
-    min-width: 160px;
+    min-width: 150px;
 }
 
-/* Responsive */
+/* Responsive Styles */
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0;
     }
     .status-badge {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
         padding: 6px 12px;
         min-width: 100px;
     }

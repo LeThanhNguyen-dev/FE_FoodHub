@@ -176,7 +176,7 @@
             const revenueEl = document.getElementById('totalRevenue');
             const ordersEl = document.getElementById('totalOrders');
             const avgOrderEl = document.getElementById('avgOrder');
-            
+                
             const avgOrder = data.orders > 0 ? Math.round(data.revenue / data.orders) : 0;
             revenueEl.textContent = formatCurrency(data.revenue);
             ordersEl.textContent = data.orders.toLocaleString('vi-VN');
@@ -187,7 +187,7 @@
             } else {
                 hideError();
             }
-        }
+        }   
 
         function updateComparisonInfo(data) {
             const infoDiv = document.getElementById('comparisonInfo');
@@ -228,16 +228,20 @@
         }
 
         function navigateToOrders() {
-            const period = document.getElementById('periodSelect').value;
-            let url = 'order.html?period=' + encodeURIComponent(period);
-            if (period === 'specific') {
-                const specificDate = document.getElementById('specificDateInput').value;
-                if (specificDate) {
-                    url += '&specificDate=' + encodeURIComponent(specificDate);
-                }
-            }
-            window.location.href = url;
+    const period = document.getElementById('periodSelect').value;
+    let url = 'order.html?period=' + encodeURIComponent(period);
+    
+    if (period === 'specific') {
+        const specificDate = document.getElementById('specificDateInput').value;
+        if (specificDate) {
+            // SỬA: Truyền ngày cụ thể dưới dạng startDate và endDate giống nhau
+            url = `order.html?period=custom&startDate=${encodeURIComponent(specificDate)}&endDate=${encodeURIComponent(specificDate)}`;
         }
+    }
+    
+    window.location.href = url;
+}
+
 
         function getChartConfig(chartId, data) {
             const period = document.getElementById('periodSelect').value;

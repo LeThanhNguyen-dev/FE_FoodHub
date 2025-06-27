@@ -548,11 +548,6 @@
                 menuItemCount: document.getElementById('menuItemCount'),
                 todayRevenue: document.getElementById('todayRevenue')
             });
-
-            // Xóa accessToken
-            localStorage.removeItem("accessToken");
-            console.log("Đã xóa accessToken:", localStorage.getItem("accessToken"));
-
             loadSidebar();
             showDashboard();
         });
