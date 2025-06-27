@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Tracking</title>
+  <!-- Tailwind CSS qua CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- SockJS và STOMP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -188,7 +192,7 @@
       animation: pulse 2s infinite;
     }
 
-    /* Enhanced Horizontal Timeline */
+    /* Timeline */
     .timeline {
       display: flex;
       position: relative;
@@ -259,7 +263,6 @@
       background: #3b82f6;
       box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
       animation: pulseGlow 2s infinite;
-      transform: translateX(-50%) scale(1.2);
     }
 
     .timeline-item.active::after {
@@ -309,7 +312,7 @@
       font-weight: 600;
     }
 
-    /* Order Items Enhanced */
+    /* Order Items */
     #order-items .content-card {
       padding: 16px;
       margin-bottom: 16px;
@@ -375,7 +378,7 @@
       animation: spin 1s ease-in-out infinite;
     }
 
-    /* Pulse Animation for Status Updates */
+    /* Pulse Animation */
     .status-pulse {
       animation: statusPulse 1s ease-in-out;
     }
@@ -462,7 +465,7 @@
       }
     }
 
-    /* Progress Bar Animation */
+    /* Progress Bar */
     .progress-bar {
       width: 100%;
       height: 6px;
@@ -566,15 +569,6 @@
         display: none;
       }
     }
-
-    /* Loading state */
-    .loading {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-    }
   </style>
 </head>
 <body class="flex">
@@ -621,9 +615,9 @@
         <div id="success-message" class="hidden message message-success"></div>
 
         <div class="mb-6">
-          <label for="order-select" class="form-label">Chọn đơn hàng để theo dõi</label>
+          <label for="order-select" class="form-label">Select an order to track</label>
           <select id="order-select" class="w-full">
-            <option value="">Chọn một đơn hàng</option>
+            <option value="">Select an order</option>
           </select>
         </div>
 
@@ -633,7 +627,6 @@
             <span id="order-date" class="text-sm text-gray-600"></span>
           </div>
           
-          <!-- Progress Bar -->
           <div class="progress-bar">
             <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
           </div>
@@ -648,43 +641,43 @@
           <div class="timeline">
             <div class="timeline-item" data-status="PENDING">
               <div class="timeline-content">
-                <p class="font-medium">Đặt hàng</p>
-                <p class="text-sm text-gray-500">Đơn hàng của bạn đã được đặt.</p>
+                <p class="font-medium">Order Placed</p>
+                <p class="text-sm text-gray-500">Your order has been placed.</p>
               </div>
             </div>
             <div class="timeline-item" data-status="CONFIRMED">
               <div class="timeline-content">
-                <p class="font-medium">Xác nhận</p>
-                <p class="text-sm text-gray-500">Đơn hàng đã được nhà hàng xác nhận.</p>
+                <p class="font-medium">Confirmed</p>
+                <p class="text-sm text-gray-500">Order confirmed by the restaurant.</p>
               </div>
             </div>
             <div class="timeline-item" data-status="PREPARING">
               <div class="timeline-content">
-                <p class="font-medium">Đang chuẩn bị</p>
-                <p class="text-sm text-gray-500">Đơn hàng đang được chuẩn bị.</p>
+                <p class="font-medium">Preparing</p>
+                <p class="text-sm text-gray-500">Order is being prepared.</p>
               </div>
             </div>
             <div class="timeline-item" data-status="READY">
               <div class="timeline-content">
-                <p class="font-medium">Sẵn sàng</p>
-                <p class="text-sm text-gray-500">Đơn hàng sẵn sàng để giao hoặc nhận.</p>
+                <p class="font-medium">Ready</p>
+                <p class="text-sm text-gray-500">Order is ready for pickup or delivery.</p>
               </div>
             </div>
             <div class="timeline-item" data-status="DELIVERING">
               <div class="timeline-content">
-                <p class="font-medium">Đang giao</p>
-                <p class="text-sm text-gray-500">Đơn hàng đang được giao.</p>
+                <p class="font-medium">Delivering</p>
+                <p class="text-sm text-gray-500">Order is on the way.</p>
               </div>
             </div>
             <div class="timeline-item" data-status="COMPLETED">
               <div class="timeline-content">
-                <p class="font-medium">Đã giao</p>
-                <p class="text-sm text-gray-500">Đơn hàng đã được giao.</p>
+                <p class="font-medium">Delivered</p>
+                <p class="text-sm text-gray-500">Order has been delivered.</p>
               </div>
             </div>
           </div>
 
-          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Món</h4>
+          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Items</h4>
           <div id="order-items" class="space-y-4"></div>
         </div>
       </div>
@@ -695,6 +688,9 @@
     const API_BASE_URL = 'http://localhost:8080';
     let currentPage = 0;
     const pageSize = 20;
+    let stompClient = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
     let pollingInterval = null;
 
     function parseJwt(token) {
@@ -705,7 +701,7 @@
           '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         return JSON.parse(jsonPayload);
       } catch (e) {
-        console.error("Token không hợp lệ:", e);
+        console.error("Invalid token:", e);
         return null;
       }
     }
@@ -713,13 +709,13 @@
     function isLoggedIn() {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        console.warn("Không tìm thấy accessToken trong localStorage");
+        console.warn("No accessToken found in localStorage");
         return false;
       }
       const payload = parseJwt(token);
       if (!payload) return false;
       const isExpired = payload.exp * 1000 <= Date.now();
-      if (isExpired) console.warn("Token đã hết hạn:", payload.exp);
+      if (isExpired) console.warn("Token expired:", payload.exp);
       return payload && !isExpired;
     }
 
@@ -728,7 +724,7 @@
         const token = localStorage.getItem('accessToken');
         const payload = parseJwt(token);
         const userId = payload.id || payload.sub;
-        if (!userId) throw new Error("Không tìm thấy userId trong JWT payload");
+        if (!userId) throw new Error("No userId found in JWT payload");
         const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -742,56 +738,80 @@
     }
 
     async function updateUI() {
-      const token = localStorage.getItem('accessToken');
       const usernameGreeting = document.getElementById('username-greeting');
       if (isLoggedIn() && usernameGreeting) {
         const username = await fetchUserInfo();
         usernameGreeting.textContent = `Welcome, ${username}!`;
-        console.log("Cập nhật UI với username:", username);
+        console.log("Updated UI with username:", username);
       } else if (usernameGreeting) {
         usernameGreeting.textContent = 'Welcome, User!';
-        console.log("Cập nhật UI cho guest");
+        console.log("Updated UI for guest");
       }
     }
 
     function logout() {
-      console.log("Đăng xuất: Xóa token và dừng polling");
+      console.log("Logging out: Clearing token, WebSocket, and selected order");
       localStorage.removeItem('accessToken');
       localStorage.removeItem('cart');
-      stopPolling();
+      localStorage.removeItem('selectedOrderId');
+      if (stompClient) {
+        stompClient.disconnect(() => {
+          console.log("WebSocket disconnected");
+        });
+        stompClient = null;
+      }
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+      }
       window.location.href = 'login.html';
     }
 
     function showError(message) {
       const errorDiv = document.getElementById('error-message');
-      errorDiv.textContent = message;
-      errorDiv.classList.remove('hidden');
-      document.getElementById('success-message').classList.add('hidden');
-      console.error("Hiển thị lỗi:", message);
+      if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        document.getElementById('success-message').classList.add('hidden');
+        console.error("Showing error:", message);
+      } else {
+        console.error("Error message element not found");
+      }
     }
 
     function showSuccess(message) {
       const successDiv = document.getElementById('success-message');
-      successDiv.textContent = message;
-      successDiv.classList.remove('hidden');
-      document.getElementById('error-message').classList.add('hidden');
-      console.log("Hiển thị thông báo thành công:", message);
+      if (successDiv) {
+        successDiv.textContent = message;
+        successDiv.classList.remove('hidden');
+        document.getElementById('error-message').classList.add('hidden');
+        console.log("Showing success:", message);
+      } else {
+        console.error("Success message element not found");
+      }
     }
 
     function setLoadingState(elementId, isLoading) {
       const element = document.getElementById(elementId);
-      if (isLoading) {
-        element.style.opacity = '0.7';
-        element.style.pointerEvents = 'none';
+      if (element) {
+        element.style.opacity = isLoading ? '0.7' : '1';
+        element.style.pointerEvents = isLoading ? 'none' : 'auto';
+        if (isLoading) {
+          element.classList.add('loading');
+          element.innerHTML += '<span class="loading-spinner ml-2"></span>';
+        } else {
+          element.classList.remove('loading');
+          const spinner = element.querySelector('.loading-spinner');
+          if (spinner) spinner.remove();
+        }
       } else {
-        element.style.opacity = '1';
-        element.style.pointerEvents = 'auto';
+        console.warn(`Element with ID ${elementId} not found`);
       }
     }
 
     async function fetchUserOrders() {
       if (!isLoggedIn()) {
-        showError('Vui lòng đăng nhập để theo dõi đơn hàng!');
+        showError('Please log in to track orders!');
         window.location.href = 'login.html';
         return;
       }
@@ -802,7 +822,7 @@
         const payload = parseJwt(token);
         const userId = payload.id || payload.sub;
         if (!userId) {
-          throw new Error("Không tìm thấy userId trong JWT payload");
+          throw new Error("No userId found in JWT payload");
         }
         console.log('Fetching orders for user ID:', userId);
         const response = await fetch(`${API_BASE_URL}/orders/user/${userId}?page=${currentPage}&size=${pageSize}&orderBy=createdAt`, {
@@ -812,31 +832,30 @@
           }
         });
         if (!response.ok) {
-          let errorMessage = 'Lỗi khi lấy danh sách đơn hàng';
+          let errorMessage = 'Error fetching orders';
           try {
             const error = await response.json();
             errorMessage = error.message || errorMessage;
-          } catch (e) {
-            // Không parse được JSON
-          }
+          } catch (e) {}
           if (response.status === 401) {
-            showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            showError('Session expired. Please log in again.');
             logout();
           } else if (response.status === 403) {
-            showError('Bạn không có quyền xem các đơn hàng này.');
+            showError('You do not have permission to view these orders.');
           } else if (response.status === 404) {
-            showError('Người dùng không tồn tại.');
+            showError('User not found.');
           } else {
             showError(errorMessage);
           }
-          console.error(`Lỗi API: ${response.status} - ${errorMessage}`);
+          console.error(`API error: ${response.status} - ${errorMessage}`);
           return;
         }
         const data = await response.json();
-        console.log("Dữ liệu đơn hàng:", data);
+        console.log("Order data:", data);
         renderOrderSelect(data.result.content);
+        restoreSelectedOrder();
       } catch (error) {
-        showError('Lỗi khi lấy danh sách đơn hàng: ' + error.message);
+        showError('Error fetching orders: ' + error.message);
         console.error('Fetch error:', error);
       } finally {
         setLoadingState('order-select', false);
@@ -845,19 +864,23 @@
 
     function renderOrderSelect(orders) {
       const orderSelect = document.getElementById('order-select');
-      orderSelect.innerHTML = '<option value="">Chọn một đơn hàng</option>';
+      if (!orderSelect) {
+        console.error("Order select element not found");
+        return;
+      }
+      orderSelect.innerHTML = '<option value="">Select an order</option>';
       orders.forEach(order => {
         const option = document.createElement('option');
         option.value = order.id;
         option.textContent = `Order #${order.id} - ${new Date(order.createdAt).toLocaleDateString()}`;
         orderSelect.appendChild(option);
       });
-      console.log("Đã render danh sách đơn hàng:", orders.length);
+      console.log("Rendered order list with", orders.length, "orders");
     }
 
     async function fetchOrderDetails(orderId) {
       if (!orderId) {
-        console.log("Không có orderId, bỏ qua fetchOrderDetails");
+        console.log("No orderId, skipping fetchOrderDetails");
         return;
       }
       setLoadingState('order-details', true);
@@ -870,115 +893,258 @@
           }
         });
         if (!response.ok) {
-          let errorMessage = 'Lỗi khi lấy chi tiết đơn hàng';
+          let errorMessage = 'Error fetching order details';
           try {
             const error = await response.json();
             errorMessage = error.message || errorMessage;
-          } catch (e) {
-            // Không parse được JSON
-          }
+          } catch (e) {}
           if (response.status === 401) {
-            showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            showError('Session expired. Please log in again.');
             logout();
           } else if (response.status === 403) {
-            showError('Bạn không có quyền xem đơn hàng này.');
+            showError('You do not have permission to view this order.');
+          } else if (response.status === 404) {
+            showError(`Order #${orderId} not found.`);
+            localStorage.removeItem('selectedOrderId');
           } else {
             showError(errorMessage);
           }
-          console.error(`Lỗi API chi tiết đơn hàng: ${response.status} - ${errorMessage}`);
+          console.error(`API error for order details: ${response.status} - ${errorMessage}`);
           return;
         }
         const data = await response.json();
-        console.log("Chi tiết đơn hàng:", data.result);
+        console.log("Fetched order details for order", orderId, ":", data.result);
         renderOrder(data.result);
-        showSuccess(`Đơn hàng #${data.result.id} đã được cập nhật: ${data.result.status}`);
+        showSuccess(`Order #${data.result.id} updated: ${data.result.status}`);
       } catch (error) {
-        showError('Lỗi khi lấy chi tiết đơn hàng: ' + error.message);
-        console.error('Fetch error chi tiết:', error);
+        showError('Error fetching order details: ' + error.message);
+        console.error('Fetch error:', error);
       } finally {
         setLoadingState('order-details', false);
       }
     }
 
     function renderOrder(order) {
-      document.getElementById('order-details').classList.remove('hidden');
-      document.getElementById('order-title').textContent = `Đơn hàng #${order.id}`;
-      document.getElementById('order-date').textContent = new Date(order.createdAt).toLocaleDateString();
-      document.getElementById('order-status').textContent = `Trạng thái: ${order.status}`;
-      document.getElementById('order-type').textContent = `Loại: ${order.orderType}`;
-      document.getElementById('order-total').textContent = `Tổng tiền: $${order.totalAmount.toFixed(2)}`;
-      document.getElementById('order-payment-status').textContent = order.paymentStatus ? `Trạng thái thanh toán: ${order.paymentStatus}` : '';
-      document.getElementById('order-table').textContent = order.tableId ? `Bàn: ${order.tableNumber || order.tableId}` : '';
-      document.getElementById('order-table').classList.toggle('hidden', !order.tableId);
-      document.getElementById('order-note').textContent = order.note ? `Ghi chú: ${order.note}` : '';
-      document.getElementById('order-note').classList.toggle('hidden', !order.note);
+      const orderDetails = document.getElementById('order-details');
+      if (!orderDetails) {
+        console.error("Order details element not found");
+        showError("Unable to display order details: DOM element missing");
+        return;
+      }
+
+      orderDetails.classList.remove('hidden');
+
+      const orderTitle = document.getElementById('order-title');
+      const orderDate = document.getElementById('order-date');
+      const orderStatus = document.getElementById('order-status');
+      const orderType = document.getElementById('order-type');
+      const orderTotal = document.getElementById('order-total');
+      const orderPaymentStatus = document.getElementById('order-payment-status');
+      const orderTable = document.getElementById('order-table');
+      const orderNote = document.getElementById('order-note');
+      const orderItems = document.getElementById('order-items');
+
+      if (!orderTitle || !orderDate || !orderStatus || !orderType || !orderTotal || !orderPaymentStatus || !orderTable || !orderNote || !orderItems) {
+        console.error("One or more order detail elements not found");
+        showError("Unable to display order details: DOM elements missing");
+        return;
+      }
+
+      orderTitle.textContent = `Order #${order.id}`;
+      orderDate.textContent = new Date(order.createdAt).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      orderStatus.textContent = `Status: ${order.status}`;
+      orderType.textContent = `Type: ${order.orderType}`;
+      orderTotal.textContent = `Total: $${order.totalAmount.toFixed(2)}`;
+      orderPaymentStatus.textContent = order.paymentStatus ? `Payment Status: ${order.paymentStatus}` : '';
+      orderTable.textContent = order.tableId ? `Table: ${order.tableNumber || order.tableId}` : '';
+      orderTable.classList.toggle('hidden', !order.tableId);
+      orderNote.textContent = order.note ? `Note: ${order.note}` : '';
+      orderNote.classList.toggle('hidden', !order.note);
+
+      const statusOrder = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERING', 'COMPLETED'];
+      const currentStatusIndex = statusOrder.indexOf(order.status);
+      const progressPercentage = ((currentStatusIndex + 1) / statusOrder.length) * 100;
+
+      const progressFill = document.getElementById('progress-fill');
+      if (progressFill) {
+        progressFill.style.width = `${progressPercentage}%`;
+        progressFill.classList.add('status-pulse');
+        setTimeout(() => {
+          progressFill.classList.remove('status-pulse');
+        }, 1000);
+      } else {
+        console.error("Progress fill element not found");
+        showError("Unable to update progress bar: DOM element missing");
+      }
 
       const timelineItems = document.querySelectorAll('.timeline-item');
-      timelineItems.forEach(item => {
-        const status = item.getAttribute('data-status');
-        item.classList.toggle('active', order.status === status || isStatusReached(order.status, status));
-      });
+      if (timelineItems.length === 0) {
+        console.error("No timeline items found");
+        showError("Unable to update timeline: DOM elements missing");
+      } else {
+        timelineItems.forEach(item => {
+          const status = item.getAttribute('data-status');
+          item.classList.toggle('active', statusOrder.indexOf(order.status) >= statusOrder.indexOf(status));
+        });
+      }
 
-      const orderItems = document.getElementById('order-items');
+      const timelineAfter = document.querySelector('.timeline::after');
+      if (timelineAfter) {
+        timelineAfter.style.width = `${progressPercentage}%`;
+      } else {
+        console.error("Timeline after element not found");
+      }
+
       orderItems.innerHTML = order.orderItems?.map(item => `
         <div class="content-card p-4">
           <div class="flex justify-between items-center mb-2">
             <h5 class="font-semibold text-gray-800">${item.menuItemName || 'Unknown Item'}</h5>
             <span class="text-sm text-gray-600">x${item.quantity}</span>
           </div>
-          <p class="text-gray-600">Giá: $${item.price.toFixed(2)}</p>
-          <p class="text-gray-600">Trạng thái: ${item.status}</p>
-          ${item.note ? `<p class="text-gray-600">Ghi chú: ${item.note}</p>` : ''}
+          <p class="text-gray-600">Price: $${item.price.toFixed(2)}</p>
+          <p class="text-gray-600">Status: ${item.status}</p>
+          ${item.note ? `<p class="text-gray-600">Note: ${item.note}</p>` : ''}
         </div>
-      `).join('') || '<p class="text-gray-600">Không có món ăn nào.</p>';
-      console.log("Đã render chi tiết đơn hàng:", order.id);
+      `).join('') || '<p class="text-gray-600">No items found.</p>';
+
+      console.log("Rendered order:", order.id, "with status:", order.status);
     }
 
-    function isStatusReached(currentStatus, targetStatus) {
-      const statusOrder = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERING', 'COMPLETED'];
-      return statusOrder.indexOf(currentStatus) >= statusOrder.indexOf(targetStatus);
+    function initializeWebSocket() {
+      if (!isLoggedIn()) {
+        console.log("Not logged in, skipping WebSocket initialization");
+        showError('Please log in to receive real-time updates!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const token = localStorage.getItem('accessToken');
+      const payload = parseJwt(token);
+      const userId = payload.id || payload.sub;
+
+      if (!userId) {
+        showError('Invalid user session. Please log in again.');
+        logout();
+        return;
+      }
+
+      const socket = new SockJS(`${API_BASE_URL}/ws`);
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect(
+        { Authorization: `Bearer ${token}` },
+        () => {
+          console.log('WebSocket connected successfully');
+          reconnectAttempts = 0;
+
+          stompClient.subscribe(`/topic/orders/${userId}`, (message) => {
+            try {
+              const data = JSON.parse(message.body);
+              console.log('Received WebSocket message for order', data.id, ':', data);
+              const orderSelect = document.getElementById('order-select');
+              if (!orderSelect) {
+                console.error("Order select element not found");
+                return;
+              }
+              if (data && orderSelect.value == data.id) {
+                renderOrder(data);
+                showSuccess(`Order #${data.id} updated: ${data.status}`);
+              } else {
+                console.log(`Ignoring WebSocket message for order ${data.id}, selected order: ${orderSelect.value}`);
+              }
+            } catch (error) {
+              console.error('Error processing WebSocket message:', error);
+              showError('Error updating order in real-time');
+            }
+          });
+        },
+        (error) => {
+          console.error('WebSocket error:', error);
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(`Reconnecting WebSocket, attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
+            setTimeout(initializeWebSocket, 5000);
+          } else {
+            showError('Failed to connect to WebSocket after multiple attempts');
+            console.log("Starting polling as fallback");
+            startPolling();
+          }
+        }
+      );
     }
 
     function startPolling() {
-      stopPolling();
-      pollingInterval = setInterval(() => {
-        const orderSelect = document.getElementById('order-select');
-        const orderId = orderSelect.value;
-        if (orderId) {
-          console.log(`Polling order details for order ID: ${orderId}`);
-          fetchOrderDetails(orderId);
-        } else {
-          console.log("No order selected, skipping poll");
-        }
-      }, 30000);
-      console.log("Started polling every 30 seconds");
-    }
-
-    function stopPolling() {
       if (pollingInterval) {
         clearInterval(pollingInterval);
-        pollingInterval = null;
-        console.log("Stopped polling");
+      }
+      pollingInterval = setInterval(() => {
+        const orderSelect = document.getElementById('order-select');
+        if (orderSelect && orderSelect.value && isLoggedIn()) {
+          console.log("Polling: Fetching details for order", orderSelect.value);
+          fetchOrderDetails(orderSelect.value);
+        } else {
+          console.log("Polling skipped: No order selected or not logged in");
+        }
+      }, 5000); // Poll every 5 seconds
+    }
+
+    function restoreSelectedOrder() {
+      const orderSelect = document.getElementById('order-select');
+      if (!orderSelect) {
+        console.error("Order select element not found");
+        return;
+      }
+      const selectedOrderId = localStorage.getItem('selectedOrderId');
+      if (selectedOrderId) {
+        const optionExists = Array.from(orderSelect.options).some(option => option.value === selectedOrderId);
+        if (optionExists) {
+          orderSelect.value = selectedOrderId;
+          console.log(`Restoring selected order: ${selectedOrderId}`);
+          fetchOrderDetails(selectedOrderId);
+          startPolling(); // Start polling for selected order
+        } else {
+          console.warn(`Selected order ${selectedOrderId} not found in order list`);
+          localStorage.removeItem('selectedOrderId');
+          showError(`Previously selected order #${selectedOrderId} is no longer available`);
+        }
+      } else {
+        console.log("No selected order in localStorage");
       }
     }
 
     function toggleMobileMenu() {
       const sidebar = document.querySelector('.sidebar');
-      sidebar.classList.toggle('open');
+      if (sidebar) {
+        sidebar.classList.toggle('open');
+      } else {
+        console.error("Sidebar element not found");
+      }
     }
 
     document.getElementById('logout-button').addEventListener('click', logout);
 
     document.getElementById('order-select').addEventListener('change', (e) => {
       const orderId = e.target.value;
-      console.log("Đã chọn đơn hàng ID:", orderId);
-      stopPolling();
+      console.log("Selected order ID:", orderId);
       if (orderId) {
+        localStorage.setItem('selectedOrderId', orderId);
         fetchOrderDetails(orderId);
-        startPolling();
+        startPolling(); // Start polling when an order is selected
       } else {
-        document.getElementById('order-details').classList.add('hidden');
-        console.log("Ẩn chi tiết đơn hàng do không chọn đơn hàng");
+        localStorage.removeItem('selectedOrderId');
+        const orderDetails = document.getElementById('order-details');
+        if (orderDetails) {
+          orderDetails.classList.add('hidden');
+        }
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+        }
+        console.log("Hid order details due to no order selected");
       }
     });
 
@@ -989,6 +1155,7 @@
       const menuBtn = document.querySelector('.mobile-menu-btn');
       
       if (window.innerWidth <= 768 && 
+          sidebar && menuBtn &&
           !sidebar.contains(e.target) && 
           !menuBtn.contains(e.target) && 
           sidebar.classList.contains('open')) {
@@ -997,12 +1164,13 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      console.log("Khởi tạo trang ordertrack.html");
+      console.log("Initializing ordertrack.html at", new Date().toLocaleTimeString());
       updateUI();
       if (isLoggedIn()) {
         fetchUserOrders();
+        initializeWebSocket();
       } else {
-        showError('Vui lòng đăng nhập để theo dõi đơn hàng!');
+        showError('Please log in to track orders!');
         window.location.href = 'login.html';
       }
     });
@@ -1012,5 +1180,5 @@
       link.setAttribute('title', link.textContent.trim());
     });
   </script>
-  </body>
+</body>
 </html>
