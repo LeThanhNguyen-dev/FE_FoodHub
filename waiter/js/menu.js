@@ -161,7 +161,7 @@ function setupMenuEventListeners() {
     }
 
     const filterElements = [
-        'categoryFilter', 'menuStatusFilter', 
+        'categoryFilter'
     ];
 
     filterElements.forEach(id => {
@@ -195,7 +195,7 @@ function setupMenuEventListeners() {
     }
 
     const filterElements = [
-        'categoryFilter', 'menuStatusFilter'
+        'categoryFilter'
     ];
 
     filterElements.forEach(id => {
@@ -218,18 +218,14 @@ async function loadMenuItems() {
         // Get filter values
         const categoryFilter = document.getElementById('categoryFilter');
         const keywordFilter = document.getElementById('keywordFilter');
-        const menuStatusFilter = document.getElementById('menuStatusFilter');
-
         const categoryId = categoryFilter ? categoryFilter.value : '';
         const keyword = keywordFilter ? keywordFilter.value : '';
-        const status = menuStatusFilter ? menuStatusFilter.value : '';
         const pageSize = '15';
 
         // Build query parameters
         const params = new URLSearchParams();
         if (categoryId) params.append('categoryId', categoryId);
         if (keyword) params.append('keyword', keyword);
-        if (status) params.append('status', status);
         params.append('page', currentMenuPage.toString());
         params.append('size', pageSize);
 
@@ -297,11 +293,17 @@ function renderMenuItems(items) {
             ? item.imageUrl
             : `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f0f0f0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='8' fill='%23999' text-anchor='middle' dy='0.3em'%3E${encodeURIComponent(item.name)}%3C/text%3E%3C/svg%3E`;
 
+        // Kiểm tra trạng thái UNAVAILABLE
+        const isUnavailable = item.status === 'UNAVAILABLE';
+        const unavailableClass = isUnavailable ? 'unavailable' : '';
+        const unavailableBadge = isUnavailable ? '<div class="unavailable-badge">Hết hàng</div>' : '';
+
         const menuItemHTML = `
-            <div class="menu-item" data-id="${item.id}">
+            <div class="menu-item ${unavailableClass}" data-id="${item.id}">
                 <div class="item-image">
                     <img src="${imageUrl}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\' viewBox=\\'0 0 100 100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23f0f0f0\\'/%3E%3Ctext x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-size=\\'8\\' fill=\\'%23999\\' text-anchor=\\'middle\\' dy=\\'0.3em\\'%3E${encodeURIComponent(item.name)}%3C/text%3E%3C/svg%3E';">
                     <div class="golden-line"></div>
+                    ${unavailableBadge}
                 </div>
                 <div class="item-content">
                     <h3 class="item-name">${item.name}</h3>
@@ -379,7 +381,7 @@ function applyMenuFilters() {
 function resetFilters() {
     // Reset all filter elements
     const filterElements = [
-        'categoryFilter', 'keywordFilter', 'menuStatusFilter',
+        'categoryFilter', 'keywordFilter', 
         'pageSizeMenuFilter'
     ];
 

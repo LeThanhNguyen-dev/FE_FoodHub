@@ -109,6 +109,34 @@ body {
     content: '';
 }
 
+/* Styles for unavailable menu items */
+.menu-item.unavailable {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.menu-item.unavailable:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.unavailable-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(220, 53, 69, 0.95);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    z-index: 3;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    letter-spacing: 0.5px;
+}
+
 /* Menu Controls Styling - Không ảnh hưởng đến menu-container và menu-grid */
 .menu-controls {
     background: white;
@@ -128,7 +156,7 @@ body.cart-open .menu-controls {
 
 .filter-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: 220px 1fr auto auto;
     gap: 15px;
     align-items: end;
     transition: all 0.3s ease;
@@ -136,7 +164,7 @@ body.cart-open .menu-controls {
 
 /* Responsive controls khi cart mở */
 body.cart-open .filter-section {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: 180px 1fr auto auto;
     gap: 10px;
 }
 
@@ -172,7 +200,7 @@ body.cart-open .filter-section input[type="text"] {
 }
 
 .filter-section button {
-    padding: 12px 20px;
+    padding: 12px 16px;
     border: none;
     border-radius: 6px;
     font-size: 14px;
@@ -180,17 +208,18 @@ body.cart-open .filter-section input[type="text"] {
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    white-space: nowrap;
 }
 
 /* Thu nhỏ button khi cart mở */
 body.cart-open .filter-section button {
-    padding: 10px 16px;
+    padding: 10px 12px;
     font-size: 13px;
 }
 
 .filter-section button:first-of-type {
-    background-color: #ff8c00;
-    color: #333;
+    background: var(--primary);
+    color: white;
 }
 
 .filter-section button:first-of-type:hover {
@@ -209,7 +238,6 @@ body.cart-open .filter-section button {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
 }
-
 /* Pagination Styling */
 .pagination-container {
     background: white;

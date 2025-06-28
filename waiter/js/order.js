@@ -196,7 +196,7 @@ async function generateTableOptions() {
         tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
         
         // Gọi API /tables để lấy danh sách bàn
-        const data = await apiFetch('/tables', {
+        const data = await apiFetch(`/tables?area=${currentWorkSchedule.area}`, {
             method: 'GET'
         });
         
