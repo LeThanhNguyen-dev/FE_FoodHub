@@ -161,8 +161,7 @@ function setupMenuEventListeners() {
     }
 
     const filterElements = [
-        'categoryFilter', 'menuStatusFilter', 'sortByMenuFilter',
-        'sortDirectionMenuFilter'
+        'categoryFilter', 'menuStatusFilter', 
     ];
 
     filterElements.forEach(id => {
@@ -196,8 +195,7 @@ function setupMenuEventListeners() {
     }
 
     const filterElements = [
-        'categoryFilter', 'menuStatusFilter', 'sortByMenuFilter',
-        'sortDirectionMenuFilter'
+        'categoryFilter', 'menuStatusFilter'
     ];
 
     filterElements.forEach(id => {
@@ -221,14 +219,10 @@ async function loadMenuItems() {
         const categoryFilter = document.getElementById('categoryFilter');
         const keywordFilter = document.getElementById('keywordFilter');
         const menuStatusFilter = document.getElementById('menuStatusFilter');
-        const sortByMenuFilter = document.getElementById('sortByMenuFilter');
-        const sortDirectionMenuFilter = document.getElementById('sortDirectionMenuFilter');
 
         const categoryId = categoryFilter ? categoryFilter.value : '';
         const keyword = keywordFilter ? keywordFilter.value : '';
         const status = menuStatusFilter ? menuStatusFilter.value : '';
-        const sortBy = sortByMenuFilter ? sortByMenuFilter.value || 'name' : 'name';
-        const sortDirection = sortDirectionMenuFilter ? sortDirectionMenuFilter.value || 'asc' : 'asc';
         const pageSize = '15';
 
         // Build query parameters
@@ -236,8 +230,6 @@ async function loadMenuItems() {
         if (categoryId) params.append('categoryId', categoryId);
         if (keyword) params.append('keyword', keyword);
         if (status) params.append('status', status);
-        params.append('sortBy', sortBy);
-        params.append('sortDirection', sortDirection);
         params.append('page', currentMenuPage.toString());
         params.append('size', pageSize);
 
@@ -388,7 +380,7 @@ function resetFilters() {
     // Reset all filter elements
     const filterElements = [
         'categoryFilter', 'keywordFilter', 'menuStatusFilter',
-        'sortByMenuFilter', 'sortDirectionMenuFilter', 'pageSizeMenuFilter'
+        'pageSizeMenuFilter'
     ];
 
     filterElements.forEach(id => {

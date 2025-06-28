@@ -210,11 +210,9 @@ async function generateTableOptions() {
         
         // Tạo danh sách tùy chọn từ dữ liệu API - sử dụng tableNumber làm value
         const options = data.result.map(table => {
-            console.log('Xử lý bàn:', table); // Debug log
             return `<option value="${table.tableNumber}">Bàn ${table.tableNumber}</option>`;
         }).join('');
         
-        console.log('Options được tạo:', options); // Debug log
         
         // Cập nhật trực tiếp vào dropdown filter
         const finalOptions = '<option value="">Tất cả bàn</option>' + options;
@@ -225,9 +223,7 @@ async function generateTableOptions() {
             tableFilter.value = currentValue;
             console.log('Đã khôi phục giá trị:', currentValue);
         }
-        
-        console.log('Đã cập nhật dropdown filter thành công');
-        
+                
         // Trả về options cho các mục đích khác (như showCart)
         return options;
         
