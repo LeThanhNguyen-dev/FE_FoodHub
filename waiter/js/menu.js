@@ -1,5 +1,5 @@
 let currentMenuPage = 0;
-let currentMenuSize = 20;
+let currentMenuSize = 15;
 let totalMenuPages = 1;
 let totalMenuElements = 0;
 let currentMenuFilters = {
@@ -229,7 +229,7 @@ async function loadMenuItems() {
         const status = menuStatusFilter ? menuStatusFilter.value : '';
         const sortBy = sortByMenuFilter ? sortByMenuFilter.value || 'name' : 'name';
         const sortDirection = sortDirectionMenuFilter ? sortDirectionMenuFilter.value || 'asc' : 'asc';
-        const pageSize = '20';
+        const pageSize = '15';
 
         // Build query parameters
         const params = new URLSearchParams();
@@ -578,7 +578,7 @@ async function loadTableOptions() {
         if (tableDropdownMenu) {
             tableDropdownMenu.innerHTML = '<div class="table-option error">Lỗi tải danh sách bàn</div>';
         }
-        showNotification('Không thể tải danh sách bàn: ' + error.message, 'warning');
+        showNotification('Không thể tải danh sách bàn: ' + error.message, 'error');
     }
 }
 
@@ -610,7 +610,7 @@ function toggleTableDropdown() {
 function selectTable(table, element) {
     // Kiểm tra trạng thái bàn
     if (table.status === 'OCCUPIED') {
-        showNotification('Bàn này đã có khách, vui lòng chọn bàn khác', 'warning');
+        showNotification('Bàn này đã có khách, vui lòng chọn bàn khác', 'error');
         return;
     }
 
@@ -767,7 +767,7 @@ async function showCartSidebar() {
 
     } catch (error) {
         console.error('Error showing cart sidebar:', error);
-        showNotification('Không thể hiển thị giỏ hàng: ' + error.message, 'warning');
+        showNotification('Không thể hiển thị giỏ hàng: ' + error.message, 'error');
     }
 }
 
@@ -1232,7 +1232,7 @@ async function confirmAddItemsToOrder() {
 
     } catch (error) {
         console.error('Error adding items to order:', error);
-        showNotification(`Lỗi thêm món: ${error.message}`, 'warning');
+        showNotification(`Lỗi thêm món: ${error.message}`, 'error');
     } finally {
         const checkoutBtn = document.querySelector('.checkout-btn');
         const checkoutBtnText = document.getElementById('checkoutBtnText');
@@ -1435,7 +1435,7 @@ async function submitOrder() {
 
     } catch (error) {
         console.error('Error submitting order:', error);
-        showNotification(`Lỗi đặt món: ${error.message}`, 'warning');
+        showNotification(`Lỗi đặt món: ${error.message}`, 'error');
     } finally {
         // Reset button
         const submitBtn = document.querySelector('.checkout-btn');

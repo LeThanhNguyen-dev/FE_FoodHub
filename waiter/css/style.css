@@ -1397,3 +1397,87 @@ body {
 .btn-danger:hover:not(:disabled) {
     background: #c82333;
 }
+
+/* CSS cho WebSocket Notification */
+.websocket-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    min-width: 300px;
+    max-width: 500px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1050;
+    border: 2px solid #ff8c00;
+}
+
+.websocket-notification.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.websocket-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.websocket-notification-content i.fa-bell {
+    font-size: 18px;
+    color: #ffd700;
+    animation: bellRing 0.5s ease-in-out;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.websocket-notification-content span {
+    flex: 1;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.websocket-notification .close-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.websocket-notification .close-btn:hover {
+    background: #f5f5f5;
+    color: #333;
+    transform: scale(1.1);
+}
+
+.websocket-notification .close-btn i {
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .websocket-notification {
+        left: 20px;
+        right: 20px;
+        transform: translateY(-100%);
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .websocket-notification.show {
+        transform: translateY(0);
+    }
+}

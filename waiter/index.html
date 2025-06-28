@@ -118,7 +118,6 @@
             <div class="welcome-section">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h2 class="mb-3" id="welcomeMessage">Dashboard - Ca làm việc</h2>
                         <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
                         <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
                         <p class="mb-0" id="shiftArea"><i class="fas fa-map-marker-alt me-2"></i>Khu vực: Đang tải...
@@ -367,6 +366,42 @@
             currentUserInfo.displayName = displayName;
         }
 
+        function initializeWebSocket(currentWorkSchedule) {
+            console.log('Initializing WebSocket for role:', currentWorkSchedule.role);
+
+            // Kết nối WebSocket
+            connectWebSocket(currentWorkSchedule, handleWebSocketMessage);
+        }
+
+        function formatInstantToTime(instant) {
+            try {
+                const date = new Date(instant);
+                return date.toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (error) {
+                console.error('Error formatting time:', error);
+                return 'Đang cập nhật';
+            }
+        }
+
+        function formatInstantToDate(instant) {
+            try {
+                const date = new Date(instant);
+                const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+                const dayName = days[date.getDay()];
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${dayName}, ${day}/${month}/${year}`;
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return 'Đang cập nhật';
+            }
+        }
         // Function to handle navigation clicks
         function handleNavClick(section) {
             // Check if user has work schedule
@@ -408,6 +443,7 @@
                     hasWorkSchedule = true;
                     displayWorkSchedule(data.result);
                     showDashboard();
+                    initializeWebSocket(currentWorkSchedule);
                 } else {
                     throw new Error(data.message || 'Invalid response format');
                 }
@@ -483,25 +519,54 @@
                 '💬 Hoặc liên hệ trực tiếp tại quầy lễ tân');
         }
 
+        function formatInstantToTime(instant) {
+            try {
+                const date = new Date(instant);
+                return date.toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (error) {
+                console.error('Error formatting time:', error);
+                return 'Đang cập nhật';
+            }
+        }
+
+        function formatInstantToDate(instant) {
+            try {
+                const date = new Date(instant);
+                const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+                const dayName = days[date.getDay()];
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${dayName}, ${day}/${month}/${year}`;
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return 'Đang cập nhật';
+            }
+        }
+
         // Function to display work schedule data
         function displayWorkSchedule(schedule) {
             // Simplified welcome message - no greeting or name
-            const welcomeMessage = document.getElementById('welcomeMessage');
-            welcomeMessage.textContent = 'Dashboard - Ca làm việc';
 
-            // Update shift information
+            // Update shift information using instant format
             document.getElementById('shiftDate').innerHTML =
-                `<i class="fas fa-calendar me-2"></i>Ngày: ${schedule.date}`;
+                `<i class="fas fa-calendar me-2"></i>Ngày: ${formatInstantToDate(schedule.date)}`;
 
-            // Use startTime and endTime directly
-            const startTime = schedule.startTime || 'Đang cập nhật';
-            const endTime = schedule.endTime || 'Đang cập nhật';
+            // Format start and end time from instant
+            const startTime = formatInstantToTime(schedule.startTime);
+            const endTime = formatInstantToTime(schedule.endTime);
             document.getElementById('shiftTime').innerHTML =
                 `<i class="fas fa-clock me-2"></i>Ca làm: ${startTime} - ${endTime}`;
 
-            // Update area
+            // Update area - use shift name if no area field
+            const areaDisplay = schedule.area || schedule.shift || 'Đang cập nhật';
             document.getElementById('shiftArea').innerHTML =
-                `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${schedule.area}`;
+                `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${areaDisplay}`;
         }
 
         // Function to show error message
@@ -581,6 +646,99 @@
 
             updateActiveNav('dashboard');
         }
+
+
+
+
+        function handleWebSocketMessage(data) {
+            console.log('Received notification:', data);
+            console.log('📩 data.message:', data.message);
+            console.log('data.type:', data.type);
+            // updateNotificationCount();
+
+            // Hiển thị thông báo WebSocket đặc biệt
+            showWebSocketNotification(data.message);
+
+            // Cập nhật dashboard stats nếu đang ở trang dashboard
+            if (hasWorkSchedule) {
+                updateDashboardStats();
+            }
+        }
+
+        // Hàm hiển thị thông báo WebSocket với âm thanh và hiệu ứng đặc biệt
+        function showWebSocketNotification(message) {
+            console.log("WebSocket notification: ", message);
+
+            // Phát âm thanh thông báo (có thể thay đổi loại âm thanh)
+            playNotificationSound(); // Có thể thay đổi thành: 'bell', 'chime', 'ping', 'success', 'gentle'
+
+            // Tạo notification element
+            const notification = document.createElement('div');
+            notification.className = 'websocket-notification';
+            notification.innerHTML = `
+        <div class="websocket-notification-content">
+            <span>${message}</span>
+            <button class="close-btn" onclick="closeWebSocketNotification(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+
+            // Thêm vào body
+            document.body.appendChild(notification);
+
+            // Hiện notification với animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                closeWebSocketNotification(notification);
+            }, 5000);
+        }
+
+        // Hàm đóng thông báo WebSocket
+        function closeWebSocketNotification(element) {
+            const notification = element.tagName === 'BUTTON' ? element.closest('.websocket-notification') : element;
+
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+
+        // Hàm phát âm thanh thông báo
+        function playNotificationSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+                const frequencies = [523, 659, 784]; // C, E, G
+
+                frequencies.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                    oscillator.type = 'sine';
+
+                    const startTime = audioContext.currentTime + (index * 0.15);
+                    gainNode.gain.setValueAtTime(0.2, startTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 1);
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + 1);
+                });
+            } catch (error) {
+                console.log('Không thể phát âm thanh thông báo:', error);
+            }
+        }
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="js/order.js"></script>
@@ -588,6 +746,9 @@
     <script src="js/show-table.js"></script>
     <script src="js/report.js"></script>
     <script src="../js/fetch-api.js"></script>
+    <script src="../js/websocket.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </body>
 
 </html>

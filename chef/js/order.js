@@ -32,11 +32,15 @@ const statusClasses = {
 function timeAgo(dateString) {
     const now = new Date();
     const date = new Date(dateString);
-    const diffMs = now - date;
+    
+    // Calculate difference using getTime() to work with UTC timestamps
+    const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMins / 60);
 
-    if (diffMins < 60) {
+    if (diffMins < 1) {
+        return 'Vừa xong';
+    } else if (diffMins < 60) {
         return `${diffMins} phút trước`;
     } else if (diffHours < 24) {
         return `${diffHours} giờ trước`;
@@ -164,9 +168,11 @@ async function loadOrders(isAutoRefresh = false) {
         params.append('size', pageSize);
         params.append('sortBy', sortBy);
         params.append('sort', sortDirection);
-
+        if (currentWorkSchedule && currentWorkSchedule.startTime) {
+            params.append('startTime', currentWorkSchedule.startTime);
+        }
         console.log('Fetching orders with pagination and sorting:', params.toString());
-        const data = await apiFetch(`/orders?${params.toString()}`, { method: 'GET' });
+        const data = await apiFetch(`/orders/chef/work-shift-orders?${params.toString()}`, { method: 'GET' });
 
         console.log('API Response:', data);
 
@@ -1506,35 +1512,7 @@ document.addEventListener('visibilitychange', function() {
 });
 
 
-function showNotification(message, type = 'info') {
-    // Tạo notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas ${getNotificationIcon(type)}"></i>
-            <span>${message}</span>
-        </div>
-    `;
 
-    // Thêm vào body
-    document.body.appendChild(notification);
-
-    // Hiện notification
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-
-    // Tự động ẩn sau 3 giây
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
 
 // NEW FUNCTION: Lấy icon cho notification
 function getNotificationIcon(type) {

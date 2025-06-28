@@ -1,500 +1,717 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chef Dashboard - Kitchen Management</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Pacifico&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-<!-- Sidebar -->
-<div class="sidebar d-flex flex-column" id="sidebar">
-  <div class="brand">
-    <h3>
-      <i class="fa fa-utensils"></i>
-      <span class="brand-text">FoodHub</span>
-    </h3>
-    <small>Dashboard Chef</small>
-  </div>
-
-  <nav class="sidebar-nav flex-fill">
-    <ul class="nav flex-column">
-      <li class="nav-item">
-        <a href="#" class="nav-link active" onclick="handleNavClick('dashboard')">
-          <i class="fas fa-tachometer-alt"></i>
-          <span class="nav-text">Dashboard</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link" onclick="handleNavClick('orders')">
-          <i class="fas fa-clipboard-list"></i>
-          <span class="nav-text">Đơn Hàng</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link" onclick="handleNavClick('tables')">
-          <i class="fas fa-chair"></i>
-          <span class="nav-text">Hàng Đợi</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link" onclick="handleNavClick('reports')">
-          <i class="fas fa-chart-line"></i>
-          <span class="nav-text">Báo Cáo Ca Làm</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-
-  <div class="logout-section">
-    <button class="logout-btn" onclick="handleLogout()">
-      <i class="fas fa-sign-out-alt"></i>
-      <span class="btn-text">Kết Thúc Ca Làm</span>
-    </button>
-  </div>
-</div>
-
-<!-- Main Content -->
-<div class="main-content" id="mainContent">
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="d-flex align-items-center">
-      <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-      </button>
-      <h4 class="mb-0" id="pageTitle">Dashboard - Ca Làm Việc</h4>
-    </div>
-    <div class="d-flex align-items-center">
-      <div class="notification-bell">
-        <i class="fas fa-bell"></i>
-        <span class="notification-badge" id="notificationCount">0</span>
-      </div>
-      <div class="dropdown">
-        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          <i class="fas fa-user-circle me-2"></i><span id="chefName">Đang tải...</span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ Sơ</a></li>
-          <li><a class="dropdown-item" href="#"><i class="fas fa-clock me-2"></i>Lịch Làm Việc</a></li>
-          <li>
-            <hr class="dropdown-divider">
-          </li>
-          <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i
-                  class="fas fa-sign-out-alt me-2"></i>Kết Thúc Ca</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dashboard Content -->
-  <div id="dashboardContent">
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-      <div class="row align-items-center">
-        <div class="col-md-8">
-          <h2 class="mb-3" id="welcomeMessage">Chào bạn!</h2>
-          <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
-          <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
-          <p class="mb-0" id="shiftType"><i class="fas fa-sun me-2"></i>Loại ca: Đang tải...</p>
-        </div>
-        <div class="col-md-4 text-center">
-          <i class="fas fa-chef-hat" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
-        </div>
-      </div>
+  <!-- Sidebar -->
+  <div class="sidebar d-flex flex-column" id="sidebar">
+    <div class="brand">
+      <h3>
+        <i class="fa fa-utensils"></i>
+        <span class="brand-text">FoodHub</span>
+      </h3>
+      <small>Dashboard Chef</small>
     </div>
 
-    <!-- Stats Section -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-number" id="pendingCount">0</div>
-        <div class="stat-label">Đơn Chờ Xử Lý</div>
-        <i class="fas fa-hourglass-half stat-icon"></i>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="preparingCount">0</div>
-        <div class="stat-label">Đang Chế Biến</div>
-        <i class="fas fa-fire stat-icon"></i>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="readyCount">0</div>
-        <div class="stat-label">Sẵn Sàng Phục Vụ</div>
-        <i class="fas fa-check-circle stat-icon"></i>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="avgTime">15p</div>
-        <div class="stat-label">Thời Gian Nấu TB</div>
-        <i class="fas fa-stopwatch stat-icon"></i>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- No Work Schedule Message -->
-  <div id="noWorkScheduleMessage" style="display: none; text-align: center; padding: 50px;">
-    <div class="alert alert-warning" role="alert" style="max-width: 600px; margin: 0 auto;">
-      <i class="fas fa-calendar-times" style="font-size: 3rem; color: #856404; margin-bottom: 1rem; display: block;"></i>
-      <h4 class="alert-heading">Không có ca làm việc hôm nay</h4>
-      <p class="mb-3">Hệ thống không tìm thấy lịch làm việc của bạn cho ngày hôm nay. Điều này có thể do:</p>
-      <ul class="text-start mb-3" style="display: inline-block;">
-        <li>Bạn không được phân công ca làm việc hôm nay</li>
-        <li>Lịch làm việc chưa được cập nhật</li>
-        <li>Có lỗi trong hệ thống phân công</li>
+    <nav class="sidebar-nav flex-fill">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a href="#" class="nav-link active" onclick="handleNavClick('dashboard')">
+            <i class="fas fa-tachometer-alt"></i>
+            <span class="nav-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" onclick="handleNavClick('orders')">
+            <i class="fas fa-clipboard-list"></i>
+            <span class="nav-text">Đơn Hàng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" onclick="handleNavClick('tables')">
+            <i class="fas fa-chair"></i>
+            <span class="nav-text">Hàng Đợi</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" onclick="handleNavClick('reports')">
+            <i class="fas fa-chart-line"></i>
+            <span class="nav-text">Báo Cáo Ca Làm</span>
+          </a>
+        </li>
       </ul>
-      <hr>
-      <div class="d-flex gap-2 justify-content-center">
-        <button class="btn btn-outline-primary" onclick="loadWorkSchedule()">
-          <i class="fas fa-refresh me-2"></i>Thử lại
-        </button>
-        <button class="btn btn-primary" onclick="contactManager()">
-          <i class="fas fa-phone me-2"></i>Liên hệ quản lý
-        </button>
-      </div>
+    </nav>
+
+    <div class="logout-section">
+      <button class="logout-btn" onclick="handleLogout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="btn-text">Kết Thúc Ca Làm</span>
+      </button>
     </div>
   </div>
 
-  <!-- Error Message -->
-  <div id="errorMessage" style="display: none; text-align: center; padding: 50px;">
-    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
-    <h4>Không thể tải thông tin ca làm việc</h4>
-    <p id="errorText">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
-    <button class="btn btn-primary" onclick="loadWorkSchedule()">
-      <i class="fas fa-refresh me-2"></i>Thử lại
-    </button>
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="d-flex align-items-center">
+        <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h4 class="mb-0" id="pageTitle">Dashboard - Ca Làm Việc</h4>
+      </div>
+      <div class="d-flex align-items-center">
+        <div class="notification-bell">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notificationCount">0</span>
+        </div>
+        <div class="dropdown">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user-circle me-2"></i><span id="chefName">Đang tải...</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ Sơ</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-clock me-2"></i>Lịch Làm Việc</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Kết
+                Thúc Ca</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboardContent">
+      <!-- Welcome Section -->
+      <div class="welcome-section">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
+            <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
+            <p class="mb-0" id="shiftType"><i class="fas fa-sun me-2"></i>Loại ca: Đang tải...</p>
+          </div>
+          <div class="col-md-4 text-center">
+            <i class="fas fa-chef-hat" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Section -->
+      <div class="stats-section">
+        <div class="stat-card">
+          <div class="stat-number" id="pendingCount">0</div>
+          <div class="stat-label">Đơn Chờ Xử Lý</div>
+          <i class="fas fa-hourglass-half stat-icon"></i>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="preparingCount">0</div>
+          <div class="stat-label">Đang Chế Biến</div>
+          <i class="fas fa-fire stat-icon"></i>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="readyCount">0</div>
+          <div class="stat-label">Sẵn Sàng Phục Vụ</div>
+          <i class="fas fa-check-circle stat-icon"></i>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="avgTime">15p</div>
+          <div class="stat-label">Thời Gian Nấu TB</div>
+          <i class="fas fa-stopwatch stat-icon"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- No Work Schedule Message -->
+    <div id="noWorkScheduleMessage" style="display: none; text-align: center; padding: 50px;">
+      <div class="alert alert-warning" role="alert" style="max-width: 600px; margin: 0 auto;">
+        <i class="fas fa-calendar-times"
+          style="font-size: 3rem; color: #856404; margin-bottom: 1rem; display: block;"></i>
+        <h4 class="alert-heading">Không có ca làm việc hôm nay</h4>
+        <p class="mb-3">Hệ thống không tìm thấy lịch làm việc của bạn cho ngày hôm nay. Điều này có thể do:</p>
+        <ul class="text-start mb-3" style="display: inline-block;">
+          <li>Bạn không được phân công ca làm việc hôm nay</li>
+          <li>Lịch làm việc chưa được cập nhật</li>
+          <li>Có lỗi trong hệ thống phân công</li>
+        </ul>
+        <hr>
+        <div class="d-flex gap-2 justify-content-center">
+          <button class="btn btn-outline-primary" onclick="loadWorkSchedule()">
+            <i class="fas fa-refresh me-2"></i>Thử lại
+          </button>
+          <button class="btn btn-primary" onclick="contactManager()">
+            <i class="fas fa-phone me-2"></i>Liên hệ quản lý
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" style="display: none; text-align: center; padding: 50px;">
+      <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+      <h4>Không thể tải thông tin ca làm việc</h4>
+      <p id="errorText">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
+      <button class="btn btn-primary" onclick="loadWorkSchedule()">
+        <i class="fas fa-refresh me-2"></i>Thử lại
+      </button>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="dynamicContent" style="display: none;">
+      <!-- Content will be loaded here dynamically -->
+    </div>
   </div>
 
-  <!-- Dynamic Content Area -->
-  <div id="dynamicContent" style="display: none;">
-    <!-- Content will be loaded here dynamically -->
-  </div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Global variables to store data
+    let currentWorkSchedule = null;
+    let currentUserInfo = null;
+    let hasWorkSchedule = false;
+    let audioContext = null;
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script>
-  // Global variables to store data
-  let currentWorkSchedule = null;
-  let currentUserInfo = null;
-  let hasWorkSchedule = false;
-
-  // Load data when page loads
-  document.addEventListener('DOMContentLoaded', function() {
-    loadUserInfo();
-    loadWorkSchedule();
-  });
-
-  // Function to load user information from API
-  async function loadUserInfo() {
-    try {
-      const data = await apiFetch('/users/my-info', {
-        method: 'GET',
-      });
-      
-      if (data.code === 0 && data.result) {
-        currentUserInfo = data.result;
-        displayUserInfo(data.result);
-      } else {
-        console.error('Error loading user info:', data.message);
-        // Set default user name if API fails
-        document.getElementById('chefName').textContent = 'Chef';
+    // 2. Thêm hàm khởi tạo AudioContext sau user gesture
+    function initializeAudioContext() {
+      if (!audioContext) {
+        try {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          console.log('AudioContext initialized successfully');
+        } catch (error) {
+          console.error('Failed to initialize AudioContext:', error);
+        }
       }
-    } catch (error) {
-      console.error('Error loading user info:', error);
-      // Set default user name if API fails
-      document.getElementById('chefName').textContent = 'Nhân viên';
+      console.log("AudioContext has been initialized successfully")
     }
-  }
+    // Load data when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      // Khởi tạo AudioContext khi user click lần đầu tiên
+      const enableAudio = () => {
+        initializeAudioContext();
+        // Remove listener sau khi đã khởi tạo
+        document.removeEventListener('click', enableAudio);
+        document.removeEventListener('keydown', enableAudio);
+        document.removeEventListener('touchstart', enableAudio);
+      };
 
-  // Function to display user information
-  function displayUserInfo(userInfo) {
-    // Extract username for display
-    const displayName = userInfo.username || 'Nhân viên';
-    
-    // Update chef name in header
-    document.getElementById('chefName').textContent = displayName;
-    
-    // Update welcome message if we have both user info and work schedule
-    if (currentWorkSchedule) {
-      updateWelcomeMessage(displayName);
-    }
-  }
+      document.addEventListener('click', enableAudio);
+      document.addEventListener('keydown', enableAudio);
+      document.addEventListener('touchstart', enableAudio);
 
-  // Function to update welcome message
-  function updateWelcomeMessage(userName) {
-    const welcomeMessage = document.getElementById('welcomeMessage');
-    const currentHour = new Date().getHours();
-    let greeting = 'Chào bạn';
-    
-    if (currentHour < 12) {
-      greeting = 'Chào buổi sáng';
-    } else if (currentHour < 18) {
-      greeting = 'Chào buổi chiều';
-    } else {
-      greeting = 'Chào buổi tối';
-    }
-    
-    welcomeMessage.textContent = `${greeting}, ${userName}!`;
-  }
-
-  // Function to handle navigation clicks
-  function handleNavClick(section) {
-    // Check if user has work schedule
-    if (!hasWorkSchedule) {
-      // Show no work schedule message for any navigation attempt
-      showNoWorkScheduleMessage();
-      return;
-    }
-
-    // If has work schedule, proceed with normal navigation
-    switch(section) {
-      case 'dashboard':
-        showDashboard();
-        break;
-      case 'orders':
-        showOrders();
-        break;
-      case 'reports':
-        showReports();
-        break;
-    }
-  }
-
-  // Function to load work schedule from API
-  async function loadWorkSchedule() {
-    try {
-      const data = await apiFetch('/shifts/my-work-schedule/today', {
-        method: 'GET',
-      });
-      
-      if (data.code === 1000 && data.result) {
-        currentWorkSchedule = data.result;
-        hasWorkSchedule = true;
-        displayWorkSchedule(data.result);
-        showDashboard();
-      } else {
-        throw new Error(data.message || 'Invalid response format');
-      }
-    } catch (error) {
-      console.error('Error loading work schedule:', error);
-      handleWorkScheduleError(error);
-    }
-  }
-
-  // Function to handle work schedule errors
-  function handleWorkScheduleError(error) {
-    hasWorkSchedule = false;
-    
-    // Check if error message contains work schedule not found
-    const errorMessage = error.message || '';
-    
-    if (errorMessage.includes('Work schedule not found') || 
-        errorMessage.includes('1041') ||
-        errorMessage.includes('404')) {
-      showNoWorkScheduleMessage();
-    } else {
-      showError(errorMessage);
-    }
-  }
-
-  // Function to show no work schedule message
-  function showNoWorkScheduleMessage() {
-    document.getElementById('dashboardContent').style.display = 'none';
-    document.getElementById('errorMessage').style.display = 'none';
-    document.getElementById('noWorkScheduleMessage').style.display = 'block';
-    document.getElementById('dynamicContent').style.display = 'none';
-    
-    // Update page title based on current attempted navigation
-    document.getElementById('pageTitle').textContent = 'Thông báo - Không có ca làm việc';
-    
-    // Ensure user name is displayed even without work schedule
-    if (currentUserInfo) {
-      document.getElementById('chefName').textContent = currentUserInfo.username || 'Chef';
-    }
-
-    // Update active nav state
-    updateActiveNav('dashboard');
-  }
-
-  // Function to update active navigation
-  function updateActiveNav(section) {
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.classList.remove('active');
+      // Load existing functions
+      loadUserInfo();
+      loadWorkSchedule();
     });
-    
-    // Find and activate the correct nav item
-    const navItems = {
-      'dashboard': '[onclick="handleNavClick(\'dashboard\')"]',
-      'orders': '[onclick="handleNavClick(\'orders\')"]',
-      'tables': '[onclick="handleNavClick(\'tables\')"]',
-      'reports': '[onclick="handleNavClick(\'reports\')"]'
-    };
-    
-    if (navItems[section]) {
-      const activeNav = document.querySelector(navItems[section]);
-      if (activeNav) {
-        activeNav.classList.add('active');
+
+    // Function to load user information from API
+    async function loadUserInfo() {
+      try {
+        const data = await apiFetch('/users/my-info', {
+          method: 'GET',
+        });
+
+        if (data.code === 0 && data.result) {
+          currentUserInfo = data.result;
+          displayUserInfo(data.result);
+
+
+        } else {
+          console.error('Error loading user info:', data.message);
+          document.getElementById('chefName').textContent = 'Chef';
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+        document.getElementById('chefName').textContent = 'Nhân viên';
       }
     }
-  }
 
-  // Function to contact manager
-  function contactManager() {
-    alert('Vui lòng liên hệ với quản lý qua:\n\n' +
-          '📞 Hotline: 1900-xxxx\n' +
-          '📧 Email: manager@foodhub.com\n' +
-          '💬 Hoặc liên hệ trực tiếp tại quầy lễ tân');
-  }
+    function initializeWebSocket(userInfo) {
+      console.log('Initializing WebSocket for role:', currentWorkSchedule.role);
 
-  // Function to display work schedule data
-  function displayWorkSchedule(schedule) {
-    // Update welcome message with user name if available
-    if (currentUserInfo) {
-      updateWelcomeMessage(currentUserInfo.username || 'Chef');
-    }
-    
-    // Update shift information
-    document.getElementById('shiftDate').innerHTML = 
-        `<i class="fas fa-calendar me-2"></i>Ngày: ${schedule.date}`;
-    
-    // Use startTime and endTime directly
-    const startTime = schedule.startTime || 'Đang cập nhật';
-    const endTime = schedule.endTime || 'Đang cập nhật';
-    document.getElementById('shiftTime').innerHTML = 
-        `<i class="fas fa-clock me-2"></i>Ca làm: ${startTime} - ${endTime}`;
-    
-    // Update shift type with appropriate icon
-    const shiftTypeText = getShiftTypeText(schedule.shift);
-    const shiftIcon = getShiftIcon(schedule.shift);
-    document.getElementById('shiftType').innerHTML = 
-        `<i class="fas fa-${shiftIcon} me-2"></i>Loại ca: ${shiftTypeText}`;
-  }
-
-  // Function to get shift type text in Vietnamese
-  function getShiftTypeText(shift) {
-    const shiftTypes = {
-      'MORNING': 'Ca sáng',
-      'AFTERNOON': 'Ca chiều', 
-      'EVENING': 'Ca tối',
-      'NIGHT': 'Ca đêm'
-    };
-    return shiftTypes[shift] || shift;
-  }
-
-  // Function to get appropriate icon for shift type
-  function getShiftIcon(shift) {
-    const shiftIcons = {
-      'MORNING': 'sun',
-      'AFTERNOON': 'sun', 
-      'EVENING': 'moon',
-      'NIGHT': 'moon'
-    };
-    return shiftIcons[shift] || 'clock';
-  }
-
-  // Function to show error message
-  function showError(errorText) {
-    document.getElementById('dashboardContent').style.display = 'none';
-    document.getElementById('noWorkScheduleMessage').style.display = 'none';
-    document.getElementById('errorMessage').style.display = 'block';
-    document.getElementById('dynamicContent').style.display = 'none';
-    document.getElementById('errorText').textContent = errorText;
-    
-    // Update page title
-    document.getElementById('pageTitle').textContent = 'Lỗi - Không thể tải dữ liệu';
-  }
-
-  // Existing functions updated to check work schedule
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-
-    sidebar.classList.toggle('collapsed');
-
-    if (mainContent) {
-      mainContent.classList.toggle('expanded');
+      // Kết nối WebSocket
+      connectWebSocket(currentWorkSchedule, handleWebSocketMessage);
     }
 
-    window.sidebarCollapsed = sidebar.classList.contains('collapsed');
-  }
+    // Function to display user information
+    function displayUserInfo(userInfo) {
+      // Extract username for display
+      const displayName = userInfo.username || 'Nhân viên';
 
-  function setActiveNav(element) {
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.classList.remove('active');
-    });
-    element.classList.add('active');
-  }
-
-  function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
-      document.body.style.opacity = '0.5';
-      document.body.style.transition = 'opacity 0.5s';
-
-      setTimeout(() => {
-        alert('Đã kết thúc ca làm việc! Cảm ơn bạn đã làm việc chăm chỉ.');
-        document.body.style.opacity = '1';
-        // Clear saved data
-        currentUserInfo = null;
-        currentWorkSchedule = null;
-        // Redirect to login or home page
-        // window.location.href = '/login';
-      }, 1000);
+      // Update chef name in header
+      document.getElementById('chefName').textContent = displayName;
     }
-  }
 
-  function showDashboard() {
-    if (!hasWorkSchedule) {
+
+    // Function to handle navigation clicks
+    function handleNavClick(section) {
+      // Check if user has work schedule
+      if (!hasWorkSchedule) {
+        // Show no work schedule message for any navigation attempt
         showNoWorkScheduleMessage();
         return;
+      }
+
+      // If has work schedule, proceed with normal navigation
+      switch (section) {
+        case 'dashboard':
+          showDashboard();
+          break;
+        case 'orders':
+          showOrders();
+          break;
+        case 'reports':
+          showReports();
+          break;
+      }
     }
-    
-    // Update page title
-    document.getElementById('pageTitle').textContent = 'Dashboard - Ca Làm Việc';
-    
-    // Show dashboard content and hide others
-    document.getElementById('dashboardContent').style.display = 'block';
-    document.getElementById('dynamicContent').style.display = 'none';
-    document.getElementById('errorMessage').style.display = 'none';
-    document.getElementById('noWorkScheduleMessage').style.display = 'none';
 
-    // Update active navigation
-    updateActiveNav('dashboard');
-}
+    // Function to load work schedule from API
+    async function loadWorkSchedule() {
+      try {
+        const data = await apiFetch('/shifts/my-work-schedule/today', {
+          method: 'GET',
+        });
 
-
-  // Placeholder functions for other navigation items
-  function showOrders() {
-    if (!hasWorkSchedule) {
-      showNoWorkScheduleMessage();
-      return;
+        if (data.code === 1000 && data.result) {
+          currentWorkSchedule = data.result;
+          hasWorkSchedule = true;
+          displayWorkSchedule(data.result);
+          showDashboard();
+          initializeWebSocket(currentWorkSchedule);
+        } else {
+          throw new Error(data.message || 'Invalid response format');
+        }
+      } catch (error) {
+        console.error('Error loading work schedule:', error);
+        handleWorkScheduleError(error);
+      }
     }
-    // Implementation for orders view
-    console.log('Show orders');
-    updateActiveNav('orders');
-  }
 
-  function showTables() {
-    if (!hasWorkSchedule) {
-      showNoWorkScheduleMessage();
-      return;
-    }
-    // Implementation for tables view
-    console.log('Show tables');
-    updateActiveNav('tables');
-  }
+    // Function to handle work schedule errors
+    function handleWorkScheduleError(error) {
+      hasWorkSchedule = false;
 
-  function showReports() {
-    if (!hasWorkSchedule) {
-      showNoWorkScheduleMessage();
-      return;
+      // Check if error message contains work schedule not found
+      const errorMessage = error.message || '';
+
+      if (errorMessage.includes('Work schedule not found') ||
+        errorMessage.includes('1041') ||
+        errorMessage.includes('404')) {
+        showNoWorkScheduleMessage();
+      } else {
+        showError(errorMessage);
+      }
     }
-    // Implementation for reports view
-    console.log('Show reports');
-    updateActiveNav('reports');
-  }
-</script>
-<script src="js/order.js"></script>
-<script src="js/report.js"></script>
-<script src="../js/fetch-api.js"></script>
+
+    // Function to show no work schedule message
+    function showNoWorkScheduleMessage() {
+      document.getElementById('dashboardContent').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('noWorkScheduleMessage').style.display = 'block';
+      document.getElementById('dynamicContent').style.display = 'none';
+
+      // Update page title based on current attempted navigation
+      document.getElementById('pageTitle').textContent = 'Thông báo - Không có ca làm việc';
+
+      // Ensure user name is displayed even without work schedule
+      if (currentUserInfo) {
+        document.getElementById('chefName').textContent = currentUserInfo.username || 'Chef';
+      }
+
+      // Update active nav state
+      updateActiveNav('dashboard');
+    }
+
+    // Function to update active navigation
+    function updateActiveNav(section) {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+
+      // Find and activate the correct nav item
+      const navItems = {
+        'dashboard': '[onclick="handleNavClick(\'dashboard\')"]',
+        'orders': '[onclick="handleNavClick(\'orders\')"]',
+        'tables': '[onclick="handleNavClick(\'tables\')"]',
+        'reports': '[onclick="handleNavClick(\'reports\')"]'
+      };
+
+      if (navItems[section]) {
+        const activeNav = document.querySelector(navItems[section]);
+        if (activeNav) {
+          activeNav.classList.add('active');
+        }
+      }
+    }
+
+    // Function to contact manager
+    function contactManager() {
+      alert('Vui lòng liên hệ với quản lý qua:\n\n' +
+        '📞 Hotline: 1900-xxxx\n' +
+        '📧 Email: manager@foodhub.com\n' +
+        '💬 Hoặc liên hệ trực tiếp tại quầy lễ tân');
+    }
+
+    // Function to display work schedule data
+    function displayWorkSchedule(schedule) {
+
+      // Parse and format date
+      const scheduleDate = new Date(schedule.date);
+      const formattedDate = scheduleDate.toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+
+      // Update shift information
+      document.getElementById('shiftDate').innerHTML =
+        `<i class="fas fa-calendar me-2"></i>Ngày: ${formattedDate}`;
+
+      // Parse and format time
+      const startTime = new Date(schedule.startTime);
+      const endTime = new Date(schedule.endTime);
+
+      const formattedStartTime = startTime.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const formattedEndTime = endTime.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      document.getElementById('shiftTime').innerHTML =
+        `<i class="fas fa-clock me-2"></i>Ca làm: ${formattedStartTime} - ${formattedEndTime}`;
+
+      // Update shift type with appropriate icon
+      const shiftTypeText = getShiftTypeText(schedule.shift);
+      const shiftIcon = getShiftIcon(schedule.shift);
+      document.getElementById('shiftType').innerHTML =
+        `<i class="fas fa-${shiftIcon} me-2"></i>Loại ca: ${shiftTypeText}`;
+    }
+
+
+    // Function to get shift type text in Vietnamese
+    function getShiftTypeText(shift) {
+      const shiftTypes = {
+        'MORNING': 'Ca sáng',
+        'AFTERNOON': 'Ca chiều',
+        'EVENING': 'Ca tối',
+        'NIGHT': 'Ca đêm'
+      };
+      return shiftTypes[shift] || shift;
+    }
+
+    // Function to get appropriate icon for shift type
+    function getShiftIcon(shift) {
+      const shiftIcons = {
+        'MORNING': 'sun',
+        'AFTERNOON': 'sun',
+        'EVENING': 'moon',
+        'NIGHT': 'moon'
+      };
+      return shiftIcons[shift] || 'clock';
+    }
+
+    // Function to show error message
+    function showError(errorText) {
+      document.getElementById('dashboardContent').style.display = 'none';
+      document.getElementById('noWorkScheduleMessage').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'block';
+      document.getElementById('dynamicContent').style.display = 'none';
+      document.getElementById('errorText').textContent = errorText;
+
+      // Update page title
+      document.getElementById('pageTitle').textContent = 'Lỗi - Không thể tải dữ liệu';
+    }
+
+    // Existing functions updated to check work schedule
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+
+      sidebar.classList.toggle('collapsed');
+
+      if (mainContent) {
+        mainContent.classList.toggle('expanded');
+      }
+
+      window.sidebarCollapsed = sidebar.classList.contains('collapsed');
+    }
+
+    function setActiveNav(element) {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+
+    function handleLogout() {
+      if (confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
+        document.body.style.opacity = '0.5';
+        document.body.style.transition = 'opacity 0.5s';
+
+        setTimeout(() => {
+          alert('Đã kết thúc ca làm việc! Cảm ơn bạn đã làm việc chăm chỉ.');
+          document.body.style.opacity = '1';
+          // Clear saved data
+          currentUserInfo = null;
+          currentWorkSchedule = null;
+          // Redirect to login or home page
+          // window.location.href = '/login';
+        }, 1000);
+      }
+    }
+
+    function showDashboard() {
+      if (!hasWorkSchedule) {
+        showNoWorkScheduleMessage();
+        return;
+      }
+
+      // Update page title
+      document.getElementById('pageTitle').textContent = 'Dashboard - Ca Làm Việc';
+
+      // Show dashboard content and hide others
+      document.getElementById('dashboardContent').style.display = 'block';
+      document.getElementById('dynamicContent').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('noWorkScheduleMessage').style.display = 'none';
+
+      // Update active navigation
+      updateActiveNav('dashboard');
+    }
+
+
+    // Placeholder functions for other navigation items
+    function showOrders() {
+      if (!hasWorkSchedule) {
+        showNoWorkScheduleMessage();
+        return;
+      }
+      // Implementation for orders view
+      console.log('Show orders');
+      updateActiveNav('orders');
+    }
+
+    function showTables() {
+      if (!hasWorkSchedule) {
+        showNoWorkScheduleMessage();
+        return;
+      }
+      // Implementation for tables view
+      console.log('Show tables');
+      updateActiveNav('tables');
+    }
+
+    function showReports() {
+      if (!hasWorkSchedule) {
+        showNoWorkScheduleMessage();
+        return;
+      }
+      // Implementation for reports view
+      console.log('Show reports');
+      updateActiveNav('reports');
+    }
+
+    // WebSocket notification handling
+    // Hàm xử lý WebSocket message với thông báo có âm thanh
+    function handleWebSocketMessage(data) {
+      console.log('Received notification:', data);
+      console.log('📩 data.message:', data.message);
+      console.log('data.type:', data.type);
+      updateNotificationCount();
+
+      // Hiển thị thông báo WebSocket đặc biệt
+      showWebSocketNotification(data.message);
+
+      // Cập nhật dashboard stats nếu đang ở trang dashboard
+      if (hasWorkSchedule) {
+        updateDashboardStats();
+      }
+    }
+
+    // Hàm hiển thị thông báo WebSocket với âm thanh và hiệu ứng đặc biệt
+    function showWebSocketNotification(message) {
+      console.log("WebSocket notification: ", message);
+
+      // Phát âm thanh thông báo (có thể thay đổi loại âm thanh)
+      playNotificationSound(); // Có thể thay đổi thành: 'bell', 'chime', 'ping', 'success', 'gentle'
+
+      // Tạo notification element
+      const notification = document.createElement('div');
+      notification.className = 'websocket-notification';
+      notification.innerHTML = `
+        <div class="websocket-notification-content">
+            <span>${message}</span>
+            <button class="close-btn" onclick="closeWebSocketNotification(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+
+      // Thêm vào body
+      document.body.appendChild(notification);
+
+      // Hiện notification với animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Tự động ẩn sau 5 giây
+      setTimeout(() => {
+        closeWebSocketNotification(notification);
+      }, 5000);
+    }
+
+    // Hàm đóng thông báo WebSocket
+    function closeWebSocketNotification(element) {
+      const notification = element.tagName === 'BUTTON' ? element.closest('.websocket-notification') : element;
+
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }
+
+    // Hàm phát âm thanh thông báo
+    function playNotificationSound() {
+      // Kiểm tra nếu AudioContext chưa được khởi tạo
+      if (!audioContext) {
+        console.log('AudioContext chưa được khởi tạo');
+        return;
+      }
+
+      try {
+        // Resume AudioContext nếu bị suspended
+        if (audioContext.state === 'suspended') {
+          audioContext.resume().then(() => {
+            playChimeSound();
+          }).catch(error => {
+            console.log('Không thể resume AudioContext:', error);
+          });
+        } else {
+          playChimeSound();
+        }
+      } catch (error) {
+        console.log('Không thể phát âm thanh thông báo:', error);
+      }
+    }
+
+
+
+    function playChimeSound() {
+      if (!audioContext || audioContext.state === 'closed') {
+        console.log('AudioContext không khả dụng');
+        return;
+      }
+
+      const frequencies = [523, 659, 784]; // C, E, G
+
+      frequencies.forEach((freq, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+        oscillator.type = 'sine';
+
+        const startTime = audioContext.currentTime + (index * 0.15);
+        gainNode.gain.setValueAtTime(0.2, startTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 1);
+
+        oscillator.start(startTime);
+        oscillator.stop(startTime + 1);
+      });
+    }
+
+    // Function to update notification count
+    function updateNotificationCount() {
+      const notificationBadge = document.getElementById('notificationCount');
+      let currentCount = parseInt(notificationBadge.textContent) || 0;
+      notificationBadge.textContent = currentCount + 1;
+
+      // Add animation class
+      notificationBadge.classList.add('notification-pulse');
+      setTimeout(() => {
+        notificationBadge.classList.remove('notification-pulse');
+      }, 1000);
+    }
+
+    // Function to update dashboard stats (placeholder)
+    function updateDashboardStats() {
+      // Reload dashboard data or update specific stats
+      // This is a placeholder - implement based on your actual API
+      const pendingElement = document.getElementById('pendingCount');
+      if (pendingElement) {
+        let currentCount = parseInt(pendingElement.textContent) || 0;
+        pendingElement.textContent = currentCount + 1;
+      }
+    }
+
+    function showNotification(message, type = 'info') {
+      // Tạo notification element
+      console.log("notification: ", message);
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+
+      // Thêm vào body
+      document.body.appendChild(notification);
+
+      // Hiện notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Tự động ẩn sau 3 giây
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Disconnect WebSocket when page unloads
+    window.addEventListener('beforeunload', function () {
+      disconnectWebSocket();
+
+      // Cleanup AudioContext
+      if (audioContext && audioContext.state !== 'closed') {
+        audioContext.close();
+      }
+    });
+  </script>
+  <script src="js/order.js"></script>
+  <script src="js/report.js"></script>
+  <script src="../js/fetch-api.js"></script>
+  <script src="../js/websocket.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </body>
+
 </html>

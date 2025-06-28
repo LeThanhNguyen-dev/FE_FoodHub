@@ -116,10 +116,6 @@ async function setupEventListeners() {
     }
 }
 
-
-
-
-
 // Global variables for pagination
 let currentOrderPage = 0; // Backend uses 0-based pagination
 let totalOrderPages = 1;
@@ -182,8 +178,6 @@ async function loadOrders() {
         showErrorState(error.message);
     }
 }
-
-
 
 async function generateTableOptions() {
     try {
@@ -1114,20 +1108,26 @@ function updateActiveNavigation(currentFunction) {
 
 // Hàm định dạng thời gian
 function formatDateTime(dateString) {
+    // Parse the date string as UTC to avoid timezone conversion
     const date = new Date(dateString);
     const now = new Date();
-    const diffMs = now - date;
+    
+    // Calculate difference using UTC time to avoid timezone issues
+    const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    // Format time part
+    // Format time part - no timezone conversion needed since dateString is already Vietnam time
     const timeStr = date.toLocaleTimeString('vi-VN', {
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        timeZone: 'UTC' // Treat as UTC to prevent double timezone conversion
     });
 
-    if (diffMins < 60) {
+    if (diffMins < 1) {
+        return 'Vừa xong';
+    } else if (diffMins < 60) {
         return `${diffMins} phút trước`;
     } else if (diffHours < 24) {
         return `${diffHours} giờ trước (${timeStr})`;
@@ -1137,7 +1137,8 @@ function formatDateTime(dateString) {
         return date.toLocaleDateString('vi-VN', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
+            year: 'numeric',
+            timeZone: 'UTC' // Treat as UTC to prevent double timezone conversion
         }) + ` ${timeStr}`;
     }
 }

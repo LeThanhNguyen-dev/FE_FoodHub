@@ -900,8 +900,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Welcome Section - Enhanced */
@@ -938,7 +943,7 @@ body {
     font-weight: 800;
     font-size: 2.4rem;
     margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-section p {
@@ -947,7 +952,7 @@ body {
     display: flex;
     align-items: center;
     font-weight: 600;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .welcome-section p i {
@@ -956,12 +961,12 @@ body {
     font-size: 1.2rem;
     width: 22px;
     text-align: center;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-section .col-md-4 i {
     color: rgba(255, 255, 255, 0.9);
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
 }
 
 /* Responsive Design - Enhanced */
@@ -1133,48 +1138,162 @@ body {
 .order-card * {
     box-sizing: border-box !important;
 }
+
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 /* Responsive cho welcome section */
 @media (max-width: 768px) {
-  .welcome-section {
-    padding: 1.5rem 2rem;
-    margin: 1rem;
-  }
-  
-  .welcome-section h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  
-  .welcome-section p {
-    font-size: 1rem;
-    margin-bottom: 0.4rem;
-  }
-  
-  .welcome-section .col-md-4 i {
-    font-size: 3rem;
-  }
+    .welcome-section {
+        padding: 1.5rem 2rem;
+        margin: 1rem;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-section p {
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .welcome-section .col-md-4 i {
+        font-size: 3rem;
+    }
 }
 
 @media (max-width: 576px) {
-  .welcome-section {
-    padding: 1.2rem 1.5rem;
-    margin: 0.8rem;
-  }
-  
-  .welcome-section h2 {
-    font-size: 1.6rem;
-  }
-  
-  .welcome-section p {
-    font-size: 0.95rem;
-  }
-  
-  .welcome-section .col-md-4 {
-    margin-top: 1rem;
-  }
+    .welcome-section {
+        padding: 1.2rem 1.5rem;
+        margin: 0.8rem;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.6rem;
+    }
+
+    .welcome-section p {
+        font-size: 0.95rem;
+    }
+
+    .welcome-section .col-md-4 {
+        margin-top: 1rem;
+    }
+}
+
+.notification-pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.notification-badge {
+    transition: all 0.3s ease;
+}
+
+/* CSS cho WebSocket Notification */
+.websocket-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    min-width: 300px;
+    max-width: 500px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1050;
+    border: 2px solid #ff8c00;
+}
+
+.websocket-notification.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.websocket-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.websocket-notification-content i.fa-bell {
+    font-size: 18px;
+    color: #ffd700;
+    animation: bellRing 0.5s ease-in-out;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.websocket-notification-content span {
+    flex: 1;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.websocket-notification .close-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.websocket-notification .close-btn:hover {
+    background: #f5f5f5;
+    color: #333;
+    transform: scale(1.1);
+}
+
+.websocket-notification .close-btn i {
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .websocket-notification {
+        left: 20px;
+        right: 20px;
+        transform: translateY(-100%);
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .websocket-notification.show {
+        transform: translateY(0);
+    }
 }

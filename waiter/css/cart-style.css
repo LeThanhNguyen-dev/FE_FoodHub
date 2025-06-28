@@ -286,7 +286,6 @@ body {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     max-width: 100% !important;
-    text-align: left !important;
     align-self: flex-start !important;
 }
 
