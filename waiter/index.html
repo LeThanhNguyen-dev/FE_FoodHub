@@ -91,9 +91,23 @@
                 <h4 class="mb-0" id="pageTitle">Dashboard - Ca làm việc</h4>
             </div>
             <div class="d-flex align-items-center">
-                <div class="notification-bell">
+                <div class="notification-bell" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge" id="notificationCount">0</span>
+
+                    <!-- Notification Dropdown -->
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h6>Thông báo</h6>
+                            <button class="clear-all-btn" onclick="clearAllNotifications()">Xóa tất cả</button>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="notification-empty">
+                                <i class="fas fa-bell-slash"></i>
+                                <div>Không có thông báo mới</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -316,9 +330,11 @@
         let currentWorkSchedule = null;
         let currentUserInfo = null;
         let hasWorkSchedule = false;
-
+        let notifications = [];
+        let notificationDropdownOpen = false;
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', function () {
+            updateNotificationCount();
             loadUserInfo();
             loadWorkSchedule();
         });
@@ -647,19 +663,18 @@
             updateActiveNav('dashboard');
         }
 
-
-
-
         function handleWebSocketMessage(data) {
             console.log('Received notification:', data);
             console.log('📩 data.message:', data.message);
             console.log('data.type:', data.type);
-            // updateNotificationCount();
 
-            // Hiển thị thông báo WebSocket đặc biệt
+            // Add to notification list
+            addNotificationToList(data.message, data.type || 'order');
+
+            // Show WebSocket notification popup
             showWebSocketNotification(data.message);
 
-            // Cập nhật dashboard stats nếu đang ở trang dashboard
+            // Update dashboard stats if needed
             if (hasWorkSchedule) {
                 updateDashboardStats();
             }
@@ -738,6 +753,192 @@
                 console.log('Không thể phát âm thanh thông báo:', error);
             }
         }
+
+        function updateNotificationCount() {
+            const notificationBadge = document.getElementById('notificationCount');
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            notificationBadge.textContent = unreadCount;
+            notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+            if (unreadCount > 0) {
+                notificationBadge.classList.add('notification-pulse');
+                setTimeout(() => {
+                    notificationBadge.classList.remove('notification-pulse');
+                }, 1000);
+            }
+        }
+
+        function toggleNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            const isVisible = dropdown.classList.contains('show');
+            console.log("in toggleNotificationDropdown");
+            if (isVisible) {
+                hideNotificationDropdown();
+            } else {
+                showNotificationDropdown();
+            }
+        }
+
+        // Function to show notification dropdown
+        function showNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.add('show');
+            notificationDropdownOpen = true;
+
+            // Mark all notifications as read
+            markAllNotificationsAsRead();
+
+            // Close dropdown when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', handleOutsideClick);
+            }, 100);
+        }
+
+        function hideNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.remove('show');
+            notificationDropdownOpen = false;
+
+            document.removeEventListener('click', handleOutsideClick);
+        }
+
+        // Function to handle clicking outside dropdown
+        function handleOutsideClick(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            const bell = document.querySelector('.notification-bell');
+
+            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                hideNotificationDropdown();
+            }
+        }
+
+
+        function addNotificationToList(message, type = 'order') {
+            const notification = {
+                id: Date.now(),
+                message: message,
+                type: type,
+                timestamp: new Date(),
+                read: false
+            };
+
+            // Add to beginning of array
+            notifications.unshift(notification);
+
+            // Keep only last 50 notifications
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+
+            // Update UI
+            updateNotificationsList();
+            updateNotificationCount();
+        }
+
+        // Function to update notifications list display
+        function updateNotificationsList() {
+            const listContainer = document.getElementById('notificationList');
+
+            if (notifications.length === 0) {
+                listContainer.innerHTML = `
+      <div class="notification-empty">
+        <i class="fas fa-bell-slash"></i>
+        <div>Không có thông báo mới</div>
+      </div>
+    `;
+                return;
+            }
+
+            const notificationsHTML = notifications.map(notification => {
+                const timeAgo = getTimeAgo(notification.timestamp);
+                const typeIcon = getNotificationTypeIcon(notification.type);
+
+                return `
+      <div class="notification-item ${!notification.read ? 'unread' : ''}" 
+           onclick="markNotificationAsRead(${notification.id})">
+        <div class="d-flex align-items-start">
+          <div class="notification-type-icon notification-type-${notification.type}">
+            <i class="fas ${typeIcon}"></i>
+          </div>
+          <div class="notification-content flex-grow-1">
+            <div class="notification-message">${notification.message}</div>
+            <div class="notification-time">${timeAgo}</div>
+          </div>
+        </div>
+      </div>
+    `;
+            }).join('');
+
+            listContainer.innerHTML = notificationsHTML;
+        }
+
+        // Function to get notification type icon
+        function getNotificationTypeIcon(type) {
+            const icons = {
+                'order': 'fa-utensils',
+                'system': 'fa-info-circle',
+                'alert': 'fa-exclamation-triangle',
+                'success': 'fa-check-circle'
+            };
+            return icons[type] || 'fa-bell';
+        }
+
+        // Function to get time ago string
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - timestamp) / 1000);
+
+            if (diffInSeconds < 60) {
+                return 'Vừa xong';
+            } else if (diffInSeconds < 3600) {
+                const minutes = Math.floor(diffInSeconds / 60);
+                return `${minutes} phút trước`;
+            } else if (diffInSeconds < 86400) {
+                const hours = Math.floor(diffInSeconds / 3600);
+                return `${hours} giờ trước`;
+            } else {
+                const days = Math.floor(diffInSeconds / 86400);
+                return `${days} ngày trước`;
+            }
+        }
+
+        // Function to mark notification as read
+        function markNotificationAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                updateNotificationsList();
+                updateNotificationCount();
+            }
+        }
+
+        // Function to mark all notifications as read
+        function markAllNotificationsAsRead() {
+            notifications.forEach(notification => {
+                notification.read = true;
+            });
+            updateNotificationsList();
+            updateNotificationCount();
+        }
+
+        // Function to clear all notifications
+        function clearAllNotifications() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả thông báo?')) {
+                notifications = [];
+                updateNotificationsList();
+                updateNotificationCount();
+            }
+        }
+
+        window.addEventListener('beforeunload', function () {
+            disconnectWebSocket();
+
+            // Cleanup AudioContext
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close();
+            }
+        });
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
