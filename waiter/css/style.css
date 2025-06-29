@@ -173,7 +173,7 @@ body {
 
 .dashboard-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 2rem;
     padding: 2rem;
 }
@@ -182,17 +182,20 @@ body {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     overflow: hidden;
     position: relative;
 }
 
-
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
 
 .card-header {
-    background: linear-gradient(135deg, var(--primary), #e09900);
-    color: white;
-    padding: 1.5rem;
+    background: white;
+    color: var(--dark);
+    padding: 1.5rem 1.5rem 0.5rem;
     border: none;
     position: relative;
     overflow: hidden;
@@ -205,36 +208,45 @@ body {
     right: -50%;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.02);
     transform: rotate(45deg);
-    transition: all 0.3s;
+    transition: all 0.3s ease;
 }
 
-
+.card:hover .card-header::before {
+    background: rgba(0, 0, 0, 0.05);
+}
 
 .card-header h5 {
     margin: 0;
     font-weight: 700;
     position: relative;
     z-index: 1;
+    font-size: 1.1rem;
+    color: var(--dark);
 }
 
 .card-body {
-    padding: 1.5rem;
+    padding: 0.5rem 1.5rem 1.5rem;
     background: white;
 }
 
 .stats-number {
     font-size: 3rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--dark);
     margin-bottom: 0.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .urgent-number {
     color: var(--danger);
     animation: pulse 2s infinite;
+}
+
+.clickable-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
 }
 
 @keyframes pulse {
@@ -324,7 +336,7 @@ body {
     background: white;
     border-radius: 20px;
     padding: 2rem;
-    margin: 2rem;
+    margin: 1rem;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
@@ -389,15 +401,6 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.table-number {
-    background: var(--primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    display: inline-block;
-    margin-right: 1rem;
-}
 
 .order-time {
     color: #666;

@@ -21,7 +21,7 @@ async function showReports() {
 // Function to load shift report data
 async function loadShiftReport() {
     const dynamicContent = document.getElementById('dynamicContent');
-    
+
     // Show loading state
     dynamicContent.innerHTML = `
         <div class="text-center py-5">
@@ -36,7 +36,7 @@ async function loadShiftReport() {
         // Get work shift orders using area and startTime from currentWorkSchedule
         const area = currentWorkSchedule.area;
         const startTime = currentWorkSchedule.startTime;
-        
+
         const data = await apiFetch(`/orders/waiter/work-shift-orders?area=${encodeURIComponent(area)}&startTime=${encodeURIComponent(startTime)}&size=100`, {
             method: 'GET',
         });
@@ -65,7 +65,7 @@ async function loadShiftReport() {
 function displayShiftReport(orderData) {
     const orders = orderData.content || [];
     const stats = calculateShiftStats(orders);
-    
+
     const dynamicContent = document.getElementById('dynamicContent');
     dynamicContent.innerHTML = `
         <div class="shift-report-container">
@@ -284,6 +284,16 @@ function displayShiftReport(orderData) {
         .filter-controls select {
             margin-left: 10px;
         }
+        
+        .shift-report-container .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid;
+            transition: all 0.2s ease;
+        }
 
         @media (max-width: 768px) {
             .stat-number { font-size: 1.4rem; }
@@ -308,16 +318,16 @@ function calculateShiftStats(orders) {
     orders.forEach(order => {
         // Calculate total revenue
         stats.totalRevenue += parseFloat(order.totalAmount || 0);
-        
+
         // Count unique tables
         if (order.tableNumber) {
             stats.totalTables.add(order.tableNumber);
         }
-        
+
         // Count status distribution
         const status = order.status || 'UNKNOWN';
         stats.statusCounts[status] = (stats.statusCounts[status] || 0) + 1;
-        
+
         // Count top items
         if (order.orderItems) {
             order.orderItems.forEach(item => {
@@ -340,7 +350,7 @@ function calculateShiftStats(orders) {
 function generateStatusChart(statusCounts) {
     const statusLabels = {
         'PENDING': 'Chờ xử lý',
-        'PREPARING': 'Đang chuẩn bị', 
+        'PREPARING': 'Đang chuẩn bị',
         'READY': 'Sẵn sàng',
         'SERVED': 'Đã phục vụ',
         'COMPLETED': 'Hoàn thành',
@@ -361,7 +371,7 @@ function generateStatusChart(statusCounts) {
             </div>
         `;
     }
-    
+
     return html || '<p class="text-muted">Không có dữ liệu</p>';
 }
 
@@ -369,7 +379,7 @@ function generateStatusChart(statusCounts) {
 function generateTopItemsChart(topItems) {
     // Sort items by quantity and take top 5
     const sortedItems = Object.entries(topItems)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5);
 
     let html = '';
@@ -381,7 +391,7 @@ function generateTopItemsChart(topItems) {
             </div>
         `;
     });
-    
+
     return html || '<p class="text-muted">Không có dữ liệu</p>';
 }
 
@@ -397,14 +407,14 @@ function generateOrderRows(orders) {
         const statusLabels = {
             'PENDING': 'Chờ xử lý',
             'PREPARING': 'Đang chuẩn bị',
-            'READY': 'Sẵn sàng', 
+            'READY': 'Sẵn sàng',
             'SERVED': 'Đã phục vụ',
             'COMPLETED': 'Hoàn thành',
             'CANCELLED': 'Đã hủy',
             'CONFIRMED': 'Đã xác nhận'
         };
-        
-        const items = order.orderItems ? order.orderItems.map(item => 
+
+        const items = order.orderItems ? order.orderItems.map(item =>
             `${item.quantity}x ${item.menuItemName}`
         ).join(', ') : 'Không có món';
 
@@ -430,7 +440,7 @@ function generateOrderRows(orders) {
 function filterOrders() {
     const selectedStatus = document.getElementById('statusFilter').value;
     const rows = document.querySelectorAll('#ordersTableBody tr');
-    
+
     rows.forEach(row => {
         const rowStatus = row.getAttribute('data-status');
         if (!selectedStatus || rowStatus === selectedStatus) {
