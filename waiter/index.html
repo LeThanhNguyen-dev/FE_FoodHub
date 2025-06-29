@@ -146,140 +146,50 @@
 
             <!-- Dashboard Cards -->
             <div class="dashboard-cards">
-                <!-- Urgent Orders Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Đơn hàng cấp bách</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-exclamation-triangle management-icon"
-                            style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"></i>
-                        <div class="stats-number urgent-number">3</div>
-                        <p class="text-muted mb-3">Cần xử lý ngay</p>
-                        <button class="btn btn-action btn-urgent" onclick="showUrgentOrders()">
-                            <i class="fas fa-bolt me-2"></i>Xử lý ngay
-                        </button>
-                    </div>
-                </div>
 
                 <!-- Active Orders Card -->
-                <div class="card">
+                <div class="card clickable-card" onclick="handleNavClick('orders')">
                     <div class="card-header">
                         <h5><i class="fas fa-clipboard-list me-2"></i>Đơn hàng đang xử lý</h5>
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-clipboard-list"
                             style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
-                        <div class="stats-number">12</div>
-                        <p class="text-muted mb-3">Đơn đang phục vụ</p>
-                        <button class="btn btn-action" onclick="handleNavClick('orders')">
-                            <i class="fas fa-list me-2"></i>Xem chi tiết
-                        </button>
+                        <div class="stats-number">0</div>
+                        <p class="text-muted mb-0">Đơn đang phục vụ</p>
                     </div>
                 </div>
 
                 <!-- Tables Management Card -->
-                <div class="card">
+                <div class="card clickable-card" onclick="handleNavClick('tables')">
                     <div class="card-header">
                         <h5><i class="fas fa-chair me-2"></i>Quản lý bàn</h5>
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-chair"
                             style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
-                        <div class="stats-number">8/15</div>
-                        <p class="text-muted mb-3">Bàn đang phục vụ</p>
-                        <button class="btn btn-action" onclick="handleNavClick('tables')">
-                            <i class="fas fa-eye me-2"></i>Xem bàn
-                        </button>
+                        <div class="stats-number">0/0</div>
+                        <p class="text-muted mb-0">Bàn đang phục vụ</p>
                     </div>
                 </div>
 
                 <!-- Daily Sales Card -->
-                <div class="card">
+                <div class="card clickable-card" onclick="handleNavClick('reports')">
                     <div class="card-header">
                         <h5><i class="fas fa-money-bill-wave me-2"></i>Doanh thu ca làm</h5>
                     </div>
                     <div class="card-body text-center">
                         <i class="fas fa-money-bill-wave"
                             style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
-                        <div class="stats-number" style="color: var(--success);">₫850K</div>
-                        <p class="text-muted mb-3">Từ 15 đơn hàng</p>
-                        <button class="btn btn-action" onclick="handleNavClick('reports')">
-                            <i class="fas fa-chart-bar me-2"></i>Xem báo cáo
-                        </button>
+                        <div class="stats-number" style="color: var(--success);">₫0K</div>
+                        <p class="text-muted mb-0">Từ 0 đơn hàng</p>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Orders -->
             <div class="orders-section">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5><i class="fas fa-clock me-2 text-primary"></i>Đơn hàng gần đây</h5>
-                    <button class="btn btn-outline-primary btn-sm" onclick="refreshOrders()">
-                        <i class="fas fa-sync-alt me-1"></i>Làm mới
-                    </button>
-                </div>
 
-                <div class="order-item order-urgent">
-                    <div class="order-info">
-                        <div class="order-number">#ORD-001</div>
-                        <div class="mb-2">
-                            <span class="table-number">Bàn 5</span>
-                            <span class="urgent-badge">URGENT - 15 phút</span>
-                        </div>
-                        <div class="order-time">2 x Phở Bò, 1 x Cơm Tấm - 14:25</div>
-                    </div>
-                    <div class="d-flex flex-column gap-2">
-                        <span class="status-badge status-ready">Sẵn sàng phục vụ</span>
-                        <button class="btn btn-sm btn-success" onclick="serveOrder('ORD-001')">
-                            <i class="fas fa-check me-1"></i>Phục vụ
-                        </button>
-                    </div>
-                </div>
-
-                <div class="order-item">
-                    <div class="order-info">
-                        <div class="order-number">#ORD-002</div>
-                        <div class="mb-2">
-                            <span class="table-number">Bàn 3</span>
-                        </div>
-                        <div class="order-time">1 x Bún Chả, 2 x Trà đá - 14:30</div>
-                    </div>
-                    <div class="d-flex flex-column gap-2">
-                        <span class="status-badge status-preparing">Đang chuẩn bị</span>
-                        <button class="btn btn-sm btn-info" onclick="checkOrderStatus('ORD-002')">
-                            <i class="fas fa-eye me-1"></i>Theo dõi
-                        </button>
-                    </div>
-                </div>
-
-                <div class="order-item">
-                    <div class="order-info">
-                        <div class="order-number">#ORD-003</div>
-                        <div class="mb-2">
-                            <span class="table-number">Bàn 7</span>
-                        </div>
-                        <div class="order-time">3 x Bánh mì, 1 x Cà phê - 14:35</div>
-                    </div>
-                    <div class="d-flex flex-column gap-2">
-                        <span class="status-badge status-pending">Chờ xử lý</span>
-                        <button class="btn btn-sm btn-warning" onclick="processOrder('ORD-003')">
-                            <i class="fas fa-play me-1"></i>Xử lý
-                        </button>
-                    </div>
-                </div>
-
-                <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="handleNavClick('menu')">
-                        <i class="fas fa-plus me-2"></i>Nhận đơn mới
-                    </button>
-                    <button class="quick-action-btn" onclick="callKitchen()">
-                        <i class="fas fa-phone me-2"></i>Gọi bếp
-                    </button>
-                    <button class="quick-action-btn" onclick="requestSupport()">
-                        <i class="fas fa-hands-helping me-2"></i>Yêu cầu hỗ trợ
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -568,8 +478,6 @@
 
         // Function to display work schedule data
         function displayWorkSchedule(schedule) {
-            // Simplified welcome message - no greeting or name
-
             // Update shift information using instant format
             document.getElementById('shiftDate').innerHTML =
                 `<i class="fas fa-calendar me-2"></i>Ngày: ${formatInstantToDate(schedule.date)}`;
@@ -584,7 +492,13 @@
             const areaDisplay = schedule.area || schedule.shift || 'Đang cập nhật';
             document.getElementById('shiftArea').innerHTML =
                 `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${areaDisplay}`;
+
+            // Load active orders count after displaying work schedule
+            loadActiveOrdersCount();
+            loadTablesCount();
+            loadShiftRevenue();
         }
+
 
         // Function to show error message
         function showError(errorText) {
@@ -929,6 +843,242 @@
                 notifications = [];
                 updateNotificationsList();
                 updateNotificationCount();
+            }
+        }
+
+        async function loadActiveOrdersCount() {
+            if (!currentWorkSchedule) {
+                console.log('No work schedule available');
+                return;
+            }
+
+            try {
+                // Construct API URL
+                const apiUrl = `/orders/waiter/work-shift-orders?area=${encodeURIComponent(currentWorkSchedule.area)}&startTime=${encodeURIComponent(currentWorkSchedule.startTime)}`;
+
+                console.log('Calling API:', apiUrl);
+
+                const data = await apiFetch(apiUrl, {
+                    method: 'GET',
+                });
+
+                console.log('API Response:', data);
+
+                if (data.code === 0 && data.result) {
+                    // Count active orders (not CANCELLED or COMPLETED)
+                    let activeOrdersCount = 0;
+
+                    // Handle API response structure: data.result.content is the array
+                    if (data.result.content && Array.isArray(data.result.content)) {
+                        activeOrdersCount = data.result.content.filter(order => {
+                            const status = order.status ? order.status.toUpperCase() : '';
+                            return status !== 'CANCELLED' && status !== 'COMPLETED';
+                        }).length;
+
+                        console.log('Orders in content:', data.result.content);
+                        console.log('Filtered orders:', data.result.content.map(o => ({ id: o.id, status: o.status })));
+                    }
+                    // Fallback: Handle if result is direct array
+                    else if (Array.isArray(data.result)) {
+                        activeOrdersCount = data.result.filter(order => {
+                            const status = order.status ? order.status.toUpperCase() : '';
+                            return status !== 'CANCELLED' && status !== 'COMPLETED';
+                        }).length;
+                    }
+
+                    console.log('Active orders count:', activeOrdersCount);
+                    console.log('Orders data structure:', data.result);
+
+                    // Update the Active Orders Card display
+                    const activeOrdersCard = document.querySelector('.card:nth-child(1) .stats-number');
+                    if (activeOrdersCard) {
+                        activeOrdersCard.textContent = activeOrdersCount;
+                        console.log('Updated active orders display to:', activeOrdersCount);
+                    } else {
+                        console.log('Could not find active orders card element');
+                    }
+
+                } else {
+                    console.error('API call failed:', data);
+                }
+            } catch (error) {
+                console.error('Error loading active orders:', error);
+            }
+        }
+
+        async function loadTablesCount() {
+            if (!currentWorkSchedule) {
+                console.log('No work schedule available for tables');
+                return;
+            }
+
+            try {
+                // Construct API URL for tables
+                const apiUrl = `/tables?area=${encodeURIComponent(currentWorkSchedule.area)}`;
+
+                console.log('Calling Tables API:', apiUrl);
+
+                const data = await apiFetch(apiUrl, {
+                    method: 'GET',
+                });
+
+                console.log('Tables API Response:', data);
+
+                if (data.code === 0 && data.result) {
+                    let totalTables = 0;
+                    let occupiedTables = 0;
+                    let availableTables = 0;
+
+                    // Handle API response - check for content array or direct array
+                    let tablesData = [];
+                    if (data.result.content && Array.isArray(data.result.content)) {
+                        tablesData = data.result.content;
+                    } else if (Array.isArray(data.result)) {
+                        tablesData = data.result;
+                    }
+
+                    // Count tables by status
+                    tablesData.forEach(table => {
+                        totalTables++;
+                        const status = table.status ? table.status.toUpperCase() : '';
+                        if (status === 'OCCUPIED') {
+                            occupiedTables++;
+                        } else if (status === 'AVAILABLE') {
+                            availableTables++;
+                        }
+                    });
+
+                    console.log('Tables count:', {
+                        total: totalTables,
+                        occupied: occupiedTables,
+                        available: availableTables
+                    });
+                    console.log('Tables data:', tablesData.map(t => ({ id: t.id, status: t.status })));
+
+                    // Update the Tables Management Card display
+                    const tablesCard = document.querySelector('.card:nth-child(2) .stats-number');
+                    if (tablesCard) {
+                        tablesCard.textContent = `${occupiedTables}/${totalTables}`;
+                        console.log('Updated tables display to:', `${occupiedTables}/${totalTables}`);
+                    } else {
+                        console.log('Could not find tables card element');
+                    }
+
+                } else {
+                    console.error('Tables API call failed:', data);
+                }
+            } catch (error) {
+                console.error('Error loading tables:', error);
+            }
+        }
+
+        async function loadShiftRevenue() {
+            if (!currentWorkSchedule) {
+                console.log('No work schedule available for revenue calculation');
+                return;
+            }
+
+            try {
+                // Construct API URL
+                const apiUrl = `/orders/waiter/work-shift-orders?area=${encodeURIComponent(currentWorkSchedule.area)}&startTime=${encodeURIComponent(currentWorkSchedule.startTime)}`;
+
+                console.log('Calling Revenue API:', apiUrl);
+
+                const data = await apiFetch(apiUrl, {
+                    method: 'GET',
+                });
+
+                console.log('Revenue API Response:', data);
+
+                if (data.code === 0 && data.result) {
+                    let totalRevenue = 0;
+                    let completedOrdersCount = 0;
+
+                    // Handle API response structure: data.result.content is the array
+                    let ordersData = [];
+                    if (data.result.content && Array.isArray(data.result.content)) {
+                        ordersData = data.result.content;
+                    } else if (Array.isArray(data.result)) {
+                        ordersData = data.result;
+                    }
+
+                    // Calculate revenue from all orders except cancelled ones
+                    ordersData.forEach(order => {
+                        const status = order.status ? order.status.toUpperCase() : '';
+                        // Count all orders that are not cancelled
+                        if (status !== 'CANCELLED') {
+                            completedOrdersCount++;
+                            // Add order total to revenue
+                            if (order.totalAmount) {
+                                totalRevenue += order.totalAmount;
+                            }
+                        }
+                    });
+
+                    console.log('Revenue calculation:', {
+                        totalRevenue: totalRevenue,
+                        validOrders: completedOrdersCount,
+                        totalOrders: ordersData.length,
+                        orderStatuses: ordersData.map(o => ({ id: o.id, status: o.status, totalAmount: o.totalAmount }))
+                    });
+
+                    // Update the Daily Sales Card display
+                    const revenueCard = document.querySelector('.card:nth-child(3) .stats-number');
+                    const revenueDescription = document.querySelector('.card:nth-child(3) .text-muted');
+
+                    if (revenueCard) {
+                        // Format revenue as Vietnamese currency
+                        const formattedRevenue = formatCurrency(totalRevenue);
+                        revenueCard.textContent = formattedRevenue;
+                        console.log('Updated revenue display to:', formattedRevenue);
+                    }
+
+                    if (revenueDescription) {
+                        revenueDescription.textContent = `Từ ${completedOrdersCount} đơn hàng`;
+                        console.log('Updated revenue description to valid orders:', completedOrdersCount);
+                    }
+
+                } else {
+                    console.error('Revenue API call failed:', data);
+                    // Set default values on error
+                    updateRevenueDisplayOnError();
+                }
+            } catch (error) {
+                console.error('Error loading revenue:', error);
+                // Set default values on error
+                updateRevenueDisplayOnError();
+            }
+        }
+
+        // Hàm mới: Format tiền tệ theo định dạng Việt Nam
+        function formatCurrency(amount) {
+            if (amount === 0) {
+                return '₫0';
+            }
+
+            // Convert to thousands (K) or millions (M) for better display
+            if (amount >= 1000000) {
+                const millions = (amount / 1000000).toFixed(1);
+                return `₫${millions}M`;
+            } else if (amount >= 1000) {
+                const thousands = (amount / 1000).toFixed(0);
+                return `₫${thousands}K`;
+            } else {
+                return `₫${amount.toLocaleString('vi-VN')}`;
+            }
+        }
+
+        // Hàm mới: Cập nhật hiển thị doanh thu khi có lỗi
+        function updateRevenueDisplayOnError() {
+            const revenueCard = document.querySelector('.card:nth-child(4) .stats-number');
+            const revenueDescription = document.querySelector('.card:nth-child(4) .text-muted');
+
+            if (revenueCard) {
+                revenueCard.textContent = '₫0';
+            }
+
+            if (revenueDescription) {
+                revenueDescription.textContent = 'Đang cập nhật...';
             }
         }
 
