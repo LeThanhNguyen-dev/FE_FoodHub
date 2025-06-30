@@ -360,10 +360,10 @@ function renderOrders(orders) {
                 <strong>#${order.id}</strong>
             </td>
             <td>
-                <span class="table-number-badge">
+                <div class="table-number-badge">
                     <i class="fas fa-chair me-1"></i>
                     ${order.tableNumber ? `Bàn ${order.tableNumber}` : 'Mang về'}
-                </span>
+                </div>
             </td>
             <td>
                 <div class="order-time">
@@ -378,8 +378,7 @@ function renderOrders(orders) {
                 </div>
             </td>
             <td>
-                <span class="status-badge-enhanced ${getStatusBadgeClass(order.status)}">
-                    ${getStatusIcon(order.status)}
+                <span class="status-badge status-${order.status.toLowerCase()}">
                     ${getStatusText(order.status)}
                 </span>
             </td>
@@ -391,7 +390,7 @@ function renderOrders(orders) {
             </td>
             <td>
                 <div class="action-btn-group">
-                    <button class="action-btn btn-info" 
+                    <button class="action-btn btn-details" 
                             onclick="event.stopPropagation(); viewOrderDetails(${order.id})"
                             title="Xem chi tiết">
                         <i class="fas fa-eye"></i>
@@ -411,7 +410,7 @@ function createOrderActionButtons(order) {
     // Nút xác nhận cho đơn hàng PENDING
     if (order.status === 'PENDING') {
         buttons += `
-            <button class="action-btn btn-success" 
+            <button class="action-btn btn-confirmed" 
                     onclick="event.stopPropagation(); confirmOrder(${order.id})"
                     title="Xác nhận đơn hàng">
                 <i class="fas fa-check"></i>
@@ -422,7 +421,7 @@ function createOrderActionButtons(order) {
     // Nút hoàn thành cho đơn hàng READY
     if (order.status === 'READY') {
         buttons += `
-            <button class="action-btn btn-primary" 
+            <button class="action-btn btn-complete" 
                     onclick="event.stopPropagation(); completeOrder(${order.id})"
                     title="Hoàn thành đơn hàng">
                 <i class="fas fa-check-double"></i>
@@ -433,7 +432,7 @@ function createOrderActionButtons(order) {
     // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
     if (order.status === 'COMPLETED') {
         buttons += `
-            <button class="action-btn btn-info checkout-btn" 
+            <button class="action-btn btn-checkout" 
                     data-order='${JSON.stringify(order)}'
                     onclick="event.stopPropagation(); handleCheckoutClick(this)"
                     title="Thanh toán đơn hàng">
@@ -445,7 +444,7 @@ function createOrderActionButtons(order) {
     // Nút hủy đơn hàng - hiển thị cho các trạng thái có thể hủy
     if (['PENDING', 'CONFIRMED'].includes(order.status)) {
         buttons += `
-            <button class="action-btn btn-danger" 
+            <button class="action-btn btn-cancel" 
                     onclick="event.stopPropagation(); cancelOrder(${order.id})"
                     title="Hủy đơn hàng">
                 <i class="fas fa-times"></i>

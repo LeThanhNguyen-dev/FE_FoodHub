@@ -1,9 +1,9 @@
 .cart-sidebar {
     position: fixed !important;
-    top: 80px !important; 
+    top: 60px !important; 
     right: 0 !important;
     width: 400px !important;
-    height: calc(100vh - 70px) !important;
+    height: calc(100vh - 60px) !important;
     background: #fff !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 999 !important;

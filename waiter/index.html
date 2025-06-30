@@ -195,11 +195,11 @@
                         Đơn hàng gần đây
                     </h5>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary" onclick="refreshDashboardOrders()">
+                        <button class="btn btn-outline-success" onclick="refreshDashboardOrders()">
                             <i class="fas fa-sync-alt me-1"></i>
                             Làm mới
                         </button>
-                        <button class="btn btn-sm btn-primary" onclick="showOrders()">
+                        <button class="btn btn-primary" onclick="showOrders()">
                             <i class="fas fa-eye me-1"></i>
                             Xem tất cả
                         </button>
@@ -1175,11 +1175,51 @@
             }
         }
 
-        function updateDashboardStats() {
+        function updateDashboardStats(orders = []) {
             if (hasWorkSchedule) {
+                // Cập nhật stats từ orders được truyền vào
+                updateOrdersStats(orders);
+
+                // Các stats khác
                 loadActiveOrdersCount();
                 loadTablesCount();
-                loadShiftRevenue(); // Thêm dòng này
+                loadShiftRevenue();
+            }
+        }
+
+        function updateOrdersStats(orders) {
+            // Đếm số lượng đơn hàng theo trạng thái
+            const stats = {
+                pending: 0,
+                confirmed: 0,
+                ready: 0,
+                completed: 0
+            };
+
+            orders.forEach(order => {
+                const status = order.status.toLowerCase();
+                if (stats.hasOwnProperty(status)) {
+                    stats[status]++;
+                }
+            });
+
+            // Cập nhật UI
+            updateStatElement('pendingOrdersCount', stats.pending);
+            updateStatElement('confirmedOrdersCount', stats.confirmed);
+            updateStatElement('readyOrdersCount', stats.ready);
+            updateStatElement('completedOrdersCount', stats.completed);
+        }
+
+        function updateStatElement(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+
+                // Thêm animation effect khi cập nhật
+                element.classList.add('stat-updated');
+                setTimeout(() => {
+                    element.classList.remove('stat-updated');
+                }, 300);
             }
         }
 
@@ -1218,13 +1258,26 @@
 
                 // Update dashboard with orders
                 renderDashboardOrders(orders);
+
+                // THAY ĐỔI: Truyền orders vào updateDashboardStats
                 updateDashboardStats(orders);
+
+                // THÊM: Hoặc có thể load full stats nếu muốn độ chính xác cao hơn
+                // await loadFullOrdersStats();
 
             } catch (error) {
                 console.error('Error loading dashboard orders:', error);
                 showDashboardError(error.message);
             }
         }
+
+        function initDashboardStats() {
+            updateStatElement('pendingOrdersCount', 0);
+            updateStatElement('confirmedOrdersCount', 0);
+            updateStatElement('readyOrdersCount', 0);
+            updateStatElement('completedOrdersCount', 0);
+        }
+
 
         // Render orders in dashboard
         function renderDashboardOrders(orders) {
@@ -1268,7 +1321,7 @@
                 </div>
                 <div class="order-info">
                     <div class="order-details">
-                        <span class="order-table">
+                        <span class="table-number-badge">
                             <i class="fas fa-chair me-1"></i>
                             ${order.tableNumber ? `Bàn ${order.tableNumber}` : 'Mang về'}
                         </span>
@@ -1277,7 +1330,7 @@
                             ${formatCurrency(order.totalAmount)}
                         </span>
                     </div>
-                    <span class="order-status-mini ${order.status.toLowerCase()}">
+                    <span class="status-badge status-${order.status.toLowerCase()}">
                         ${getStatusText(order.status)}
                     </span>
                 </div>

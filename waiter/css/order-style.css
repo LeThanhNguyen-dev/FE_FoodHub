@@ -37,33 +37,58 @@
   background-color: #f8f9fa;
 }
 
-.table-number-badge {
-  background: #e3f2fd;
-  color: #1976d2;
-  padding: 4px 8px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-}
 
-.order-time {
-  font-size: 14px;
-  color: #666;
-}
 
 .order-amount {
   font-weight: 600;
   color: #2e7d32;
 }
 
-.status-badge-enhanced {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
+.status-badge {
+  padding: 6px 14px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border: 2px solid !important;
 }
 
+.status-confirmed {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #3b82f6 !important;
+}
+
+.status-preparing {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #f59e0b !important;
+}
+
+.status-ready {
+  background: #d1fae5 !important;
+  color: #047857 !important;
+  border-color: #10b981 !important;
+}
+
+.status-completed {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #22c55e !important;
+}
+
+.status-pending {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border-color: #9ca3af !important;
+}
+
+.status-cancelled {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border-color: #ef4444 !important;
+}
 
 .order-type-badge {
   padding: 4px 8px;
@@ -87,29 +112,7 @@
   color: #1976d2;
 }
 
-.action-btn-group {
-  display: flex;
-  gap: 5px;
-}
 
-.action-btn {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.2s ease;
-}
-
-.action-btn.btn-info {
-  background: #17a2b8;
-  color: white;
-}
-
-.action-btn:hover {
-  opacity: 0.8;
-  transform: scale(1.05);
-}
 
 .orders-loading {
   text-align: center;
@@ -368,6 +371,3 @@
 .pagination-jump .form-control {
   transition: all 0.2s ease-in-out;
 }
-
-
-

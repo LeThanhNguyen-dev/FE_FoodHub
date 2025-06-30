@@ -748,19 +748,6 @@ body {
     font-size: 11px !important;
 }
 
-.order-actions .btn-print {
-    background: #f3f4f6 !important;
-    color: #374151 !important;
-    border-color: #9ca3af !important;
-    flex: 0 0 36px !important;
-    gap: 0 !important;
-}
-
-.order-actions .btn-print:hover {
-    background: #e5e7eb !important;
-    border-color: #6b7280 !important;
-}
-
 .order-actions .btn-preparing {
     background: #fef3c7 !important;
     border-color: #f59e0b !important;
