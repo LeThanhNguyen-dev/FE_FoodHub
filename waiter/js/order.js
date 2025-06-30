@@ -45,7 +45,7 @@ async function showOrders() {
         renderOrdersTemplate();
 
         // Initialize and load orders after template is loaded
-        await loadOrders();
+        await loadOrders(20);
 
         // Update navigation active state
         updateActiveNavigation('showOrders()');
@@ -123,7 +123,7 @@ let totalOrderElements = 0;
 let currentOrderForAddItems = null;
 
 // Load orders from API with filters and pagination
-async function loadOrders() {
+async function loadOrders(pageSize = 20) {
     try {
         // Get filter values
         const orderStatusFilter = document.getElementById('orderStatusFilter');
@@ -135,7 +135,6 @@ async function loadOrders() {
         const tableNumber = tableNumberFilter ? tableNumberFilter.value : ''; // Đã là tableNumber
         const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
         const sortDirection = sortDirectionOrderFilter ? sortDirectionOrderFilter.value || 'DESC' : 'DESC';
-        const pageSize = '20';
 
         // Build query parameters
         const params = new URLSearchParams();
