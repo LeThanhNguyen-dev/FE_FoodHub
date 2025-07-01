@@ -20,7 +20,7 @@
         <i class="fa fa-utensils"></i>
         <span class="brand-text">FoodHub</span>
       </h3>
-      <small>Dashboard Chef</small>
+      <small>Kitchen Panel </small>
     </div>
 
     <nav class="sidebar-nav flex-fill">
@@ -146,8 +146,52 @@
         </div>
       </div>
 
-    </div>
+      <div class="orders-recent-section" id="dashboardOrdersSection">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Đơn hàng gần đây
+          </h5>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-success" onclick="refreshDashboardOrders()">
+              <i class="fas fa-sync-alt me-1"></i>
+              Làm mới
+            </button>
+            <button class="btn btn-primary" onclick="showOrders()">
+              <i class="fas fa-eye me-1"></i>
+              Xem tất cả
+            </button>
+          </div>
+        </div>
 
+        <!-- Orders List -->
+        <div class="dashboard-orders-list" id="dashboardOrdersList">
+          <!-- Loading state -->
+          <div class="dashboard-orders-loading" id="dashboardOrdersLoading">
+            <div class="d-flex justify-content-center align-items-center py-4">
+              <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <span>Đang tải đơn hàng...</span>
+            </div>
+          </div>
+
+          <!-- Orders will be rendered here -->
+          <div class="dashboard-orders-content" id="dashboardOrdersContent" style="display: none;">
+            <!-- Orders list will be populated by JavaScript -->
+          </div>
+
+          <!-- Empty state -->
+          <div class="dashboard-orders-empty" id="dashboardOrdersEmpty" style="display: none;">
+            <div class="text-center py-4">
+              <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+              <h6 class="text-muted">Chưa có đơn hàng nào</h6>
+              <p class="text-muted small">Đơn hàng mới sẽ hiển thị ở đây</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- No Work Schedule Message -->
     <div id="noWorkScheduleMessage" style="display: none; text-align: center; padding: 50px;">
       <div class="alert alert-warning" role="alert" style="max-width: 600px; margin: 0 auto;">
@@ -187,6 +231,9 @@
       <!-- Content will be loaded here dynamically -->
     </div>
   </div>
+
+
+
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -228,6 +275,7 @@
       updateNotificationCount();
       loadUserInfo();
       loadWorkSchedule();
+
     });
 
     // Function to load user information from API
@@ -308,6 +356,10 @@
         } else {
           throw new Error(data.message || 'Invalid response format');
         }
+        if (document.getElementById('dashboardOrdersSection')) {
+          console.log('init order');
+          initDashboardOrders();
+        }
       } catch (error) {
         console.error('Error loading work schedule:', error);
         handleWorkScheduleError(error);
@@ -381,7 +433,6 @@
 
     // Function to display work schedule data
     function displayWorkSchedule(schedule) {
-
       // Parse and format date
       const scheduleDate = new Date(schedule.date);
       const formattedDate = scheduleDate.toLocaleDateString('vi-VN', {
@@ -416,7 +467,9 @@
       const shiftIcon = getShiftIcon(schedule.shift);
       document.getElementById('shiftType').innerHTML =
         `<i class="fas fa-${shiftIcon} me-2"></i>Loại ca: ${shiftTypeText}`;
+
     }
+
 
 
     // Function to get shift type text in Vietnamese
@@ -509,6 +562,7 @@
       // Update active navigation
       updateActiveNav('dashboard');
     }
+
 
 
     // Placeholder functions for other navigation items
@@ -879,6 +933,196 @@
       }
     }
 
+    function initDashboardOrders() {
+      loadDashboardOrders();
+    }
+
+
+    // Load orders for dashboard (recent orders only)
+    async function loadDashboardOrders() {
+      try {
+        showDashboardLoading();
+
+        // Build query parameters for recent orders
+        const params = new URLSearchParams();
+        params.append('page', '0');
+        params.append('size', '10'); // Only show 10 recent orders
+        params.append('orderBy', 'createdAt');
+        params.append('sort', 'DESC');
+
+        if (currentWorkSchedule && currentWorkSchedule.startTime) {
+          params.append('startTime', currentWorkSchedule.startTime);
+        }
+
+        // Fetch orders
+        const data = await apiFetch(`/orders/chef/work-shift-orders?${params.toString()}`, {
+          method: 'GET'
+        });
+
+        const orderPage = data.result;
+        const orders = orderPage.content || [];
+
+        // Update dashboard with orders
+        renderDashboardOrders(orders);
+
+        // THAY ĐỔI: Truyền orders vào updateDashboardStats
+        updateDashboardStats(orders);
+
+        // THÊM: Hoặc có thể load full stats nếu muốn độ chính xác cao hơn
+        // await loadFullOrdersStats();
+
+      } catch (error) {
+        console.error('Error loading dashboard orders:', error);
+        showDashboardError(error.message);
+      }
+    }
+
+
+
+    // Render orders in dashboard
+    function renderDashboardOrders(orders) {
+      const loadingElement = document.getElementById('dashboardOrdersLoading');
+      const contentElement = document.getElementById('dashboardOrdersContent');
+      const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+      // Hide loading
+      if (loadingElement) {
+        loadingElement.style.display = 'none';
+      }
+
+      if (orders.length === 0) {
+        // Show empty state
+        if (contentElement) {
+          contentElement.style.display = 'none';
+        }
+        if (emptyElement) {
+          emptyElement.style.display = 'block';
+        }
+        return;
+      }
+
+      // Show content
+      if (emptyElement) {
+        emptyElement.style.display = 'none';
+      }
+      if (contentElement) {
+        contentElement.style.display = 'block';
+
+        // Render orders
+        contentElement.innerHTML = orders.map(order => `
+            <div class="dashboard-order-item ${order.status.toLowerCase()}" 
+                 onclick="viewOrderDetails(${order.id})">
+                <div class="order-header">
+                    <span class="order-id">#${order.id}</span>
+                    <span class="order-time">
+                        <i class="fas fa-clock me-1"></i>
+                        ${formatDateTime(order.createdAt)}
+                    </span>
+                </div>
+                <div class="order-info">
+                    <div class="order-details">
+                        <span class="table-number-badge">
+                            <i class="fas fa-chair me-1"></i>
+                            ${order.tableNumber ? `Bàn ${order.tableNumber}` : 'Mang về'}
+                        </span>
+                        <span class="order-amount">
+                            <i class="fas fa-money-bill me-1"></i>
+                            ${formatCurrency(order.totalAmount)}
+                        </span>
+                    </div>
+                    <span class="status-badge status-${order.status.toLowerCase()}">
+                        ${statusTranslations[order.status] || order.status}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+      }
+    }
+
+    function showDashboardLoading() {
+      const loadingElement = document.getElementById('dashboardOrdersLoading');
+      const contentElement = document.getElementById('dashboardOrdersContent');
+      const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+      if (loadingElement) {
+        loadingElement.style.display = 'block';
+      }
+      if (contentElement) {
+        contentElement.style.display = 'none';
+      }
+      if (emptyElement) {
+        emptyElement.style.display = 'none';
+      }
+    }
+
+    // Show error state
+    function showDashboardError(message) {
+      const loadingElement = document.getElementById('dashboardOrdersLoading');
+      const contentElement = document.getElementById('dashboardOrdersContent');
+      const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+      if (loadingElement) {
+        loadingElement.style.display = 'none';
+      }
+      if (contentElement) {
+        contentElement.style.display = 'none';
+      }
+      if (emptyElement) {
+        emptyElement.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                <h6 class="text-danger">Lỗi tải đơn hàng</h6>
+                <p class="text-muted small">${message}</p>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshDashboardOrders()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Thử lại
+                </button>
+            </div>
+        `;
+        emptyElement.style.display = 'block';
+      }
+    }
+
+    // Refresh dashboard orders manually
+    function refreshDashboardOrders() {
+      loadDashboardOrders();
+    }
+
+    function formatDateTime(dateString) {
+      // Parse the date string as UTC to avoid timezone conversion
+      const date = new Date(dateString);
+      const now = new Date();
+
+      // Calculate difference using UTC time to avoid timezone issues
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      // Format time part - no timezone conversion needed since dateString is already Vietnam time
+      const timeStr = date.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'UTC' // Treat as UTC to prevent double timezone conversion
+      });
+
+      if (diffMins < 1) {
+        return 'Vừa xong';
+      } else if (diffMins < 60) {
+        return `${diffMins} phút trước`;
+      } else if (diffHours < 24) {
+        return `${diffHours} giờ trước (${timeStr})`;
+      } else if (diffDays < 7) {
+        return `${diffDays} ngày trước (${timeStr})`;
+      } else {
+        return date.toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          timeZone: 'UTC' // Treat as UTC to prevent double timezone conversion
+        }) + ` ${timeStr}`;
+      }
+    }
     // Disconnect WebSocket when page unloads
     window.addEventListener('beforeunload', function () {
       disconnectWebSocket();

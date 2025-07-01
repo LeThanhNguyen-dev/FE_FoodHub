@@ -340,9 +340,9 @@
             updateNotificationCount();
             loadUserInfo();
             loadWorkSchedule();
-            if (document.getElementById('dashboardOrdersSection')) {
-                initDashboardOrders();
-            }
+            // if (document.getElementById('dashboardOrdersSection')) {
+            //     initDashboardOrders();
+            // }
         });
 
 
@@ -468,6 +468,9 @@
                     initializeWebSocket(currentWorkSchedule);
                 } else {
                     throw new Error(data.message || 'Invalid response format');
+                }
+                if (document.getElementById('dashboardOrdersSection')) {
+                    initDashboardOrders();
                 }
             } catch (error) {
                 console.error('Error loading work schedule:', error);
