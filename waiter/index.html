@@ -146,43 +146,45 @@
 
             <!-- Dashboard Cards -->
             <div class="dashboard-cards">
-
                 <!-- Active Orders Card -->
                 <div class="card clickable-card" onclick="handleNavClick('orders')">
                     <div class="card-header">
-                        <h5><i class="fas fa-clipboard-list me-2"></i>Đơn hàng đang xử lý</h5>
+                        <h5><i class="fas fa-clipboard-list"></i>Đơn hàng đang xử lý</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-clipboard-list"
-                            style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
+                    <div class="card-body">
+                        <div class="card-icon orders-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
                         <div class="stats-number">0</div>
-                        <p class="text-muted mb-0">Đơn đang phục vụ</p>
+                        <p class="stats-label">Đơn đang phục vụ</p>
                     </div>
                 </div>
 
                 <!-- Tables Management Card -->
                 <div class="card clickable-card" onclick="handleNavClick('tables')">
                     <div class="card-header">
-                        <h5><i class="fas fa-chair me-2"></i>Quản lý bàn</h5>
+                        <h5><i class="fas fa-chair"></i>Quản lý bàn</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-chair"
-                            style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
+                    <div class="card-body">
+                        <div class="card-icon tables-icon">
+                            <i class="fas fa-chair"></i>
+                        </div>
                         <div class="stats-number">0/0</div>
-                        <p class="text-muted mb-0">Bàn đang phục vụ</p>
+                        <p class="stats-label">Bàn đang phục vụ</p>
                     </div>
                 </div>
 
                 <!-- Daily Sales Card -->
                 <div class="card clickable-card" onclick="handleNavClick('reports')">
                     <div class="card-header">
-                        <h5><i class="fas fa-money-bill-wave me-2"></i>Doanh thu ca làm</h5>
+                        <h5><i class="fas fa-money-bill-wave"></i>Doanh thu ca làm</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-money-bill-wave"
-                            style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
-                        <div class="stats-number" style="color: var(--success);">₫0K</div>
-                        <p class="text-muted mb-0">Từ 0 đơn hàng</p>
+                    <div class="card-body">
+                        <div class="card-icon sales-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stats-number sales-number">₫0K</div>
+                        <p class="stats-label">Từ 0 đơn hàng</p>
                     </div>
                 </div>
             </div>

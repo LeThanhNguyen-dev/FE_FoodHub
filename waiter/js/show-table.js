@@ -145,11 +145,11 @@ function renderTablesByArea(tablesByArea) {
             const statusClass = getTableStatusClass(table.status);
             const statusText = getTableStatusText(table.status);
             const statusIcon = getTableStatusIcon(table.status);
-            const isUrgent = table.status === 'OCCUPIED' && shouldShowUrgent(table);
+            // const isUrgent = table.status === 'OCCUPIED' && shouldShowUrgent(table);
 
             html += `
                 <div class="table-card-wrapper">
-                    <div class="table-card ${statusClass} ${isUrgent ? 'table-urgent' : ''}" 
+                    <div class="table-card" 
                          onclick="handleTableClick(${table.id}, '${table.status}')"
                          data-table-id="${table.id}">
                         
@@ -163,10 +163,10 @@ function renderTablesByArea(tablesByArea) {
                             </div>
                             
                             <div class="table-status">
-                                <span class="status-badge ${getStatusBadgeClass(table.status)}">
+                                <span class="status-badge ${statusClass}">
                                     ${statusText}
                                 </span>
-                                ${isUrgent ? '<span class="urgent-badge ms-1">Khẩn cấp</span>' : ''}
+                                
                             </div>
                             
                             <div class="table-info-actions-container">
@@ -421,7 +421,6 @@ function refreshTables() {
     // Refresh tables
     showTables();
 }
-
 
 
 

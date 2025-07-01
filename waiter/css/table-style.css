@@ -15,49 +15,63 @@
 
 .table-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 1.5rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    /* Updated border styling */
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    border: 3px solid transparent;
 }
 
 .table-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    border-color: #d1d5db;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 
-.table-card.status-available {
-    border-color: var(--success);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), white);
+/* Status-specific border colors */
+.table-card.table-available {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
 }
 
-.table-card.status-occupied {
-    border-color: var(--waiter-blue);
-    background: linear-gradient(135deg, rgba(0, 102, 204, 0.05), white);
+.table-card.table-occupied {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
 }
 
-.table-card.status-reserved {
-    border-color: var(--warning);
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), white);
+
+.table-card.table-reserved {
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
 }
 
+
+/* Urgent status with pulsing border */
 .table-card.table-urgent {
-    border-color: var(--danger);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), white);
-    animation: urgentPulse 2s infinite;
+    border-color: #ef4444;
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    animation: urgentPulseBorder 2s ease-in-out infinite;
+}
+
+@keyframes urgentPulseBorder {
+    0%, 100% {
+        border-color: #ef4444;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+    50% {
+        border-color: #dc2626;
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    }
 }
 
 @keyframes urgentPulse {
-
-    0%,
-    100% {
+    0%, 100% {
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
-
     50% {
         box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
     }
@@ -93,6 +107,53 @@
     margin-bottom: 1rem;
 }
 
+/* Status badge styling to match border theme */
+
+
+.status-badge.badge-available {
+    background-color: #dcfce7;
+    color: #166534;
+    border-color: #10b981;
+}
+
+.status-badge.badge-occupied {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-color: #3b82f6;
+}
+
+.status-badge.badge-waiting {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-color: #f59e0b;
+}
+
+.status-badge.badge-cleaning {
+    background-color: #f3f4f6;
+    color: #374151;
+    border-color: #6b7280;
+}
+
+.urgent-badge {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1.5px solid #ef4444;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    animation: urgentBadgePulse 2s ease-in-out infinite;
+}
+
+@keyframes urgentBadgePulse {
+    0%, 100% {
+        background-color: #fee2e2;
+    }
+    50% {
+        background-color: #fecaca;
+    }
+}
+
 /* NEW: Container for table info and actions */
 .table-info-actions-container {
     display: flex;
@@ -120,6 +181,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    border: 2px solid transparent;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,6 +190,7 @@
 
 .table-action-btn:hover {
     transform: scale(1.1);
+    border-color: currentColor;
 }
 
 .area-section {
@@ -137,6 +200,8 @@
 .area-header {
     position: relative;
     overflow: hidden;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
 }
 
 .area-header::before {
@@ -149,7 +214,6 @@
     background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     animation: float 6s ease-in-out infinite;
 }
-
 
 .table-overlay {
     position: absolute;
@@ -281,6 +345,7 @@
 
     .table-card {
         padding: 1rem;
+        border-width: 1.5px; /* Slightly thinner border on mobile */
     }
 
     .table-number {
@@ -318,10 +383,12 @@
     .table-action-btn {
         width: 35px;
         height: 35px;
+        border-width: 1.5px;
     }
 
     .area-header {
         padding: 1rem !important;
+        border-width: 1.5px;
     }
 
     .area-title {
@@ -384,6 +451,7 @@
 
     .table-card {
         border-radius: 15px;
+        border-width: 1.5px;
     }
 
     .area-header {
@@ -407,7 +475,7 @@
 @media (hover: none) and (pointer: coarse) {
     .table-card:hover {
         transform: none;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .table-card:active {
@@ -426,7 +494,7 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     .table-card {
-        border-width: 2px;
+        border-width: 3px;
     }
 
     .status-badge {
@@ -436,7 +504,6 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-
     .table-card,
     .table-action-btn,
     .notification-toast,
@@ -446,6 +513,10 @@
     }
 
     .table-urgent {
+        animation: none;
+    }
+
+    .urgent-badge {
         animation: none;
     }
 }

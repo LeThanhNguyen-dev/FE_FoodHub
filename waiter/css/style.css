@@ -174,18 +174,21 @@ body {
 
 .dashboard-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 0.5rem 2rem;
 }
 
 .card {
-    border: none;
+    background: white;
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(15, 23, 43, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
     position: relative;
+    border: 1px solid rgba(15, 23, 43, 0.05);
 }
 
 .card:hover {
@@ -193,62 +196,168 @@ body {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.card:hover::before {
+    transform: scaleX(1);
+}
+
 .card-header {
-    background: white;
-    color: var(--dark);
-    padding: 1.5rem 1.5rem 0.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, var(--light) 100%);
+    padding: 1.5rem 2rem 1rem;
     border: none;
+    position: relative;
+}
+
+.card-header h5 {
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-header h5 i {
+    color: var(--primary);
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+}
+
+.card-body {
+    padding: 1rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.card-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-.card-header::before {
+.card:hover .card-icon {
+    transform: rotate(5deg) scale(1.1);
+}
+
+.card-icon::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.02);
-    transform: rotate(45deg);
-    transition: all 0.3s ease;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.1;
+    transform: scale(0);
+    transition: transform 0.3s ease;
 }
 
-.card:hover .card-header::before {
-    background: rgba(0, 0, 0, 0.05);
+.card:hover .card-icon::before {
+    transform: scale(1.2);
 }
 
-.card-header h5 {
-    margin: 0;
-    font-weight: 700;
-    position: relative;
-    z-index: 1;
-    font-size: 1.1rem;
-    color: var(--dark);
+.orders-icon {
+    background: linear-gradient(135deg, var(--info), #60A5FA);
+    color: white;
 }
 
-.card-body {
-    padding: 0.5rem 1.5rem 1.5rem;
-    background: white;
+.tables-icon {
+    background: linear-gradient(135deg, var(--primary), var(--warning));
+    color: white;
+}
+
+.sales-icon {
+    background: linear-gradient(135deg, var(--success), #34D399);
+    color: white;
 }
 
 .stats-number {
-    font-size: 3rem;
-    font-weight: 700;
+    font-size: 2.5rem;
+    font-weight: 800;
     color: var(--dark);
     margin-bottom: 0.5rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--dark), #374151);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
 }
 
-.urgent-number {
-    color: var(--danger);
-    animation: pulse 2s infinite;
+.sales-number {
+    background: linear-gradient(135deg, var(--success), #34D399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stats-label {
+    color: #6B7280;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
 }
 
 .clickable-card {
     cursor: pointer;
-    transition: all 0.3s ease;
-    border: 1px solid #dee2e6;
+}
+
+.clickable-card:active {
+    transform: translateY(-5px) scale(0.98);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    body {
+        padding: 1rem;
+    }
+}
+
+/* Animation for numbers */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stats-number {
+    animation: countUp 0.6s ease-out;
+}
+
+/* Subtle glow effect on hover */
+.card:hover {
+    box-shadow: 0 20px 40px rgba(15, 23, 43, 0.15),
+        0 0 0 1px rgba(254, 161, 22, 0.1);
 }
 
 @keyframes pulse {
@@ -415,13 +524,21 @@ body {
 }
 
 .status-badge {
+    display: inline-flex !important;
+    /* Tạo khối linh hoạt, không bị gãy */
+    align-items: center !important;
+    /* Căn giữa nội dung theo chiều dọc */
     padding: 6px 14px !important;
     border-radius: 12px !important;
     font-size: 12px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
     border: 2px solid !important;
+    white-space: nowrap !important;
+    /* Ngăn văn bản xuống dòng */
+    box-sizing: border-box !important;
+    /* Đảm bảo kích thước tính cả padding và border */
 }
 
 .status-confirmed {
@@ -430,7 +547,8 @@ body {
     border-color: #3b82f6 !important;
 }
 
-.status-preparing {
+.status-preparing,
+.status-occupied {
     background: #fef3c7 !important;
     color: #b45309 !important;
     border-color: #f59e0b !important;
@@ -442,7 +560,8 @@ body {
     border-color: #10b981 !important;
 }
 
-.status-completed {
+.status-completed,
+.status-available {
     background: #dcfce7 !important;
     color: #15803d !important;
     border-color: #22c55e !important;
@@ -459,6 +578,7 @@ body {
     color: #b91c1c !important;
     border-color: #ef4444 !important;
 }
+
 .logout-section {
     padding: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -1053,7 +1173,7 @@ body {
     justify-content: center;
     min-width: 40px;
     height: 40px;
-    background: white ;
+    background: white;
     border: 2px solid #d1d5db !important;
     background: white !important;
     color: #374151 !important;
@@ -1061,11 +1181,11 @@ body {
 }
 
 .action-btn .btn:hover {
-    background: #f3f4f6 ;
-    border-color: #6b7280 ;
-    text-decoration: none ;
-    transform: translateY(-1px) ;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) ;
+    background: #f3f4f6;
+    border-color: #6b7280;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .action-btn .btn i {
@@ -1737,8 +1857,8 @@ body {
     background: white;
     border-radius: 8px;
     padding: 1rem;
-    border-left: 4px solid;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease;
 }
 
@@ -1746,7 +1866,7 @@ body {
     transform: translateY(-2px);
 }
 
-.stat-card.pending {
+/* .stat-card.pending {
     border-left-color: #808080;
 }
 
@@ -1760,7 +1880,7 @@ body {
 
 .stat-card.completed {
     border-left-color: #28a745;
-}
+} */
 
 
 .stat-card .stat-icon {
@@ -1835,6 +1955,7 @@ body {
 .dashboard-order-item.preparing {
     border-left-color: #fd7e14;
 }
+
 .order-header {
     display: flex;
     justify-content: space-between;
@@ -1853,8 +1974,8 @@ body {
 }
 
 .order-amount {
-  font-weight: 600;
-  color: #28a745;
+    font-weight: 600;
+    color: #28a745;
 }
 
 .order-info {
@@ -1872,4 +1993,83 @@ body {
 .order-table {
     font-size: 0.9rem;
     color: #495057;
+}
+
+
+.clear-all-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: none !important;
+    border: none !important;
+    color: #dc3545 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.clear-all-btn:hover {
+    background: rgba(220, 53, 69, 0.1) !important;
+}
+
+
+.orders-filter-section .card-body {
+    padding: 1.5rem !important;
+    background: white !important;
+    text-align: left;
+}
+
+.orders-filter-section.card:hover {
+    transform: none !important;
+}
+.orders-table-card.card:hover {
+    transform: none !important;
+}
+
+#tablesContainer.orders-section {
+    margin: 16px !important;
+    padding: 2rem;
+}
+
+.shift-report-container .card:not(.report-header .card) .card-body {
+    padding: 1rem !important;
+    background: white !important;
+}
+
+.shift-report-container .card:not(.report-header .card) .card-header {
+    padding: 0.75rem 1rem !important;
+    background-color: rgba(0,0,0,.03) !important;
+    border-bottom: 1px solid rgba(0,0,0,.125) !important;
+}
+
+/* Ngăn hover effect cho tất cả card không phải trong report-header */
+.shift-report-container .card:not(.report-header .card):hover {
+    transform: none !important;
+}
+
+.shift-report-container .card:not(.report-header .card):hover .card-icon {
+    transform: none !important;
+}
+
+/* Đảm bảo stat cards hiển thị đúng */
+.shift-report-container .stat-card .card-body {
+    padding: 1.5rem 1rem !important;
+    text-align: center !important;
+}
+
+/* Override riêng cho card có table */
+.shift-report-container .card .card-body.p-0 {
+    padding: 0 !important;
+}
+
+/* Override cho table responsive */
+.shift-report-container .table-responsive {
+    margin: 0 !important;
+}
+
+/* Đảm bảo table trong card hiển thị đúng */
+.shift-report-container .card .table-responsive .table {
+    margin-bottom: 0 !important;
 }

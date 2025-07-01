@@ -219,37 +219,20 @@
     transition: all 0.3s ease;
 }
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
 
-.btn-primary:hover {
-    background: #ff7700;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgb(255, 145, 0);
-}
 
 .btn-success {
     color: white;
 }
 
-.btn-success:hover {
-    background: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(21, 255, 0, 0.185);
-}
+
 
 .btn-secondary {
     background: #6c757d;
     color: white;
 }
 
-.btn-secondary:hover {
-    background: #5c636a;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
-}
+
 
 
 
