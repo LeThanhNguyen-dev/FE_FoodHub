@@ -375,15 +375,15 @@
         .modal-notification .modal-dialog {
             max-width: 400px;
             position: fixed;
-            right: 20px; /* Đặt modal cách mép phải 20px */
-            top: 20px; /* Đặt modal cách mép trên 20px */
-            margin: 0; /* Bỏ margin mặc định */
+            right: 20px;
+            top: 20px;
+            margin: 0;
         }
 
         .modal-notification .modal-content {
             border-radius: 10px;
-            border: 2px solid #22c55e; /* Màu xanh lá cho viền */
-            background-color: #f0fdf4; /* Màu nền xanh nhạt */
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
         }
 
         .modal-notification .modal-body {
@@ -394,7 +394,7 @@
         }
 
         .modal-notification .modal-body a {
-            color: #15803d; /* Màu xanh lá đậm hơn cho liên kết */
+            color: #15803d;
             text-decoration: none;
         }
 
@@ -402,9 +402,8 @@
             text-decoration: underline;
         }
 
-        /* Đảm bảo modal không bị che khuất */
         .modal-notification {
-            z-index: 1055; /* Đặt z-index cao hơn nếu cần */
+            z-index: 1055;
         }
 
         @keyframes fadeIn {
@@ -419,7 +418,6 @@
             }
         }
 
-        /* Animations */
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -488,8 +486,8 @@
 
             .modal-notification .modal-dialog {
                 max-width: 90%;
-                right: 10px; /* Giảm khoảng cách mép phải cho màn hình nhỏ */
-                top: 10px; /* Giảm khoảng cách mép trên */
+                right: 10px;
+                top: 10px;
             }
         }
     </style>
@@ -804,8 +802,8 @@
                             <p class="card-price">${price}</p>
                             ${loggedIn ? `
                                 <div>
-                                    <button class="btn btn-order" onclick="orderItem(${JSON.stringify(item).replace(/"/g, '"')})">Đặt món</button>
-                                    <button class="btn btn-add-to-cart" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '"')})">Thêm vào giỏ</button>
+                                    <button class="btn btn-order" onclick="orderItem(${JSON.stringify(item).replace(/"/g, '&quot;')})">Đặt món</button>
+                                    <button class="btn btn-add-to-cart" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">Thêm vào giỏ</button>
                                 </div>
                             ` : ''}
                         </div>

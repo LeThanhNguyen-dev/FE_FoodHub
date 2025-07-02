@@ -26,9 +26,25 @@ function isLoggedIn() {
     return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
 }
 
+// Lấy userId từ JWT
+function getUserId() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return null;
+    const payload = parseJwt(token);
+    return payload ? payload.id : null;
+}
+
 // Cập nhật số lượng giỏ hàng
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const userId = getUserId();
+    if (!userId) {
+        const cartCountEl = document.getElementById('cart-count');
+        if (cartCountEl) cartCountEl.textContent = '0';
+        return;
+    }
+
+    const cartKey = `cart_${userId}`; // Key riêng cho từng user
+    const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
     const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     const cartCountEl = document.getElementById('cart-count');
     if (cartCountEl) cartCountEl.textContent = count;
@@ -41,27 +57,77 @@ function addToCart(item) {
         window.location.href = 'login.html';
         return;
     }
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const userId = getUserId();
+    if (!userId) {
+        alert('Không thể xác định người dùng. Vui lòng đăng nhập lại!');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const cartKey = `cart_${userId}`; // Key riêng cho từng user
+    let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
     const existing = cart.find(i => i.id === item.id);
     if (existing) {
         existing.quantity = (existing.quantity || 1) + 1;
     } else {
         cart.push({ ...item, quantity: 1 });
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem(cartKey, JSON.stringify(cart));
     updateCartCount();
     alert('Đã thêm món vào giỏ hàng!');
 }
 
 // Đặt món -> chuyển đến trang thanh toán
 function orderItem(item) {
+    console.log('orderItem called with:', item); // Debug
     if (!isLoggedIn()) {
+        console.log('User not logged in, redirecting to login.html');
         alert('Vui lòng đăng nhập để đặt món!');
         window.location.href = 'login.html';
         return;
     }
-    localStorage.setItem('orderItem', JSON.stringify(item));
-    window.location.href = 'checkout.html';
+
+    const userId = getUserId();
+    if (!userId) {
+        console.log('No userId, redirecting to login.html');
+        alert('Không thể xác định người dùng. Vui lòng đăng nhập lại!');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        const cartKey = `cart_${userId}`; // Key riêng cho từng user
+        // Clear existing cart
+        localStorage.removeItem(cartKey);
+        console.log('Cleared existing cart');
+
+        // Create cart item
+        const cartItem = {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: 1,
+            imageUrl: item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'
+        };
+        console.log('Created cart item:', cartItem);
+
+        // Save to cart
+        const cart = [cartItem];
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        console.log('Saved cart to localStorage:', cart);
+
+        // Update cart count
+        updateCartCount();
+        console.log('Updated cart count');
+
+        // Redirect to checkout
+        console.log('Redirecting to checkout.html');
+        window.location.href = 'checkout.html';
+    } catch (error) {
+        console.error('Error in orderItem:', error);
+        alert('Đã xảy ra lỗi khi đặt món. Vui lòng thử lại.');
+    }
 }
 
 // ===================== CẬP NHẬT UI NAVBAR =====================
@@ -73,37 +139,42 @@ function updateUI() {
     const userNavItem = document.getElementById('user-nav-item');
     const cartNavItem = document.getElementById('cart-nav-item');
     const usernameDisplay = document.getElementById('username-display');
-    const welcomeMessage = document.getElementById('welcome-message'); // optional
-    const usernameGreeting = document.getElementById('username-greeting'); // optional
+    const welcomeMessage = document.getElementById('welcome-message');
+    const usernameGreeting = document.getElementById('username-greeting');
     const navbar = document.getElementById('navbar');
 
-    // Ẩn hết các thành phần liên quan trước
     if (authNavItem) authNavItem.style.display = 'none';
     if (userNavItem) userNavItem.style.display = 'none';
     if (cartNavItem) cartNavItem.style.display = 'none';
     if (welcomeMessage) welcomeMessage.style.display = 'none';
 
-    // Kiểm tra trạng thái đăng nhập
     const isCustomer =
         payload &&
         payload.exp * 1000 > Date.now() &&
         payload.scope === 'ROLE_CUSTOMER';
 
     if (isCustomer) {
-        const email = payload.sub || 'Customer';
+        // Lấy username từ JWT, fallback là 'Khách hàng'
+        const displayName = payload.username || 'Khách hàng';
 
         if (userNavItem) userNavItem.style.display = 'block';
         if (cartNavItem) cartNavItem.style.display = 'block';
-        if (usernameDisplay) usernameDisplay.textContent = email;
-        if (usernameGreeting) usernameGreeting.textContent = email;
+        if (usernameDisplay) usernameDisplay.textContent = displayName;
+        if (usernameGreeting) usernameGreeting.textContent = displayName;
         if (welcomeMessage) welcomeMessage.style.display = 'block';
 
         updateCartCount();
     } else {
         if (authNavItem) authNavItem.style.display = 'block';
+        // Xóa giỏ hàng khi không đăng nhập
+        const userId = payload ? payload.id : null;
+        if (userId) {
+            localStorage.removeItem(`cart_${userId}`);
+        }
+        const cartCountEl = document.getElementById('cart-count');
+        if (cartCountEl) cartCountEl.textContent = '0';
     }
 
-    // Sau cùng, hiện navbar để tránh "nháy"
     if (navbar) {
         navbar.classList.remove('invisible', 'opacity-0');
         navbar.classList.add('opacity-100', 'visible');
@@ -112,7 +183,11 @@ function updateUI() {
 
 // ===================== ĐĂNG XUẤT =====================
 function logout() {
+    const userId = getUserId();
     localStorage.removeItem('accessToken');
+    if (userId) {
+        localStorage.removeItem(`cart_${userId}`); // Xóa giỏ hàng của user
+    }
     window.location.href = 'login.html';
 }
 
