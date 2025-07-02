@@ -13,262 +13,304 @@
         rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
     <style>
-        
-/* Hero Section */
-.hero {
-    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    position: relative;
-    overflow: hidden;
-}
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-    z-index: 1;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
 
-.hero .container {
-    position: relative;
-    z-index: 2;
-}
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
 
-.hero h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: #F7E6A3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s ease-out;
-}
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
 
-.hero p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.25rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 1s ease-out 0.3s;
-    animation-fill-mode: both;
-}
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
 
-/* Contact Section */
-#contact {
-    background: #f8f9fa;
-    padding: 5rem 0;
-    position: relative;
-}
+        /* Contact Section */
+        #contact {
+            background: #f8f9fa;
+            padding: 5rem 0;
+            position: relative;
+        }
 
-.section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 3rem;
-    font-weight: 700;
-    color: #1A3C34;
-    text-align: center;
-    margin-bottom: 3rem;
-    position: relative;
-}
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1A3C34;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
 
-.section-title::after {
-    content: '';
-    display: block;
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(to right, #D4A017, #1A3C34);
-    margin: 1rem auto;
-}
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #D4A017, #1A3C34);
+            margin: 1rem auto;
+        }
 
-.contact-form {
-    background: #fff;
-    padding: 3rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    max-width: 700px;
-    margin: 0 auto;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+        .contact-form {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: 0 auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.contact-form:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
+        .contact-form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
 
-.contact-form .form-label {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    color: #1A3C34;
-    font-size: 1rem;
-}
+        .contact-form .form-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #1A3C34;
+            font-size: 1rem;
+        }
 
-.contact-form .form-control {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 12px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
+        .contact-form .form-control {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.contact-form .form-control:focus {
-    border-color: #D4A017;
-    box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
-    outline: none;
-}
+        .contact-form .form-control:focus {
+            border-color: #D4A017;
+            box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
+            outline: none;
+        }
 
-.contact-form textarea.form-control {
-    resize: vertical;
-    min-height: 120px;
-}
+        .contact-form textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
 
-.contact-form .btn-primary {
-    background: linear-gradient(90deg, #1A3C34, #D4A017);
-    border: none;
-    padding: 12px 30px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #fff;
-    border-radius: 8px;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
+        .contact-form .btn-primary {
+            background: linear-gradient(90deg, #1A3C34, #D4A017);
+            border: none;
+            padding: 12px 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #fff;
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
 
-.contact-form .btn-primary:hover {
-    background: linear-gradient(90deg, #D4A017, #1A3C34);
-    transform: translateY(-2px);
-}
+        .contact-form .btn-primary:hover {
+            background: linear-gradient(90deg, #D4A017, #1A3C34);
+            transform: translateY(-2px);
+        }
 
-.alert {
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-}
+        .alert {
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
 
-.login-prompt {
-    text-align: center;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
-    color: #333;
-    margin-top: 2rem;
-}
+        .login-prompt {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: #333;
+            margin-top: 2rem;
+        }
 
-.login-prompt a {
-    color: #D4A017;
-    font-weight: 600;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
+        .login-prompt a {
+            color: #D4A017;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
 
-.login-prompt a:hover {
-    color: #1A3C34;
-}
+        .login-prompt a:hover {
+            color: #1A3C34;
+        }
 
-/* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px; /* Đặt modal cách mép phải 20px */
+            top: 20px; /* Đặt modal cách mép trên 20px */
+            margin: 0; /* Bỏ margin mặc định */
+        }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e; /* Màu xanh lá cho viền */
+            background-color: #f0fdf4; /* Màu nền xanh nhạt */
+        }
 
-/* Responsive Design */
-@media (max-width: 992px) {
-    .hero h1 {
-        font-size: 3rem;
-    }
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
 
-    .hero p {
-        font-size: 1.1rem;
-    }
+        .modal-notification .modal-body a {
+            color: #15803d; /* Màu xanh lá đậm hơn cho liên kết */
+            text-decoration: none;
+        }
 
-    .section-title {
-        font-size: 2.5rem;
-    }
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
 
-    .contact-form {
-        padding: 2rem;
-    }
-}
+        /* Đảm bảo modal không bị che khuất */
+        .modal-notification {
+            z-index: 1055; /* Đặt z-index cao hơn nếu cần */
+        }
 
-@media (max-width: 768px) {
-    .hero {
-        height: 50vh;
-    }
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .hero h1 {
-        font-size: 2.5rem;
-    }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .hero p {
-        font-size: 1rem;
-    }
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
 
-    .section-title {
-        font-size: 2rem;
-    }
+            .hero p {
+                font-size: 1.1rem;
+            }
 
-    .contact-form {
-        padding: 1.5rem;
-    }
+            .section-title {
+                font-size: 2.5rem;
+            }
 
-    .contact-form .btn-primary {
-        width: 100%;
-        padding: 12px;
-    }
-}
+            .contact-form {
+                padding: 2rem;
+            }
+        }
 
-@media (max-width: 576px) {
-    .hero h1 {
-        font-size: 2rem;
-    }
+        @media (max-width: 768px) {
+            .hero {
+                height: 50vh;
+            }
 
-    .hero p {
-        font-size: 0.9rem;
-    }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
 
-    .section-title {
-        font-size: 1.8rem;
-    }
-}
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .contact-form {
+                padding: 1.5rem;
+            }
+
+            .contact-form .btn-primary {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px; /* Giảm khoảng cách mép phải cho màn hình nhỏ */
+                top: 10px; /* Giảm khoảng cách mép trên */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <!-- Navigation -->
-    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
@@ -281,7 +323,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="menu.html">Thực Đơn</a>
@@ -290,14 +332,12 @@
                         <a class="nav-link" href="about.html">Giới Thiệu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Liên Hệ</a>
+                        <a class="nav-link active" href="contact.html">Liên Hệ</a>
                     </li>
-    
                     <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-    
                     <!-- User đã login -->
                     <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
@@ -311,7 +351,6 @@
                             </ul>
                         </div>
                     </li>
-    
                     <!-- Giỏ hàng -->
                     <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
@@ -324,6 +363,16 @@
         </div>
     </nav>
 
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -346,13 +395,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn" required
-                            readonly>
+                        <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn" required readonly>
                     </div>
                     <div class="mb-3">
                         <label for="message" class="form-label">Phản hồi</label>
-                        <textarea class="form-control" id="message" rows="5"
-                            placeholder="Nhập ý kiến hoặc báo cáo của bạn" required></textarea>
+                        <textarea class="form-control" id="message" rows="5" placeholder="Nhập ý kiến hoặc báo cáo của bạn" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Gửi phản hồi</button>
                 </form>
@@ -362,8 +409,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer"
-        color: #F7E6A3; padding: 2rem 0; text-align: center;>
+    <footer class="footer" style="color: #F7E6A3; padding: 2rem 0; text-align: center;">
         <div class="container">
             <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
             <p class="contact-info">1 FPT | Phone: (123) 456-7890 | Email: info@foodhub.com</p>
@@ -380,10 +426,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
+    <script src="../js/notification.js"></script>
     <!-- Form Submission JS -->
     <script>
-        // Khởi tạo UI
-        updateUI();
+        // Initialize UI and notification system
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI(); // From auth.js
+            updateContactForm();
+            fetchUserOrders().then(() => startPolling());
+            initializeWebSocket();
+        });
 
         // Hàm cập nhật biểu mẫu dựa trên trạng thái đăng nhập
         function updateContactForm() {
@@ -407,9 +459,6 @@
                 loginPrompt.innerHTML = 'Vui lòng <a href="login.html">đăng nhập</a> để gửi phản hồi.';
             }
         }
-
-        // Gọi hàm cập nhật biểu mẫu khi tải trang
-        updateContactForm();
 
         // Xử lý gửi biểu mẫu
         document.getElementById('feedback-form').addEventListener('submit', async (e) => {
@@ -438,7 +487,7 @@
                 if (response.ok) {
                     feedbackMessage.classList.remove('d-none');
                     feedbackMessage.classList.add('alert-success');
-                    feedbackMessage.textContent = 'Phản hồi đã được gửi thành công vào lúc 09:00 PM +07, 17/06/2025!';
+                    feedbackMessage.textContent = 'Phản hồi đã được gửi thành công vào lúc 07:42 AM +07, 02/07/2025!';
                     document.getElementById('feedback-form').reset();
                 } else {
                     const error = await response.text();

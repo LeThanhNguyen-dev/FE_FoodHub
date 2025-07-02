@@ -13,8 +13,10 @@
         rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
@@ -73,22 +75,22 @@
 
         .hero h1 {
             font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: #F7E6A3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s ease-out;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
         }
 
         .hero p {
             font-family: 'Montserrat', sans-serif;
-    font-size: 1.25rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 1s ease-out 0.3s;
-    animation-fill-mode: both;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
         }
 
         .hero-btn {
@@ -113,28 +115,28 @@
         }
 
         .carousel-item .hero {
-    height: 60vh;
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: white;
-}
+            height: 60vh;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
 
-.carousel-item .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 0;
-}
+        .carousel-item .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+        }
 
-.carousel-item .container {
-    position: relative;
-    z-index: 2;
-}
+        .carousel-item .container {
+            position: relative;
+            z-index: 2;
+        }
 
         /* Stats Section */
         .stats-section {
@@ -153,7 +155,6 @@
             font-weight: 700;
             color: var(--gold);
             font-family: 'Montserrat', sans-serif;
-
         }
 
         .stat-label {
@@ -310,7 +311,6 @@
             margin-right: auto;
         }
 
-        
         /* Welcome Message */
         .welcome-message {
             background: rgba(212, 175, 55, 0.2);
@@ -318,6 +318,42 @@
             padding: 1rem 2rem;
             margin-top: 1rem;
             border: 2px solid var(--gold);
+        }
+
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px; /* Đặt modal cách mép phải 20px */
+            top: 20px; /* Đặt modal cách mép trên 20px */
+            margin: 0; /* Bỏ margin mặc định */
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e; /* Màu xanh lá cho viền */
+            background-color: #f0fdf4; /* Màu nền xanh nhạt */
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d; /* Màu xanh lá đậm hơn cho liên kết */
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        /* Đảm bảo modal không bị che khuất */
+        .modal-notification {
+            z-index: 1055; /* Đặt z-index cao hơn nếu cần */
         }
 
         @media (max-width: 768px) {
@@ -336,6 +372,12 @@
             .stat-number {
                 font-size: 2rem;
             }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px; /* Giảm khoảng cách mép phải cho màn hình nhỏ */
+                top: 10px; /* Giảm khoảng cách mép trên */
+            }
         }
 
         /* Scroll animations */
@@ -351,280 +393,239 @@
         }
 
         /* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
     <!-- Navigation -->
-<!-- Thanh Điều Hướng -->
-<!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
-<nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
-            <i class="fa fa-utensils"></i>
-            <span>FoodHub</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link active" href="home.html">Trang Chủ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="menu.html">Thực Đơn</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="about.html">Giới Thiệu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="contact.html">Liên Hệ</a>
-                </li>
-
-                <!-- Đăng nhập (hiện khi chưa login) -->
-                <li class="nav-item" id="auth-nav-item">
-                    <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
-                </li>
-
-                <!-- User đã login -->
-                <li class="nav-item" id="user-nav-item">
-                    <div class="user-dropdown dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                            <span id="username-display"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                            <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
-                        </ul>
-                    </div>
-                </li>
-
-                <!-- Giỏ hàng -->
-                <li class="nav-item" id="cart-nav-item">
-                    <a class="nav-link cart-icon" href="cart.html">
-                        <i class="bi bi-cart"></i>
-                        <span class="badge" id="cart-count">0</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-
-<!-- Phần Chào Mừng -->
-<section id="hero-carousel" class="carousel slide hero" data-bs-ride="carousel">
-    <div class="carousel-inner">
-
-        <!-- Slide 1 -->
-        <div class="carousel-item active">
-            <div class="hero d-flex align-items-center"
-                style="background-image: url('https://images.unsplash.com/photo-1555992336-cbf8f63ba2e3'); background-size: cover; background-position: center;">
-                <div class="container text-center text-white">
-                    <h1>Chào Mừng Đến Với FoodHub</h1>
-                    <p>Thưởng thức hương vị tuyệt hảo trong từng món ăn.</p>
-                    <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Khám Phá Thực Đơn</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 2 -->
-        <div class="carousel-item">
-            <div class="hero d-flex align-items-center"
-                style="background-image: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092'); background-size: cover; background-position: center;">
-                <div class="container text-center text-white">
-                    <h1>Món Ăn Tươi Ngon Mỗi Ngày</h1>
-                    <p>Được chế biến từ nguyên liệu chất lượng cao.</p>
-                    <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Xem Ngay</a>
-                </div>
-            </div>
-        </div>
-
-       
-
-    </div>
-
-    <!-- Điều hướng -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Trước</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Tiếp</span>
-    </button>
-</section>
-  
-
-<!-- Phần Thống Kê -->
-<section class="stats-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3 col-6">
-                <div class="stat-item fade-in">
-                    <div class="stat-number">1000+</div>
-                    <div class="stat-label">Khách Hàng Hài Lòng</div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item fade-in">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label">Món Ăn Ngon</div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item fade-in">
-                    <div class="stat-number">5</div>
-                    <div class="stat-label">Năm Kinh Nghiệm</div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item fade-in">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Phục Vụ Mọi Lúc</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Phần Lý Do Chọn FoodHub -->
-<section class="features-section">
-    <div class="container">
-        <h2 class="section-title fade-in">Vì Sao Chọn FoodHub?</h2>
-        <p class="section-subtitle fade-in">Chúng tôi cam kết mang đến cho bạn trải nghiệm ẩm thực tốt nhất với chất
-            lượng và dịch vụ tuyệt vời.</p>
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="bi bi-award"></i>
-                    </div>
-                    <h3 class="feature-title">Chất Lượng Cao Cấp</h3>
-                    <p>Chúng tôi chỉ sử dụng những nguyên liệu tốt nhất từ các nhà cung cấp uy tín để đảm bảo món ăn
-                        luôn đạt chuẩn cao nhất.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="bi bi-lightning"></i>
-                    </div>
-                    <h3 class="feature-title">Giao Hàng Nhanh Chóng</h3>
-                    <p>Hệ thống giao hàng hiệu quả giúp món ăn đến tay bạn luôn nóng hổi và tươi ngon trong thời gian
-                        ngắn nhất.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="bi bi-heart"></i>
-                    </div>
-                    <h3 class="feature-title">Chế Biến Bằng Tâm Huyết</h3>
-                    <p>Mỗi món ăn đều được chế biến với niềm đam mê và sự tỉ mỉ bởi các đầu bếp giàu kinh nghiệm và yêu
-                        nghề.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-    <<!-- Phần Xem Trước Thực Đơn -->
-<section id="menu-preview" class="menu-preview">
-    <div class="container">
-        <h2 class="section-title text-black fade-in">Món Ăn Nổi Bật</h2>
-        <p class="section-subtitle text-black fade-in">
-            Khám phá những món ăn được yêu thích nhất và được đầu bếp đề xuất – chắc chắn sẽ làm say mê vị giác của bạn.
-        </p>
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="menu-item fade-in">
-                    <img src="https://mycayseouly.vn/Images/image/mycay/Lau-Thai-Bo-My.jpg" alt="Lẩu kim chi bò mỹ">
-                    <h3 class="menu-item-title">Lẩu Kim Chi Bò Mỹ</h3>
-                    <p>Lẩu kim chi với thịt bò Mỹ tươi, nấm, đậu phụ và rau xanh trong nước dùng cay nồng đậm vị Hàn Quốc.</p>
-                    <div class="menu-item-price">289.000₫</div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="menu-item fade-in">
-                    <img src="https://cdn-www.vinid.net/2020/01/Buzza-BBQ-voi-uu-dai-200.000-dong-tu-app-VinID-1024x576.jpg" alt="Ba chỉ bò mỹ nướng">
-                    <h3 class="menu-item-title">Ba Chỉ Bò Mỹ Nướng</h3>
-                    <p>Ba chỉ bò Mỹ nướng than hồng, tẩm ướp đậm đà, dùng kèm rau xanh và nước chấm đặc biệt.</p>
-                    <div class="menu-item-price">129.000₫</div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="menu-item fade-in">
-                    <img src="https://mcdn.coolmate.me/image/July2023/cocktail-trai-cay-1734_240.jpg" alt="Cocktail trái cây">
-                    <h3 class="menu-item-title">Cocktail Trái Cây</h3>
-                    <p>Cocktail trái cây tươi mát, kết hợp dưa hấu, dứa, kiwi và cam mọng nước, hòa quyện trong lớp syrup ngọt nhẹ và đá viên mát lạnh.</p>
-                    <div class="menu-item-price">60.000₫</div>
-                </div>
-            </div>
-        </div>
-        <div class="text-center mt-4">
-            <a href="menu.html" class="hero-btn">Xem Toàn Bộ Thực Đơn</a>
-        </div>
-    </div>
-</section>
-
-
-    <!-- Testimonials Section
-    <section class="testimonials">
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
-            <h2 class="section-title fade-in">What Our Customers Say</h2>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+                <i class="fa fa-utensils"></i>
+                <span>FoodHub</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="menu.html">Thực Đơn</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">Giới Thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Liên Hệ</a>
+                    </li>
+                    <!-- Đăng nhập (hiện khi chưa login) -->
+                    <li class="nav-item" id="auth-nav-item">
+                        <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
+                    </li>
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
+                        <div class="user-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span id="username-display"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
+                        <a class="nav-link cart-icon" href="cart.html">
+                            <i class="bi bi-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phần Chào Mừng -->
+    <section id="hero-carousel" class="carousel slide hero" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <div class="hero d-flex align-items-center"
+                    style="background-image: url('https://images.unsplash.com/photo-1555992336-cbf8f63ba2e3'); background-size: cover; background-position: center;">
+                    <div class="container text-center text-white">
+                        <h1>Chào Mừng Đến Với FoodHub</h1>
+                        <p>Thưởng thức hương vị tuyệt hảo trong từng món ăn.</p>
+                        <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Khám Phá Thực Đơn</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-item">
+                <div class="hero d-flex align-items-center"
+                    style="background-image: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092'); background-size: cover; background-position: center;">
+                    <div class="container text-center text-white">
+                        <h1>Món Ăn Tươi Ngon Mỗi Ngày</h1>
+                        <p>Được chế biến từ nguyên liệu chất lượng cao.</p>
+                        <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Xem Ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Điều hướng -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Trước</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Tiếp</span>
+        </button>
+    </section>
+
+    <!-- Phần Thống Kê -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Khách Hàng Hài Lòng</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Món Ăn Ngon</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Năm Kinh Nghiệm</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Phục Vụ Mọi Lúc</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Phần Lý Do Chọn FoodHub -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title fade-in">Vì Sao Chọn FoodHub?</h2>
+            <p class="section-subtitle fade-in">Chúng tôi cam kết mang đến cho bạn trải nghiệm ẩm thực tốt nhất với chất lượng và dịch vụ tuyệt vời.</p>
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="testimonial-card fade-in">
-                        <div class="stars">★★★★★</div>
-                        <p class="testimonial-text">"The food quality is outstanding and the service is exceptional.
-                            FoodHub has become our go-to restaurant!"</p>
-                        <div class="testimonial-author">- Sarah Johnson</div>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <h3 class="feature-title">Chất Lượng Cao Cấp</h3>
+                        <p>Chúng tôi chỉ sử dụng những nguyên liệu tốt nhất từ các nhà cung cấp uy tín để đảm bảo món ăn luôn đạt chuẩn cao nhất.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="testimonial-card fade-in">
-                        <div class="stars">★★★★★</div>
-                        <p class="testimonial-text">"Amazing flavors and beautiful presentation. The chefs here really
-                            know what they're doing!"</p>
-                        <div class="testimonial-author">- Michael Chen</div>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <h3 class="feature-title">Giao Hàng Nhanh Chóng</h3>
+                        <p>Hệ thống giao hàng hiệu quả giúp món ăn đến tay bạn luôn nóng hổi và tươi ngon trong thời gian ngắn nhất.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="testimonial-card fade-in">
-                        <div class="stars">★★★★★</div>
-                        <p class="testimonial-text">"Fast delivery and the food arrived hot and fresh. Definitely
-                            ordering again!"</p>
-                        <div class="testimonial-author">- Emily Davis</div>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="bi bi-heart"></i>
+                        </div>
+                        <h3 class="feature-title">Chế Biến Bằng Tâm Huyết</h3>
+                        <p>Mỗi món ăn đều được chế biến với niềm đam mê và sự tỉ mỉ bởi các đầu bếp giàu kinh nghiệm và yêu nghề.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </section> -->
+    </section>
+
+    <!-- Phần Xem Trước Thực Đơn -->
+    <section id="menu-preview" class="menu-preview">
+        <div class="container">
+            <h2 class="section-title text-black fade-in">Món Ăn Nổi Bật</h2>
+            <p class="section-subtitle text-black fade-in">
+                Khám phá những món ăn được yêu thích nhất và được đầu bếp đề xuất – chắc chắn sẽ làm say mê vị giác của bạn.
+            </p>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="menu-item fade-in">
+                        <img src="https://mycayseouly.vn/Images/image/mycay/Lau-Thai-Bo-My.jpg" alt="Lẩu kim chi bò mỹ">
+                        <h3 class="menu-item-title">Lẩu Kim Chi Bò Mỹ</h3>
+                        <p>Lẩu kim chi với thịt bò Mỹ tươi, nấm, đậu phụ và rau xanh trong nước dùng cay nồng đậm vị Hàn Quốc.</p>
+                        <div class="menu-item-price">289.000₫</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="menu-item fade-in">
+                        <img src="https://cdn-www.vinid.net/2020/01/Buzza-BBQ-voi-uu-dai-200.000-dong-tu-app-VinID-1024x576.jpg" alt="Ba chỉ bò mỹ nướng">
+                        <h3 class="menu-item-title">Ba Chỉ Bò Mỹ Nướng</h3>
+                        <p>Ba chỉ bò Mỹ nướng than hồng, tẩm ướp đậm đà, dùng kèm rau xanh và nước chấm đặc biệt.</p>
+                        <div class="menu-item-price">129.000₫</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="menu-item fade-in">
+                        <img src="https://mcdn.coolmate.me/image/July2023/cocktail-trai-cay-1734_240.jpg" alt="Cocktail trái cây">
+                        <h3 class="menu-item-title">Cocktail Trái Cây</h3>
+                        <p>Cocktail trái cây tươi mát, kết hợp dưa hấu, dứa, kiwi và cam mọng nước, hòa quyện trong lớp syrup ngọt nhẹ và đá viên mát lạnh.</p>
+                        <div class="menu-item-price">60.000₫</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="menu.html" class="hero-btn">Xem Toàn Bộ Thực Đơn</a>
+            </div>
+        </div>
+    </section>
 
     <!-- About Section -->
     <section id="about" class="py-5 bg-light">
@@ -634,13 +635,8 @@
                 <div class="col-lg-6">
                     <div class="fade-in">
                         <p class="lead">FoodHub cam kết mang đến cho bạn trải nghiệm ẩm thực tuyệt vời nhất với các nguyên liệu tươi ngon và dịch vụ đặc biệt.</p>
-                        <p>Được thành lập với niềm đam mê về sự xuất sắc trong ẩm thực, chúng tôi kết hợp các phương pháp nấu ăn truyền thống với
-                        sự đổi mới hiện đại để tạo ra những món ăn không chỉ có hương vị tuyệt vời mà còn kể một câu chuyện. Cam kết về chất
-                        lượng của chúng tôi mở rộng từ các nguyên liệu được lựa chọn cẩn thận đến đội ngũ nhân viên được đào tạo chuyên nghiệp
-                        của chúng tôi.</p>
-                        <p>Cho dù bạn đang ăn tại chỗ hay đặt giao hàng, chúng tôi đảm bảo mọi bữa ăn đều được chế biến với cùng mức độ chăm chút
-                        và chú ý đến từng chi tiết đã khiến chúng tôi trở thành một phần được yêu mến của cộng đồng.
-                        </p>
+                        <p>Được thành lập với niềm đam mê về sự xuất sắc trong ẩm thực, chúng tôi kết hợp các phương pháp nấu ăn truyền thống với sự đổi mới hiện đại để tạo ra những món ăn không chỉ có hương vị tuyệt vời mà còn kể một câu chuyện. Cam kết về chất lượng của chúng tôi mở rộng từ các nguyên liệu được lựa chọn cẩn thận đến đội ngũ nhân viên được đào tạo chuyên nghiệp của chúng tôi.</p>
+                        <p>Cho dù bạn đang ăn tại chỗ hay đặt giao hàng, chúng tôi đảm bảo mọi bữa ăn đều được chế biến với cùng mức độ chăm chút và chú ý đến từng chi tiết đã khiến chúng tôi trở thành một phần được yêu mến của cộng đồng.</p>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -669,16 +665,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
-
+    <script src="../js/notification.js"></script>
+    <!-- Page-specific JS -->
     <script>
         // Scroll animations
         function handleScrollAnimations() {
             const elements = document.querySelectorAll('.fade-in');
-
             elements.forEach(element => {
                 const elementTop = element.getBoundingClientRect().top;
                 const elementVisible = 150;
-
                 if (elementTop < window.innerHeight - elementVisible) {
                     element.classList.add('visible');
                 }
@@ -717,11 +712,11 @@
 
         window.addEventListener('load', handleScrollAnimations);
 
-        
-
-        // Initialize cart count (placeholder)
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize any auth state or cart count here
+        // Initialize UI and notification system
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            fetchUserOrders().then(() => startPolling());
+            initializeWebSocket();
         });
     </script>
 </body>

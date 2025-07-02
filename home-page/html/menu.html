@@ -14,57 +14,60 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
     <style>
         .hero {
-    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    position: relative;
-    overflow: hidden;
-}
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-    z-index: 1;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
 
-.hero .container {
-    position: relative;
-    z-index: 2;
-}
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
 
-.hero h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: #F7E6A3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s ease-out;
-}
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
 
-.hero p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.25rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 1s ease-out 0.3s;
-    animation-fill-mode: both;
-}
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
@@ -368,6 +371,42 @@
             font-family: 'Montserrat', sans-serif;
         }
 
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px; /* Đặt modal cách mép phải 20px */
+            top: 20px; /* Đặt modal cách mép trên 20px */
+            margin: 0; /* Bỏ margin mặc định */
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e; /* Màu xanh lá cho viền */
+            background-color: #f0fdf4; /* Màu nền xanh nhạt */
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d; /* Màu xanh lá đậm hơn cho liên kết */
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        /* Đảm bảo modal không bị che khuất */
+        .modal-notification {
+            z-index: 1055; /* Đặt z-index cao hơn nếu cần */
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -381,27 +420,27 @@
         }
 
         /* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         @media (max-width: 992px) {
             .menu-layout {
@@ -446,13 +485,18 @@
             .menu-card img {
                 height: 150px;
             }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px; /* Giảm khoảng cách mép phải cho màn hình nhỏ */
+                top: 10px; /* Giảm khoảng cách mép trên */
+            }
         }
     </style>
 </head>
 
 <body>
     <!-- Thanh Điều Hướng -->
-    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
@@ -465,10 +509,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="menu.html">Thực Đơn</a>
+                        <a class="nav-link active" href="menu.html">Thực Đơn</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="about.html">Giới Thiệu</a>
@@ -476,12 +520,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
-    
                     <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-    
                     <!-- User đã login -->
                     <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
@@ -495,7 +537,6 @@
                             </ul>
                         </div>
                     </li>
-    
                     <!-- Giỏ hàng -->
                     <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
@@ -508,6 +549,16 @@
         </div>
     </nav>
 
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Phần Chào Mừng -->
     <section class="hero">
@@ -521,23 +572,19 @@
     <section id="menu" class="menu-section py-5">
         <div class="container">
             <h2 class="section-title">Khám Phá Thực Đơn</h2>
-
             <div class="menu-layout">
                 <!-- Sidebar -->
                 <div class="menu-sidebar">
                     <h4>Danh Mục</h4>
-
                     <!-- Search Box -->
                     <div class="search-box">
                         <input type="text" id="search-input" placeholder="Tìm kiếm món ăn..." onkeyup="handleSearch()">
                     </div>
-
                     <!-- Category List -->
                     <div class="category-list" id="category-list">
                         <div class="loading-spinner">Đang tải...</div>
                     </div>
                 </div>
-
                 <!-- Main Content -->
                 <div class="menu-main">
                     <div id="menu-contents">
@@ -566,6 +613,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
+    <script src="../js/notification.js"></script>
     <!-- Page-specific JS -->
     <script>
         // Global variables
@@ -622,32 +670,32 @@
 
                 // Add "View All" button
                 categoryContainer.innerHTML += `
-                        <button class="category-btn active" data-category-id="all" onclick="selectCategory('all')">
-                            Xem Tất Cả
-                        </button>
-                    `;
+                    <button class="category-btn active" data-category-id="all" onclick="selectCategory('all')">
+                        Xem Tất Cả
+                    </button>
+                `;
 
                 categories.forEach(category => {
                     categoryContainer.innerHTML += `
-                            <button class="category-btn" data-category-id="${category.id}" onclick="selectCategory(${category.id})">
-                                ${category.name}
-                            </button>
-                        `;
+                        <button class="category-btn" data-category-id="${category.id}" onclick="selectCategory(${category.id})">
+                            ${category.name}
+                        </button>
+                    `;
                 });
 
                 // Create content containers
                 contentContainer.innerHTML = `
-                        <div id="category-all" class="menu-content active">
-                            <div class="loading-spinner">Đang tải...</div>
-                        </div>
-                    `;
+                    <div id="category-all" class="menu-content active">
+                        <div class="loading-spinner">Đang tải...</div>
+                    </div>
+                `;
 
                 categories.forEach(category => {
                     contentContainer.innerHTML += `
-                            <div id="category-${category.id}" class="menu-content">
-                                <div class="loading-spinner">Đang tải...</div>
-                            </div>
-                        `;
+                        <div id="category-${category.id}" class="menu-content">
+                            <div class="loading-spinner">Đang tải...</div>
+                        </div>
+                    `;
                 });
 
                 // Load all items initially
@@ -726,11 +774,11 @@
 
             if (items.length === 0) {
                 container.innerHTML = `
-                        <div class="no-results">
-                            <h4>Không tìm thấy món ăn</h4>
-                            <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
-                        </div>
-                    `;
+                    <div class="no-results">
+                        <h4>Không tìm thấy món ăn</h4>
+                        <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -747,22 +795,22 @@
                 const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
 
                 html += `
-                        <div class="menu-card">
-                            <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
-                            <div class="card-body">
-                                <span class="badge">Có sẵn</span>
-                                <h5 class="card-title">${item.name}</h5>
-                                <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
-                                <p class="card-price">${price}</p>
-                                ${loggedIn ? `
-                                    <div>
-                                        <button class="btn btn-order" onclick="orderItem(${JSON.stringify(item).replace(/"/g, '&quot;')})">Đặt món</button>
-                                        <button class="btn btn-add-to-cart" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">Thêm vào giỏ</button>
-                                    </div>
-                                ` : ''}
-                            </div>
+                    <div class="menu-card">
+                        <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                        <div class="card-body">
+                            <span class="badge">Có sẵn</span>
+                            <h5 class="card-title">${item.name}</h5>
+                            <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
+                            <p class="card-price">${price}</p>
+                            ${loggedIn ? `
+                                <div>
+                                    <button class="btn btn-order" onclick="orderItem(${JSON.stringify(item).replace(/"/g, '"')})">Đặt món</button>
+                                    <button class="btn btn-add-to-cart" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '"')})">Thêm vào giỏ</button>
+                                </div>
+                            ` : ''}
                         </div>
-                    `;
+                    </div>
+                `;
             });
 
             html += '</div>';
@@ -781,10 +829,10 @@
 
             // Previous button
             paginationHTML += `
-                    <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>
-                        <i class="bi bi-chevron-left"></i> Trước
-                    </button>
-                `;
+                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>
+                    <i class="bi bi-chevron-left"></i> Trước
+                </button>
+            `;
 
             // Page numbers
             const maxVisiblePages = 5;
@@ -797,25 +845,25 @@
 
             for (let i = startPage; i <= endPage; i++) {
                 paginationHTML += `
-                        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
-                            ${i + 1}
-                        </button>
-                    `;
+                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i + 1}
+                    </button>
+                `;
             }
 
             // Next button
             paginationHTML += `
-                    <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
-                        Sau <i class="bi bi-chevron-right"></i>
-                    </button>
-                `;
+                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
+                    Sau <i class="bi bi-chevron-right"></i>
+                </button>
+            `;
 
             // Page info
             paginationHTML += `
-                    <div class="pagination-info">
-                        Trang ${currentPage + 1} / ${totalPages}
-                    </div>
-                `;
+                <div class="pagination-info">
+                    Trang ${currentPage + 1} / ${totalPages}
+                </div>
+            `;
 
             paginationHTML += '</div>';
             return paginationHTML;
@@ -868,12 +916,12 @@
             displayMenuItems(searchResults, currentCategory);
         }
 
-
-
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             updateUI(); // From auth.js
             fetchCategories();
+            fetchUserOrders().then(() => startPolling());
+            initializeWebSocket();
         });
     </script>
 </body>

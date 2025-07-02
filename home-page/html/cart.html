@@ -14,57 +14,60 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
     <style>
         .hero {
-    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    position: relative;
-    overflow: hidden;
-}
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-    z-index: 1;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
 
-.hero .container {
-    position: relative;
-    z-index: 2;
-}
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
 
-.hero h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: #F7E6A3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s ease-out;
-}
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
 
-.hero p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.25rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 1s ease-out 0.3s;
-    animation-fill-mode: both;
-}
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
@@ -109,6 +112,42 @@
             font-family: 'Montserrat', sans-serif;
         }
 
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px; /* Đặt modal cách mép phải 20px */
+            top: 20px; /* Đặt modal cách mép trên 20px */
+            margin: 0; /* Bỏ margin mặc định */
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e; /* Màu xanh lá cho viền */
+            background-color: #f0fdf4; /* Màu nền xanh nhạt */
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d; /* Màu xanh lá đậm hơn cho liên kết */
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        /* Đảm bảo modal không bị che khuất */
+        .modal-notification {
+            z-index: 1055; /* Đặt z-index cao hơn nếu cần */
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2rem;
@@ -129,10 +168,15 @@
             .cart-table .btn-qty {
                 width: 30px;
             }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px; /* Giảm khoảng cách mép phải cho màn hình nhỏ */
+                top: 10px; /* Giảm khoảng cách mép trên */
+            }
         }
 
         @media (max-width: 576px) {
-
             .cart-table th,
             .cart-table td {
                 font-size: 0.85rem;
@@ -148,33 +192,34 @@
                 font-size: 1.3rem;
             }
         }
-        /* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
+    <!-- Navigation -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
@@ -187,7 +232,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="menu.html">Thực Đơn</a>
@@ -198,12 +243,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
-    
                     <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-    
                     <!-- User đã login -->
                     <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
@@ -217,7 +260,6 @@
                             </ul>
                         </div>
                     </li>
-    
                     <!-- Giỏ hàng -->
                     <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
@@ -230,6 +272,16 @@
         </div>
     </nav>
 
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Phần Chào Mừng -->
     <section class="hero">
@@ -285,13 +337,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
+    <script src="../js/notification.js"></script>
     <!-- Page-specific JS -->
     <script>
         // Update cart count in navbar
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const cartCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
-            const cartCountElement = document.getElementById('cartCount');
+            const cartCountElement = document.getElementById('cart-count');
             if (cartCountElement) {
                 cartCountElement.textContent = cartCount;
             }
@@ -302,7 +355,7 @@
             if (!isLoggedIn()) {
                 document.getElementById('cart-empty').classList.remove('d-none');
                 document.getElementById('cart-content').classList.add('d-none');
-                document.getElementById('cartCount').textContent = '0';
+                document.getElementById('cart-count').textContent = '0';
                 return;
             }
 
@@ -395,6 +448,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateUI(); // From auth.js
             loadCart();
+            fetchUserOrders().then(() => startPolling());
+            initializeWebSocket();
 
             // Add event listener for checkout button
             document.getElementById('checkout-btn').addEventListener('click', () => {
