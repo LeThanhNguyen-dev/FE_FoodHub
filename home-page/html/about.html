@@ -9,64 +9,66 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
     <!-- Page-specific CSS -->
     <style>
         .hero {
-    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    position: relative;
-    overflow: hidden;
-}
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-    z-index: 1;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
 
-.hero .container {
-    position: relative;
-    z-index: 2;
-}
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
 
-.hero h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: #F7E6A3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s ease-out;
-}
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
 
-.hero p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.25rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 1s ease-out 0.3s;
-    animation-fill-mode: both;
-}
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
-            color: var(--dark-green);
+            color: var(--dark-green, #1a3c34);
             font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
@@ -108,7 +110,7 @@
 
         .team-member h5 {
             font-family: 'Montserrat', sans-serif;
-            color: var(--dark-green);
+            color: var(--dark-green, #1a3c34);
             font-size: 1.4rem;
             margin-bottom: 0.5rem;
         }
@@ -143,12 +145,38 @@
             border: 0;
         }
 
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #3b82f6;
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
-            .about-hero h1 {
+            .hero h1 {
                 font-size: 2rem;
             }
 
-            .about-hero p {
+            .hero p {
                 font-size: 0.9rem;
             }
 
@@ -168,34 +196,38 @@
             .map-container {
                 padding-bottom: 75%; /* Tỷ lệ 4:3 cho màn hình nhỏ */
             }
-        }
-        /* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Thanh Điều Hướng -->
-    <!-- Thêm class invisible + opacity-0 để ẩn khi chưa xử lý xong -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
@@ -208,23 +240,21 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="menu.html">Thực Đơn</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="about.html">Giới Thiệu</a>
+                        <a class="nav-link active" href="about.html">Giới Thiệu</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
-    
                     <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-    
                     <!-- User đã login -->
                     <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
@@ -238,7 +268,6 @@
                             </ul>
                         </div>
                     </li>
-    
                     <!-- Giỏ hàng -->
                     <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
@@ -251,9 +280,18 @@
         </div>
     </nav>
 
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Phần Giới Thiệu -->
-    
     <section class="hero">
         <div class="container">
             <h1>Giới thiệu về FoodHub</h1>
@@ -266,12 +304,8 @@
         <div class="container">
             <h2 class="section-title">Câu Chuyện Của Chúng Tôi</h2>
             <div class="about-content">
-                <p>FoodHub được thành lập với một sứ mệnh đơn giản: kết nối mọi người qua niềm vui ẩm thực. Được thành
-                    lập từ năm 2020, chúng tôi đã phát triển từ một quán ăn nhỏ thành một địa điểm ẩm thực được yêu
-                    thích, nổi tiếng với cam kết về chất lượng, sự bền vững và dịch vụ xuất sắc.</p>
-                <p>Các đầu bếp của chúng tôi chế biến từng món ăn với nguyên liệu tươi ngon nhất, được chọn lọc từ các
-                    nông trại và nhà cung cấp địa phương. Chúng tôi tin rằng mỗi bữa ăn là một câu chuyện, và chúng tôi
-                    luôn cố gắng tạo ra những trải nghiệm đáng nhớ cho thực khách.</p>
+                <p>FoodHub được thành lập với một sứ mệnh đơn giản: kết nối mọi người qua niềm vui ẩm thực. Được thành lập từ năm 2020, chúng tôi đã phát triển từ một quán ăn nhỏ thành một địa điểm ẩm thực được yêu thích, nổi tiếng với cam kết về chất lượng, sự bền vững và dịch vụ xuất sắc.</p>
+                <p>Các đầu bếp của chúng tôi chế biến từng món ăn với nguyên liệu tươi ngon nhất, được chọn lọc từ các nông trại và nhà cung cấp địa phương. Chúng tôi tin rằng mỗi bữa ăn là một câu chuyện, và chúng tôi luôn cố gắng tạo ra những trải nghiệm đáng nhớ cho thực khách.</p>
             </div>
         </div>
     </section>
@@ -283,7 +317,7 @@
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Thành viên đội ngũ">
+                        <img src="https://picsum.photos/150" alt="Thành viên đội ngũ" onerror="this.src='../images/fallback.jpg'">
                         <h5>Nguyễn Văn A</h5>
                         <p>Bếp Trưởng</p>
                         <p>Với hơn 15 năm kinh nghiệm, bếp trưởng A mang đến sự sáng tạo và đam mê cho từng món ăn.</p>
@@ -291,16 +325,15 @@
                 </div>
                 <div class="col-md-4">
                     <div class="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Thành viên đội ngũ">
+                        <img src="https://picsum.photos/150" alt="Thành viên đội ngũ" onerror="this.src='../images/fallback.jpg'">
                         <h5>Trần Thị B</h5>
                         <p>Quản Lý Nhà Hàng</p>
-                        <p>Chị B luôn đảm bảo mỗi khách hàng ra về với nụ cười, quản lý hoạt động với sự ấm áp và hiệu
-                            quả.</p>
+                        <p>Chị B luôn đảm bảo mỗi khách hàng ra về với nụ cười, quản lý hoạt động với sự ấm áp và hiệu quả.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Thành viên đội ngũ">
+                        <img src="https://picsum.photos/150" alt="Thành viên đội ngũ" onerror="this.src='../images/fallback.jpg'">
                         <h5>Lê Văn C</h5>
                         <p>Đầu Bếp Bánh</p>
                         <p>Những món tráng miệng của anh C là cái kết ngọt ngào mỗi bữa ăn, được làm với sự tỉ mỉ.</p>
@@ -315,10 +348,7 @@
         <div class="container">
             <h2 class="section-title">Địa Chỉ Của Chúng Tôi</h2>
             <div class="map-container">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3835.863084371478!2d108.25943217485829!3d15.968524865546536!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142116949840599%3A0x365b35580f52e8d5!2zxJDhuqFpIGjhu41jIEZQVCDEkMOgIE7hurVuZw!5e0!3m2!1svi!2s!4v1750065400680!5m2!1svi!2s"
-                    style="border:0;" allowfullscreen="" loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3835.863084371478!2d108.25943217485829!3d15.968524865546536!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142116949840599%3A0x365b35580f52e8d5!2zxJDhuqFpIGjhu41jIEZQVCDEkMOgIE7hurVuZw!5e0!3m2!1svi!2s!4v1750065400680!5m2!1svi!2s" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
@@ -326,7 +356,7 @@
     <!-- Chân Trang -->
     <footer id="contact" class="footer">
         <div class="container">
-            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold, #F7E6A3);">FoodHub</h3>
             <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#">Facebook</a>
@@ -341,6 +371,179 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
-</body>
+    <!-- Page-specific JS -->
+    <script>
+        let stompClient = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        let orders = [];
 
+        // Hàm lấy danh sách đơn hàng
+        async function fetchUserOrders() {
+            if (!isLoggedIn()) {
+                console.log("Chưa đăng nhập, bỏ qua fetchUserOrders");
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('accessToken');
+                const payload = parseJwt(token);
+                const userId = payload.id;
+                if (!userId) throw new Error("Không tìm thấy userId trong JWT payload");
+
+                console.log('Đang lấy đơn hàng cho user ID:', userId);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const response = await fetch(`${API_BASE_URL}/orders/user/${userId}?page=0&size=10&orderBy=createdAt`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    let errorMessage = 'Lỗi khi lấy đơn hàng';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.message || errorMessage;
+                    } catch (e) {}
+                    console.error(`Lỗi API: ${response.status} - ${errorMessage}`);
+                    if (response.status === 401) {
+                        console.error('Phiên hết hạn. Vui lòng đăng nhập lại.');
+                        showNotification('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+                        logout();
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                orders = data.result.content || [];
+                console.log("Đã lấy được", orders.length, "đơn hàng:", orders);
+            } catch (error) {
+                console.error('Lỗi khi lấy đơn hàng:', error.message);
+                if (error.name === 'AbortError') {
+                    showNotification('Không thể lấy dữ liệu đơn hàng: Máy chủ không phản hồi.');
+                } else if (error.message.includes('Failed to fetch')) {
+                    showNotification('Không thể kết nối với máy chủ. Vui lòng kiểm tra kết nối mạng.');
+                }
+            }
+        }
+
+        // Hàm hiển thị thông báo dưới dạng popup
+        function showNotification(message) {
+            const modal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            const modalBody = document.getElementById('notificationModalBody');
+            modalBody.innerHTML = message;
+
+            modal.show();
+
+            // Tự động đóng sau 5 giây
+            setTimeout(() => {
+                modal.hide();
+            }, 5000);
+
+            // Cho phép đóng thủ công (đã có nút close mặc định của modal)
+        }
+
+        // Hàm polling dự phòng
+        function startPolling() {
+            const pollingInterval = setInterval(async () => {
+                if (!isLoggedIn()) {
+                    clearInterval(pollingInterval);
+                    return;
+                }
+                try {
+                    const token = localStorage.getItem('accessToken');
+                    const payload = parseJwt(token);
+                    const userId = payload.id;
+                    const response = await fetch(`${API_BASE_URL}/orders/user/${userId}?page=0&size=10&orderBy=createdAt`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (!response.ok) {
+                        console.error('Lỗi khi polling:', await response.text());
+                        return;
+                    }
+                    const data = await response.json();
+                    const newOrders = data.result.content || [];
+                    console.log('Danh sách đơn hàng mới từ polling:', newOrders);
+                    newOrders.forEach(newOrder => {
+                        const existingOrder = orders.find(o => o.id === newOrder.id);
+                        if (!existingOrder || existingOrder.status !== newOrder.status) {
+                            orders = orders.map(o => o.id === newOrder.id ? newOrder : o);
+                            showNotification(`Đơn hàng #${newOrder.id} đã được cập nhật: ${newOrder.status} <a href="ordertrack.html?orderId=${newOrder.id}" class="text-primary ms-2">Xem</a>`);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Lỗi khi polling:', error);
+                }
+            }, 15000);
+        }
+
+        // Hàm khởi tạo WebSocket
+        function initializeWebSocket() {
+            if (!isLoggedIn()) {
+                console.log("Chưa đăng nhập, bỏ qua khởi tạo WebSocket");
+                return;
+            }
+
+            const token = localStorage.getItem('accessToken');
+            const payload = parseJwt(token);
+            const userId = payload.id;
+            if (!userId) {
+                console.error('Phiên người dùng không hợp lệ.');
+                showNotification('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
+                logout();
+                return;
+            }
+
+            const socket = new SockJS(`${API_BASE_URL}/ws`);
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect(
+                { Authorization: `Bearer ${token}` },
+                () => {
+                    console.log('WebSocket đã kết nối, đang đăng ký với /topic/orders/' + userId);
+                    stompClient.subscribe(`/topic/orders/${userId}`, (message) => {
+                        console.log('Nhận được thông điệp WebSocket:', message.body);
+                        try {
+                            const data = JSON.parse(message.body);
+                            console.log('Dữ liệu phân tích:', data);
+                            if (data.id && data.status) {
+                                showNotification(`Đơn hàng #${data.id} đã được cập nhật: ${data.status} <a href="ordertrack.html?orderId=${data.id}" class="text-primary ms-2">Xem</a>`);
+                            } else {
+                                console.warn('Thiếu id hoặc status trong thông điệp:', data);
+                            }
+                        } catch (error) {
+                            console.error('Lỗi khi xử lý thông điệp WebSocket:', error);
+                        }
+                    });
+                },
+                (error) => {
+                    console.error('Lỗi WebSocket:', error);
+                    if (reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts++;
+                        console.log(`Đang thử kết nối lại WebSocket, lần ${reconnectAttempts}/${maxReconnectAttempts}`);
+                        setTimeout(initializeWebSocket, 5000);
+                    } else {
+                        console.error('Không thể kết nối WebSocket sau nhiều lần thử');
+                        showNotification('Không thể kết nối với cập nhật thời gian thực. Đang sử dụng phương pháp dự phòng.');
+                        startPolling();
+                    }
+                }
+            );
+        }
+
+        // Khởi tạo sau khi DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            fetchUserOrders().then(() => startPolling());
+            initializeWebSocket();
+        });
+    </script>
+</body>
 </html>
