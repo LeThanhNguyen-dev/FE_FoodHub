@@ -1052,7 +1052,7 @@ body {
 
 .orders-table tbody tr:hover {
     background: linear-gradient(135deg, rgba(254, 161, 22, 0.08), rgba(254, 161, 22, 0.05));
-    transform: translateX(5px);
+    transform: translateX(3px);
     box-shadow: 0 5px 15px rgba(254, 161, 22, 0.15);
 }
 
