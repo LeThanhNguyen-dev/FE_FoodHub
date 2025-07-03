@@ -38,12 +38,6 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link" onclick="handleNavClick('tables')">
-            <i class="fas fa-chair"></i>
-            <span class="nav-text">Hàng Đợi</span>
-          </a>
-        </li>
-        <li class="nav-item">
           <a href="#" class="nav-link" onclick="handleNavClick('reports')">
             <i class="fas fa-chart-line"></i>
             <span class="nav-text">Báo Cáo Ca Làm</span>
@@ -140,7 +134,7 @@
           <i class="fas fa-check-circle stat-icon"></i>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="avgTime">15p</div>
+          <div class="stat-number" id="avgTime">0p</div>
           <div class="stat-label">Thời Gian Nấu TB</div>
           <i class="fas fa-stopwatch stat-icon"></i>
         </div>
@@ -608,11 +602,6 @@
 
       // Show WebSocket notification popup
       showWebSocketNotification(data.message);
-
-      // Update dashboard stats if needed
-      if (hasWorkSchedule) {
-        updateDashboardStats();
-      }
     }
 
     // Hàm hiển thị thông báo WebSocket với âm thanh và hiệu ứng đặc biệt
@@ -726,17 +715,6 @@
         setTimeout(() => {
           notificationBadge.classList.remove('notification-pulse');
         }, 1000);
-      }
-    }
-
-    // Function to update dashboard stats (placeholder)
-    function updateDashboardStats() {
-      // Reload dashboard data or update specific stats
-      // This is a placeholder - implement based on your actual API
-      const pendingElement = document.getElementById('pendingCount');
-      if (pendingElement) {
-        let currentCount = parseInt(pendingElement.textContent) || 0;
-        pendingElement.textContent = currentCount + 1;
       }
     }
 
@@ -960,13 +938,12 @@
         });
 
         const orderPage = data.result;
-        const orders = orderPage.content || [];
+        ordersData = orderPage.content || [];
 
         // Update dashboard with orders
-        renderDashboardOrders(orders);
+        renderDashboardOrders(ordersData);
 
-        // THAY ĐỔI: Truyền orders vào updateDashboardStats
-        updateDashboardStats(orders);
+        if (typeof updateStats === 'function') updateStats();
 
         // THÊM: Hoặc có thể load full stats nếu muốn độ chính xác cao hơn
         // await loadFullOrdersStats();

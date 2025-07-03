@@ -331,16 +331,49 @@ function renderOrders(orders) {
     ordersGrid.innerHTML = ordersHTML;
 }
 
+function calculateAverageTime() {
+    console.log("Calculating average cooking time...");
+    
+    const readyOrders = ordersData.filter(order => order.status === 'READY');
+    console.log("ready orders: ", readyOrders.length);
+    if (readyOrders.length === 0) {
+        return '0p';
+    }
+    
+    let totalTime = 0;
+    let validOrders = 0;
+    
+    readyOrders.forEach(order => {
+        if (order.createdAt && order.updatedAt) {
+            const createdTime = new Date(order.createdAt);
+            const updatedTime = new Date(order.updatedAt);
+            const timeDiff = (updatedTime - createdTime) / (1000 * 60);
+            
+            if (timeDiff >= 5 && timeDiff <= 60) {
+                totalTime += timeDiff;
+                validOrders++;
+            }
+        }
+    });
+    
+    if (validOrders === 0) {
+        return '0p';
+    }
+    
+    const avgMinutes = Math.round(totalTime / validOrders);
+    return `${avgMinutes}p`;
+}
 
 
 // Update statistics with smooth animations
 function updateStats() {
+    console.log("in updateStats");
     const pendingCount = ordersData.filter(order => order.status === 'PENDING').length;
     const preparingCount = ordersData.filter(order => order.status === 'PREPARING').length;
     const readyCount = ordersData.filter(order => order.status === 'READY').length;
-
+    console.log("pending: ", pendingCount);
     // Calculate average cooking time (mock calculation for now)
-    const avgTime = '15p';
+    const avgTime = calculateAverageTime();
 
     // Smooth update function
     function updateStatElement(elementId, newValue) {
@@ -599,10 +632,6 @@ function addModalStyles() {
             cursor: pointer;
             font-size: 14px;
             transition: all 0.2s;
-        }
-        .btn-primary {
-            background: #007bff;
-            color: white;
         }
         .btn-secondary {
             background: #6c757d;
@@ -1026,7 +1055,7 @@ function initializeFilters() {
                                 <button class="btn btn-outline-secondary" onclick="clearFilters()">
                                     <i class="fas fa-times"></i> Xóa bộ lọc
                                 </button>
-                                <button class="btn btn-outline-info" onclick="loadOrders()">
+                                <button class="btn btn-outline-success" onclick="loadOrders()">
                                     <i class="fas fa-sync-alt"></i> Làm mới
                                 </button>
                             </div>

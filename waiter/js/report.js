@@ -65,7 +65,23 @@ async function loadShiftReport() {
 function displayShiftReport(orderData) {
     const orders = orderData.content || [];
     const stats = calculateShiftStats(orders);
+    const scheduleDate = new Date(currentWorkSchedule.date);
+    const formattedDate = scheduleDate.toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+    const startTime = new Date(currentWorkSchedule.startTime);
+    const endTime = new Date(currentWorkSchedule.endTime);
 
+    const formattedStartTime = startTime.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    const formattedEndTime = endTime.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
     const dynamicContent = document.getElementById('dynamicContent');
     dynamicContent.innerHTML = `
         <div class="shift-report-container">
@@ -80,11 +96,11 @@ function displayShiftReport(orderData) {
                         <div class="shift-details">
                             <span class="detail-item">
                                 <i class="fas fa-calendar-alt"></i>
-                                ${currentWorkSchedule.date}
+                                ${formattedDate}
                             </span>
                             <span class="detail-item">
                                 <i class="fas fa-clock"></i>
-                                ${currentWorkSchedule.startTime} - ${currentWorkSchedule.endTime}
+                                ${formattedStartTime} - ${formattedEndTime}
                             </span>
                             <span class="detail-item">
                                 <i class="fas fa-map-marker-alt"></i>
@@ -389,6 +405,9 @@ function displayShiftReport(orderData) {
             color: var(--dark);
             margin-bottom: 4px;
             line-height: 1;
+        }
+        .stat-content .stat-number{
+            animation: countUp 0.6s ease-out;
         }
 
         .stat-label {
@@ -729,7 +748,7 @@ function generateOrderRows(orders) {
         return `
             <tr data-status="${order.status}">
                 <td><strong>#${order.id}</strong></td>
-                <td><span class="badge bg-secondary">${order.tableNumber || 'N/A'}</span></td>
+                <td><span class="badge" style="background-color: var(--primary)">${order.tableNumber || 'N/A'}</span></td>
                 <td>${orderTime}</td>
                 <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${items}">
                     ${items}

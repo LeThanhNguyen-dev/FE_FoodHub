@@ -107,9 +107,9 @@ body {
 }
 
 .nav-link:hover,
-.nav-link.active {
-    background: rgba(254, 161, 22, 0.1);
-    color: var(--primary);
+.nav-link:focus {
+    background: rgba(254, 161, 22, 0.1) !important;
+    color: var(--primary) !important;
 }
 
 .nav-link i {
@@ -300,6 +300,7 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: none;
+    animation: countUp 0.6s ease-out;
 }
 
 .sales-number {
@@ -350,9 +351,6 @@ body {
     }
 }
 
-.stats-number {
-    animation: countUp 0.6s ease-out;
-}
 
 /* Subtle glow effect on hover */
 .card:hover {
@@ -1905,11 +1903,6 @@ body {
     color: #28a745;
 }
 
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #495057;
-}
 
 .stat-label {
     font-size: 0.85rem;
@@ -2033,43 +2026,3 @@ body {
     padding: 2rem;
 }
 
-.shift-report-container .card:not(.report-header .card) .card-body {
-    padding: 1rem !important;
-    background: white !important;
-}
-
-.shift-report-container .card:not(.report-header .card) .card-header {
-    padding: 0.75rem 1rem !important;
-    background-color: rgba(0,0,0,.03) !important;
-    border-bottom: 1px solid rgba(0,0,0,.125) !important;
-}
-
-/* Ngăn hover effect cho tất cả card không phải trong report-header */
-.shift-report-container .card:not(.report-header .card):hover {
-    transform: none !important;
-}
-
-.shift-report-container .card:not(.report-header .card):hover .card-icon {
-    transform: none !important;
-}
-
-/* Đảm bảo stat cards hiển thị đúng */
-.shift-report-container .stat-card .card-body {
-    padding: 1.5rem 1rem !important;
-    text-align: center !important;
-}
-
-/* Override riêng cho card có table */
-.shift-report-container .card .card-body.p-0 {
-    padding: 0 !important;
-}
-
-/* Override cho table responsive */
-.shift-report-container .table-responsive {
-    margin: 0 !important;
-}
-
-/* Đảm bảo table trong card hiển thị đúng */
-.shift-report-container .card .table-responsive .table {
-    margin-bottom: 0 !important;
-}

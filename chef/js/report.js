@@ -1,31 +1,26 @@
-// Function to show reports section for Chef Dashboard
+// Function to show reports section
 async function showReports() {
     if (!hasWorkSchedule) {
         showNoWorkScheduleMessage();
         return;
     }
 
-    // Update page title
     document.getElementById('pageTitle').textContent = 'Báo cáo ca làm việc';
-    
-    // Show dynamic content (for reports) and hide others
     document.getElementById('dashboardContent').style.display = 'none';
     document.getElementById('dynamicContent').style.display = 'block';
     document.getElementById('errorMessage').style.display = 'none';
     document.getElementById('noWorkScheduleMessage').style.display = 'none';
 
-    // Update active navigation
     updateActiveNav('reports');
 
     // Load shift report content
     await loadShiftReport();
 }
 
-
-// Function to load shift report data for Chef
+// Function to load shift report data
 async function loadShiftReport() {
     const dynamicContent = document.getElementById('dynamicContent');
-    
+
     // Show loading state
     dynamicContent.innerHTML = `
         <div class="text-center py-5">
@@ -37,10 +32,9 @@ async function loadShiftReport() {
     `;
 
     try {
-        // Get work shift orders using only startTime from currentWorkSchedule (no area for chef)
         const startTime = currentWorkSchedule.startTime;
-        
-        const data = await apiFetch(`/orders/work-shift-orders?startTime=${encodeURIComponent(startTime)}&size=100`, {
+
+        const data = await apiFetch(`/orders/chef/work-shift-orders?startTime=${encodeURIComponent(startTime)}&size=100`, {
             method: 'GET',
         });
 
@@ -64,122 +58,137 @@ async function loadShiftReport() {
     }
 }
 
-// Function to display shift report for Chef
+// Function to display shift report
 function displayShiftReport(orderData) {
     const orders = orderData.content || [];
     const stats = calculateShiftStats(orders);
-    
+    const scheduleDate = new Date(currentWorkSchedule.date);
+    const formattedDate = scheduleDate.toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+    const startTime = new Date(currentWorkSchedule.startTime);
+    const endTime = new Date(currentWorkSchedule.endTime);
+
+    const formattedStartTime = startTime.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    const formattedEndTime = endTime.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
     const dynamicContent = document.getElementById('dynamicContent');
     dynamicContent.innerHTML = `
         <div class="shift-report-container">
             <!-- Report Header -->
-            <div class="report-header mb-4">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h4><i class="fas fa-chart-line me-2 text-primary"></i>Báo cáo ca làm việc - Bếp</h4>
-                        <p class="text-muted mb-0">
-                            <i class="fas fa-calendar me-2"></i>${currentWorkSchedule.date} | 
-                            <i class="fas fa-clock me-2"></i>${currentWorkSchedule.startTime} - ${currentWorkSchedule.endTime} | 
-                            <i class="fas fa-chef-hat me-2"></i>Tổng quan toàn bộ nhà hàng
-                        </p>
+            <div class="report-header">
+                <div class="header-content">
+                    <div class="header-info">
+                        <h2 class="report-title">
+                            <i class="fas fa-chart-line"></i>
+                            Báo cáo ca làm việc
+                        </h2>
+                        <div class="shift-details">
+                            <span class="detail-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                ${formattedDate}
+                            </span>
+                            <span class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                ${formattedStartTime} - ${formattedEndTime}
+                            </span>
+                            <span class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Khu vực: ${currentWorkSchedule.area}
+                            </span>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <button class="btn btn-outline-primary btn-sm me-2" onclick="exportReport()">
-                            <i class="fas fa-download me-1"></i>Xuất báo cáo
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="exportReport()">
+                            <i class="fas fa-download"></i>
+                            Xuất báo cáo
                         </button>
-                        <button class="btn btn-primary btn-sm" onclick="loadShiftReport()">
-                            <i class="fas fa-sync-alt me-1"></i>Làm mới
+                        <button class="btn btn-primary" onclick="loadShiftReport()">
+                            <i class="fas fa-sync-alt"></i>
+                            Làm mới
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Summary Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card stat-card stat-primary">
-                        <div class="card-body text-center">
-                            <i class="fas fa-clipboard-list stat-icon"></i>
-                            <div class="stat-number">${stats.totalOrders}</div>
-                            <div class="stat-label">Tổng đơn hàng</div>
-                        </div>
+            <div class="stats-grid">
+                <div class="shift-stat-card stat-primary">
+                    <div class="shift-stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">${stats.totalOrders}</div>
+                        <div class="stat-label">Tổng đơn hàng</div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card stat-card stat-success">
-                        <div class="card-body text-center">
-                            <i class="fas fa-utensils stat-icon"></i>
-                            <div class="stat-number">${stats.totalDishes}</div>
-                            <div class="stat-label">Tổng món đã nấu</div>
-                        </div>
+                
+                <div class="shift-stat-card stat-success">
+                    <div class="shift-stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">${formatCurrency(stats.totalRevenue)}</div>
+                        <div class="stat-label">Tổng doanh thu</div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card stat-card stat-info">
-                        <div class="card-body text-center">
-                            <i class="fas fa-fire stat-icon"></i>
-                            <div class="stat-number">${stats.completedOrders}</div>
-                            <div class="stat-label">Đơn hoàn thành</div>
-                        </div>
+            
+                
+                <div class="shift-stat-card stat-warning">
+                    <div class="shift-stat-icon">
+                        <i class="fas fa-calculator"></i>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card stat-warning">
-                        <div class="card-body text-center">
-                            <i class="fas fa-clock stat-icon"></i>
-                            <div class="stat-number">${stats.avgPrepTime}</div>
-                            <div class="stat-label">Thời gian TB</div>
-                        </div>
+                    <div class="stat-content">
+                        <div class="stat-number">${formatCurrency(stats.avgOrderValue)}</div>
+                        <div class="stat-label">Trung bình/đơn</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Kitchen Performance -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-chart-pie me-2"></i>Trạng thái đơn hàng</h6>
-                        </div>
-                        <div class="card-body">
-                            ${generateStatusChart(stats.statusCounts)}
-                        </div>
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Phân bố trạng thái đơn hàng
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        ${generateStatusChart(stats.statusCounts)}
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-chart-bar me-2"></i>Món ăn được nấu nhiều nhất</h6>
-                        </div>
-                        <div class="card-body">
-                            ${generateTopItemsChart(stats.topItems)}
-                        </div>
+                
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Top món ăn bán chạy
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        ${generateTopItemsChart(stats.topItems)}
                     </div>
                 </div>
             </div>
 
-            <!-- Area Performance (if available) -->
-            ${stats.areaStats ? `
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-map-marker-alt me-2"></i>Hiệu suất theo khu vực</h6>
-                        </div>
-                        <div class="card-body">
-                            ${generateAreaChart(stats.areaStats)}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            ` : ''}
-
-            <!-- Detailed Orders Table -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6><i class="fas fa-list me-2"></i>Chi tiết đơn hàng (${orders.length})</h6>
-                    <div class="filter-controls">
-                        <select id="statusFilter" class="form-select form-select-sm" style="width: auto; display: inline-block;" onchange="filterOrders()">
+            <!-- Orders Table -->
+            <div class="table-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-list"></i>
+                        Chi tiết đơn hàng (${orders.length})
+                    </h3>
+                    <div class="filter-section">
+                        <select id="statusFilter" class="filter-select" onchange="filterOrders()">
                             <option value="">Tất cả trạng thái</option>
                             <option value="PENDING">Chờ xử lý</option>
                             <option value="PREPARING">Đang chuẩn bị</option>
@@ -191,182 +200,446 @@ function displayShiftReport(orderData) {
                         </select>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="ordersTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Mã đơn</th>
-                                    <th>Bàn</th>
-                                    <th>Khu vực</th>
-                                    <th>Thời gian</th>
-                                    <th>Món ăn</th>
-                                    <th>Trạng thái</th>
-                                    <th>Tổng tiền</th>
-                                    <th>Ghi chú bếp</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ordersTableBody">
-                                ${generateOrderRows(orders)}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-wrapper">
+                    <table class="orders-table" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Bàn</th>
+                                <th>Thời gian</th>
+                                <th>Món ăn</th>
+                                <th>Trạng thái</th>
+                                <th>Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            ${generateOrderRows(orders)}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <style>
+        :root {
+            --primary: #FEA116;
+            --light: #F1F8FF;
+            --dark: #0F172B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --white: #FFFFFF;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
         .shift-report-container {
-            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            background-color: var(--gray-50);
+            min-height: 100vh;
         }
 
-        .stat-card {
-            transition: transform 0.2s ease;
+        /* Header Styles */
+        .report-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #FFB84D 100%);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .report-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .report-title i {
+            font-size: 24px;
+        }
+
+        .shift-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            opacity: 0.9;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
             border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
         }
 
-        .stat-card:hover {
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--gray-100);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .shift-stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .shift-stat-card:hover {
             transform: translateY(-2px);
         }
 
-        .stat-card.stat-primary { border-left: 4px solid #007bff; }
-        .stat-card.stat-success { border-left: 4px solid #28a745; }
-        .stat-card.stat-info { border-left: 4px solid #17a2b8; }
-        .stat-card.stat-warning { border-left: 4px solid #ffc107; }
-
-        .stat-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            opacity: 0.8;
+        /* Specific styling for shift report stat icons to avoid conflicts */
+        .shift-stat-card .shift-stat-icon {
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 24px !important;
+            color: var(--white) !important;
+            flex-shrink: 0 !important;
+            position: static !important;
+            top: auto !important;
+            right: auto !important;
+            transition: none !important;
         }
 
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
+        .stat-primary .shift-stat-icon { background-color: var(--primary) !important; }
+        .stat-success .shift-stat-icon { background-color: var(--success) !important; }
+        .stat-info .shift-stat-icon { background-color: var(--info) !important; }
+        .stat-warning .shift-stat-icon { background-color: var(--warning) !important; }
+
+        .stat-content {
+            flex: 1;
         }
 
-        .stat-label {
-            color: #666;
-            font-size: 0.9rem;
+        .stat-content .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+            line-height: 1;
+            animation: countUp 0.6s ease-out;
+            font-size: 24px;
         }
 
-        .status-item {
+        .stat-content .stat-label {
+            font-size: 14px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        /* Card Styles */
+        .chart-card, .table-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
         }
 
-        .status-item:last-child {
-            border-bottom: none;
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        /* Filter Styles */
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            background: var(--white);
+            color: var(--dark);
+            font-size: 14px;
+            min-width: 160px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(254, 161, 22, 0.1);
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .orders-table th {
+            background: var(--gray-50);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        .orders-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            vertical-align: top;
+        }
+
+        .orders-table tbody tr:hover {
+            background-color: var(--gray-50);
+        }
+
+        /* Status Badges */
         .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
             min-width: 80px;
             text-align: center;
         }
 
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .status-preparing { background-color: #cfe2ff; color: #084298; }
-        .status-ready { background-color: #d4edda; color: #155724; }
-        .status-served { background-color: #d1ecf1; color: #0c5460; }
-        .status-completed { background-color: #d4edda; color: #155724; }
-        .status-cancelled { background-color: #f8d7da; color: #721c24; }
-        .status-confirmed { background-color: #cfe2ff; color: #084298; }
+        .status-pending { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-preparing { background-color: rgba(59, 130, 246, 0.1); color: var(--info); }
+        .status-ready { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-served { background-color: rgba(59, 130, 246, 0.1); color: var(--info); }
+        .status-completed { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-cancelled { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .status-confirmed { background-color: rgba(59, 130, 246, 0.1); color: var(--info); }
 
-        .top-item {
+        /* Chart Items */
+        .status-item, .top-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-200);
         }
 
-        .top-item:last-child {
+        .status-item:last-child, .top-item:last-child {
             border-bottom: none;
         }
 
         .item-quantity {
-            background-color: #007bff;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary) 0%, #FFB84D 100%);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
         }
 
-        .area-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .area-item:last-child {
-            border-bottom: none;
-        }
-
-        .area-name {
-            font-weight: 500;
-        }
-
-        .area-orders {
-            background-color: #28a745;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .filter-controls select {
-            margin-left: 10px;
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .stat-number { font-size: 1.4rem; }
-            .stat-icon { font-size: 1.5rem; }
-            .shift-report-container { padding: 10px; }
+            .shift-report-container {
+                padding: 16px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                justify-content: flex-end;
+                margin-top: 16px;
+            }
+
+            .shift-details {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .shift-stat-card .shift-stat-icon {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+            }
+
+            .report-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .filter-section {
+                justify-content: flex-end;
+            }
+
+            .orders-table {
+                font-size: 12px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 8px 12px;
+            }
         }
         </style>
     `;
 }
 
-// Function to calculate shift statistics for Chef
+
+// Function to calculate shift statistics
 function calculateShiftStats(orders) {
     const stats = {
         totalOrders: orders.length,
-        totalDishes: 0,
-        completedOrders: 0,
+        totalRevenue: 0,
         statusCounts: {},
         topItems: {},
-        areaStats: {},
-        avgPrepTime: '15p' // This would need actual calculation based on timestamps
+        avgOrderValue: 0
     };
 
     orders.forEach(order => {
-        // Count completed orders
-        if (['COMPLETED', 'SERVED'].includes(order.status)) {
-            stats.completedOrders++;
-        }
-        
+        // Calculate total revenue
+        stats.totalRevenue += parseFloat(order.totalAmount || 0);
+
         // Count status distribution
         const status = order.status || 'UNKNOWN';
         stats.statusCounts[status] = (stats.statusCounts[status] || 0) + 1;
-        
-        // Count total dishes and top items
+
+        // Count top items
         if (order.orderItems) {
             order.orderItems.forEach(item => {
-                stats.totalDishes += item.quantity;
-                
                 const itemName = item.menuItemName;
                 if (!stats.topItems[itemName]) {
                     stats.topItems[itemName] = 0;
@@ -374,29 +647,18 @@ function calculateShiftStats(orders) {
                 stats.topItems[itemName] += item.quantity;
             });
         }
-
-        // Count orders by area (if area information is available)
-        if (order.area) {
-            if (!stats.areaStats[order.area]) {
-                stats.areaStats[order.area] = 0;
-            }
-            stats.areaStats[order.area]++;
-        }
     });
 
-    // Check if we have area data
-    if (Object.keys(stats.areaStats).length === 0) {
-        stats.areaStats = null;
-    }
+    stats.avgOrderValue = stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0;
 
     return stats;
 }
 
-// Function to generate status chart (same as waiter)
+// Function to generate status chart
 function generateStatusChart(statusCounts) {
     const statusLabels = {
         'PENDING': 'Chờ xử lý',
-        'PREPARING': 'Đang chuẩn bị', 
+        'PREPARING': 'Đang chuẩn bị',
         'READY': 'Sẵn sàng',
         'SERVED': 'Đã phục vụ',
         'COMPLETED': 'Hoàn thành',
@@ -417,15 +679,15 @@ function generateStatusChart(statusCounts) {
             </div>
         `;
     }
-    
+
     return html || '<p class="text-muted">Không có dữ liệu</p>';
 }
 
-// Function to generate top items chart (same as waiter)
+// Function to generate top items chart
 function generateTopItemsChart(topItems) {
     // Sort items by quantity and take top 5
     const sortedItems = Object.entries(topItems)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5);
 
     let html = '';
@@ -437,32 +699,14 @@ function generateTopItemsChart(topItems) {
             </div>
         `;
     });
-    
+
     return html || '<p class="text-muted">Không có dữ liệu</p>';
 }
 
-// Function to generate area chart for Chef
-function generateAreaChart(areaStats) {
-    const sortedAreas = Object.entries(areaStats)
-        .sort(([,a], [,b]) => b - a);
-
-    let html = '';
-    sortedAreas.forEach(([areaName, orderCount]) => {
-        html += `
-            <div class="area-item">
-                <div class="area-name">${areaName}</div>
-                <div class="area-orders">${orderCount} đơn</div>
-            </div>
-        `;
-    });
-    
-    return html || '<p class="text-muted">Không có dữ liệu khu vực</p>';
-}
-
-// Function to generate order rows for Chef (updated with area column)
+// Function to generate order rows
 function generateOrderRows(orders) {
     if (!orders || orders.length === 0) {
-        return '<tr><td colspan="8" class="text-center text-muted py-4">Không có đơn hàng nào trong ca làm việc này</td></tr>';
+        return '<tr><td colspan="7" class="text-center text-muted py-4">Không có đơn hàng nào trong ca làm việc này</td></tr>';
     }
 
     return orders.map(order => {
@@ -471,47 +715,37 @@ function generateOrderRows(orders) {
         const statusLabels = {
             'PENDING': 'Chờ xử lý',
             'PREPARING': 'Đang chuẩn bị',
-            'READY': 'Sẵn sàng', 
+            'READY': 'Sẵn sàng',
             'SERVED': 'Đã phục vụ',
             'COMPLETED': 'Hoàn thành',
             'CANCELLED': 'Đã hủy',
             'CONFIRMED': 'Đã xác nhận'
         };
-        
-        const items = order.orderItems ? order.orderItems.map(item => 
+
+        const items = order.orderItems ? order.orderItems.map(item =>
             `${item.quantity}x ${item.menuItemName}`
         ).join(', ') : 'Không có món';
-
-        // Extract kitchen notes from order items
-        const kitchenNotes = order.orderItems ? order.orderItems
-            .filter(item => item.note)
-            .map(item => `${item.menuItemName}: ${item.note}`)
-            .join('; ') : '';
 
         return `
             <tr data-status="${order.status}">
                 <td><strong>#${order.id}</strong></td>
-                <td><span class="badge bg-secondary">${order.tableNumber || 'N/A'}</span></td>
-                <td><span class="badge bg-info">${order.area || 'N/A'}</span></td>
+                <td><span class="badge" style="background-color: var(--primary)">${order.tableNumber || 'N/A'}</span></td>
                 <td>${orderTime}</td>
                 <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${items}">
                     ${items}
                 </td>
                 <td><span class="status-badge ${statusClass}">${statusLabels[order.status] || order.status}</span></td>
                 <td><strong>${formatCurrency(order.totalAmount)}</strong></td>
-                <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${kitchenNotes || order.note || ''}">
-                    ${kitchenNotes || order.note || '<em class="text-muted">Không có ghi chú</em>'}
-                </td>
             </tr>
         `;
     }).join('');
 }
 
-// Function to filter orders by status (same as waiter)
+// Function to filter orders by status
 function filterOrders() {
     const selectedStatus = document.getElementById('statusFilter').value;
     const rows = document.querySelectorAll('#ordersTableBody tr');
-    
+
     rows.forEach(row => {
         const rowStatus = row.getAttribute('data-status');
         if (!selectedStatus || rowStatus === selectedStatus) {
@@ -522,7 +756,7 @@ function filterOrders() {
     });
 }
 
-// Function to format currency (same as waiter)
+// Function to format currency
 function formatCurrency(amount) {
     if (!amount) return '₫0';
     return '₫' + parseFloat(amount).toLocaleString('vi-VN');
@@ -530,5 +764,5 @@ function formatCurrency(amount) {
 
 // Function to export report (placeholder)
 function exportReport() {
-    alert('Chức năng xuất báo cáo sẽ được phát triển trong phiên bản tiếp theo.\n\nBáo cáo sẽ được xuất dưới dạng PDF hoặc Excel.\n\nBáo cáo bếp sẽ bao gồm:\n- Thống kê món ăn đã nấu\n- Hiệu suất theo ca làm việc\n- Phân tích thời gian chuẩn bị');
+    alert('Chức năng xuất báo cáo sẽ được phát triển trong phiên bản tiếp theo.\n\nBáo cáo sẽ được xuất dưới dạng PDF hoặc Excel.');
 }
