@@ -26,6 +26,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <link href="css/table-style.css" rel="stylesheet">
+    <link href="css/chat-style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -107,6 +108,21 @@
                                 <i class="fas fa-bell-slash"></i>
                                 <div>Không có thông báo mới</div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-icon" onclick="toggleMessageDropdown()">
+                    <i class="fas fa-envelope"></i>
+                    <span class="message-badge" id="messageCount">0</span>
+
+                    <!-- Message Dropdown -->
+                    <div class="message-dropdown" id="messageDropdown">
+                        <div class="message-header">
+                            <h6>Tin nhắn</h6>
+                            <button class="clear-all-btn" onclick="markAllMessagesRead()">Đánh dấu đã đọc</button>
+                        </div>
+                        <div class="message-list" id="messageList">
+
                         </div>
                     </div>
                 </div>
@@ -335,6 +351,7 @@
         let hasWorkSchedule = false;
         let notifications = [];
         let notificationDropdownOpen = false;
+        
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', function () {
             updateNotificationCount();
@@ -392,7 +409,8 @@
             console.log('Initializing WebSocket for role:', currentWorkSchedule.role);
 
             // Kết nối WebSocket
-            connectWebSocket(currentWorkSchedule, handleWebSocketMessage);
+            connectNotificationWebSocket(currentWorkSchedule, handleWebSocketMessage);
+            connectChatSocketForStaff(currentWorkSchedule, handleIncomingChatMessage);
         }
 
         function formatInstantToTime(instant) {
@@ -793,6 +811,10 @@
             }
         }
 
+        
+        
+
+
         // Function to show notification dropdown
         function showNotificationDropdown() {
             const dropdown = document.getElementById('notificationDropdown');
@@ -954,13 +976,9 @@
                 // Construct API URL
                 const apiUrl = `/orders/waiter/work-shift-orders?area=${encodeURIComponent(currentWorkSchedule.area)}&startTime=${encodeURIComponent(currentWorkSchedule.startTime)}`;
 
-                console.log('Calling API:', apiUrl);
-
                 const data = await apiFetch(apiUrl, {
                     method: 'GET',
                 });
-
-                console.log('API Response:', data);
 
                 if (data.code === 0 && data.result) {
                     // Count active orders (not CANCELLED or COMPLETED)
@@ -972,9 +990,6 @@
                             const status = order.status ? order.status.toUpperCase() : '';
                             return status !== 'CANCELLED' && status !== 'COMPLETED';
                         }).length;
-
-                        console.log('Orders in content:', data.result.content);
-                        console.log('Filtered orders:', data.result.content.map(o => ({ id: o.id, status: o.status })));
                     }
                     // Fallback: Handle if result is direct array
                     else if (Array.isArray(data.result)) {
@@ -984,14 +999,11 @@
                         }).length;
                     }
 
-                    console.log('Active orders count:', activeOrdersCount);
-                    console.log('Orders data structure:', data.result);
 
                     // Update the Active Orders Card display
                     const activeOrdersCard = document.querySelector('.card:nth-child(1) .stats-number');
                     if (activeOrdersCard) {
                         activeOrdersCard.textContent = activeOrdersCount;
-                        console.log('Updated active orders display to:', activeOrdersCount);
                     } else {
                         console.log('Could not find active orders card element');
                     }
@@ -1013,9 +1025,6 @@
             try {
                 // Construct API URL for tables
                 const apiUrl = `/tables?area=${encodeURIComponent(currentWorkSchedule.area)}`;
-
-                console.log('Calling Tables API:', apiUrl);
-
                 const data = await apiFetch(apiUrl, {
                     method: 'GET',
                 });
@@ -1051,13 +1060,10 @@
                         occupied: occupiedTables,
                         available: availableTables
                     });
-                    console.log('Tables data:', tablesData.map(t => ({ id: t.id, status: t.status })));
-
                     // Update the Tables Management Card display
                     const tablesCard = document.querySelector('.card:nth-child(2) .stats-number');
                     if (tablesCard) {
                         tablesCard.textContent = `${occupiedTables}/${totalTables}`;
-                        console.log('Updated tables display to:', `${occupiedTables}/${totalTables}`);
                     } else {
                         console.log('Could not find tables card element');
                     }
@@ -1085,8 +1091,6 @@
                 const data = await apiFetch(apiUrl, {
                     method: 'GET',
                 });
-
-                console.log('Revenue API Response:', data);
 
                 if (data.code === 0 && data.result) {
                     let totalRevenue = 0;
@@ -1128,16 +1132,13 @@
                         // Format revenue as Vietnamese currency
                         const formattedRevenue = formatCurrency(totalRevenue);
                         revenueCard.textContent = formattedRevenue;
-                        console.log('Updated revenue display to:', formattedRevenue);
                     }
 
                     if (revenueDescription) {
                         revenueDescription.textContent = `Từ ${completedOrdersCount} đơn hàng`;
-                        console.log('Updated revenue description to valid orders:', completedOrdersCount);
                     }
 
                 } else {
-                    console.error('Revenue API call failed:', data);
                     // Set default values on error
                     updateRevenueDisplayOnError();
                 }
@@ -1407,6 +1408,7 @@
     <script src="js/menu.js"></script>
     <script src="js/show-table.js"></script>
     <script src="js/report.js"></script>
+    <script src="js/chat.js"></script>
     <script src="../js/fetch-api.js"></script>
     <script src="../js/websocket.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
