@@ -99,8 +99,12 @@ class CartManager {
         if (!this.storage.isLocalStorageAvailable) {
             setInterval(() => {
                 this.syncCart();
-            }, 1000);
+            }, 500);
         }
+        window.addEventListener('pageshow', () => {
+            this.syncCart();
+            this.notifyCallbacks();
+        });
     }
 
     // Tải giỏ hàng từ storage
@@ -432,6 +436,7 @@ class CartUIManager {
         }
     }
 
+
     updateCartModal() {
         const cartItemCount = document.getElementById('cartItemCount');
         const emptyCart = document.getElementById('emptyCart');
@@ -462,13 +467,26 @@ class CartUIManager {
             if (cartItems) {
                 const cartHeader = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted" style="font-size: 14px;">Danh sách món đã chọn</span>
-                        <button class="btn p-1" onclick="event.stopPropagation(); cartUIManager.clearAllItems()"
-                            style="background: none; border-radius: 20px; padding: 4px 10px; color: #dc3545; font-size: 12px;"
-                            title="Xóa toàn bộ giỏ hàng">
-                            Xoá toàn bộ giỏ hàng
-                        </button>
-                    </div>
+    <span class="text-muted" style="font-size: 14px;">Danh sách món đã chọn</span>
+
+    <button class="btn p-1 d-flex align-items-center"
+        onclick="event.stopPropagation(); cartUIManager.clearAllItems()"
+        style="background: none; border: 1px solid #dc3545; border-radius: 20px; padding: 4px 10px; color: #dc3545; font-size: 12px;"
+        title="Xóa toàn bộ giỏ hàng">
+        
+        <!-- Icon thùng rác -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 4px;">
+            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+        </svg>
+
+        Xoá toàn bộ giỏ hàng
+    </button>
+</div>
+
                 `;
 
                 const cartItemsHTML = items.map(item => `
@@ -482,7 +500,7 @@ class CartUIManager {
         <div class="food-name">${item.name}</div>
         <div class="food-price">${formatPrice(item.price)}</div>
         ${item.note ? `<div class="food-note"><i class="fas fa-sticky-note me-1"></i>${item.note}</div>` : ''}
-        <a href="view-food-detail.html?itemId=${item.id}" class="food-edit-link">Chỉnh sửa</a>
+        <span class="food-edit-link" onclick="viewFoodDetail(${item.id})">Chỉnh sửa</span>
     </div>
     <div class="d-flex align-items-center gap-2">
         <button class="btn cart-btn cart-remove-btn"
@@ -509,6 +527,8 @@ class CartUIManager {
             }
         }
     }
+
+
 
     toggleCart() {
         const cartModal = document.getElementById('cartModal');
@@ -549,7 +569,7 @@ class CartUIManager {
         }
     }
 
-    clearAllItems() {
+    clearAllItems(e) {
         // Ngăn chặn event bubbling
         event?.stopPropagation();
 
@@ -570,264 +590,257 @@ class CartUIManager {
         }
     }
 
-    async placeOrder(event) {
-    // Lấy tableNumber từ URL parameters
-    const getUrlParameter = (name) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    };
+    async placeOrder() {
+        // Lấy tableNumber từ URL parameters
+        const getUrlParameter = (name) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        };
 
-    const tableNumber = getUrlParameter('tableNumber');
-    const BACKEND_BASE_URL = "http://localhost:8080";
+        const tableNumber = getUrlParameter('tableNumber');
 
-    if (this.cartManager.isEmpty()) {
-        alert('Giỏ hàng trống!');
-        return;
-    }
 
-    if (!tableNumber) {
-        alert('Không tìm thấy thông tin bàn!');
-        return;
-    }
-
-    try {
-        // Hiển thị loading state
-        const originalText = event?.target?.textContent;
-        if (event?.target) {
-            event.target.textContent = 'Đang đặt món...';
-            event.target.disabled = true;
+        if (this.cartManager.isEmpty()) {
+            alert('Giỏ hàng trống!');
+            return;
         }
 
-        // Bước 1: Tìm table info dựa trên tableNumber
-        console.log('Finding table info for table number:', tableNumber);
-
-        const tableResponse = await fetch(`${BACKEND_BASE_URL}/tables?tableNumber=${encodeURIComponent(tableNumber)}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!tableResponse.ok) {
-            throw new Error('Lỗi khi tìm thông tin bàn');
+        if (!tableNumber) {
+            alert('Không tìm thấy thông tin bàn!');
+            return;
         }
-
-        const tableData = await tableResponse.json();
-        const table = tableData.result[0]; // Vì tableNumber unique nên chỉ có 1 kết quả
-        const tableId = table.id;
-
-        console.log('Found table:', { id: tableId, number: table.tableNumber, status: table.status });
-
-        // Bước 2: Kiểm tra xem bàn đã có đơn hàng active chưa
-        let existingOrder = null;
-        let isNewOrder = true;
 
         try {
-            const currentOrderResponse = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current`, {
+            // Hiển thị loading state
+            const originalText = event?.target?.textContent;
+            if (event?.target) {
+                event.target.textContent = 'Đang đặt món...';
+                event.target.disabled = true;
+            }
+
+            // Bước 1: Tìm table info dựa trên tableNumber
+            console.log('Finding table info for table number:', tableNumber);
+
+            const tableResponse = await fetch(`${BACKEND_BASE_URL}/tables?tableNumber=${encodeURIComponent(tableNumber)}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
                 }
             });
 
-            if (currentOrderResponse.ok) {
-                const currentOrderData = await currentOrderResponse.json();
-                existingOrder = currentOrderData.result;
-                
-                // Kiểm tra status của đơn hàng hiện tại
-                const activeStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
-                if (existingOrder && activeStatuses.includes(existingOrder.status)) {
-                    isNewOrder = false;
-                    console.log('Found existing active order:', existingOrder.id);
-                }
+            if (!tableResponse.ok) {
+                throw new Error('Lỗi khi tìm thông tin bàn');
             }
-        } catch (error) {
-            console.log('No existing order found, will create new order');
-        }
 
-        // Bước 3: Chuẩn bị dữ liệu order items
-        const orderItems = this.cartManager.getItems().map(item => ({
-            menuItemId: item.id,
-            quantity: item.quantity,
-            note: item.note || '',
-        }));
+            const tableData = await tableResponse.json();
+            const table = tableData.result[0]; // Vì tableNumber unique nên chỉ có 1 kết quả
+            const tableId = table.id;
 
-        let orderResponse;
-        let orderResult;
+            console.log('Found table:', { id: tableId, number: table.tableNumber, status: table.status });
 
-        if (isNewOrder) {
-            // Tạo đơn hàng mới
-            console.log('Creating new order...');
-            
-            const orderData = {
-                tableId: tableId,
-                userId: null,
-                orderType: 'DINE_IN',
-                orderItems: orderItems,
-            };
-
-            console.log('Sending new order data:', orderData);
-
-            orderResponse = await fetch(`${BACKEND_BASE_URL}/orders`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(orderData)
-            });
-        } else {
-            // Thêm món vào đơn hàng hiện tại
-            console.log('Adding items to existing order:', existingOrder.id);
-            
-            const addItemsData = {
-                orderItems: orderItems,
-            };
-
-            console.log('Sending add items data:', addItemsData);
-
-            orderResponse = await fetch(`${BACKEND_BASE_URL}/orders/${existingOrder.id}/items`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(addItemsData)
-            });
-        }
-
-        if (!orderResponse.ok) {
-            // Xử lý response lỗi từ server
-            let errorMessage = 'Có lỗi xảy ra khi đặt món';
+            // Bước 2: Kiểm tra xem bàn đã có đơn hàng active chưa
+            let existingOrder = null;
+            let isNewOrder = true;
 
             try {
-                const errorResponse = await orderResponse.json();
-                console.error('Server error response:', errorResponse);
+                const currentOrderResponse = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
-                if (errorResponse.message) {
-                    errorMessage = errorResponse.message;
-                } else if (errorResponse.code) {
-                    switch (errorResponse.code) {
-                        case 'TABLE_NOT_EXISTED':
-                            errorMessage = 'Bàn không tồn tại';
-                            break;
-                        case 'TABLE_NOT_AVAILABLE':
-                            errorMessage = 'Bàn đang được sử dụng';
-                            break;
-                        case 'MENU_ITEM_NOT_EXISTED':
-                            errorMessage = 'Món ăn không tồn tại';
-                            break;
-                        case 'MENU_ITEM_NOT_AVAILABLE':
-                            errorMessage = 'Món ăn hiện không có sẵn';
-                            break;
-                        case 'USER_NOT_EXISTED':
-                            errorMessage = 'Người dùng không tồn tại';
-                            break;
-                        case 'ORDER_NOT_EXISTED':
-                            errorMessage = 'Đơn hàng không tồn tại';
-                            break;
-                        default:
-                            errorMessage = `Lỗi: ${errorResponse.code}`;
+                if (currentOrderResponse.ok) {
+                    const currentOrderData = await currentOrderResponse.json();
+                    existingOrder = currentOrderData.result;
+
+                    // Kiểm tra status của đơn hàng hiện tại
+                    const activeStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
+                    if (existingOrder && activeStatuses.includes(existingOrder.status)) {
+                        isNewOrder = false;
+                        console.log('Found existing active order:', existingOrder.id);
                     }
                 }
-            } catch (parseError) {
-                console.error('Cannot parse error response:', parseError);
-                switch (orderResponse.status) {
-                    case 400:
-                        errorMessage = 'Dữ liệu đơn hàng không hợp lệ';
-                        break;
-                    case 404:
-                        errorMessage = 'Không tìm thấy thông tin cần thiết';
-                        break;
-                    case 500:
-                        errorMessage = 'Lỗi server nội bộ';
-                        break;
-                    default:
-                        errorMessage = `Lỗi HTTP: ${orderResponse.status}`;
-                }
-            }
-
-            throw new Error(errorMessage);
-        }
-
-        const apiResponse = await orderResponse.json();
-        console.log('Order operation completed successfully:', apiResponse);
-
-        if (apiResponse.result) {
-            orderResult = apiResponse.result;
-
-            // Lưu order ID vào storage nếu có thể
-            try {
-                if (this.cartManager.storage.isLocalStorageAvailable) {
-                    localStorage.setItem('currentOrderId', orderResult.id);
-
-                    // Lưu thông tin đơn hàng chi tiết để hiển thị trên trang xác nhận
-                    const orderDetails = {
-                        ...orderResult,
-                        tableNumber: tableNumber,
-                        items: this.cartManager.getItems().map(item => ({
-                            name: item.name,
-                            quantity: item.quantity,
-                            price: item.price,
-                            note: item.note || ''
-                        })),
-                        isNewOrder: isNewOrder
-                    };
-                    localStorage.setItem('orderConfirmationData', JSON.stringify(orderDetails));
-                }
             } catch (error) {
-                console.warn('Cannot save order details:', error);
+                console.log('No existing order found, will create new order');
             }
 
-            // Clear cart
-            this.cartManager.clearCart();
-            this.toggleCart();
+            // Bước 3: Chuẩn bị dữ liệu order items
+            const orderItems = this.cartManager.getItems().map(item => ({
+                menuItemId: item.id,
+                quantity: item.quantity,
+                note: item.note || '',
+            }));
 
-            // Hiển thị thông báo thành công
-            const successMessage = isNewOrder ? 
-                'Đặt món thành công!' : 
-                'Thêm món vào đơn hàng thành công!';
-            
-            // Có thể thay alert bằng toast notification đẹp hơn
-            // alert(successMessage);
+            let orderResponse;
+            let orderResult;
 
-            // Chuyển hướng đến trang xác nhận đơn hàng
-            const confirmationUrl = `order-confirmation.html?orderId=${orderResult.id}&tableNumber=${encodeURIComponent(tableNumber)}`;
-            window.location.href = confirmationUrl;
+            if (isNewOrder) {
+                // Tạo đơn hàng mới
+                console.log('Creating new order...');
 
-        } else {
-            console.warn('Unexpected API response format:', apiResponse);
-            // Fallback: vẫn chuyển đến trang xác nhận với thông tin cơ bản
-            this.cartManager.clearCart();
-            this.toggleCart();
+                const orderData = {
+                    tableId: tableId,
+                    userId: null,
+                    orderType: 'DINE_IN',
+                    orderItems: orderItems,
+                };
 
-            const confirmationUrl = `order-confirmation.html?tableNumber=${encodeURIComponent(tableNumber)}`;
-            window.location.href = confirmationUrl;
-        }
+                console.log('Sending new order data:', orderData);
 
-    } catch (error) {
-        console.error('Error placing order:', error);
+                orderResponse = await fetch(`${BACKEND_BASE_URL}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+            } else {
+                // Thêm món vào đơn hàng hiện tại
+                console.log('Adding items to existing order:', existingOrder.id);
 
-        let userMessage;
-        if (error.message.includes('Failed to fetch')) {
-            userMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
-        } else if (error.message.includes('NetworkError')) {
-            userMessage = 'Lỗi mạng. Vui lòng thử lại sau.';
-        } else if (error.message.includes('CORS')) {
-            userMessage = 'Lỗi kết nối. Vui lòng liên hệ quản trị viên.';
-        } else {
-            userMessage = error.message;
-        }
+                const addItemsData = {
+                    orderItems: orderItems,
+                };
 
-        alert(userMessage);
-    } finally {
-        // Reset button state
-        if (event?.target) {
-            event.target.textContent = originalText || 'Đặt món';
-            event.target.disabled = false;
+                console.log('Sending add items data:', addItemsData);
+
+                orderResponse = await fetch(`${BACKEND_BASE_URL}/orders/${existingOrder.id}/items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(addItemsData)
+                });
+            }
+
+            if (!orderResponse.ok) {
+                // Xử lý response lỗi từ server
+                let errorMessage = 'Có lỗi xảy ra khi đặt món';
+
+                try {
+                    const errorResponse = await orderResponse.json();
+                    console.error('Server error response:', errorResponse);
+
+                    if (errorResponse.message) {
+                        errorMessage = errorResponse.message;
+                    } else if (errorResponse.code) {
+                        switch (errorResponse.code) {
+                            case 'TABLE_NOT_EXISTED':
+                                errorMessage = 'Bàn không tồn tại';
+                                break;
+                            case 'TABLE_NOT_AVAILABLE':
+                                errorMessage = 'Bàn đang được sử dụng';
+                                break;
+                            case 'MENU_ITEM_NOT_EXISTED':
+                                errorMessage = 'Món ăn không tồn tại';
+                                break;
+                            case 'MENU_ITEM_NOT_AVAILABLE':
+                                errorMessage = 'Món ăn hiện không có sẵn';
+                                break;
+                            case 'USER_NOT_EXISTED':
+                                errorMessage = 'Người dùng không tồn tại';
+                                break;
+                            case 'ORDER_NOT_EXISTED':
+                                errorMessage = 'Đơn hàng không tồn tại';
+                                break;
+                            default:
+                                errorMessage = `Lỗi: ${errorResponse.code}`;
+                        }
+                    }
+                } catch (parseError) {
+                    console.error('Cannot parse error response:', parseError);
+                    switch (orderResponse.status) {
+                        case 400:
+                            errorMessage = 'Dữ liệu đơn hàng không hợp lệ';
+                            break;
+                        case 404:
+                            errorMessage = 'Không tìm thấy thông tin cần thiết';
+                            break;
+                        case 500:
+                            errorMessage = 'Lỗi server nội bộ';
+                            break;
+                        default:
+                            errorMessage = `Lỗi HTTP: ${orderResponse.status}`;
+                    }
+                }
+
+                throw new Error(errorMessage);
+            }
+
+            const apiResponse = await orderResponse.json();
+            console.log('Order operation completed successfully:', apiResponse);
+
+            if (apiResponse.result) {
+                orderResult = apiResponse.result;
+
+                // Lưu order ID vào storage nếu có thể
+                try {
+                    if (this.cartManager.storage.isLocalStorageAvailable) {
+                        localStorage.setItem('currentOrderId', orderResult.id);
+
+                        // Lưu thông tin đơn hàng chi tiết để hiển thị trên trang xác nhận
+                        const orderDetails = {
+                            ...orderResult,
+                            tableNumber: tableNumber,
+                            items: this.cartManager.getItems().map(item => ({
+                                name: item.name,
+                                quantity: item.quantity,
+                                price: item.price,
+                                note: item.note || ''
+                            })),
+                            isNewOrder: isNewOrder
+                        };
+                        localStorage.setItem('orderConfirmationData', JSON.stringify(orderDetails));
+                    }
+                } catch (error) {
+                    console.warn('Cannot save order details:', error);
+                }
+
+                // Clear cart
+                this.cartManager.clearCart();
+                this.toggleCart();
+
+
+                // Chuyển hướng đến trang xác nhận đơn hàng
+                const confirmationUrl = `order-confirmation.html?orderId=${orderResult.id}&tableNumber=${encodeURIComponent(tableNumber)}`;
+                window.location.href = confirmationUrl;
+
+            } else {
+                console.warn('Unexpected API response format:', apiResponse);
+                // Fallback: vẫn chuyển đến trang xác nhận với thông tin cơ bản
+                this.cartManager.clearCart();
+                this.toggleCart();
+
+                const confirmationUrl = `order-confirmation.html?tableNumber=${encodeURIComponent(tableNumber)}`;
+                window.location.href = confirmationUrl;
+            }
+
+        } catch (error) {
+            console.error('Error placing order:', error);
+
+            let userMessage;
+            if (error.message.includes('Failed to fetch')) {
+                userMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+            } else if (error.message.includes('NetworkError')) {
+                userMessage = 'Lỗi mạng. Vui lòng thử lại sau.';
+            } else if (error.message.includes('CORS')) {
+                userMessage = 'Lỗi kết nối. Vui lòng liên hệ quản trị viên.';
+            } else {
+                userMessage = error.message;
+            }
+
+            alert(userMessage);
+        } finally {
+            // Reset button state
+            if (event?.target) {
+                event.target.textContent = originalText || 'Đặt món';
+                event.target.disabled = false;
+            }
         }
     }
-}
 
     // Debug functions
     exportCartData() {
@@ -843,6 +856,12 @@ class CartUIManager {
 
 // Tạo instance global cho UI manager
 const cartUIManager = new CartUIManager(cartManager);
+
+function viewFoodDetail(foodId) {
+    const tableNumber = getUrlParameter('tableNumber') || '';
+    const url = `view-food-detail.html?itemId=${foodId}&tableNumber=${encodeURIComponent(tableNumber)}`;
+    window.location.replace(url); // Thay thế mục lịch sử hiện tại
+}
 
 // Global functions để sử dụng trong HTML
 function toggleCart() {

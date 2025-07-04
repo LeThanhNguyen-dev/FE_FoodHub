@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FoodHub - Đang xử lý...</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: white;
+        }
+
+        .loading-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .loading-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .logo-container i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6b35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-text {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .sub-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .error-card {
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .success-card {
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-container">
+        <div class="loading-card" id="statusCard">
+            <div class="logo-container">
+                <i class="fas fa-utensils"></i>
+            </div>
+
+            <div id="loadingContent">
+                <div class="spinner"></div>
+                <h4 class="status-text">Đang xử lý QR Code...</h4>
+                <p class="sub-text">Vui lòng đợi trong giây lát</p>
+            </div>
+
+            <div id="errorContent" style="display: none;">
+                <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h4 class="status-text text-danger">Có lỗi xảy ra</h4>
+                <p class="sub-text" id="errorMessage">QR Code không hợp lệ hoặc bàn không khả dụng</p>
+                <button class="btn btn-retry" onclick="retryQRScan()">
+                    <i class="fas fa-redo me-2"></i>Thử lại
+                </button>
+            </div>
+
+            <div id="successContent" style="display: none;">
+                <i class="fas fa-check-circle text-success" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h4 class="status-text text-success">Quét QR thành công!</h4>
+            </div>
+        </div>
+    </div>
+    <script src="js/backend-url.js"></script>
+    <script>
+        // Cấu hình API
+        const API_ENDPOINTS = {
+            scanQR: '/qr/scan',
+            validateToken: '/qr/validate'
+        };
+
+        // Lấy QR code từ URL parameter
+        function getQRCodeFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('qrCode') || urlParams.get('code') || urlParams.get('qr');
+        }
+
+        // Xử lý quét QR code
+        async function handleQRScan(qrCode) {
+            try {
+                showLoading();
+                
+                // Gọi API scan QR
+                const response = await fetch(`${BACKEND_BASE_URL}${API_ENDPOINTS.scanQR}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        qrCode: qrCode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.result) {
+                    // Lưu thông tin phiên vào localStorage
+                    const sessionData = {
+                        token: data.result.token,
+                        tableNumber: data.result.tableNumber,
+                        orderId: data.result.orderId,
+                        expiryTime: data.result.expiryTime,
+                        isReservationToken: data.result.isReservationToken,
+                        scanTime: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('qrSession', JSON.stringify(sessionData));
+                    localStorage.setItem('tableNumber', data.result.tableNumber);
+                    localStorage.setItem('sessionToken', data.result.token);
+
+                    // Hiển thị thành công
+                    showSuccess();
+
+                    // Chuyển đến trang nhập tên sau 1.5 giây
+                    setTimeout(() => {
+                        if (data.result.orderId) {
+                            // Nếu đã có order, chuyển thẳng đến home page
+                            window.location.href = `home-page.html?tableNumber=${data.result.tableNumber}&orderId=${data.result.orderId}`;
+                        } else {
+                            // Nếu chưa có order, chuyển đến trang nhập tên
+                            window.location.href = `enter-name.html?tableNumber=${data.result.tableNumber}`;
+                        }
+                    }, 1500);
+
+                } else {
+                    // Xử lý lỗi từ API
+                    const errorMsg = data.message || 'QR Code không hợp lệ hoặc bàn không khả dụng';
+                    showError(errorMsg);
+                }
+
+            } catch (error) {
+                console.error('Lỗi khi xử lý QR code:', error);
+                showError('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.');
+            }
+        }
+
+        // Hiển thị trạng thái loading
+        function showLoading() {
+            document.getElementById('loadingContent').style.display = 'block';
+            document.getElementById('errorContent').style.display = 'none';
+            document.getElementById('successContent').style.display = 'none';
+        }
+
+        // Hiển thị lỗi
+        function showError(message) {
+            document.getElementById('loadingContent').style.display = 'none';
+            document.getElementById('errorContent').style.display = 'block';
+            document.getElementById('successContent').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Hiển thị thành công
+        function showSuccess() {
+            document.getElementById('loadingContent').style.display = 'none';
+            document.getElementById('errorContent').style.display = 'none';
+            document.getElementById('successContent').style.display = 'block';
+        }
+
+        // Thử lại quét QR
+        function retryQRScan() {
+            const qrCode = getQRCodeFromURL();
+            if (qrCode) {
+                handleQRScan(qrCode);
+            } else {
+                showError('Không tìm thấy mã QR. Vui lòng quét lại.');
+            }
+        }
+
+        // Xử lý khi trang được load
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrCode = getQRCodeFromURL();
+            
+            if (qrCode) {
+                // Có QR code, bắt đầu xử lý
+                setTimeout(() => {
+                    handleQRScan(qrCode);
+                }, 500); // Delay nhỏ để UX mượt hơn
+            } else {
+                // Không có QR code
+                showError('Không tìm thấy mã QR trong URL. Vui lòng quét mã QR từ bàn.');
+            }
+            
+            // Bắt đầu theo dõi token sau khi load xong
+            startTokenMonitoring();
+        });
+
+        // Xử lý khi trang được đóng - finish session
+        window.addEventListener('beforeunload', async function(e) {
+            const sessionData = JSON.parse(localStorage.getItem('qrSession') || '{}');
+            
+            if (sessionData.token && sessionData.isReservationToken) {
+                // Chỉ finish session nếu là reservation token (chưa order)
+                try {
+                    await fetch(`${BACKEND_BASE_URL}/qr/finish-session`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            token: sessionData.token
+                        }),
+                        keepalive: true // Đảm bảo request được gửi khi đóng trang
+                    });
+                } catch (error) {
+                    console.error('Lỗi khi finish session:', error);
+                }
+            }
+        });
+
+        // Xử lý visibility change (khi chuyển tab hoặc minimize app)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // Kiểm tra token khi quay lại trang
+                checkAndRefreshToken();
+            }
+        });
+
+        // Refresh token khi sắp hết hạn
+        async function refreshToken() {
+            const sessionData = JSON.parse(localStorage.getItem('qrSession') || '{}');
+            
+            if (!sessionData.token) {
+                console.warn('Không có token để refresh');
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_BASE_URL}/qr/refresh-token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: sessionData.token
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.result) {
+                    // Cập nhật token mới
+                    sessionData.token = data.result.newToken;
+                    sessionData.expiryTime = data.result.expiryTime;
+                    
+                    localStorage.setItem('qrSession', JSON.stringify(sessionData));
+                    localStorage.setItem('sessionToken', data.result.newToken);
+                    
+                    console.log('Token đã được refresh thành công');
+                    return true;
+                } else {
+                    console.error('Lỗi refresh token:', data.message);
+                    return false;
+                }
+
+            } catch (error) {
+                console.error('Lỗi khi refresh token:', error);
+                return false;
+            }
+        }
+
+        // Kiểm tra và tự động refresh token
+        async function checkAndRefreshToken() {
+            const sessionData = JSON.parse(localStorage.getItem('qrSession') || '{}');
+            
+            if (!sessionData.token || !sessionData.expiryTime) {
+                return false;
+            }
+
+            const expiryTime = new Date(sessionData.expiryTime);
+            const now = new Date();
+            const timeUntilExpiry = expiryTime.getTime() - now.getTime();
+            
+            // Refresh token nếu còn ít hơn 5 phút
+            if (timeUntilExpiry < 300000 && timeUntilExpiry > 0) {
+                console.log('Token sắp hết hạn, đang refresh...');
+                return await refreshToken();
+            }
+            
+            // Token đã hết hạn
+            if (timeUntilExpiry <= 0) {
+                console.warn('Token đã hết hạn');
+                clearExpiredSession();
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Xóa session hết hạn
+        function clearExpiredSession() {
+            localStorage.removeItem('qrSession');
+            localStorage.removeItem('sessionToken');
+            localStorage.removeItem('tableNumber');
+            localStorage.removeItem('customerName');
+            localStorage.removeItem('customerSession');
+            
+            console.log('Đã xóa session hết hạn');
+        }
+
+        // Validate token với server
+        async function validateTokenWithServer(token) {
+            try {
+                const response = await fetch(`${BACKEND_BASE_URL}/qr/validate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: token
+                    })
+                });
+
+                const data = await response.json();
+                return response.ok && data.result && data.result.isValid;
+
+            } catch (error) {
+                console.error('Lỗi khi validate token:', error);
+                return false;
+            }
+        }
+
+        // Bắt đầu theo dõi token
+        function startTokenMonitoring() {
+            // Kiểm tra token mỗi 2 phút
+            setInterval(async () => {
+                const sessionData = JSON.parse(localStorage.getItem('qrSession') || '{}');
+                
+                if (sessionData.token) {
+                    // Kiểm tra token local trước
+                    const isValidLocal = await checkAndRefreshToken();
+                    
+                    if (isValidLocal) {
+                        // Validate với server mỗi 10 phút
+                        const lastValidation = localStorage.getItem('lastTokenValidation');
+                        const now = Date.now();
+                        
+                        if (!lastValidation || (now - parseInt(lastValidation)) > 600000) {
+                            const isValidServer = await validateTokenWithServer(sessionData.token);
+                            
+                            if (!isValidServer) {
+                                console.warn('Token không hợp lệ trên server');
+                                clearExpiredSession();
+                                // Có thể chuyển về trang lỗi hoặc yêu cầu quét lại QR
+                                showError('Phiên làm việc đã hết hạn. Vui lòng quét lại mã QR.');
+                            } else {
+                                localStorage.setItem('lastTokenValidation', now.toString());
+                            }
+                        }
+                    }
+                }
+            }, 120000); // 2 phút
+        }
+    </script>
+</body>
+
+</html>
