@@ -1,0 +1,357 @@
+
+:root {
+    --primary: #FEA116;
+    --light: #F8F9FA;
+    --dark: #1E293B;
+    --secondary: #6C757D;
+    --border-color: #DEE2E6;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --info: #3B82F6;
+    --pending: #FBBF24; /* Màu vàng sáng cho PENDING */
+    --unknown: #6B7280; /* Màu xám cho UNKNOWN */
+}
+
+body {
+    font-family: 'Poppins', 'Nunito', sans-serif;
+    background-color: var(--light);
+    color: #495057;
+}
+
+/* Layout */
+.main-content {
+    margin-left: 280px;
+    transition: all 0.3s ease-in-out;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+.main-content.expanded {
+    margin-left: 70px;
+}
+
+.top-bar {
+    background: #FFFFFF;
+    padding: 1rem 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.toggle-sidebar {
+    background: none;
+    border: none;
+    color: var(--dark);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Components */
+.card {
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+    background: #FFFFFF;
+    color: var(--dark);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: #e8960f;
+    border-color: #e8960f;
+}
+
+/* Table */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.table {
+    background: white;
+    margin-bottom: 0;
+}
+
+.table th, .table td {
+    padding: 0.75rem; /* Giảm padding để gọn hơn */
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem; /* Giảm kích thước chữ */
+}
+
+.table thead th {
+    background: var(--light);
+    color: var(--dark);
+    font-weight: 600;
+    border: none;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr:first-child td {
+    border-top: none;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(254, 161, 22, 0.05);
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700; /* Tăng độ đậm */
+    font-size: 0.9rem; /* Tăng kích thước chữ để nổi bật */
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 120px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Thêm bóng nhẹ */
+}
+
+.status-paid {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.status-pending {
+    background: rgba(251, 191, 36, 0.2);
+    border-color: var(--pending);
+    color: var(--pending);
+}
+
+.status-unpaid {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.status-cancelled {
+    background: rgba(107, 114, 128, 0.2);
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.status-failed {
+    background: rgba(234, 88, 12, 0.2);
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.status-refunded {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: var(--info);
+    color: var(--info);
+}
+
+.status-unknown {
+    background: rgba(107, 114, 128, 0.2);
+    border-color: var(--unknown);
+    color: var(--unknown);
+}
+
+/* Forms */
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(254, 161, 22, 0.15);
+    background-color: #fff;
+}
+
+/* Other Components */
+.action-buttons .btn {
+    margin: 0 2px;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+}
+
+.pagination-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.pagination .page-link {
+    border-radius: 8px;
+    margin: 0 3px;
+    border: 1px solid var(--border-color);
+    color: var(--secondary);
+    font-weight: 500;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+.pagination .page-link:hover {
+    background: rgba(254, 161, 22, 0.1);
+    color: var(--primary);
+}
+
+.pagination .page-item.disabled .page-link {
+    border-color: #e5e7eb;
+    color: #6b7280;
+    background: transparent;
+}
+
+.sort-arrow {
+    margin-left: 5px;
+    color: #6c757d;
+}
+
+.sort-arrow:after {
+    content: '↕';
+}
+
+.sort-arrow.asc:after {
+    content: '↑';
+    color: #007bff;
+}
+
+.sort-arrow.desc:after {
+    content: '↓';
+    color: #007bff;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    min-width: 300px;
+    animation: slideInRight 0.3s ease-out;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.spinner-border {
+    color: var(--primary) !important;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--secondary);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.modal-content {
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 25, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary), #ff8c00);
+    color: white;
+    border: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
+/* Status Column */
+.table th[data-status-column],
+.table td[data-status-column] {
+    width: 160px;
+    min-width: 150px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        min-width: 100px;
+    }
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: stretch;
+    }
+    .action-buttons .btn {
+        width: 100%;
+        margin: 0;
+        font-size: 0.8rem;
+    }
+}

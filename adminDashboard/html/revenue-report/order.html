@@ -26,8 +26,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/sidebar.css">
-    <link rel="stylesheet" href="/css/orderList.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/orderList.css">
 </head>
 <body>
     <!-- Sidebar Include -->
@@ -36,27 +36,7 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="d-flex align-items-center">
-                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Quản lý đơn hàng</h4>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i>Admin
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <div id="topbar-container"></div>
 
         <!-- Order Management Content -->
         <div class="container-fluid p-4">
@@ -222,7 +202,8 @@
 
     <!-- Custom JS -->
     <script src="/js/fetch-api.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="../../js/sidebar.js"></script>
+     <script src="../../js/topbar.js"></script>
     <script>
         let summaryChart;
         let currentPage = 0;
@@ -233,7 +214,7 @@
 
         async function loadSidebar() {
             try {
-                const response = await fetch('/components/sidebar.html');
+                const response = await fetch('../../components/sidebar.html');
                 if (!response.ok) throw new Error('Không thể tải sidebar');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -673,38 +654,48 @@ setTimeout(() => {
             }
         }
 
-        async function showOrderDetail(orderId) {
-            try {
-                const data = await apiFetch(`/orders/${orderId}`);
-                const order = data.result;
-                document.getElementById('orderDetailModalLabel').textContent = `Chi tiết đơn hàng ${order.id}`;
-                document.getElementById('orderDetails').innerHTML = `
-                    <div class="col-md-6">
-                        <p><strong>Mã:</strong> ${order.id}</p>
-                        <p><strong>Ngày đặt:</strong> ${formatDate(order.createdAt)}</p>
-                        <p><strong>Khách hàng:</strong> ${order.username || 'Khách lẻ'}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
-                        <p><strong>Loại đơn:</strong> ${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</p>
-                        <p><strong>Bàn:</strong> ${order.tableNumber || 'N/A'}</p>
-                        <p><strong>Phương thức thanh toán:</strong> ${formatPaymentMethod(order.payment.paymentMethod)}</p>
-                    </div>
-                `;
-                document.getElementById('itemsTableBody').innerHTML = order.orderItems.map(item => `
-                    <tr>
-                        <td>${item.menuItemName}</td>
-                        <td>${item.quantity}</td>
-                        <td>${formatCurrency(item.price)}</td>
-                        <td>${formatCurrency(item.quantity * item.price)}</td>
-                    </tr>
-                `).join('');
-                document.getElementById('orderNote').innerHTML = order.note ? `<strong>Ghi chú:</strong> ${order.note}` : '';
-                new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
-            } catch (error) {
-                showNotification(`Không thể tải chi tiết đơn hàng: ${error.message}`, 'error');
-            }
+       async function showOrderDetail(orderId) {
+    try {
+        const data = await apiFetch(`/orders/${orderId}`);
+        const order = data.result;
+        
+        // Xử lý an toàn cho payment method
+        let paymentMethodText = 'Chưa xác định';
+        if (order.payment && order.payment.paymentMethod) {
+            paymentMethodText = formatPaymentMethod(order.payment.paymentMethod);
         }
+        
+        document.getElementById('orderDetailModalLabel').textContent = `Chi tiết đơn hàng ${order.id}`;
+        document.getElementById('orderDetails').innerHTML = `
+            <div class="col-md-6">
+                <p><strong>Mã:</strong> ${order.id}</p>
+                <p><strong>Ngày đặt:</strong> ${formatDate(order.createdAt)}</p>
+                <p><strong>Khách hàng:</strong> ${order.username || 'Khách lẻ'}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
+                <p><strong>Loại đơn:</strong> ${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</p>
+                <p><strong>Bàn:</strong> ${order.tableNumber || 'N/A'}</p>
+                <p><strong>Phương thức thanh toán:</strong> ${paymentMethodText}</p>
+            </div>
+        `;
+        
+        document.getElementById('itemsTableBody').innerHTML = order.orderItems.map(item => `
+            <tr>
+                <td>${item.menuItemName}</td>
+                <td>${item.quantity}</td>
+                <td>${formatCurrency(item.price)}</td>
+                <td>${formatCurrency(item.quantity * item.price)}</td>
+            </tr>
+        `).join('');
+        
+        document.getElementById('orderNote').innerHTML = order.note ? `<strong>Ghi chú:</strong> ${order.note}` : '';
+        new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
+    } catch (error) {
+        console.error('Chi tiết lỗi:', error);
+        showNotification(`Không thể tải chi tiết đơn hàng: ${error.message}`, 'error');
+    }
+}
 
         function sortTable(column) {
     // Xóa tất cả class sort cũ
@@ -760,6 +751,7 @@ setTimeout(() => {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadTopbar();
             loadSidebar();
             initPeriodFromQueryParams();
             updateData();

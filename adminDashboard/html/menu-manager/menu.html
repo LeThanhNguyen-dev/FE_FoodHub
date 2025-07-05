@@ -24,8 +24,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/sidebar.css">
-    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/menu.css">
 
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -38,30 +38,7 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="d-flex align-items-center">
-                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h4 class="mb-0"><i class="fas fa-utensils me-2"></i>Quản lý món ăn</h4>
-            </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-success me-3" onclick="addNewDish()">
-                    <i class="fas fa-plus me-2"></i>Thêm món ăn
-                </button>
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i>Admin
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+         <div id="topbar-container"></div>
 
         <!-- Menu Management Content -->
         <div class="container-fluid p-4">
@@ -111,9 +88,14 @@
 
             <!-- Menu Table Card -->
             <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-list me-2"></i>Danh sách món ăn</h5>
-                </div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">
+        <i class="fas fa-list me-2"></i>Danh sách món ăn
+    </h5>
+    <button class="btn btn-success" onclick="addNewDish()">
+        <i class="fas fa-plus me-2"></i>Thêm món ăn
+    </button>
+</div>
                 <div class="card-body">
                     <!-- Loading spinner -->
                     <div id="loadingSpinner" class="text-center py-5" style="display: none;">
@@ -163,15 +145,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JS -->
+      <script src="../../js/topbar.js"></script>
     <script src="/js/fetch-api.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="../../js/sidebar.js"></script>
+    
     <script>
         let currentPage = 0;
         const pageSize = 10;
 
         async function loadSidebar() {
             try {
-                const response = await fetch('/components/sidebar.html');
+                const response = await fetch('../../components/sidebar.html');
                 if (!response.ok) throw new Error('Không thể tải sidebar');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -471,6 +455,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadSidebar();
+           loadTopbar();
+           loadUserInfo();
             fetchCategories();
             fetchMenuItems();
 

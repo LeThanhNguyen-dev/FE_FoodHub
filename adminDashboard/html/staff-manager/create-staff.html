@@ -23,8 +23,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/sidebar.css">
-    <link rel="stylesheet" href="/css/create-staff.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/create-staff.css">
 
     <!-- Goong Map JavaScript SDK -->
     <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7bVxaW"></script>
@@ -110,7 +110,6 @@
               <label for="roleName" class="form-label">Vai trò</label>
               <select class="form-select" id="roleName" name="roleName" required>
                 <option value="" disabled selected>Chọn vai trò</option>
-                <option value="MANAGER">MANAGER</option>
                 <option value="CASHIER">CASHIER</option>
                 <option value="CHEF">CHEF</option>
                 <option value="WAITER">WAITER</option>
@@ -131,7 +130,8 @@
   <!-- Bootstrap JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="/js/fetch-api.js"></script>
-  <script src="/js/sidebar.js"></script>
+  <script src="../../js/sidebar.js"></script>
+  <script src="../../js/topbar.js"></script>
   <script>
     // Xóa lỗi và viền đỏ
     function clearErrors() {
@@ -171,7 +171,7 @@
     // Tải sidebar
     async function loadSidebar() {
       try {
-        const response = await fetch('/components/sidebar.html');
+        const response = await fetch('../../components/sidebar.html');
         if (!response.ok) throw new Error('Không thể tải sidebar');
         const sidebarHtml = await response.text();
         document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -322,7 +322,7 @@
 
     // Quay lại danh sách
     function goBack() {
-      window.location.href = '/staff-manager/staffList.html';
+      window.location.href = 'staffList.html';
     }
 
     // Toggle mật khẩu hiển thị/ẩn
@@ -342,6 +342,7 @@
 
     // Khởi tạo
     document.addEventListener('DOMContentLoaded', () => {
+      loadUserInfo(); 
       loadSidebar();
       disableAutocomplete();
       document.querySelectorAll('input').forEach(input => {

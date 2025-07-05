@@ -16,8 +16,8 @@
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/sidebar.css">
-    <link rel="stylesheet" href="/css/revenue-report.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/revenue-report.css">
 </head>
 <body>
     <!-- Sidebar Include -->
@@ -25,16 +25,9 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <button class="sidebar-toggle" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="dashboard">
-            <div class="header">
-                <div>
-                    <h1>Báo Cáo Tài Chính</h1>
-                    <p>FOODHUB</p>
-                </div>
-                <div class="date-filter">
+        <!-- Top Bar -->
+      <div id="topbar-container"></div>
+                <div class="date-filter me-3">
                     <select id="periodSelect">
                         <option value="today">Hôm nay</option>
                         <option value="week">Tuần này</option>
@@ -47,8 +40,8 @@
                         <button onclick="updateData()">Lọc</button>
                     </div>
                 </div>
-            </div>
-
+        <!-- Dashboard Content -->
+        <div class="dashboard">
             <div class="stats-grid">
                 <div class="stat-card revenue">
                     <div class="stat-header">
@@ -130,15 +123,17 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="/js/fetch-api.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="../../js/sidebar.js"></script>
+     <script src="../../js/topbar.js"></script>
     <script>
         let revenueChart, paymentMethodChart, orderTypeChart, comparisonChart, dishChart, popupChart;
         let chartData = null;
 
+
         // Tải sidebar
         async function loadSidebar() {
             try {
-                const response = await fetch('/components/sidebar.html');
+                const response = await fetch('../../components/sidebar.html');
                 if (!response.ok) throw new Error('Không thể tải sidebar');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -228,20 +223,16 @@
         }
 
         function navigateToOrders() {
-    const period = document.getElementById('periodSelect').value;
-    let url = 'order.html?period=' + encodeURIComponent(period);
-    
-    if (period === 'specific') {
-        const specificDate = document.getElementById('specificDateInput').value;
-        if (specificDate) {
-            // SỬA: Truyền ngày cụ thể dưới dạng startDate và endDate giống nhau
-            url = `order.html?period=custom&startDate=${encodeURIComponent(specificDate)}&endDate=${encodeURIComponent(specificDate)}`;
+            const period = document.getElementById('periodSelect').value;
+            let url = 'order.html?period=' + encodeURIComponent(period);
+            if (period === 'specific') {
+                const specificDate = document.getElementById('specificDateInput').value;
+                if (specificDate) {
+                    url = `order.html?period=custom&startDate=${encodeURIComponent(specificDate)}&endDate=${encodeURIComponent(specificDate)}`;
+                }
+            }
+            window.location.href = url;
         }
-    }
-    
-    window.location.href = url;
-}
-
 
         function getChartConfig(chartId, data) {
             const period = document.getElementById('periodSelect').value;
@@ -286,9 +277,6 @@
                                     title: function(context) {
                                         const label = context[0].label;
                                         const period = document.getElementById('periodSelect').value;
-                                        
-                                        console.log('Tooltip label:', label, 'Period:', period); // Debug log
-                                        
                                         if (period === 'week') {
                                             const dayMap = {
                                                 'Thứ 2': 1,
@@ -306,41 +294,27 @@
                                                 'T6': 5,
                                                 'T7': 6
                                             };
-                                            
-                                            console.log('Available dayMap keys:', Object.keys(dayMap)); // Debug log
-                                            
                                             if (dayMap.hasOwnProperty(label)) {
                                                 try {
                                                     const today = new Date();
-                                                    const currentDay = today.getDay(); // 0 = Chủ nhật, 1 = Thứ 2, ...
-                                                    const targetDay = dayMap[label];
-                                                    
-                                                    console.log('Current day:', currentDay, 'Target day:', targetDay); // Debug log
-                                                    
+                                                    const currentDay = today.getDay();
                                                     const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
                                                     const mondayOfCurrentWeek = new Date(today);
                                                     mondayOfCurrentWeek.setDate(today.getDate() + mondayOffset);
-                                                    
+                                                    const targetDay = dayMap[label];
                                                     const targetDate = new Date(mondayOfCurrentWeek);
                                                     if (targetDay === 0) {
                                                         targetDate.setDate(mondayOfCurrentWeek.getDate() + 6);
                                                     } else {
                                                         targetDate.setDate(mondayOfCurrentWeek.getDate() + (targetDay - 1));
                                                     }
-                                                    
                                                     const day = targetDate.getDate().toString().padStart(2, '0');
                                                     const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
-                                                    
-                                                    const result = `${label} (${day}/${month})`;
-                                                    console.log('Tooltip result:', result); // Debug log
-                                                    return result;
-                                                    
+                                                    return `${label} (${day}/${month})`;
                                                 } catch (error) {
                                                     console.error('Error in tooltip calculation:', error);
                                                     return label;
                                                 }
-                                            } else {
-                                                console.log('Label not found in dayMap:', label);
                                             }
                                         }
                                         return label;
@@ -650,7 +624,7 @@
                 document.getElementById('totalRevenue').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
                 document.getElementById('totalOrders').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
                 document.getElementById('avgOrder').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
-                document.getElementById('topDishes').innerHTML = '<div class="loading"><span class="loading-spinner"></span>Đang tải dữ liệu...</div>';
+            document.getElementById('topDishes').innerHTML = '<div class="loading"><span class="loading-spinner"></span>Đang tải dữ liệu...</div>';
                 hideError();
 
                 const dashboardData = await apiFetch(`/dashboard?${queryParams}`);
@@ -680,6 +654,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            loadTopbar();
             loadSidebar();
             updateData();
             document.getElementById('periodSelect').addEventListener('change', function() {

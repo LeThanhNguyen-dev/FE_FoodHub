@@ -38,27 +38,7 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="d-flex align-items-center">
-                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h4 class="mb-0"><i class="fas fa-users me-2"></i>Quản lý khách hàng</h4>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i>Admin
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <div id="topbar-container"></div>
 
         <!-- Customer Management Content -->
         <div class="container-fluid p-4">
@@ -145,11 +125,12 @@
 
     <!-- Custom JS -->
     <script src="/js/fetch-api.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="/adminDashboard/js/sidebar.js"></script>
+     <script src="/adminDashboard/js/topbar.js"></script>
     <script>
         async function loadSidebar() {
             try {
-                const response = await fetch('/components/sidebar.html');
+                const response = await fetch('/adminDashboard/components/sidebar.html');
                 if (!response.ok) throw new Error('Không thể tải sidebar');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -427,7 +408,7 @@
                 showNotification('Không tìm thấy ID khách hàng!', 'error');
                 return;
             }
-            window.location.href = `/customer-manager/edit-customer.html?id=${id}`;
+            window.location.href = `edit-customer.html?id=${id}`;
         }
 
         // Debounce function để tránh gọi API quá nhiều lần khi gõ
@@ -454,6 +435,7 @@
 
         // Gắn sự kiện cho các elements
         document.addEventListener('DOMContentLoaded', () => {
+            loadTopbar();
             loadSidebar();
             fetchCustomers();
 

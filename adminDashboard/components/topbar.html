@@ -1,0 +1,24 @@
+<div class="top-bar">
+    <div class="d-flex align-items-center">
+        <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h4 class="mb-0"id="pageTitle"><span id="topbar-title">Quản lý nhân viên</span></h4>
+    </div>
+    <div class="d-flex align-items-center">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle me-2"></i><span id="user-name">Loading...</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                <li><a class="dropdown-item" href="#" onclick="viewProfile()">
+                    <i class="fas fa-user me-2"></i>Hồ sơ
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
