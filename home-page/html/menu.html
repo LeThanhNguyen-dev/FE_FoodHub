@@ -197,6 +197,7 @@
             flex-direction: column;
             height: 100%;
             min-height: 450px;
+            position: relative;
         }
 
         .menu-card:hover {
@@ -209,6 +210,27 @@
             object-fit: cover;
             width: 100%;
             border-bottom: 3px solid var(--gold);
+        }
+
+        .menu-card .view-details-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(26, 60, 52, 0.8);
+            color: var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-card:hover .view-details-btn {
+            opacity: 1;
         }
 
         .menu-card .card-body {
@@ -406,6 +428,97 @@
             z-index: 1055;
         }
 
+        /* Item Details Modal Styles */
+        .modal-item-details .modal-dialog {
+            max-width: 500px;
+        }
+
+        .modal-item-details .modal-content {
+            border-radius: 15px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-item-details .modal-header {
+            background-color: var(--dark-green);
+            color: var(--gold);
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-item-details .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-item-details .modal-body {
+            padding: 2rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .modal-item-details .modal-body img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .item-description {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .item-price {
+            color: var(--gold);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .quantity-selector input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid var(--dark-green);
+            border-radius: 10px;
+            padding: 5px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .modal-item-details .modal-body .quantity-selector button {
+            background-color: var(--dark-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-item-details .modal-body .quantity-selector button:hover {
+            background-color: var(--gold);
+            color: var(--dark-green);
+        }
+
+        .modal-item-details .modal-footer {
+            border-top: none;
+            padding: 1rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -489,6 +602,14 @@
                 right: 10px;
                 top: 10px;
             }
+
+            .modal-item-details .modal-dialog {
+                max-width: 90%;
+            }
+
+            .modal-item-details .modal-body img {
+                height: 200px;
+            }
         }
     </style>
 </head>
@@ -553,6 +674,33 @@
             <div class="modal-content">
                 <div class="modal-body" id="notificationModalBody">
                     <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Item Details -->
+    <div class="modal fade modal-item-details" id="itemDetailsModal" tabindex="-1" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-item-details">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="itemDetailsModalLabel">Chi Tiết Món Ăn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="itemDetailsImage" src="" alt="Item Image" class="img-fluid">
+                    <h5 id="itemDetailsName" class="card-title"></h5>
+                    <p id="itemDetailsDescription" class="item-description"></p>
+                    <p id="itemDetailsPrice" class="item-price"></p>
+                    <div class="quantity-selector">
+                        <button onclick="updateQuantity(-1)">-</button>
+                        <input type="number" id="itemQuantity" value="1" min="1" max="100">
+                        <button onclick="updateQuantity(1)">+</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-add-to-cart" onclick="addItemToCart()">Thêm vào giỏ</button>
+                    <button class="btn btn-order" onclick="orderItemNow()">Đặt ngay</button>
                 </div>
             </div>
         </div>
@@ -623,6 +771,7 @@
         const itemsPerPage = 8;
         let isSearching = false;
         let searchResults = [];
+        let selectedItem = null;
 
         // Show category function
         function showCategory(categoryId) {
@@ -794,7 +943,10 @@
 
                 html += `
                     <div class="menu-card">
-                        <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                        <div style="position: relative;">
+                            <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                            <button class="view-details-btn" onclick="showItemDetails(${JSON.stringify(item).replace(/"/g, '&quot;')})">Xem Chi Tiết</button>
+                        </div>
                         <div class="card-body">
                             <span class="badge">Có sẵn</span>
                             <h5 class="card-title">${item.name}</h5>
@@ -912,6 +1064,59 @@
             );
 
             displayMenuItems(searchResults, currentCategory);
+        }
+
+        // Show item details modal
+        function showItemDetails(item) {
+            selectedItem = item;
+            const modal = new bootstrap.Modal(document.getElementById('itemDetailsModal'));
+            document.getElementById('itemDetailsImage').src = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+            document.getElementById('itemDetailsName').textContent = item.name;
+            document.getElementById('itemDetailsDescription').textContent = item.description || 'Chưa có mô tả.';
+            document.getElementById('itemDetailsPrice').textContent = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
+            document.getElementById('itemQuantity').value = 1;
+            modal.show();
+        }
+
+        // Update quantity
+        function updateQuantity(change) {
+            const input = document.getElementById('itemQuantity');
+            let quantity = parseInt(input.value) + change;
+            if (quantity < 1) quantity = 1;
+            if (quantity > 100) quantity = 100;
+            input.value = quantity;
+        }
+
+        // Add item to cart from modal
+        function addItemToCart() {
+            if (!isLoggedIn()) {
+                showNotification('Vui lòng đăng nhập để thêm món vào giỏ hàng.');
+                return;
+            }
+            const quantity = parseInt(document.getElementById('itemQuantity').value);
+            const item = { ...selectedItem, quantity };
+            addToCart(item);
+            bootstrap.Modal.getInstance(document.getElementById('itemDetailsModal')).hide();
+            showNotification(`${item.name} đã được thêm vào giỏ hàng!`);
+        }
+
+        // Order item now from modal
+        function orderItemNow() {
+            if (!isLoggedIn()) {
+                showNotification('Vui lòng đăng nhập để đặt món.');
+                return;
+            }
+            const quantity = parseInt(document.getElementById('itemQuantity').value);
+            const item = { ...selectedItem, quantity: quantity };
+            try {
+                orderItem(item);
+                bootstrap.Modal.getInstance(document.getElementById('itemDetailsModal')).hide();
+                showNotification(`${item.name} đã được thêm vào đơn hàng!`);
+                window.location.href = 'checkout.html';
+            } catch (error) {
+                console.error('Error ordering item:', error);
+                showNotification('Có lỗi xảy ra khi đặt món. Vui lòng thử lại.');
+            }
         }
 
         // Initialize page
