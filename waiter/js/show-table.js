@@ -134,7 +134,7 @@ function groupTablesByArea(tables) {
 // Hàm render bàn theo khu vực với layout responsive
 function renderTablesByArea(tablesByArea) {
     const container = document.getElementById('tablesContainer');
-    let html = `<h3 class="mb-4 section-title"><i class="fas fa-chair"></i> Bàn khu vực ${currentWorkSchedule.area}</h3>`;
+    let html = `<h3 class="mb-4 section-title"><i class="fas fa-chair" style="color: var(--primary)"></i> Bàn khu vực ${currentWorkSchedule.area}</h3>`;
 
     Object.keys(tablesByArea).sort().forEach(area => {
         html += `
@@ -242,7 +242,7 @@ function getTableActionButtons(table) {
     switch (table.status) {
         case 'AVAILABLE':
             return `
-                <button class="btn btn-sm btn-success table-action-btn" 
+                <button class="btn btn-outline-success" 
                         onclick="event.stopPropagation(); assignTable(${table.id})"
                         title="Xếp khách vào bàn">
                     <i class="fas fa-user-plus"></i>
@@ -250,23 +250,20 @@ function getTableActionButtons(table) {
             `;
         case 'OCCUPIED':
             return `
-                <button class="btn btn-sm btn-info table-action-btn me-1" 
+                <button class="btn btn-outline-info" 
                         onclick="event.stopPropagation(); viewTableOrders(${table.id})"
                         title="Xem đơn hàng">
                     <i class="fas fa-list"></i>
                 </button>
-                <button class="btn btn-sm btn-warning table-action-btn" 
+                <button class="btn btn-outline-primary" 
+                        onclick="event.stopPropagation(); openChatPopup(${table.id})"
+                        title="Chat với khách">
+                    <i class="fas fa-comments"></i>
+                </button>
+                <button class="btn btn-outline-warning" 
                         onclick="event.stopPropagation(); checkoutTable(${table.id})"
                         title="Thanh toán">
                     <i class="fas fa-credit-card"></i>
-                </button>
-            `;
-        case 'RESERVED':
-            return `
-                <button class="btn btn-sm btn-primary table-action-btn" 
-                        onclick="event.stopPropagation(); viewReservation(${table.id})"
-                        title="Xem chi tiết đặt bàn">
-                    <i class="fas fa-info-circle"></i>
                 </button>
             `;
         default:

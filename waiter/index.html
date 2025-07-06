@@ -27,6 +27,8 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="css/table-style.css" rel="stylesheet">
     <link href="css/chat-style.css" rel="stylesheet">
+
+
 </head>
 
 <body>
@@ -199,7 +201,7 @@
                         <div class="card-icon sales-icon">
                             <i class="fas fa-money-bill-wave"></i>
                         </div>
-                        <div class="stats-number sales-number">₫0K</div>
+                        <div class="stats-number sales-number">0K₫</div>
                         <p class="stats-label">Từ 0 đơn hàng</p>
                     </div>
                 </div>
@@ -216,6 +218,10 @@
                         <button class="btn btn-outline-success" onclick="refreshDashboardOrders()">
                             <i class="fas fa-sync-alt me-1"></i>
                             Làm mới
+                        </button>
+                        <button class="btn btn-success" onclick="showMenu()">
+                            <i class="fas fa-plus me-1"></i>
+                            Nhận đơn mới
                         </button>
                         <button class="btn btn-primary" onclick="showOrders()">
                             <i class="fas fa-eye me-1"></i>
@@ -351,9 +357,10 @@
         let hasWorkSchedule = false;
         let notifications = [];
         let notificationDropdownOpen = false;
-        
+
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', function () {
+            updateChatNotificationCount();
             updateNotificationCount();
             loadUserInfo();
             loadWorkSchedule();
@@ -613,6 +620,7 @@
             loadActiveOrdersCount();
             loadTablesCount();
             loadShiftRevenue();
+            loadTables();
         }
 
 
@@ -811,8 +819,8 @@
             }
         }
 
-        
-        
+
+
 
 
         // Function to show notification dropdown
@@ -1150,21 +1158,11 @@
         }
 
         // Hàm mới: Format tiền tệ theo định dạng Việt Nam
-        function formatCurrency(amount) {
-            if (amount === 0) {
-                return '₫0';
-            }
+        
 
-            // Convert to thousands (K) or millions (M) for better display
-            if (amount >= 1000000) {
-                const millions = (amount / 1000000).toFixed(1);
-                return `₫${millions}M`;
-            } else if (amount >= 1000) {
-                const thousands = (amount / 1000).toFixed(0);
-                return `₫${thousands}K`;
-            } else {
-                return `₫${amount.toLocaleString('vi-VN')}`;
-            }
+        function formatCurrency(amount) {
+            if (!amount) return '0₫';
+            return parseInt(amount).toLocaleString('vi-VN') + '₫';
         }
 
         // Hàm mới: Cập nhật hiển thị doanh thu khi có lỗi

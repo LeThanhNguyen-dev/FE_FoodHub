@@ -420,55 +420,55 @@ body {
 }
 
 .stat-card {
-    background: #ffffff ;
-    border-radius: 12px ;
-    padding: 2rem ;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) ;
-    position: relative ;
-    border: 2px solid #e5e7eb ;
-    transition: transform 0.3s ease, box-shadow 0.3s ease ;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    border: 2px solid #e5e7eb;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-5px) ;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) ;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card::before {
-    content: '' ;
-    position: absolute ;
-    top: 0 ;
-    left: 0 ;
-    width: 100% ;
-    height: 5px ;
-    background: var(--primary) ;
-    border-radius: 10px 10px 0 0 ;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--primary);
+    border-radius: 10px 10px 0 0;
 }
 
 .stat-number {
-    font-size: 2.8rem ;
-    font-weight: 800 ;
-    color: var(--primary) ;
-    margin-bottom: 0.5rem ;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
     display: block;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) ;
-    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
 }
 
 .stat-label {
-    color: #374151 ;
-    font-weight: 700 ;
-    margin-bottom: 1rem ;
-    font-size: 1rem ;
+    color: #374151;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1rem;
 }
 
 .stat-icon {
-    position: absolute ;
-    top: 1.5rem ;
-    right: 1.5rem ;
-    font-size: 2.2rem ;
-    color: rgba(254, 161, 22, 0.4) ;
-    transition: color 0.3s ease ;
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 2.2rem;
+    color: rgba(254, 161, 22, 0.4);
+    transition: color 0.3s ease;
 }
 
 .stat-card:hover .stat-icon {
@@ -704,9 +704,9 @@ body {
 }
 
 .item-info {
-    flex: 1 !important;
-    display: flex !important;
-    align-items: center !important;
+    flex: 1 ;
+    display: flex ;
+    align-items: center;
 }
 
 .item-name {
@@ -1744,3 +1744,241 @@ body {
     transition: all 0.2s ease;
 }
 
+
+.dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    /* Đảm bảo xuống phía dưới nút */
+    right: 0 !important;
+    left: auto !important;
+    /* Ghi đè Bootstrap default */
+    width: 220px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+    overflow: hidden;
+    padding: 0;
+    margin: 0 !important;
+    transform: none !important;
+    /* Ghi đè Bootstrap transform */
+    inset: auto !important;
+    /* Ghi đè Bootstrap inset */
+}
+
+.dropdown-menu.show {
+    display: block;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) !important;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) !important;
+    }
+}
+
+/* Đảm bảo dropdown container có position relative */
+.dropdown {
+    position: relative !important;
+}
+
+/* User Header */
+.user-header {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-header h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.user-header i {
+    color: #6c757d;
+    font-size: 16px;
+}
+
+/* Menu Items - Sửa lại để tương thích với Bootstrap */
+.dropdown-item {
+    padding: 12px 16px !important;
+    color: #495057 !important;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f3f4;
+    width: 100%;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #f8f9fa !important;
+    color: var(--primary) !important;
+    text-decoration: none;
+    outline: none;
+}
+
+.dropdown-item i {
+    font-size: 14px;
+    color: #6c757d;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dropdown-item:hover i,
+.dropdown-item:focus i {
+    color: var(--primary);
+}
+
+/* Logout item - special styling */
+.dropdown-item.logout {
+    color: #dc3545 !important;
+    border-top: 1px solid #dee2e6;
+    margin-top: 4px;
+}
+
+.dropdown-item.logout:hover,
+.dropdown-item.logout:focus {
+    background-color: #f8f9fa !important;
+    color: #dc3545 !important;
+}
+
+.dropdown-item.logout i {
+    color: #dc3545 !important;
+}
+
+.dropdown-item.logout:hover i,
+.dropdown-item.logout:focus i {
+    color: #dc3545 !important;
+}
+
+/* Divider */
+.dropdown-divider {
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Loading state for chef name */
+#chefName {
+    display: inline-block;
+    min-width: 80px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dropdown .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .dropdown-menu {
+        width: 200px !important;
+        top: calc(100% + 2px) !important;
+    }
+
+    .dropdown-item {
+        padding: 10px 14px !important;
+        font-size: 13px;
+    }
+
+    .user-header {
+        padding: 10px 14px;
+    }
+
+    .user-header h6 {
+        font-size: 13px;
+    }
+}
+
+/* Demo styling */
+.demo-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dropdown .btn {
+    padding: 0.3rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.dropdown .btn-outline-primary {
+    background: white;
+    color: #F97316;
+    border: 2px solid #F97316;
+}
+
+.dropdown .btn-outline-primary:hover {
+    background: linear-gradient(135deg, #F97316, #FB923C);
+    color: white;
+    box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3);
+}
+
+.dropdown .btn-outline-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #F97316 !important;
+    background: linear-gradient(135deg, #EA580C, #F97316) !important;
+    color: white !important;
+}
+
+.dropdown .btn-outline-primary:focus {
+    border-color: #F97316 !important;
+    box-shadow: 0 0 0 0.2rem rgba(249, 115, 22, 0.25) !important;
+}
+
+.dropdown .btn-outline-primary i {
+    color: #F97316;
+    font-size: 1.25rem;
+}
+
+.dropdown .btn-outline-primary:hover i {
+    color: white;
+}
+
+.dropdown .btn-outline-primary span {
+    margin-left: 0.15rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #F97316;
+}
+
+.dropdown .btn-outline-primary:hover span {
+    color: white;
+}

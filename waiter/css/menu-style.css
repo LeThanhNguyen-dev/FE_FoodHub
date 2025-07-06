@@ -204,6 +204,39 @@ body.cart-open .filter-section input[type="text"] {
     white-space: nowrap;
 }
 
+.search-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-input-container input[type="text"] {
+    padding: 12px 15px 12px 45px !important; /* Tăng padding-left cho icon */
+}
+
+.search-input-container i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+    pointer-events: none;
+    transition: color 0.3s ease;
+}
+
+.search-input-container input[type="text"]:focus + i {
+    color: #ff8c00;
+}
+
+/* Thu nhỏ khi cart mở */
+body.cart-open .search-input-container input[type="text"] {
+    padding: 10px 12px 10px 38px !important;
+}
+
+body.cart-open .search-input-container i {
+    left: 12px;
+    font-size: 13px;
+}
 /* Thu nhỏ button khi cart mở */
 body.cart-open .filter-section button {
     padding: 10px 12px;
@@ -211,7 +244,7 @@ body.cart-open .filter-section button {
 }
 
 .filter-section button:first-of-type {
-    background: var(--primary);
+    background: #F97316;
     color: white;
 }
 

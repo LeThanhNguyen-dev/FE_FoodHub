@@ -20,11 +20,14 @@
                         <!-- Categories sẽ được load động -->
                     </select>
 
-                    <input type="text" id="keywordFilter" placeholder="Tìm kiếm món ăn...">
+                    <div class="search-input-container">
+                        <input type="text" id="keywordFilter" placeholder="Tìm kiếm món ăn...">
+                        <i class="fas fa-search"></i>
+                    </div>
 
                     <button onclick="applyMenuFilters()">
                         <i class="fas fa-search me-1"></i>
-                        Áp dụng
+                        Tìm kiếm
                     </button>
                     <button onclick="resetFilters()">Đặt lại</button>
                 </div>

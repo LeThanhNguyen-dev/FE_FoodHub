@@ -355,7 +355,7 @@ function displayShiftReport(orderData) {
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 24px;
         }
@@ -625,6 +625,11 @@ function displayShiftReport(orderData) {
             .orders-table td {
                 padding: 8px 12px;
             }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
         }
         </style>
     `;
@@ -775,11 +780,6 @@ function filterOrders() {
     });
 }
 
-// Function to format currency
-function formatCurrency(amount) {
-    if (!amount) return '₫0';
-    return '₫' + parseFloat(amount).toLocaleString('vi-VN');
-}
 
 // Function to export report (placeholder)
 function exportReport() {

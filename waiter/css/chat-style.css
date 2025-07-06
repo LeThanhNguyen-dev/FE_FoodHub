@@ -166,13 +166,14 @@
     transform: scale(0.95);
 }
 
-/* Updated table item styles */
+/* Table item styles - Compact */
 .table-item {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid #f1f3f4;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     position: relative;
+    background: white;
 }
 
 .table-item:hover {
@@ -185,7 +186,13 @@
     align-items: center;
 }
 
-.table-number {
+.table-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.table-header .table-number {
     font-weight: 600;
     font-size: 14px;
     color: #333;
@@ -201,6 +208,44 @@
 
 .table-status i {
     font-size: 14px;
+    color: #28a745;
+}
+
+.last-message-time {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+}
+
+/* Unread message badge */
+.unread-badge {
+    background: #ff6b35;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 8px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Improved unread table item styles */
+.table-item.has-unread {
+    background: #fff8f5;
+    border-left: 2px solid #ff6b35;
+}
+
+.table-item.has-unread:hover {
+    background: #fff5f0;
+}
+
+.table-item.has-unread .table-number {
+    color: #ff6b35;
+    font-weight: 700;
 }
 
 /* Responsive design */
@@ -226,23 +271,8 @@
     .message {
         max-width: 85%;
     }
-}
-
-/* Scrollbar styles for chat messages */
-.chat-messages::-webkit-scrollbar {
-    width: 6px;
-}
-
-.chat-messages::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.chat-messages::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-}
-
-.chat-messages::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    
+    .table-item {
+        padding: 8px 12px;
+    }
 }

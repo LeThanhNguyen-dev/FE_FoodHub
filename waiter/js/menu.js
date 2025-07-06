@@ -308,7 +308,7 @@ function renderMenuItems(items) {
                 <div class="item-content">
                     <h3 class="item-name">${item.name}</h3>
                     <p class="item-description">${item.description}</p>
-                    <div class="item-price">đ${formatPrice(item.price)}</div>
+                    <div class="item-price">${formatPrice(item.price)}đ</div>
                 </div>
             </div>
         `;
@@ -1011,7 +1011,7 @@ function updateCartSidebarContent() {
     });
 
     // 3. Cập nhật tổng tiền
-    totalAmountElement.textContent = `₫${formatPrice(totalAmount)}`;
+    totalAmountElement.textContent = `${formatPrice(totalAmount)}₫`;
 
     // 4. Cập nhật text và hành động của nút đặt hàng
     const checkoutBtn = document.querySelector('.checkout-btn');

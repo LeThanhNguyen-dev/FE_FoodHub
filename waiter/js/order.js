@@ -1102,23 +1102,41 @@ function updateActiveNavigation(currentFunction) {
 
 // Hàm định dạng thời gian
 function formatDateTime(dateString) {
-    // Parse the date string as UTC to avoid timezone conversion
-    const date = new Date(dateString);
+    console.log("date string: ", dateString);
+    
+    // Remove 'Z' suffix if present and treat as local time
+    const cleanDateString = dateString.replace('Z', '');
+    const date = new Date(cleanDateString);
     const now = new Date();
     
-    // Calculate difference using UTC time to avoid timezone issues
+    // Calculate difference in milliseconds
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    // Format time part - no timezone conversion needed since dateString is already Vietnam time
+    // Format time part
     const timeStr = date.toLocaleTimeString('vi-VN', {
         hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'UTC' // Treat as UTC to prevent double timezone conversion
+        minute: '2-digit'
     });
 
+    // Handle future dates (when date is in the future)
+    if (diffMs < 0) {
+        const absDiffMins = Math.abs(diffMins);
+        const absDiffHours = Math.abs(diffHours);
+        const absDiffDays = Math.abs(diffDays);
+        
+        if (absDiffMins < 60) {
+            return `Trong ${absDiffMins} phút`;
+        } else if (absDiffHours < 24) {
+            return `Trong ${absDiffHours} giờ (${timeStr})`;
+        } else {
+            return `Trong ${absDiffDays} ngày (${timeStr})`;
+        }
+    }
+
+    // Handle past dates (normal case)
     if (diffMins < 1) {
         return 'Vừa xong';
     } else if (diffMins < 60) {
@@ -1131,8 +1149,7 @@ function formatDateTime(dateString) {
         return date.toLocaleDateString('vi-VN', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric',
-            timeZone: 'UTC' // Treat as UTC to prevent double timezone conversion
+            year: 'numeric'
         }) + ` ${timeStr}`;
     }
 }
@@ -1218,9 +1235,25 @@ async function displayOrderDetails(orderData) {
             tableNumber, username, totalAmount, orderItems
         } = orderData;
 
-        // Format dữ liệu
-        const formattedDateCreation = new Date(createdAt).toLocaleString('vi-VN');
-        const formattedDateUpdate = updatedAt ? new Date(updatedAt).toLocaleString('vi-VN') : 'Chưa cập nhật';
+        // Format dữ liệu - parse trực tiếp mà không chuyển đổi múi giờ
+        const formatDateTime = (dateStr) => {
+            if (!dateStr) return 'Chưa cập nhật';
+            
+            // Parse date string trực tiếp mà không để JS tự động chuyển đổi timezone
+            const date = new Date(dateStr.replace('Z', ''));
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+        };
+
+        const formattedDateCreation = formatDateTime(createdAt);
+        const formattedDateUpdate = formatDateTime(updatedAt);
         const formattedAmount = formatCurrency(totalAmount);
 
         // Fetch order.html
