@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +7,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -19,6 +16,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
+    <!-- Chat JS -->
+    <script src="../js/chat.js"></script>
     <!-- Page-specific CSS -->
     <style>
         .hero {
@@ -126,7 +125,6 @@
             z-index: 2;
         }
 
-        /* Stats Section */
         .stats-section {
             background: var(--dark-green);
             color: white;
@@ -150,7 +148,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Features Section */
         .features-section {
             padding: 5rem 0;
             background: var(--cream);
@@ -192,7 +189,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Menu Preview Section */
         .menu-preview {
             padding: 5rem 0;
             background: linear-gradient(135deg, var(--dark-green), var(--light-green));
@@ -235,7 +231,6 @@
             color: #FEA116;
         }
 
-        /* Testimonials Section */
         .testimonials {
             padding: 5rem 0;
             background: white;
@@ -299,7 +294,6 @@
             margin-right: auto;
         }
 
-        /* Welcome Message */
         .welcome-message {
             background: rgba(212, 175, 55, 0.2);
             border-radius: 25px;
@@ -308,7 +302,6 @@
             border: 2px solid var(--gold);
         }
 
-        /* Modal Popup Styles */
         .modal-notification .modal-dialog {
             max-width: 400px;
             position: fixed;
@@ -343,12 +336,11 @@
             z-index: 1055;
         }
 
-        /* Chat Window Styles */
         .chat-container {
             display: none;
             position: fixed;
             bottom: 80px;
-            right: 20px; /* Đặt ở góc phải dưới */
+            right: 20px;
             width: 380px;
             height: 550px;
             background: #ffffff;
@@ -357,7 +349,7 @@
             display: flex;
             flex-direction: column;
             border: 1px solid #e0e0e0;
-            z-index: 1060; /* Cao hơn modal-notification */
+            z-index: 1060;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
@@ -373,7 +365,7 @@
         }
 
         .chat-header {
-            background: #FEA116; /* Phù hợp với màu chủ đạo của FoodHub */
+            background: #FEA116;
             color: var(--dark-green);
             padding: 12px 16px;
             border-radius: 12px 12px 0 0;
@@ -412,7 +404,7 @@
         }
 
         .message.user {
-            background: #FEA116; /* Phù hợp với màu chủ đạo */
+            background: #FEA116;
             color: var(--dark-green);
             margin-left: auto;
             border-bottom-right-radius: 2px;
@@ -442,7 +434,7 @@
         }
 
         .bot strong {
-            color: #FEA116; /* Phù hợp với màu chủ đạo */
+            color: #FEA116;
             font-weight: 600;
         }
 
@@ -510,10 +502,10 @@
         #chat-toggle {
             position: fixed;
             bottom: 20px;
-            right: 20px; /* Đặt ở góc phải dưới */
+            right: 20px;
             width: 50px;
             height: 50px;
-            background: #FEA116; /* Phù hợp với màu chủ đạo */
+            background: #FEA116;
             color: var(--dark-green);
             border-radius: 50%;
             display: flex;
@@ -522,7 +514,7 @@
             cursor: pointer;
             font-size: 24px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 1060; /* Cao hơn modal-notification */
+            z-index: 1060;
         }
 
         @media (max-width: 768px) {
@@ -543,7 +535,6 @@
             }
         }
 
-        /* Scroll animations */
         .fade-in {
             opacity: 0;
             transform: translateY(30px);
@@ -555,7 +546,6 @@
             transform: translateY(0);
         }
 
-        /* Animations */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -565,9 +555,17 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .navbar {
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .navbar.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
     </style>
 </head>
-
 <body>
     <!-- Navigation -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
@@ -606,7 +604,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
                                 <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
@@ -634,19 +632,19 @@
     </div>
 
     <!-- Chat Toggle Button -->
-    <div id="chat-toggle" onclick="toggleChat()">💬</div>
+    <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
 
     <!-- Chat Window -->
     <div id="chat-container" class="chat-container">
         <div class="chat-header">
             <span>FoodHub Chat</span>
-            <button onclick="toggleChat()">✕</button>
+            <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
         </div>
         <div class="messages" id="messages"></div>
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') sendMessage()" />
-            <button onclick="sendMessage()">Gửi</button>
-            <button class="clear-btn" onclick="clearChatHistory()">Xóa</button>
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }" />
+            <button onclick="try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }">Gửi</button>
+            <button class="clear-btn" onclick="try { clearChatHistory(); } catch(e) { console.error('Error clearing chat:', e); showNotification('Lỗi khi xóa chat: ' + e.message); }">Xóa</button>
         </div>
     </div>
 
@@ -787,7 +785,6 @@
                         <p>Cocktail trái cây tươi mát, kết hợp dưa hấu, dứa, kiwi và cam mọng nước, hòa quyện trong lớp syrup ngọt nhẹ và đá viên mát lạnh.</p>
                         <div class="menu-item-price">60.000₫</div>
                     </div>
-                    </div>
                 </div>
             </div>
             <div class="text-center mt-4">
@@ -820,13 +817,13 @@
     <footer id="contact" class="footer">
         <div class="container">
             <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
-            <p class="contact-info">1 FPT | Phone: (123) 456-7890 | Email: info@foodhub.com</p>
+            <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#">Facebook</a>
                 <a href="#">Instagram</a>
                 <a href="#">Twitter</a>
             </div>
-            <p class="mt-3">© 2025 FoodHub. All rights reserved.</p>
+            <p class="mt-3">© 2025 FoodHub. Bản quyền đã được bảo hộ.</p>
         </div>
     </footer>
 
@@ -837,159 +834,109 @@
     <script src="../js/notification.js"></script>
     <!-- Page-specific JS -->
     <script>
-        // Khởi tạo lịch sử chat từ localStorage
-        let chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
-
-        // Hiển thị lại lịch sử chat khi reload
-        function loadChatHistory() {
-            const msgDiv = document.getElementById('messages');
-            msgDiv.innerHTML = ''; // Xóa nội dung cũ
-            chatHistory.forEach(msg => {
-                appendMessage(msg.sender, msg.text, msg.type, msg.timestamp);
-            });
-        }
-
-        // Gọi hàm loadChatHistory khi trang được tải
-        document.addEventListener('DOMContentLoaded', () => {
-            loadChatHistory();
-            updateUI();
-            fetchUserOrders().then(() => startPolling());
-            initializeWebSocket();
-        });
-
-        function toggleChat() {
-            const chatContainer = document.getElementById('chat-container');
-            const isHidden = chatContainer.classList.contains('show');
-            chatContainer.classList.toggle('show', !isHidden);
-            chatContainer.classList.toggle('hidden', isHidden);
-            if (!isHidden) document.getElementById('userInput').focus();
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const timestamp = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            const userMsg = { sender: 'Bạn', text: message, type: 'user', timestamp };
-            appendMessage(userMsg.sender, userMsg.text, userMsg.type, timestamp);
-            chatHistory.push(userMsg);
-            saveChatHistory();
-
-            input.value = '';
-
+        // Update cart badge
+        function updateCartBadge() {
             try {
-                const response = await fetch('http://localhost:8080/api/gemini/reply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-
-                if (!response.ok) throw new Error(`Yêu cầu thất bại: ${response.status}`);
-
-                const data = await response.json();
-                const reply = data.result?.reply;
-                if (reply) {
-                    const formattedReply = formatReply(reply);
-                    const botMsg = { sender: 'FoodHub Bot', text: formattedReply, type: 'bot', timestamp };
-                    appendMessage(botMsg.sender, botMsg.text, botMsg.type, timestamp);
-                    chatHistory.push(botMsg);
-                    saveChatHistory();
-                } else {
-                    appendMessage('FoodHub Bot', 'Không có phản hồi hợp lệ.', 'bot', timestamp);
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cart-count').textContent = totalItems;
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+                document.getElementById('cart-count').textContent = '0';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật giỏ hàng: ' + error.message);
                 }
-            } catch (err) {
-                appendMessage('Lỗi', `Không thể kết nối: ${err.message}`, 'bot', timestamp);
             }
-        }
-
-        function formatReply(text) {
-            // Xử lý Markdown
-            let formatted = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // In đậm
-                .replace(/\*(.*?)\*/g, '<em>$1</em>') // In nghiêng
-                .replace(/`([^`]+)`/g, '<code>$1</code>') // Code inline
-                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Code block
-                .replace(/^### (.*)$/gm, '<h3>$1</h3>') // Tiêu đề cấp 3
-                .replace(/^## (.*)$/gm, '<h2>$1</h2>') // Tiêu đề cấp 2
-                .replace(/^# (.*)$/gm, '<h1>$1</h1>') // Tiêu đề cấp 1
-                .replace(/^\* (.*)$/gm, '<li>$1</li>') // Danh sách không thứ tự
-                .replace(/^\d+\. (.*)$/gm, '<li>$1</li>') // Danh sách có thứ tự
-                .replace(/(<li>.*<\/li>)/g, match => `<ul>${match}</ul>`) // Bao danh sách
-                .replace(/<\/ul>\s*<ul>/g, '') // Gộp danh sách liên tiếp
-                .replace(/^(?!<h[1-3]>|<ul>|<pre>)(.+)$/gm, '<p>$1</p>'); // Đoạn văn
-            return formatted;
-        }
-
-        function appendMessage(sender, text, type, timestamp) {
-            const msgDiv = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.className = `message ${type}`;
-            div.innerHTML = `
-                <strong>${sender}</strong>: ${text}
-                <div class="message-time">${timestamp}</div>
-            `;
-            msgDiv.appendChild(div);
-            msgDiv.scrollTop = msgDiv.scrollHeight;
-        }
-
-        function saveChatHistory() {
-            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-        }
-
-        function clearChatHistory() {
-            chatHistory = [];
-            document.getElementById('messages').innerHTML = '';
-            saveChatHistory();
         }
 
         // Scroll animations
         function handleScrollAnimations() {
-            const elements = document.querySelectorAll('.fade-in');
-            elements.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const elementVisible = 150;
-                if (elementTop < window.innerHeight - elementVisible) {
-                    element.classList.add('visible');
+            try {
+                const elements = document.querySelectorAll('.fade-in');
+                elements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
+                });
+            } catch (error) {
+                console.error('Error in handleScrollAnimations:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý hiệu ứng cuộn: ' + error.message);
                 }
-            });
+            }
         }
 
         // Navbar background change on scroll
         function handleNavbarScroll() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.background = '#0F172B';
-            } else {
-                navbar.style.background = '#0F172B';
+            try {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                } else {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                }
+            } catch (error) {
+                console.error('Error in handleNavbarScroll:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý thanh điều hướng: ' + error.message);
+                }
             }
         }
 
         // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+        function handleSmoothScrolling() {
+            try {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
                     });
+                });
+            } catch (error) {
+                console.error('Error in handleSmoothScrolling:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý cuộn mượt: ' + error.message);
                 }
-            });
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
+                    fetchUserOrders().then(() => startPolling());
+                }
+                if (typeof initializeWebSocket === 'function') initializeWebSocket();
+                if (typeof loadChatHistory === 'function') loadChatHistory();
+                document.getElementById('chat-toggle').style.display = 'flex';
+                updateCartBadge();
+                handleScrollAnimations();
+                handleNavbarScroll();
+                handleSmoothScrolling();
+
+                // Add event listeners
+                window.addEventListener('scroll', () => {
+                    handleScrollAnimations();
+                    handleNavbarScroll();
+                });
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
+                }
+            }
         });
-
-        // Event listeners
-        window.addEventListener('scroll', () => {
-            handleScrollAnimations();
-            handleNavbarScroll();
-        });
-
-        window.addEventListener('load', handleScrollAnimations);
-
-        // Khởi tạo trạng thái ban đầu
-        document.getElementById('chat-toggle').style.display = 'flex';
     </script>
 </body>
-
 </html>

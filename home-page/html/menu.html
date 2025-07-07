@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +7,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -19,6 +16,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
+    <!-- Chat JS -->
+    <script src="../js/chat.js"></script>
     <!-- Page-specific CSS -->
     <style>
         .hero {
@@ -761,7 +760,6 @@
         }
     </style>
 </head>
-
 <body>
     <!-- Thanh Điều Hướng -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
@@ -800,7 +798,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
                                 <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
@@ -841,33 +839,33 @@
                     <p id="itemDetailsDescription" class="item-description"></p>
                     <p id="itemDetailsPrice" class="item-price"></p>
                     <div class="quantity-selector">
-                        <button onclick="updateQuantity(-1)">-</button>
+                        <button onclick="try { updateQuantity(-1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">-</button>
                         <input type="number" id="itemQuantity" value="1" min="1" max="100">
-                        <button onclick="updateQuantity(1)">+</button>
+                        <button onclick="try { updateQuantity(1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">+</button>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-add-to-cart" onclick="addItemToCart()">Thêm vào giỏ</button>
-                    <button class="btn btn-order" onclick="orderItemNow()">Đặt ngay</button>
+                    <button class="btn btn-add-to-cart" onclick="try { addItemToCart(); } catch(e) { console.error('Error adding to cart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                    <button class="btn btn-order" onclick="try { orderItemNow(); } catch(e) { console.error('Error ordering item:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt ngay</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Chat Toggle Button -->
-    <div id="chat-toggle" onclick="toggleChat()">💬</div>
+    <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
 
     <!-- Chat Window -->
     <div id="chat-container" class="chat-container">
         <div class="chat-header">
             <span>FoodHub Chat</span>
-            <button onclick="toggleChat()">✕</button>
+            <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
         </div>
         <div class="messages" id="messages"></div>
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') sendMessage()" />
-            <button onclick="sendMessage()">Gửi</button>
-            <button class="clear-btn" onclick="clearChatHistory()">Xóa</button>
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }" />
+            <button onclick="try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }">Gửi</button>
+            <button class="clear-btn" onclick="try { clearChatHistory(); } catch(e) { console.error('Error clearing chat:', e); showNotification('Lỗi khi xóa chat: ' + e.message); }">Xóa</button>
         </div>
     </div>
 
@@ -889,7 +887,7 @@
                     <h4>Danh Mục</h4>
                     <!-- Search Box -->
                     <div class="search-box">
-                        <input type="text" id="search-input" placeholder="Tìm kiếm món ăn..." onkeyup="handleSearch()">
+                        <input type="text" id="search-input" placeholder="Tìm kiếm món ăn..." onkeyup="try { handleSearch(); } catch(e) { console.error('Error searching:', e); showNotification('Lỗi khi tìm kiếm: ' + e.message); }">
                     </div>
                     <!-- Category List -->
                     <div class="category-list" id="category-list">
@@ -938,202 +936,6 @@
         let searchResults = [];
         let selectedItem = null;
 
-        // Chat history initialization
-        let chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
-
-        // Load chat history on page load
-        function loadChatHistory() {
-            const msgDiv = document.getElementById('messages');
-            msgDiv.innerHTML = '';
-            chatHistory.forEach(msg => {
-                appendMessage(msg.sender, msg.text, msg.type, msg.timestamp);
-            });
-        }
-
-        // Toggle chat window
-        function toggleChat() {
-            const chatContainer = document.getElementById('chat-container');
-            const isHidden = chatContainer.classList.contains('show');
-            chatContainer.classList.toggle('show', !isHidden);
-            chatContainer.classList.toggle('hidden', isHidden);
-            if (!isHidden) document.getElementById('userInput').focus();
-        }
-
-        // Check if message is related to menu
-        function isMenuRelated(message) {
-            const keywords = [
-    'món', 'món ăn', 'thực đơn', 'menu', 'combo', 'combo hôm nay', 'món chính',
-    'món phụ', 'món chay', 'món mới', 'đặc sản', 'món đặc biệt', 'món hot',
-    'đề xuất món', 'có gì ăn', 'ăn gì', 'món nào ngon',
-
-    'giá', 'giá tiền', 'bao nhiêu tiền', 'giá bao nhiêu', 'đắt không',
-    'rẻ không', 'bảng giá', 'menu giá',
-
-    'khuyến mãi', 'giảm giá', 'ưu đãi', 'combo khuyến mãi', 'có khuyến mãi không',
-    'khuyến mãi hôm nay', 'mã giảm giá', 'voucher', 'coupon',
-
-    'lẩu', 'nướng', 'chiên', 'xào', 'hấp', 'đồ nướng', 'đồ lẩu', 'buffet',
-    'set menu', 'gọi món', 'ăn chay', 'ăn kiêng',
-
-    'đồ uống', 'nước uống', 'trà sữa', 'sinh tố', 'nước ép', 'bia',
-    'cocktail', 'nước ngọt', 'tráng miệng', 'kem', 'bánh ngọt',
-
-     'giao hàng', 'mở cửa lúc mấy giờ', 'giờ hoạt động',
-    'có ship không', 'ship tận nơi', 'thanh toán', 'thanh toán thế nào',
-
-    'nguyên liệu', 'thành phần', 'có cay không', 'có gì trong món',
-    'chế biến thế nào', 'an toàn vệ sinh',
-
-            ];
-            const messageLower = message.toLowerCase();
-
-            // Check if message contains any menu-related keywords
-            if (keywords.some(keyword => messageLower.includes(keyword))) {
-                return true;
-            }
-
-            // Check if message matches any menu item name or description
-            return allMenuItems.some(item =>
-                item.name.toLowerCase().includes(messageLower) ||
-                (item.description && item.description.toLowerCase().includes(messageLower))
-            );
-        }
-
-        // Search menu items for a response
-        function searchMenuItems(message) {
-            const messageLower = message.toLowerCase();
-            const matchedItems = allMenuItems.filter(item =>
-                item.name.toLowerCase().includes(messageLower) ||
-                (item.description && item.description.toLowerCase().includes(messageLower))
-            );
-
-            if (matchedItems.length === 0) {
-                return null;
-            }
-
-            // Format response for matched items
-            let response = 'Danh sách món ăn phù hợp:\n';
-            matchedItems.forEach(item => {
-                const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
-                response += `* **${item.name}**: ${item.description || 'Chưa có mô tả.'} - Giá: ${price}\n`;
-            });
-            return response;
-        }
-
-        // Send message
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const timestamp = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            const userMsg = { sender: 'Bạn', text: message, type: 'user', timestamp };
-            appendMessage(userMsg.sender, userMsg.text, userMsg.type, timestamp);
-            chatHistory.push(userMsg);
-            saveChatHistory();
-
-            input.value = '';
-
-            // Check if message is related to menu
-            if (!isMenuRelated(message)) {
-                const botMsg = {
-                    sender: 'FoodHub Bot',
-                    text: 'Xin lỗi, tôi chỉ có thể trả lời về các món ăn của FoodHub. Vui lòng hỏi về thực đơn!',
-                    type: 'bot',
-                    timestamp
-                };
-                appendMessage(botMsg.sender, botMsg.text, botMsg.type, timestamp);
-                chatHistory.push(botMsg);
-                saveChatHistory();
-                return;
-            }
-
-            // Try to respond with menu items first
-            const menuResponse = searchMenuItems(message);
-            if (menuResponse) {
-                const botMsg = { sender: 'FoodHub Bot', text: menuResponse, type: 'bot', timestamp };
-                appendMessage(botMsg.sender, botMsg.text, botMsg.type, timestamp);
-                chatHistory.push(botMsg);
-                saveChatHistory();
-                return;
-            }
-
-            // If no direct match, proceed with API call
-            try {
-                const response = await fetch('http://localhost:8080/api/gemini/reply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message,
-                        context: 'Only respond about FoodHub menu items and related information.'
-                    })
-                });
-
-                if (!response.ok) throw new Error(`Yêu cầu thất bại: ${response.status}`);
-
-                const data = await response.json();
-                const reply = data.result?.reply;
-                if (reply) {
-                    const formattedReply = formatReply(reply);
-                    const botMsg = { sender: 'FoodHub Bot', text: formattedReply, type: 'bot', timestamp };
-                    appendMessage(botMsg.sender, botMsg.text, botMsg.type, timestamp);
-                    chatHistory.push(botMsg);
-                    saveChatHistory();
-                } else {
-                    appendMessage('FoodHub Bot', 'Không có phản hồi hợp lệ.', 'bot', timestamp);
-                }
-            } catch (err) {
-                appendMessage('Lỗi', `Không thể kết nối: ${err.message}`, 'bot', timestamp);
-            }
-        }
-
-        // Format reply with Markdown
-        function formatReply(text) {
-            let formatted = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/`([^`]+)`/g, '<code>$1</code>')
-                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-                .replace(/^### (.*)$/gm, '<h3>$1</h3>')
-                .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-                .replace(/^# (.*)$/gm, '<h1>$1</h1>')
-                .replace(/^\* (.*)$/gm, '<li>$1</li>')
-                .replace(/^\d+\. (.*)$/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/g, match => `<ul>${match}</ul>`)
-                .replace(/<\/ul>\s*<ul>/g, '')
-                .replace(/^(?!<h[1-3]>|<ul>|<pre>)(.+)$/gm, '<p>$1</p>');
-            return formatted;
-        }
-
-        // Append message to chat
-        function appendMessage(sender, text, type, timestamp) {
-            const msgDiv = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.className = `message ${type}`;
-            div.innerHTML = `
-                <strong>${sender}</strong>: ${text}
-                <div class="message-time">${timestamp}</div>
-            `;
-            msgDiv.appendChild(div);
-            msgDiv.scrollTop = msgDiv.scrollHeight;
-        }
-
-        // Save chat history
-        function saveChatHistory() {
-            try {
-                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-            } catch (error) {
-                console.error('Error saving chat history:', error);
-            }
-        }
-
-        // Clear chat history
-        function clearChatHistory() {
-            chatHistory = [];
-            document.getElementById('messages').innerHTML = '';
-            saveChatHistory();
-        }
-
         // Update cart badge
         function updateCartBadge() {
             try {
@@ -1168,6 +970,9 @@
                 }
             } catch (error) {
                 console.error('Error in showCategory:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi hiển thị danh mục: ' + error.message);
+                }
             }
         }
 
@@ -1194,14 +999,14 @@
 
                 // Add "View All" button
                 categoryContainer.innerHTML += `
-                    <button class="category-btn active" data-category-id="all" onclick="selectCategory('all')">
+                    <button class="category-btn active" data-category-id="all" onclick="try { selectCategory('all'); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
                         Xem Tất Cả
                     </button>
                 `;
 
                 categories.forEach(category => {
                     categoryContainer.innerHTML += `
-                        <button class="category-btn" data-category-id="${category.id}" onclick="selectCategory(${category.id})">
+                        <button class="category-btn" data-category-id="${category.id}" onclick="try { selectCategory(${category.id}); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
                             ${category.name}
                         </button>
                     `;
@@ -1224,10 +1029,12 @@
 
                 // Load all items initially
                 await fetchAllMenuItems();
-
             } catch (error) {
                 console.error('Error fetching categories:', error);
                 categoryContainer.innerHTML = '<div class="error-message">Không thể tải danh mục.</div>';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tải danh mục: ' + error.message);
+                }
             }
         }
 
@@ -1247,6 +1054,9 @@
                 const container = document.getElementById('category-all');
                 if (container) {
                     container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
+                }
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tải món ăn: ' + error.message);
                 }
             }
         }
@@ -1268,6 +1078,9 @@
                 }
             } catch (error) {
                 console.error('Error in selectCategory:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi chọn danh mục: ' + error.message);
+                }
             }
         }
 
@@ -1288,10 +1101,12 @@
 
                 menuItemsCache[categoryId] = menuItems;
                 displayMenuItems(menuItems, categoryId);
-
             } catch (error) {
                 console.error('Error fetching menu items:', error);
                 container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tải món ăn: ' + error.message);
+                }
             }
         }
 
@@ -1319,16 +1134,17 @@
                 const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : false;
                 let html = '<div class="menu-grid">';
 
-                currentItems.forEach(item => {
+                currentItems.forEach((item, index) => {
                     const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
                     const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
-                    const safeItem = JSON.stringify(item).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    window.menuItems = window.menuItems || [];
+                    window.menuItems[index] = item;
 
                     html += `
                         <div class="menu-card">
                             <div style="position: relative;">
                                 <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
-                                <button class="view-details-btn" onclick="showItemDetails(${safeItem})">Xem Chi Tiết</button>
+                                <button class="view-details-btn" onclick="try { showItemDetails(window.menuItems[${index}]); } catch(e) { console.error('Error showing item details:', e); showNotification('Lỗi khi hiển thị chi tiết món: ' + e.message); }">Xem Chi Tiết</button>
                             </div>
                             <div class="card-body">
                                 <span class="badge">Có sẵn</span>
@@ -1337,8 +1153,8 @@
                                 <p class="card-price">${price}</p>
                                 ${loggedIn ? `
                                     <div>
-                                        <button class="btn btn-order" onclick="try { orderItem(${safeItem}); } catch(e) { console.error('Error in orderItem:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt món</button>
-                                        <button class="btn btn-add-to-cart" onclick="try { addToCart(${safeItem}); } catch(e) { console.error('Error in addToCart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                                        <button class="btn btn-order" onclick="try { orderItem(window.menuItems[${index}]); } catch(e) { console.error('Error in orderItem:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt món</button>
+                                        <button class="btn btn-add-to-cart" onclick="try { addToCart(window.menuItems[${index}]); } catch(e) { console.error('Error in addToCart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
                                     </div>
                                 ` : ''}
                             </div>
@@ -1357,6 +1173,9 @@
             } catch (error) {
                 console.error('Error in displayMenuItems:', error);
                 container.innerHTML = '<div class="error-message">Lỗi hiển thị món ăn.</div>';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi hiển thị món ăn: ' + error.message);
+                }
             }
         }
 
@@ -1366,7 +1185,7 @@
 
             // Previous button
             paginationHTML += `
-                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>
+                <button class="pagination-btn" onclick="try { changePage(${currentPage - 1}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }" ${currentPage === 0 ? 'disabled' : ''}>
                     <i class="bi bi-chevron-left"></i> Trước
                 </button>
             `;
@@ -1382,7 +1201,7 @@
 
             for (let i = startPage; i <= endPage; i++) {
                 paginationHTML += `
-                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="try { changePage(${i}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }">
                         ${i + 1}
                     </button>
                 `;
@@ -1390,7 +1209,7 @@
 
             // Next button
             paginationHTML += `
-                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
+                <button class="pagination-btn" onclick="try { changePage(${currentPage + 1}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
                     Sau <i class="bi bi-chevron-right"></i>
                 </button>
             `;
@@ -1422,6 +1241,9 @@
                 }
             } catch (error) {
                 console.error('Error in changePage:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi chuyển trang: ' + error.message);
+                }
             }
         }
 
@@ -1458,6 +1280,9 @@
                 displayMenuItems(searchResults, currentCategory);
             } catch (error) {
                 console.error('Error in handleSearch:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tìm kiếm: ' + error.message);
+                }
             }
         }
 
@@ -1474,7 +1299,9 @@
                 modal.show();
             } catch (error) {
                 console.error('Error in showItemDetails:', error);
-                showNotification('Lỗi khi hiển thị chi tiết món ăn.');
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi hiển thị chi tiết món ăn: ' + error.message);
+                }
             }
         }
 
@@ -1488,6 +1315,9 @@
                 input.value = quantity;
             } catch (error) {
                 console.error('Error in updateQuantity:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật số lượng: ' + error.message);
+                }
             }
         }
 
@@ -1553,14 +1383,17 @@
                     fetchUserOrders().then(() => startPolling());
                 }
                 if (typeof initializeWebSocket === 'function') initializeWebSocket();
-                loadChatHistory();
-                document.getElementById('chat-toggle').style.display = 'flex';
+                if (typeof loadChatHistory === 'function') loadChatHistory();
+                const chatToggle = document.getElementById('chat-toggle');
+                if (chatToggle) chatToggle.style.display = 'flex';
                 updateCartBadge();
             } catch (error) {
                 console.error('Error in DOMContentLoaded:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
+                }
             }
         });
     </script>
 </body>
-
 </html>
