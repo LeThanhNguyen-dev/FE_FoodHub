@@ -45,7 +45,7 @@ async function showOrders() {
         renderOrdersTemplate();
 
         // Initialize and load orders after template is loaded
-        await loadOrders();
+        await loadOrders(20);
 
         // Update navigation active state
         updateActiveNavigation('showOrders()');
@@ -79,7 +79,9 @@ function renderOrdersTemplate() {
 }
 
 // Setup event listeners after HTML is loaded
-function setupEventListeners() {
+async function setupEventListeners() {
+    console.log('=== setupEventListeners() được gọi ===');
+    
     // Setup jump to page input event listener
     const jumpInput = document.getElementById('jumpToOrderPage');
     if (jumpInput) {
@@ -92,16 +94,26 @@ function setupEventListeners() {
 
     // Setup filter change listeners
     const filterElements = [
-        'orderStatusFilter', 'tableNumberFilter', 'minPriceFilter',
-        'maxPriceFilter', 'sortByOrderFilter', 'sortDirectionOrderFilter', 'pageSizeOrderFilter'
+        'orderStatusFilter', 'tableNumberFilter',
+        'sortByOrderFilter', 'sortDirectionOrderFilter'
     ];
 
     filterElements.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.addEventListener('change', applyOrderFilters);
+            console.log(`Đã setup listener cho ${id}`);
+        } else {
+            console.warn(`Không tìm thấy element ${id}`);
         }
     });
+
+    // Gọi generateTableOptions trực tiếp để load danh sách bàn
+    try {
+        await generateTableOptions();
+    } catch (error) {
+        console.error('=== Lỗi khi load danh sách bàn ===', error);
+    }
 }
 
 // Global variables for pagination
@@ -111,31 +123,23 @@ let totalOrderElements = 0;
 let currentOrderForAddItems = null;
 
 // Load orders from API with filters and pagination
-async function loadOrders() {
+async function loadOrders(pageSize = 20) {
     try {
-        // Get filter values - với null checks
+        // Get filter values
         const orderStatusFilter = document.getElementById('orderStatusFilter');
         const tableNumberFilter = document.getElementById('tableNumberFilter');
-        const minPriceFilter = document.getElementById('minPriceFilter');
-        const maxPriceFilter = document.getElementById('maxPriceFilter');
         const sortByOrderFilter = document.getElementById('sortByOrderFilter');
         const sortDirectionOrderFilter = document.getElementById('sortDirectionOrderFilter');
-        const pageSizeOrderFilter = document.getElementById('pageSizeOrderFilter');
 
         const status = orderStatusFilter ? orderStatusFilter.value : '';
-        const tableNumber = tableNumberFilter ? tableNumberFilter.value : '';
-        const minPrice = minPriceFilter ? minPriceFilter.value : '';
-        const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
+        const tableNumber = tableNumberFilter ? tableNumberFilter.value : ''; // Đã là tableNumber
         const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
         const sortDirection = sortDirectionOrderFilter ? sortDirectionOrderFilter.value || 'DESC' : 'DESC';
-        const pageSize = pageSizeOrderFilter ? pageSizeOrderFilter.value || '10' : '10';
 
         // Build query parameters
         const params = new URLSearchParams();
         if (status) params.append('status', status);
-        if (tableNumber) params.append('tableNumber', tableNumber);
-        if (minPrice) params.append('minPrice', minPrice);
-        if (maxPrice) params.append('maxPrice', maxPrice);
+        if (tableNumber) params.append('tableNumber', tableNumber); // Gửi tableNumber
         params.append('page', currentOrderPage.toString());
         params.append('size', pageSize);
         params.append('orderBy', sortBy);
@@ -146,11 +150,12 @@ async function loadOrders() {
             params.append('area', currentWorkSchedule.area);
         }
         if (currentWorkSchedule && currentWorkSchedule.startTime) {
-            params.append('startTime', currentWorkSchedule.startTime); // Chỉ gửi "08:30"
+            params.append('startTime', currentWorkSchedule.startTime);
         }
-
+        console.log("area: ", currentWorkSchedule.area);
+        console.log("start time: ", currentWorkSchedule.startTime);
         // Fetch orders with filters
-        const data = await apiFetch(`/orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders/waiter/work-shift-orders?${params.toString()}`, {
             method: 'GET'
         });
 
@@ -173,6 +178,112 @@ async function loadOrders() {
     }
 }
 
+async function generateTableOptions() {
+    try {
+        
+        // Lấy element filter trước khi gọi API
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (!tableFilter) {
+            console.warn('Không tìm thấy element tableNumberFilter');
+            return '<option value="">Element không tồn tại</option>';
+        }
+
+        // Lưu giá trị hiện tại
+        const currentValue = tableFilter.value;
+        
+        // Hiển thị loading
+        tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
+        
+        // Gọi API /tables để lấy danh sách bàn
+        const data = await apiFetch(`/tables?area=${currentWorkSchedule.area}`, {
+            method: 'GET'
+        });
+        
+        
+        // Kiểm tra dữ liệu trả về
+        if (!data || !data.result || !Array.isArray(data.result)) {
+            console.error('Dữ liệu bàn không hợp lệ:', data);
+            tableFilter.innerHTML = '<option value="">Không có dữ liệu bàn</option>';
+            return '<option value="">Không có dữ liệu bàn</option>';
+        }
+        
+        // Tạo danh sách tùy chọn từ dữ liệu API - sử dụng tableNumber làm value
+        const options = data.result.map(table => {
+            return `<option value="${table.tableNumber}">Bàn ${table.tableNumber}</option>`;
+        }).join('');
+        
+        
+        // Cập nhật trực tiếp vào dropdown filter
+        const finalOptions = '<option value="">Tất cả bàn</option>' + options;
+        tableFilter.innerHTML = finalOptions;
+        
+        // Khôi phục giá trị đã chọn trước đó (nếu có)
+        if (currentValue) {
+            tableFilter.value = currentValue;
+            console.log('Đã khôi phục giá trị:', currentValue);
+        }
+                
+        // Trả về options cho các mục đích khác (như showCart)
+        return options;
+        
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách bàn:', error);
+        
+        // Cập nhật UI hiển thị lỗi
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (tableFilter) {
+            tableFilter.innerHTML = '<option value="">Lỗi tải danh sách bàn</option>';
+        }
+        
+        // Trả về option lỗi
+        return '<option value="">Lỗi tải danh sách bàn</option>';
+    }
+}
+
+
+
+async function loadTableOptions() {
+    try {
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (!tableFilter) {
+            console.warn('Không tìm thấy element tableNumberFilter');
+            return;
+        }
+
+        const currentValue = tableFilter.value; // Lưu giá trị hiện tại
+        console.log('Giá trị hiện tại của filter:', currentValue);
+        
+        // Thêm loading indicator
+        tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
+        
+        // Lấy danh sách bàn - await đúng cách như trong showCart()
+        const tableOptions = await generateTableOptions();
+        console.log('Table options nhận được:', tableOptions);
+        
+        // Cập nhật dropdown với danh sách bàn
+        const finalOptions = '<option value="">Tất cả bàn</option>' + tableOptions;
+        tableFilter.innerHTML = finalOptions;
+        
+        // Khôi phục giá trị đã chọn trước đó (nếu có)
+        if (currentValue) {
+            tableFilter.value = currentValue;
+            console.log('Đã khôi phục giá trị:', currentValue);
+        }
+        
+        console.log('Load table options thành công');
+        
+    } catch (error) {
+        console.error('Lỗi khi load danh sách bàn:', error);
+        const tableFilter = document.getElementById('tableNumberFilter');
+        if (tableFilter) {
+            tableFilter.innerHTML = '<option value="">Lỗi tải danh sách bàn</option>';
+        }
+    }
+}
+
+
+
+
 // Apply filters and reload data
 function applyOrderFilters() {
     currentOrderPage = 0; // Reset to first page when applying filters
@@ -184,14 +295,12 @@ function applyOrderFilters() {
 
 // Clear all filters
 function clearFilters() {
+    // Removed price filter elements and pageSizeOrderFilter from the array
     const filterElements = [
-        {id: 'orderStatusFilter', value: ''},
-        {id: 'tableNumberFilter', value: ''}, // Thay đổi từ tableIdFilter
-        {id: 'minPriceFilter', value: ''},
-        {id: 'maxPriceFilter', value: ''},
-        {id: 'sortByOrderFilter', value: 'createdAt'},
-        {id: 'sortDirectionOrderFilter', value: 'DESC'},
-        {id: 'pageSizeOrderFilter', value: '10'}
+        { id: 'orderStatusFilter', value: '' },
+        { id: 'tableNumberFilter', value: '' },
+        { id: 'sortByOrderFilter', value: 'createdAt' },
+        { id: 'sortDirectionOrderFilter', value: 'DESC' }
     ];
 
     filterElements.forEach(filter => {
@@ -203,6 +312,8 @@ function clearFilters() {
 
     applyOrderFilters();
 }
+
+
 
 // Render orders table
 function renderOrders(orders) {
@@ -249,10 +360,10 @@ function renderOrders(orders) {
                 <strong>#${order.id}</strong>
             </td>
             <td>
-                <span class="table-number-badge">
+                <div class="table-number-badge">
                     <i class="fas fa-chair me-1"></i>
                     ${order.tableNumber ? `Bàn ${order.tableNumber}` : 'Mang về'}
-                </span>
+                </div>
             </td>
             <td>
                 <div class="order-time">
@@ -267,8 +378,7 @@ function renderOrders(orders) {
                 </div>
             </td>
             <td>
-                <span class="status-badge-enhanced ${getStatusBadgeClass(order.status)}">
-                    ${getStatusIcon(order.status)}
+                <span class="status-badge status-${order.status.toLowerCase()}">
                     ${getStatusText(order.status)}
                 </span>
             </td>
@@ -280,7 +390,7 @@ function renderOrders(orders) {
             </td>
             <td>
                 <div class="action-btn-group">
-                    <button class="action-btn btn-info" 
+                    <button class="action-btn btn-details" 
                             onclick="event.stopPropagation(); viewOrderDetails(${order.id})"
                             title="Xem chi tiết">
                         <i class="fas fa-eye"></i>
@@ -296,33 +406,33 @@ function renderOrders(orders) {
 
 function createOrderActionButtons(order) {
     let buttons = '';
-    
+
     // Nút xác nhận cho đơn hàng PENDING
     if (order.status === 'PENDING') {
         buttons += `
-            <button class="action-btn btn-success" 
+            <button class="action-btn btn-confirmed" 
                     onclick="event.stopPropagation(); confirmOrder(${order.id})"
                     title="Xác nhận đơn hàng">
                 <i class="fas fa-check"></i>
             </button>
         `;
     }
-    
+
     // Nút hoàn thành cho đơn hàng READY
     if (order.status === 'READY') {
         buttons += `
-            <button class="action-btn btn-primary" 
+            <button class="action-btn btn-complete" 
                     onclick="event.stopPropagation(); completeOrder(${order.id})"
                     title="Hoàn thành đơn hàng">
                 <i class="fas fa-check-double"></i>
             </button>
         `;
     }
-    
+
     // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
     if (order.status === 'COMPLETED') {
         buttons += `
-            <button class="action-btn btn-info checkout-btn" 
+            <button class="action-btn btn-checkout" 
                     data-order='${JSON.stringify(order)}'
                     onclick="event.stopPropagation(); handleCheckoutClick(this)"
                     title="Thanh toán đơn hàng">
@@ -330,18 +440,18 @@ function createOrderActionButtons(order) {
             </button>
         `;
     }
-    
+
     // Nút hủy đơn hàng - hiển thị cho các trạng thái có thể hủy
     if (['PENDING', 'CONFIRMED'].includes(order.status)) {
         buttons += `
-            <button class="action-btn btn-danger" 
+            <button class="action-btn btn-cancel" 
                     onclick="event.stopPropagation(); cancelOrder(${order.id})"
                     title="Hủy đơn hàng">
                 <i class="fas fa-times"></i>
             </button>
         `;
     }
-    
+
     return buttons;
 }
 
@@ -411,53 +521,7 @@ async function checkoutOrder(order) {
         }
     }
 }
-async function handlePaymentCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('orderId');
-    const status = urlParams.get('status');
-    const pendingOrderId = sessionStorage.getItem('pendingOrderId');
 
-    // Kiểm tra xem có phải redirect từ PayOS không
-    if (orderId && pendingOrderId && orderId === pendingOrderId) {
-        try {
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'block';
-            }
-
-            // Gọi API /payments/callback với query string
-            const response = await apiFetch(`/payments/callback?${urlParams.toString()}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.code === 0) {
-                const paymentResult = response.result;
-                if (paymentResult.status === 'PAID') {
-                    alert(`Thanh toán thành công!\nSố tiền: ${paymentResult.amount.toLocaleString('vi-VN')} VND\nMã giao dịch: ${paymentResult.transactionId}`);
-                } else if (paymentResult.status === 'CANCELLED') {
-                    alert('Thanh toán đã bị hủy.');
-                } else {
-                    alert(`Trạng thái thanh toán: ${paymentResult.status}`);
-                }
-                await loadOrders();
-            } else {
-                throw new Error(response.message || 'Lỗi khi xử lý kết quả thanh toán');
-            }
-        } catch (error) {
-            console.error('Error handling callback:', error);
-            alert('Có lỗi khi xử lý kết quả thanh toán: ' + error.message);
-        } finally {
-            sessionStorage.removeItem('pendingOrderId');
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
-        }
-    }
-}
 
 
 // Helper function để hiển thị modal với thông tin đơn hàng và chọn phương thức thanh toán
@@ -577,9 +641,9 @@ function showOrderDetailsAndPaymentModal(order) {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         window.selectPaymentMethod = (method) => {
             document.body.removeChild(modal);
             delete window.selectPaymentMethod;
@@ -600,7 +664,7 @@ async function cancelOrder(orderId) {
             const originalHTML = cancelBtn.innerHTML;
             cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             cancelBtn.disabled = true;
-            
+
             // Restore button sau khi hoàn thành
             setTimeout(() => {
                 if (cancelBtn) {
@@ -617,7 +681,7 @@ async function cancelOrder(orderId) {
         if (response && response.code === 0) {
             // Hiển thị thông báo thành công
             showNotification('Đơn hàng đã được hủy thành công!', 'success');
-            
+
             // Refresh danh sách đơn hàng
             await loadOrders();
         } else {
@@ -644,7 +708,7 @@ async function confirmOrder(orderId) {
             const originalHTML = confirmBtn.innerHTML;
             confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             confirmBtn.disabled = true;
-            
+
             // Restore button sau khi hoàn thành
             setTimeout(() => {
                 if (confirmBtn) {
@@ -661,7 +725,7 @@ async function confirmOrder(orderId) {
         if (response && response.code === 0) {
             // Hiển thị thông báo thành công
             showNotification('Đơn hàng đã được xác nhận thành công!', 'success');
-            
+
             // Refresh danh sách đơn hàng
             await loadOrders();
         } else {
@@ -687,7 +751,7 @@ async function completeOrder(orderId) {
             const originalHTML = completeBtn.innerHTML;
             completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             completeBtn.disabled = true;
-            
+
             // Restore button sau khi hoàn thành
             setTimeout(() => {
                 if (completeBtn) {
@@ -704,7 +768,7 @@ async function completeOrder(orderId) {
         if (response && response.code === 0) {
             // Hiển thị thông báo thành công
             showNotification('Đơn hàng đã được hoàn thành!', 'success');
-            
+
             // Refresh danh sách đơn hàng
             await loadOrders();
         } else {
@@ -759,109 +823,6 @@ function getNotificationIcon(type) {
     return icons[type] || 'fa-info-circle';
 }
 
-// NEW FUNCTION: Thêm CSS cho notification
-function addNotificationStyles() {
-    if (document.getElementById('notificationStyles')) return;
-
-    const styles = `
-        <style id="notificationStyles">
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            min-width: 300px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 1050;
-        }
-        .notification.show {
-            transform: translateX(0);
-        }
-        .notification-success {
-            background: linear-gradient(135deg, #28a745, #20c997);
-        }
-        .notification-error {
-            background: linear-gradient(135deg, #dc3545, #e74c3c);
-        }
-        .notification-warning {
-            background: linear-gradient(135deg, #ffc107, #f39c12);
-            color: #333;
-        }
-        .notification-info {
-            background: linear-gradient(135deg, #17a2b8, #3498db);
-        }
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .notification-content i {
-            font-size: 18px;
-        }
-        .action-btn-group {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .action-btn {
-            padding: 6px 8px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-            min-width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .action-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn-success:hover:not(:disabled) {
-            background: #218838;
-        }
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background: #0056b3;
-        }
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-        }
-        .btn-info:hover:not(:disabled) {
-            background: #138496;
-        }
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-danger:hover:not(:disabled) {
-            background: #c82333;
-        }
-        </style>
-    `;
-    document.head.insertAdjacentHTML('beforeend', styles);
-}
 
 
 
@@ -1141,9 +1102,15 @@ function updateActiveNavigation(currentFunction) {
 
 // Hàm định dạng thời gian
 function formatDateTime(dateString) {
-    const date = new Date(dateString);
+    console.log("date string: ", dateString);
+    
+    // Remove 'Z' suffix if present and treat as local time
+    const cleanDateString = dateString.replace('Z', '');
+    const date = new Date(cleanDateString);
     const now = new Date();
-    const diffMs = now - date;
+    
+    // Calculate difference in milliseconds
+    const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
@@ -1154,7 +1121,25 @@ function formatDateTime(dateString) {
         minute: '2-digit'
     });
 
-    if (diffMins < 60) {
+    // Handle future dates (when date is in the future)
+    if (diffMs < 0) {
+        const absDiffMins = Math.abs(diffMins);
+        const absDiffHours = Math.abs(diffHours);
+        const absDiffDays = Math.abs(diffDays);
+        
+        if (absDiffMins < 60) {
+            return `Trong ${absDiffMins} phút`;
+        } else if (absDiffHours < 24) {
+            return `Trong ${absDiffHours} giờ (${timeStr})`;
+        } else {
+            return `Trong ${absDiffDays} ngày (${timeStr})`;
+        }
+    }
+
+    // Handle past dates (normal case)
+    if (diffMins < 1) {
+        return 'Vừa xong';
+    } else if (diffMins < 60) {
         return `${diffMins} phút trước`;
     } else if (diffHours < 24) {
         return `${diffHours} giờ trước (${timeStr})`;
@@ -1250,9 +1235,25 @@ async function displayOrderDetails(orderData) {
             tableNumber, username, totalAmount, orderItems
         } = orderData;
 
-        // Format dữ liệu
-        const formattedDateCreation = new Date(createdAt).toLocaleString('vi-VN');
-        const formattedDateUpdate = updatedAt ? new Date(updatedAt).toLocaleString('vi-VN') : 'Chưa cập nhật';
+        // Format dữ liệu - parse trực tiếp mà không chuyển đổi múi giờ
+        const formatDateTime = (dateStr) => {
+            if (!dateStr) return 'Chưa cập nhật';
+            
+            // Parse date string trực tiếp mà không để JS tự động chuyển đổi timezone
+            const date = new Date(dateStr.replace('Z', ''));
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+        };
+
+        const formattedDateCreation = formatDateTime(createdAt);
+        const formattedDateUpdate = formatDateTime(updatedAt);
         const formattedAmount = formatCurrency(totalAmount);
 
         // Fetch order.html
@@ -1280,6 +1281,16 @@ async function displayOrderDetails(orderData) {
             itemNode.querySelector('.item-details').textContent = `SL: ${item.quantity} × ${formatCurrency(item.price)}`;
             itemNode.querySelector('.item-status .badge').className = `badge ${getStatusBadgeClass(item.status)}`;
             itemNode.querySelector('.item-status .badge').textContent = getStatusText(item.status);
+            
+            // Thêm ghi chú cho item nếu có
+            const itemNoteElement = itemNode.querySelector('.item-note');
+            if (item.note && item.note.trim() !== '') {
+                itemNoteElement.textContent = `Ghi chú: ${item.note}`;
+                itemNoteElement.style.display = 'block';
+            } else {
+                itemNoteElement.style.display = 'none';
+            }
+            
             return itemNode.querySelector('.order-item').outerHTML;
         }).join('');
 
@@ -1287,25 +1298,25 @@ async function displayOrderDetails(orderData) {
         modalContent.querySelector('h3').textContent = `Chi tiết đơn hàng #${id}`;
         modalContent.querySelector('.badge').className = `badge ${getStatusBadgeClass(status)}`;
         modalContent.querySelector('.badge').textContent = getStatusText(status);
-        
+
         // Cập nhật từng info-row theo đúng thứ tự
         const infoRows = modalContent.querySelectorAll('.info-row');
-        
+
         // info-row[1]: Loại đơn (index 1)
         infoRows[1].querySelector('span:nth-child(2)').textContent = getOrderTypeText(orderType);
-        
+
         // info-row[2]: Thời gian tạo (index 2)
         infoRows[2].querySelector('span:nth-child(2)').textContent = formattedDateCreation;
-        
+
         // info-row[3]: Thời gian cập nhật (index 3)
         infoRows[3].querySelector('span:nth-child(2)').textContent = formattedDateUpdate;
-        
+
         // info-row[4]: Bàn (index 4)
         infoRows[4].querySelector('span:nth-child(2)').textContent = tableNumber || 'Mang về';
-        
+
         // info-row[5]: Khách hàng (index 5)
         infoRows[5].querySelector('span:nth-child(2)').textContent = username || 'Guest';
-        
+
         // info-row[6]: Ghi chú (index 6)
         infoRows[6].querySelector('span:nth-child(2)').textContent = note || 'Không có ghi chú';
 
@@ -1361,27 +1372,46 @@ async function displayOrderDetails(orderData) {
 }
 
 
+
 function startAddItemsToOrder(orderId) {
     // Lưu thông tin đơn hàng để sử dụng sau
     currentOrderForAddItems = {
         orderId: orderId,
         isAddingItems: true
     };
-    
+
     // Đóng modal chi tiết đơn hàng
     closeModal();
-    
+
+    // Reset cart trước khi chuyển sang chế độ thêm món
+    cart = [];
+
     // Chuyển đến trang menu
     showMenu();
-    
+
     // Hiển thị thông báo
-    showToast('Chế độ gọi thêm món được kích hoạt. Chọn món muốn thêm vào đơn hàng.', 'info');
-    
-    // Cập nhật giao diện để hiển thị trạng thái gọi thêm món
-    updateUIForAddItemsMode();
+    showNotification('Chế độ gọi thêm món được kích hoạt. Chọn món muốn thêm vào đơn hàng.', 'info');
 }
 
+function closeModal() {
+    try {
+        // Tìm và xóa modal overlay
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
 
+        // Xóa CSS modal để tránh conflict
+        const modalLink = document.querySelector('link[href="css/modal-style.css"]');
+        if (modalLink) {
+            modalLink.remove();
+        }
+
+        console.log('Modal đã được đóng thành công');
+    } catch (error) {
+        console.error('Lỗi khi đóng modal:', error);
+    }
+}
 
 // Đóng modal
 function closeOrderDetails() {
@@ -1510,16 +1540,7 @@ async function showOrderItemsStatusModal(orderData) {
     }
 }
 
-// Hàm hỗ trợ (giả định đã tồn tại)
-function getStatusBadgeClass(status) {
-    switch (status) {
-        case 'PENDING': return 'badge-pending';
-        case 'CONFIRMED': return 'badge-confirmed';
-        case 'COMPLETED': return 'badge-completed';
-        case 'CANCELLED': return 'badge-cancelled';
-        default: return '';
-    }
-}
+
 
 function getStatusText(status) {
     switch (status) {
@@ -1563,7 +1584,7 @@ function executeStatusUpdate() {
 function toggleSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAll');
     const itemCheckboxes = document.querySelectorAll('.order-item-option input[type="checkbox"]');
-    
+
     itemCheckboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
     });
@@ -1572,7 +1593,7 @@ function toggleSelectAll() {
 async function executeStatusUpdate() {
     const selectedItems = Array.from(document.querySelectorAll('.order-item-option input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.value);
-    
+
     const newStatus = document.getElementById('newStatus').value;
 
     if (selectedItems.length === 0) {
@@ -1593,21 +1614,21 @@ async function executeStatusUpdate() {
         updateBtn.disabled = true;
 
         // Gọi API để cập nhật từng item
-        const updatePromises = selectedItems.map(itemId => 
+        const updatePromises = selectedItems.map(itemId =>
             apiFetch(`/orders/items/status/${itemId}?status=${newStatus}`, {
                 method: 'PUT'
             })
         );
 
         const results = await Promise.all(updatePromises);
-        
+
         // Kiểm tra kết quả
         const failedUpdates = results.filter(result => result.code !== 0);
-        
+
         if (failedUpdates.length === 0) {
             alert(`Cập nhật trạng thái thành công cho ${selectedItems.length} món ăn!`);
             closeStatusUpdateModal();
-            
+
             // Refresh orders list và close order details modal
             await loadOrders();
             closeOrderDetails();
@@ -1650,7 +1671,7 @@ function startSmartRefresh() {
 }
 
 // Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Chỉ gọi dashboard nếu không phải trang payment-result
     if (!window.location.pathname.includes('/payment-result')) {
         showDashboard();
@@ -1659,7 +1680,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Stop refresh when page is hidden
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         if (refreshInterval) clearInterval(refreshInterval);
     } else {
@@ -1710,12 +1731,12 @@ function pauseAutoRefreshTemporarily() {
     }
 }
 
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     stopAutoRefresh();
 });
 
 // Thêm event listener để dừng/khởi động auto refresh khi tab ẩn/hiện
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         stopAutoRefresh();
     } else {
@@ -1725,8 +1746,6 @@ document.addEventListener('visibilitychange', function() {
         }
     }
 });
-
-
 
 
 

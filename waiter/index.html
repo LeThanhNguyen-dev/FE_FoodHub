@@ -25,6 +25,10 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/table-style.css" rel="stylesheet">
+    <link href="css/chat-style.css" rel="stylesheet">
+
+
 </head>
 
 <body>
@@ -91,9 +95,38 @@
                 <h4 class="mb-0" id="pageTitle">Dashboard - Ca làm việc</h4>
             </div>
             <div class="d-flex align-items-center">
-                <div class="notification-bell">
+                <div class="notification-bell" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge" id="notificationCount">0</span>
+
+                    <!-- Notification Dropdown -->
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h6>Thông báo</h6>
+                            <button class="clear-all-btn" onclick="clearAllNotifications()">Xóa tất cả</button>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="notification-empty">
+                                <i class="fas fa-bell-slash"></i>
+                                <div>Không có thông báo mới</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-icon" onclick="toggleMessageDropdown()">
+                    <i class="fas fa-envelope"></i>
+                    <span class="message-badge" id="messageCount">0</span>
+
+                    <!-- Message Dropdown -->
+                    <div class="message-dropdown" id="messageDropdown">
+                        <div class="message-header">
+                            <h6>Tin nhắn</h6>
+                            <button class="clear-all-btn" onclick="markAllMessagesRead()">Đánh dấu đã đọc</button>
+                        </div>
+                        <div class="message-list" id="messageList">
+
+                        </div>
+                    </div>
                 </div>
                 <div class="dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -118,7 +151,6 @@
             <div class="welcome-section">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h2 class="mb-3" id="welcomeMessage">Dashboard - Ca làm việc</h2>
                         <p class="mb-2" id="shiftTime"><i class="fas fa-clock me-2"></i>Ca làm: Đang tải...</p>
                         <p class="mb-2" id="shiftDate"><i class="fas fa-calendar me-2"></i>Ngày: Đang tải...</p>
                         <p class="mb-0" id="shiftArea"><i class="fas fa-map-marker-alt me-2"></i>Khu vực: Đang tải...
@@ -132,139 +164,145 @@
 
             <!-- Dashboard Cards -->
             <div class="dashboard-cards">
-                <!-- Urgent Orders Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Đơn hàng cấp bách</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-exclamation-triangle management-icon"
-                            style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"></i>
-                        <div class="stats-number urgent-number">3</div>
-                        <p class="text-muted mb-3">Cần xử lý ngay</p>
-                        <button class="btn btn-action btn-urgent" onclick="showUrgentOrders()">
-                            <i class="fas fa-bolt me-2"></i>Xử lý ngay
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Active Orders Card -->
-                <div class="card">
+                <div class="card clickable-card" onclick="handleNavClick('orders')">
                     <div class="card-header">
-                        <h5><i class="fas fa-clipboard-list me-2"></i>Đơn hàng đang xử lý</h5>
+                        <h5><i class="fas fa-clipboard-list"></i>Đơn hàng đang xử lý</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-clipboard-list"
-                            style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
-                        <div class="stats-number">12</div>
-                        <p class="text-muted mb-3">Đơn đang phục vụ</p>
-                        <button class="btn btn-action" onclick="handleNavClick('orders')">
-                            <i class="fas fa-list me-2"></i>Xem chi tiết
-                        </button>
+                    <div class="card-body">
+                        <div class="card-icon orders-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="stats-number">0</div>
+                        <p class="stats-label">Đơn đang phục vụ</p>
                     </div>
                 </div>
 
                 <!-- Tables Management Card -->
-                <div class="card">
+                <div class="card clickable-card" onclick="handleNavClick('tables')">
                     <div class="card-header">
-                        <h5><i class="fas fa-chair me-2"></i>Quản lý bàn</h5>
+                        <h5><i class="fas fa-chair"></i>Quản lý bàn</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-chair"
-                            style="font-size: 3rem; color: var(--waiter-blue); margin-bottom: 1rem;"></i>
-                        <div class="stats-number">8/15</div>
-                        <p class="text-muted mb-3">Bàn đang phục vụ</p>
-                        <button class="btn btn-action" onclick="handleNavClick('tables')">
-                            <i class="fas fa-eye me-2"></i>Xem bàn
-                        </button>
+                    <div class="card-body">
+                        <div class="card-icon tables-icon">
+                            <i class="fas fa-chair"></i>
+                        </div>
+                        <div class="stats-number">0/0</div>
+                        <p class="stats-label">Bàn đang phục vụ</p>
                     </div>
                 </div>
 
                 <!-- Daily Sales Card -->
-                <div class="card">
+                <div class="card clickable-card" onclick="handleNavClick('reports')">
                     <div class="card-header">
-                        <h5><i class="fas fa-money-bill-wave me-2"></i>Doanh thu ca làm</h5>
+                        <h5><i class="fas fa-money-bill-wave"></i>Doanh thu ca làm</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-money-bill-wave"
-                            style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
-                        <div class="stats-number" style="color: var(--success);">₫850K</div>
-                        <p class="text-muted mb-3">Từ 15 đơn hàng</p>
-                        <button class="btn btn-action" onclick="handleNavClick('reports')">
-                            <i class="fas fa-chart-bar me-2"></i>Xem báo cáo
-                        </button>
+                    <div class="card-body">
+                        <div class="card-icon sales-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stats-number sales-number">0K₫</div>
+                        <p class="stats-label">Từ 0 đơn hàng</p>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Orders -->
-            <div class="orders-section">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5><i class="fas fa-clock me-2 text-primary"></i>Đơn hàng gần đây</h5>
-                    <button class="btn btn-outline-primary btn-sm" onclick="refreshOrders()">
-                        <i class="fas fa-sync-alt me-1"></i>Làm mới
-                    </button>
-                </div>
-
-                <div class="order-item order-urgent">
-                    <div class="order-info">
-                        <div class="order-number">#ORD-001</div>
-                        <div class="mb-2">
-                            <span class="table-number">Bàn 5</span>
-                            <span class="urgent-badge">URGENT - 15 phút</span>
-                        </div>
-                        <div class="order-time">2 x Phở Bò, 1 x Cơm Tấm - 14:25</div>
-                    </div>
-                    <div class="d-flex flex-column gap-2">
-                        <span class="status-badge status-ready">Sẵn sàng phục vụ</span>
-                        <button class="btn btn-sm btn-success" onclick="serveOrder('ORD-001')">
-                            <i class="fas fa-check me-1"></i>Phục vụ
+            <div class="orders-section" id="dashboardOrdersSection">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2" style="color: var(--primary)"></i>
+                        Đơn hàng gần đây
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success" onclick="refreshDashboardOrders()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Làm mới
+                        </button>
+                        <button class="btn btn-success" onclick="showMenu()">
+                            <i class="fas fa-plus me-1"></i>
+                            Nhận đơn mới
+                        </button>
+                        <button class="btn btn-primary" onclick="showOrders()">
+                            <i class="fas fa-eye me-1"></i>
+                            Xem tất cả
                         </button>
                     </div>
                 </div>
 
-                <div class="order-item">
-                    <div class="order-info">
-                        <div class="order-number">#ORD-002</div>
-                        <div class="mb-2">
-                            <span class="table-number">Bàn 3</span>
+                <!-- Quick Stats -->
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <div class="stat-card pending">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="pendingOrdersCount">-</div>
+                                <div class="stat-label">Chờ xử lý</div>
+                            </div>
                         </div>
-                        <div class="order-time">1 x Bún Chả, 2 x Trà đá - 14:30</div>
                     </div>
-                    <div class="d-flex flex-column gap-2">
-                        <span class="status-badge status-preparing">Đang chuẩn bị</span>
-                        <button class="btn btn-sm btn-info" onclick="checkOrderStatus('ORD-002')">
-                            <i class="fas fa-eye me-1"></i>Theo dõi
-                        </button>
+                    <div class="col-3">
+                        <div class="stat-card confirmed">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="confirmedOrdersCount">-</div>
+                                <div class="stat-label">Đã xác nhận</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card ready">
+                            <div class="stat-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="readyOrdersCount">-</div>
+                                <div class="stat-label">Sẵn sàng</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card completed">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="completedOrdersCount">-</div>
+                                <div class="stat-label">Hoàn thành</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="order-item">
-                    <div class="order-info">
-                        <div class="order-number">#ORD-003</div>
-                        <div class="mb-2">
-                            <span class="table-number">Bàn 7</span>
+                <!-- Orders List -->
+                <div class="dashboard-orders-list" id="dashboardOrdersList">
+                    <!-- Loading state -->
+                    <div class="dashboard-orders-loading" id="dashboardOrdersLoading">
+                        <div class="d-flex justify-content-center align-items-center py-4">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span>Đang tải đơn hàng...</span>
                         </div>
-                        <div class="order-time">3 x Bánh mì, 1 x Cà phê - 14:35</div>
                     </div>
-                    <div class="d-flex flex-column gap-2">
-                        <span class="status-badge status-pending">Chờ xử lý</span>
-                        <button class="btn btn-sm btn-warning" onclick="processOrder('ORD-003')">
-                            <i class="fas fa-play me-1"></i>Xử lý
-                        </button>
-                    </div>
-                </div>
 
-                <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="handleNavClick('menu')">
-                        <i class="fas fa-plus me-2"></i>Nhận đơn mới
-                    </button>
-                    <button class="quick-action-btn" onclick="callKitchen()">
-                        <i class="fas fa-phone me-2"></i>Gọi bếp
-                    </button>
-                    <button class="quick-action-btn" onclick="requestSupport()">
-                        <i class="fas fa-hands-helping me-2"></i>Yêu cầu hỗ trợ
-                    </button>
+                    <!-- Orders will be rendered here -->
+                    <div class="dashboard-orders-content" id="dashboardOrdersContent" style="display: none;">
+                        <!-- Orders list will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Empty state -->
+                    <div class="dashboard-orders-empty" id="dashboardOrdersEmpty" style="display: none;">
+                        <div class="text-center py-4">
+                            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">Chưa có đơn hàng nào</h6>
+                            <p class="text-muted small">Đơn hàng mới sẽ hiển thị ở đây</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -317,11 +355,18 @@
         let currentWorkSchedule = null;
         let currentUserInfo = null;
         let hasWorkSchedule = false;
+        let notifications = [];
+        let notificationDropdownOpen = false;
 
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', function () {
+            updateChatNotificationCount();
+            updateNotificationCount();
             loadUserInfo();
             loadWorkSchedule();
+            // if (document.getElementById('dashboardOrdersSection')) {
+            //     initDashboardOrders();
+            // }
         });
 
 
@@ -367,6 +412,43 @@
             currentUserInfo.displayName = displayName;
         }
 
+        function initializeWebSocket(currentWorkSchedule) {
+            console.log('Initializing WebSocket for role:', currentWorkSchedule.role);
+
+            // Kết nối WebSocket
+            connectNotificationWebSocket(currentWorkSchedule, handleWebSocketMessage);
+            connectChatSocketForStaff(currentWorkSchedule, handleIncomingChatMessage);
+        }
+
+        function formatInstantToTime(instant) {
+            try {
+                const date = new Date(instant);
+                return date.toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (error) {
+                console.error('Error formatting time:', error);
+                return 'Đang cập nhật';
+            }
+        }
+
+        function formatInstantToDate(instant) {
+            try {
+                const date = new Date(instant);
+                const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+                const dayName = days[date.getDay()];
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${dayName}, ${day}/${month}/${year}`;
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return 'Đang cập nhật';
+            }
+        }
         // Function to handle navigation clicks
         function handleNavClick(section) {
             // Check if user has work schedule
@@ -408,8 +490,12 @@
                     hasWorkSchedule = true;
                     displayWorkSchedule(data.result);
                     showDashboard();
+                    initializeWebSocket(currentWorkSchedule);
                 } else {
                     throw new Error(data.message || 'Invalid response format');
+                }
+                if (document.getElementById('dashboardOrdersSection')) {
+                    initDashboardOrders();
                 }
             } catch (error) {
                 console.error('Error loading work schedule:', error);
@@ -483,26 +569,60 @@
                 '💬 Hoặc liên hệ trực tiếp tại quầy lễ tân');
         }
 
+        function formatInstantToTime(instant) {
+            try {
+                const date = new Date(instant);
+                return date.toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (error) {
+                console.error('Error formatting time:', error);
+                return 'Đang cập nhật';
+            }
+        }
+
+        function formatInstantToDate(instant) {
+            try {
+                const date = new Date(instant);
+                const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+                const dayName = days[date.getDay()];
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+
+                return `${dayName}, ${day}/${month}/${year}`;
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return 'Đang cập nhật';
+            }
+        }
+
         // Function to display work schedule data
         function displayWorkSchedule(schedule) {
-            // Simplified welcome message - no greeting or name
-            const welcomeMessage = document.getElementById('welcomeMessage');
-            welcomeMessage.textContent = 'Dashboard - Ca làm việc';
-
-            // Update shift information
+            // Update shift information using instant format
             document.getElementById('shiftDate').innerHTML =
-                `<i class="fas fa-calendar me-2"></i>Ngày: ${schedule.date}`;
+                `<i class="fas fa-calendar me-2"></i>Ngày: ${formatInstantToDate(schedule.date)}`;
 
-            // Use startTime and endTime directly
-            const startTime = schedule.startTime || 'Đang cập nhật';
-            const endTime = schedule.endTime || 'Đang cập nhật';
+            // Format start and end time from instant
+            const startTime = formatInstantToTime(schedule.startTime);
+            const endTime = formatInstantToTime(schedule.endTime);
             document.getElementById('shiftTime').innerHTML =
                 `<i class="fas fa-clock me-2"></i>Ca làm: ${startTime} - ${endTime}`;
 
-            // Update area
+            // Update area - use shift name if no area field
+            const areaDisplay = schedule.area || schedule.shift || 'Đang cập nhật';
             document.getElementById('shiftArea').innerHTML =
-                `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${schedule.area}`;
+                `<i class="fas fa-map-marker-alt me-2"></i>Khu vực: ${areaDisplay}`;
+
+            // Load active orders count after displaying work schedule
+            loadActiveOrdersCount();
+            loadTablesCount();
+            loadShiftRevenue();
+            loadTables();
         }
+
 
         // Function to show error message
         function showError(errorText) {
@@ -581,13 +701,716 @@
 
             updateActiveNav('dashboard');
         }
+
+        function handleWebSocketMessage(data) {
+            console.log('Received notification:', data);
+            console.log('📩 data.message:', data.message);
+            console.log('data.type:', data.type);
+
+            // Add to notification list
+            addNotificationToList(data.message, data.type || 'order');
+
+            // Show WebSocket notification popup
+            showWebSocketNotification(data.message);
+
+            // Update dashboard stats if needed
+            if (hasWorkSchedule) {
+                updateDashboardStats();
+            }
+        }
+
+        // Hàm hiển thị thông báo WebSocket với âm thanh và hiệu ứng đặc biệt
+        function showWebSocketNotification(message) {
+            console.log("WebSocket notification: ", message);
+
+            // Phát âm thanh thông báo (có thể thay đổi loại âm thanh)
+            playNotificationSound(); // Có thể thay đổi thành: 'bell', 'chime', 'ping', 'success', 'gentle'
+
+            // Tạo notification element
+            const notification = document.createElement('div');
+            notification.className = 'websocket-notification';
+            notification.innerHTML = `
+        <div class="websocket-notification-content">
+            <span>${message}</span>
+            <button class="close-btn" onclick="closeWebSocketNotification(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+
+            // Thêm vào body
+            document.body.appendChild(notification);
+
+            // Hiện notification với animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                closeWebSocketNotification(notification);
+            }, 5000);
+        }
+
+        // Hàm đóng thông báo WebSocket
+        function closeWebSocketNotification(element) {
+            const notification = element.tagName === 'BUTTON' ? element.closest('.websocket-notification') : element;
+
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+
+        // Hàm phát âm thanh thông báo
+        function playNotificationSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+                const frequencies = [523, 659, 784]; // C, E, G
+
+                frequencies.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                    oscillator.type = 'sine';
+
+                    const startTime = audioContext.currentTime + (index * 0.15);
+                    gainNode.gain.setValueAtTime(0.2, startTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 1);
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + 1);
+                });
+            } catch (error) {
+                console.log('Không thể phát âm thanh thông báo:', error);
+            }
+        }
+
+        function updateNotificationCount() {
+            const notificationBadge = document.getElementById('notificationCount');
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            notificationBadge.textContent = unreadCount;
+            notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+            if (unreadCount > 0) {
+                notificationBadge.classList.add('notification-pulse');
+                setTimeout(() => {
+                    notificationBadge.classList.remove('notification-pulse');
+                }, 1000);
+            }
+        }
+
+        function toggleNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            const isVisible = dropdown.classList.contains('show');
+            console.log("in toggleNotificationDropdown");
+            if (isVisible) {
+                hideNotificationDropdown();
+            } else {
+                showNotificationDropdown();
+            }
+        }
+
+
+
+
+
+        // Function to show notification dropdown
+        function showNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.add('show');
+            notificationDropdownOpen = true;
+
+            // Mark all notifications as read
+            markAllNotificationsAsRead();
+
+            // Close dropdown when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', handleOutsideClick);
+            }, 100);
+        }
+
+        function hideNotificationDropdown() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.remove('show');
+            notificationDropdownOpen = false;
+
+            document.removeEventListener('click', handleOutsideClick);
+        }
+
+        // Function to handle clicking outside dropdown
+        function handleOutsideClick(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            const bell = document.querySelector('.notification-bell');
+
+            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                hideNotificationDropdown();
+            }
+        }
+
+
+        function addNotificationToList(message, type = 'order') {
+            const notification = {
+                id: Date.now(),
+                message: message,
+                type: type,
+                timestamp: new Date(),
+                read: false
+            };
+
+            // Add to beginning of array
+            notifications.unshift(notification);
+
+            // Keep only last 50 notifications
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+
+            // Update UI
+            updateNotificationsList();
+            updateNotificationCount();
+        }
+
+        // Function to update notifications list display
+        function updateNotificationsList() {
+            const listContainer = document.getElementById('notificationList');
+
+            if (notifications.length === 0) {
+                listContainer.innerHTML = `
+      <div class="notification-empty">
+        <i class="fas fa-bell-slash"></i>
+        <div>Không có thông báo mới</div>
+      </div>
+    `;
+                return;
+            }
+
+            const notificationsHTML = notifications.map(notification => {
+                const timeAgo = getTimeAgo(notification.timestamp);
+                const typeIcon = getNotificationTypeIcon(notification.type);
+
+                return `
+      <div class="notification-item ${!notification.read ? 'unread' : ''}" 
+           onclick="markNotificationAsRead(${notification.id})">
+        <div class="d-flex align-items-start">
+          <div class="notification-type-icon notification-type-${notification.type}">
+            <i class="fas ${typeIcon}"></i>
+          </div>
+          <div class="notification-content flex-grow-1">
+            <div class="notification-message">${notification.message}</div>
+            <div class="notification-time">${timeAgo}</div>
+          </div>
+        </div>
+      </div>
+    `;
+            }).join('');
+
+            listContainer.innerHTML = notificationsHTML;
+        }
+
+        // Function to get notification type icon
+        function getNotificationTypeIcon(type) {
+            const icons = {
+                'order': 'fa-utensils',
+                'system': 'fa-info-circle',
+                'alert': 'fa-exclamation-triangle',
+                'success': 'fa-check-circle'
+            };
+            return icons[type] || 'fa-bell';
+        }
+
+        // Function to get time ago string
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - timestamp) / 1000);
+
+            if (diffInSeconds < 60) {
+                return 'Vừa xong';
+            } else if (diffInSeconds < 3600) {
+                const minutes = Math.floor(diffInSeconds / 60);
+                return `${minutes} phút trước`;
+            } else if (diffInSeconds < 86400) {
+                const hours = Math.floor(diffInSeconds / 3600);
+                return `${hours} giờ trước`;
+            } else {
+                const days = Math.floor(diffInSeconds / 86400);
+                return `${days} ngày trước`;
+            }
+        }
+
+        // Function to mark notification as read
+        function markNotificationAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                updateNotificationsList();
+                updateNotificationCount();
+            }
+        }
+
+        // Function to mark all notifications as read
+        function markAllNotificationsAsRead() {
+            notifications.forEach(notification => {
+                notification.read = true;
+            });
+            updateNotificationsList();
+            updateNotificationCount();
+        }
+
+        // Function to clear all notifications
+        function clearAllNotifications() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả thông báo?')) {
+                notifications = [];
+                updateNotificationsList();
+                updateNotificationCount();
+            }
+        }
+
+        async function loadActiveOrdersCount() {
+            if (!currentWorkSchedule) {
+                console.log('No work schedule available');
+                return;
+            }
+
+            try {
+                // Construct API URL
+                const apiUrl = `/orders/waiter/work-shift-orders?area=${encodeURIComponent(currentWorkSchedule.area)}&startTime=${encodeURIComponent(currentWorkSchedule.startTime)}`;
+
+                const data = await apiFetch(apiUrl, {
+                    method: 'GET',
+                });
+
+                if (data.code === 0 && data.result) {
+                    // Count active orders (not CANCELLED or COMPLETED)
+                    let activeOrdersCount = 0;
+
+                    // Handle API response structure: data.result.content is the array
+                    if (data.result.content && Array.isArray(data.result.content)) {
+                        activeOrdersCount = data.result.content.filter(order => {
+                            const status = order.status ? order.status.toUpperCase() : '';
+                            return status !== 'CANCELLED' && status !== 'COMPLETED';
+                        }).length;
+                    }
+                    // Fallback: Handle if result is direct array
+                    else if (Array.isArray(data.result)) {
+                        activeOrdersCount = data.result.filter(order => {
+                            const status = order.status ? order.status.toUpperCase() : '';
+                            return status !== 'CANCELLED' && status !== 'COMPLETED';
+                        }).length;
+                    }
+
+
+                    // Update the Active Orders Card display
+                    const activeOrdersCard = document.querySelector('.card:nth-child(1) .stats-number');
+                    if (activeOrdersCard) {
+                        activeOrdersCard.textContent = activeOrdersCount;
+                    } else {
+                        console.log('Could not find active orders card element');
+                    }
+
+                } else {
+                    console.error('API call failed:', data);
+                }
+            } catch (error) {
+                console.error('Error loading active orders:', error);
+            }
+        }
+
+        async function loadTablesCount() {
+            if (!currentWorkSchedule) {
+                console.log('No work schedule available for tables');
+                return;
+            }
+
+            try {
+                // Construct API URL for tables
+                const apiUrl = `/tables?area=${encodeURIComponent(currentWorkSchedule.area)}`;
+                const data = await apiFetch(apiUrl, {
+                    method: 'GET',
+                });
+
+                console.log('Tables API Response:', data);
+
+                if (data.code === 0 && data.result) {
+                    let totalTables = 0;
+                    let occupiedTables = 0;
+                    let availableTables = 0;
+
+                    // Handle API response - check for content array or direct array
+                    let tablesData = [];
+                    if (data.result.content && Array.isArray(data.result.content)) {
+                        tablesData = data.result.content;
+                    } else if (Array.isArray(data.result)) {
+                        tablesData = data.result;
+                    }
+
+                    // Count tables by status
+                    tablesData.forEach(table => {
+                        totalTables++;
+                        const status = table.status ? table.status.toUpperCase() : '';
+                        if (status === 'OCCUPIED') {
+                            occupiedTables++;
+                        } else if (status === 'AVAILABLE') {
+                            availableTables++;
+                        }
+                    });
+
+                    console.log('Tables count:', {
+                        total: totalTables,
+                        occupied: occupiedTables,
+                        available: availableTables
+                    });
+                    // Update the Tables Management Card display
+                    const tablesCard = document.querySelector('.card:nth-child(2) .stats-number');
+                    if (tablesCard) {
+                        tablesCard.textContent = `${occupiedTables}/${totalTables}`;
+                    } else {
+                        console.log('Could not find tables card element');
+                    }
+
+                } else {
+                    console.error('Tables API call failed:', data);
+                }
+            } catch (error) {
+                console.error('Error loading tables:', error);
+            }
+        }
+
+        async function loadShiftRevenue() {
+            if (!currentWorkSchedule) {
+                console.log('No work schedule available for revenue calculation');
+                return;
+            }
+
+            try {
+                // Construct API URL
+                const apiUrl = `/orders/waiter/work-shift-orders?area=${encodeURIComponent(currentWorkSchedule.area)}&startTime=${encodeURIComponent(currentWorkSchedule.startTime)}`;
+
+                console.log('Calling Revenue API:', apiUrl);
+
+                const data = await apiFetch(apiUrl, {
+                    method: 'GET',
+                });
+
+                if (data.code === 0 && data.result) {
+                    let totalRevenue = 0;
+                    let completedOrdersCount = 0;
+
+                    // Handle API response structure: data.result.content is the array
+                    let ordersData = [];
+                    if (data.result.content && Array.isArray(data.result.content)) {
+                        ordersData = data.result.content;
+                    } else if (Array.isArray(data.result)) {
+                        ordersData = data.result;
+                    }
+
+                    // Calculate revenue from all orders except cancelled ones
+                    ordersData.forEach(order => {
+                        const status = order.status ? order.status.toUpperCase() : '';
+                        // Count all orders that are not cancelled
+                        if (status !== 'CANCELLED') {
+                            completedOrdersCount++;
+                            // Add order total to revenue
+                            if (order.totalAmount) {
+                                totalRevenue += order.totalAmount;
+                            }
+                        }
+                    });
+
+                    console.log('Revenue calculation:', {
+                        totalRevenue: totalRevenue,
+                        validOrders: completedOrdersCount,
+                        totalOrders: ordersData.length,
+                        orderStatuses: ordersData.map(o => ({ id: o.id, status: o.status, totalAmount: o.totalAmount }))
+                    });
+
+                    // Update the Daily Sales Card display
+                    const revenueCard = document.querySelector('.card:nth-child(3) .stats-number');
+                    const revenueDescription = document.querySelector('.card:nth-child(3) .text-muted');
+
+                    if (revenueCard) {
+                        // Format revenue as Vietnamese currency
+                        const formattedRevenue = formatCurrency(totalRevenue);
+                        revenueCard.textContent = formattedRevenue;
+                    }
+
+                    if (revenueDescription) {
+                        revenueDescription.textContent = `Từ ${completedOrdersCount} đơn hàng`;
+                    }
+
+                } else {
+                    // Set default values on error
+                    updateRevenueDisplayOnError();
+                }
+            } catch (error) {
+                console.error('Error loading revenue:', error);
+                // Set default values on error
+                updateRevenueDisplayOnError();
+            }
+        }
+
+        // Hàm mới: Format tiền tệ theo định dạng Việt Nam
+        
+
+        function formatCurrency(amount) {
+            if (!amount) return '0₫';
+            return parseInt(amount).toLocaleString('vi-VN') + '₫';
+        }
+
+        // Hàm mới: Cập nhật hiển thị doanh thu khi có lỗi
+        function updateRevenueDisplayOnError() {
+            const revenueCard = document.querySelector('.card:nth-child(4) .stats-number');
+            const revenueDescription = document.querySelector('.card:nth-child(4) .text-muted');
+
+            if (revenueCard) {
+                revenueCard.textContent = '₫0';
+            }
+
+            if (revenueDescription) {
+                revenueDescription.textContent = 'Đang cập nhật...';
+            }
+        }
+
+        function updateDashboardStats(orders = []) {
+            if (hasWorkSchedule) {
+                // Cập nhật stats từ orders được truyền vào
+                updateOrdersStats(orders);
+
+                // Các stats khác
+                loadActiveOrdersCount();
+                loadTablesCount();
+                loadShiftRevenue();
+            }
+        }
+
+        function updateOrdersStats(orders) {
+            // Đếm số lượng đơn hàng theo trạng thái
+            const stats = {
+                pending: 0,
+                confirmed: 0,
+                ready: 0,
+                completed: 0
+            };
+
+            orders.forEach(order => {
+                const status = order.status.toLowerCase();
+                if (stats.hasOwnProperty(status)) {
+                    stats[status]++;
+                }
+            });
+
+            // Cập nhật UI
+            updateStatElement('pendingOrdersCount', stats.pending);
+            updateStatElement('confirmedOrdersCount', stats.confirmed);
+            updateStatElement('readyOrdersCount', stats.ready);
+            updateStatElement('completedOrdersCount', stats.completed);
+        }
+
+        function updateStatElement(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+
+                // Thêm animation effect khi cập nhật
+                element.classList.add('stat-updated');
+                setTimeout(() => {
+                    element.classList.remove('stat-updated');
+                }, 300);
+            }
+        }
+
+        function initDashboardOrders() {
+            loadDashboardOrders();
+        }
+
+
+        // Load orders for dashboard (recent orders only)
+        async function loadDashboardOrders() {
+            try {
+                showDashboardLoading();
+
+                // Build query parameters for recent orders
+                const params = new URLSearchParams();
+                params.append('page', '0');
+                params.append('size', '10'); // Only show 10 recent orders
+                params.append('orderBy', 'createdAt');
+                params.append('sort', 'DESC');
+
+                // Add area and startTime from currentWorkSchedule
+                if (currentWorkSchedule && currentWorkSchedule.area) {
+                    params.append('area', currentWorkSchedule.area);
+                }
+                if (currentWorkSchedule && currentWorkSchedule.startTime) {
+                    params.append('startTime', currentWorkSchedule.startTime);
+                }
+
+                // Fetch orders
+                const data = await apiFetch(`/orders/waiter/work-shift-orders?${params.toString()}`, {
+                    method: 'GET'
+                });
+
+                const orderPage = data.result;
+                const orders = orderPage.content || [];
+
+                // Update dashboard with orders
+                renderDashboardOrders(orders);
+
+                // THAY ĐỔI: Truyền orders vào updateDashboardStats
+                updateDashboardStats(orders);
+
+                // THÊM: Hoặc có thể load full stats nếu muốn độ chính xác cao hơn
+                // await loadFullOrdersStats();
+
+            } catch (error) {
+                console.error('Error loading dashboard orders:', error);
+                showDashboardError(error.message);
+            }
+        }
+
+        function initDashboardStats() {
+            updateStatElement('pendingOrdersCount', 0);
+            updateStatElement('confirmedOrdersCount', 0);
+            updateStatElement('readyOrdersCount', 0);
+            updateStatElement('completedOrdersCount', 0);
+        }
+
+
+        // Render orders in dashboard
+        function renderDashboardOrders(orders) {
+            const loadingElement = document.getElementById('dashboardOrdersLoading');
+            const contentElement = document.getElementById('dashboardOrdersContent');
+            const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+            // Hide loading
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+
+            if (orders.length === 0) {
+                // Show empty state
+                if (contentElement) {
+                    contentElement.style.display = 'none';
+                }
+                if (emptyElement) {
+                    emptyElement.style.display = 'block';
+                }
+                return;
+            }
+
+            // Show content
+            if (emptyElement) {
+                emptyElement.style.display = 'none';
+            }
+            if (contentElement) {
+                contentElement.style.display = 'block';
+
+                // Render orders
+                contentElement.innerHTML = orders.map(order => `
+            <div class="dashboard-order-item ${order.status.toLowerCase()}" 
+                 onclick="viewOrderDetails(${order.id})">
+                <div class="order-header">
+                    <span class="order-id">#${order.id}</span>
+                    <span class="order-time">
+                        <i class="fas fa-clock me-1"></i>
+                        ${formatDateTime(order.createdAt)}
+                    </span>
+                </div>
+                <div class="order-info">
+                    <div class="order-details">
+                        <span class="table-number-badge">
+                            <i class="fas fa-chair me-1"></i>
+                            ${order.tableNumber ? `Bàn ${order.tableNumber}` : 'Mang về'}
+                        </span>
+                        <span class="order-amount">
+                            <i class="fas fa-money-bill me-1"></i>
+                            ${formatCurrency(order.totalAmount)}
+                        </span>
+                    </div>
+                    <span class="status-badge status-${order.status.toLowerCase()}">
+                        ${getStatusText(order.status)}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+            }
+        }
+
+        function showDashboardLoading() {
+            const loadingElement = document.getElementById('dashboardOrdersLoading');
+            const contentElement = document.getElementById('dashboardOrdersContent');
+            const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+            if (loadingElement) {
+                loadingElement.style.display = 'block';
+            }
+            if (contentElement) {
+                contentElement.style.display = 'none';
+            }
+            if (emptyElement) {
+                emptyElement.style.display = 'none';
+            }
+        }
+
+        // Show error state
+        function showDashboardError(message) {
+            const loadingElement = document.getElementById('dashboardOrdersLoading');
+            const contentElement = document.getElementById('dashboardOrdersContent');
+            const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            if (contentElement) {
+                contentElement.style.display = 'none';
+            }
+            if (emptyElement) {
+                emptyElement.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                <h6 class="text-danger">Lỗi tải đơn hàng</h6>
+                <p class="text-muted small">${message}</p>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshDashboardOrders()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Thử lại
+                </button>
+            </div>
+        `;
+                emptyElement.style.display = 'block';
+            }
+        }
+
+        // Refresh dashboard orders manually
+        function refreshDashboardOrders() {
+            loadDashboardOrders();
+        }
+        window.addEventListener('beforeunload', function () {
+            disconnectWebSocket();
+
+            // Cleanup AudioContext
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close();
+            }
+        });
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="js/order.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/show-table.js"></script>
     <script src="js/report.js"></script>
+    <script src="js/chat.js"></script>
     <script src="../js/fetch-api.js"></script>
+    <script src="../js/websocket.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </body>
 
 </html>
