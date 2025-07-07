@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Window - AI</title>
     <style>
         * {
@@ -9,7 +10,7 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
             background: transparent;
@@ -18,199 +19,304 @@
         .chat-container {
             display: none;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 350px;
-            height: 500px;
+            bottom: 20px;
+            left: 20px;
+            width: 380px;
+            height: 550px;
             background: #ffffff;
-            border-radius: 10px;
-            padding: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
             flex-direction: column;
-            border: 2px solid #1976d2;
+            border: 1px solid #e0e0e0;
             z-index: 1002;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         .chat-container.show {
             display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .chat-container.hidden {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .chat-header {
+            background: #1976d2;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .messages {
-            max-height: 400px;
+            flex: 1;
             overflow-y: auto;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 16px;
+            background: #f5f5f5;
+            scroll-behavior: smooth;
         }
 
         .message {
-            margin-bottom: 5px;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 16px;
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            max-width: 80%;
+            word-wrap: break-word;
         }
 
-        .user {
-            background-color: #e1f5fe;
-            text-align: right;
+        .message.user {
+            background: #1976d2;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
         }
 
-        .bot {
-            background-color: #f1f8e9;
-            text-align: left;
+        .message.bot {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
         }
 
-        .bot ul {
-            list-style-type: disc;
-            padding-left: 15px;
-            margin: 5px 0;
+        .message-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .bot ul, .bot ol {
+            padding-left: 20px;
+            margin: 8px 0;
         }
 
         .bot li {
-            margin-bottom: 3px;
-            font-size: 16px;
+            margin-bottom: 6px;
         }
 
         .bot strong {
             color: #1976d2;
+            font-weight: 600;
+        }
+
+        .bot code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bot pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
         }
 
         .input-area {
             display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 5px 0;
-            margin-top: auto;
+            gap: 8px;
+            padding: 12px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
         }
 
         input[type="text"] {
             flex: 1;
-            padding: 8px;
-            border: 2px solid #1976d2;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         input[type="text"]:focus {
-            border-color: #0d47a1;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
         }
 
         button {
-            padding: 8px 15px;
-            border: 2px solid #1976d2;
-            background-color: #1976d2;
+            padding: 10px 16px;
+            border: none;
+            background: #1976d2;
             color: white;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            outline: none;
-            transition: background-color 0.3s, border-color 0.3s;
+            font-size: 15px;
+            transition: background-color 0.3s;
         }
 
         button:hover {
-            background-color: #0d47a1;
-            border-color: #0d47a1;
+            background: #1565c0;
+        }
+
+        button.clear-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.clear-btn:hover {
+            background: #d0d0d0;
         }
 
         #chat-toggle {
-            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: #1976d2;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
         }
     </style>
 </head>
 <body>
     <div id="chat-toggle" onclick="toggleChat()">💬</div>
     <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <span>AI Chat</span>
+            <button onclick="toggleChat()">✕</button>
+        </div>
         <div class="messages" id="messages"></div>
         <div class="input-area">
             <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') sendMessage()" />
             <button onclick="sendMessage()">Gửi</button>
-            <button onclick="clearChatHistory()">Xóa lịch sử</button> <!-- Thêm nút xóa lịch sử -->
+            <button class="clear-btn" onclick="clearChatHistory()">Xóa</button>
         </div>
     </div>
 
     <script>
-        let chatHistory = JSON.parse(getCookie('chatHistory') || '[]');
-        chatHistory.forEach(msg => appendMessage(msg.sender, msg.text, msg.type));
+        // Khởi tạo lịch sử chat từ localStorage
+        let chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+
+        // Hiển thị lại lịch sử chat khi reload
+        function loadChatHistory() {
+            const msgDiv = document.getElementById('messages');
+            msgDiv.innerHTML = ''; // Xóa nội dung cũ
+            chatHistory.forEach(msg => {
+                appendMessage(msg.sender, msg.text, msg.type, msg.timestamp);
+            });
+        }
+
+        // Gọi hàm loadChatHistory khi trang được tải
+        document.addEventListener('DOMContentLoaded', loadChatHistory);
+
+        function toggleChat() {
+            const chatContainer = document.getElementById('chat-container');
+            const isHidden = chatContainer.classList.contains('show');
+            chatContainer.classList.toggle('show', !isHidden);
+            chatContainer.classList.toggle('hidden', isHidden);
+            if (!isHidden) document.getElementById('userInput').focus();
+        }
 
         async function sendMessage() {
-            const input = document.getElementById("userInput");
+            const input = document.getElementById('userInput');
             const message = input.value.trim();
             if (!message) return;
 
-            const msgObj = { sender: "Bạn", text: message, type: "user" };
-            appendMessage(msgObj.sender, msgObj.text, msgObj.type);
-            chatHistory.push(msgObj);
+            const timestamp = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const userMsg = { sender: 'Bạn', text: message, type: 'user', timestamp };
+            appendMessage(userMsg.sender, userMsg.text, userMsg.type, timestamp);
+            chatHistory.push(userMsg);
             saveChatHistory();
 
-            input.value = "";
+            input.value = '';
 
             try {
-                const response = await fetch("http://localhost:8080/api/gemini/reply", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ message: message })
+                const response = await fetch('http://localhost:8080/api/gemini/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
                 });
 
-                if (!response.ok) {
-                    throw new Error("Yêu cầu không thành công: " + response.status);
-                }
+                if (!response.ok) throw new Error(`Yêu cầu thất bại: ${response.status}`);
 
                 const data = await response.json();
-                if (data.result && data.result.reply) {
-                    const formattedReply = formatReply(data.result.reply);
-                    const botMsg = { sender: "Gemini", text: formattedReply, type: "bot" };
-                    appendMessage(botMsg.sender, botMsg.text, botMsg.type);
+                const reply = data.result?.reply;
+                if (reply) {
+                    const formattedReply = formatReply(reply);
+                    const botMsg = { sender: 'Gemini', text: formattedReply, type: 'bot', timestamp };
+                    appendMessage(botMsg.sender, botMsg.text, botMsg.type, timestamp);
                     chatHistory.push(botMsg);
                     saveChatHistory();
                 } else {
-                    appendMessage("Gemini", "Không có phản hồi hợp lệ.", "bot");
+                    appendMessage('Gemini', 'Không có phản hồi hợp lệ.', 'bot', timestamp);
                 }
-
             } catch (err) {
-                appendMessage("Lỗi", "Không thể kết nối đến máy chủ: " + err.message, "bot");
+                appendMessage('Lỗi', `Không thể kết nối: ${err.message}`, 'bot', timestamp);
             }
         }
 
         function formatReply(text) {
-            let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            formatted = formatted.replace(/^\*\s(.+?)$/gm, '<li>$1</li>')
-                                .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
-                                .replace(/<\/ul>\s*<ul>/g, '');
-            formatted = formatted.replace(/^(.+?)(?:\n|$)/, '<p>$1</p>');
+            // Xử lý Markdown
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // In đậm
+                .replace(/\*(.*?)\*/g, '<em>$1</em>') // In nghiêng
+                .replace(/`([^`]+)`/g, '<code>$1</code>') // Code inline
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Code block
+                .replace(/^### (.*)$/gm, '<h3>$1</h3>') // Tiêu đề cấp 3
+                .replace(/^## (.*)$/gm, '<h2>$1</h2>') // Tiêu đề cấp 2
+                .replace(/^# (.*)$/gm, '<h1>$1</h1>') // Tiêu đề cấp 1
+                .replace(/^\* (.*)$/gm, '<li>$1</li>') // Danh sách không thứ tự
+                .replace(/^\d+\. (.*)$/gm, '<li>$1</li>') // Danh sách có thứ tự
+                .replace(/(<li>.*<\/li>)/g, match => `<ul>${match}</ul>`) // Bao danh sách
+                .replace(/<\/ul>\s*<ul>/g, '') // Gộp danh sách liên tiếp
+                .replace(/^(?!<h[1-3]>|<ul>|<pre>)(.+)$/gm, '<p>$1</p>'); // Đoạn văn
             return formatted;
         }
 
-        function appendMessage(sender, text, type) {
-            const msgDiv = document.getElementById("messages");
-            const div = document.createElement("div");
+        function appendMessage(sender, text, type, timestamp) {
+            const msgDiv = document.getElementById('messages');
+            const div = document.createElement('div');
             div.className = `message ${type}`;
-            div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            div.innerHTML = `
+                <strong>${sender}</strong>: ${text}
+                <div class="message-time">${timestamp}</div>
+            `;
             msgDiv.appendChild(div);
             msgDiv.scrollTop = msgDiv.scrollHeight;
         }
 
         function saveChatHistory() {
-            document.cookie = `chatHistory=${JSON.stringify(chatHistory)}; path=/; max-age=${60 * 60 * 24 * 30}`;
-        }
-
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null;
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         }
 
         function clearChatHistory() {
-            chatHistory = []; // Xóa mảng lịch sử
-            const msgDiv = document.getElementById("messages");
-            msgDiv.innerHTML = ""; // Xóa nội dung hiển thị
-            saveChatHistory(); // Cập nhật cookie
+            chatHistory = [];
+            document.getElementById('messages').innerHTML = '';
+            saveChatHistory();
         }
+
+        // Khởi tạo trạng thái ban đầu
+        document.getElementById('chat-toggle').style.display = 'flex';
     </script>
 </body>
 </html>

@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Tracking</title>
+  <!-- Tailwind CSS qua CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- SockJS và STOMP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #FEA116;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background-color: #0F172B;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      color: #ffffff;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .sidebar-link:hover {
+      background-color: #FEA116;
+      color: #334155;
+    }
+
+    .sidebar-link.active {
+      background-color: #FEA116;
+      color: white;
+    }
+
+    .sidebar-link.active:hover {
+      background-color: #FEA116;
+    }
+
+    .sidebar-link i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      background-color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    .content-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .content-card:hover {
+      box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Form Elements */
+    .form-label {
+      display: block;
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      color: #1f2937;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-primary:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .btn-logout {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn-logout:hover {
+      background-color: #dc2626;
+    }
+
+    /* Messages */
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
+      animation: slideInFromTop 0.5s ease-out;
+    }
+
+    .message-success {
+      background-color: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .message-error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+      animation: pulse 2s infinite;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: flex;
+      position: relative;
+      margin: 40px 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to right, #e2e8f0, #cbd5e1);
+      border-radius: 2px;
+      z-index: 1;
+    }
+
+    .timeline::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(to right, #3b82f6, #2563eb, #1d4ed8);
+      border-radius: 2px;
+      transition: width 1s ease-in-out;
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .timeline-item {
+      flex: 1;
+      position: relative;
+      text-align: center;
+      z-index: 3;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+    .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px #e2e8f0;
+      transition: all 0.5s ease;
+      z-index: 4;
+    }
+
+    .timeline-item.active::before {
+      background: #3b82f6;
+      box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
+      animation: pulseGlow 2s infinite;
+    }
+
+    .timeline-item.active::after {
+      content: '✓';
+      position: absolute;
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      z-index: 5;
+      animation: checkmarkPop 0.5s ease-out;
+    }
+
+    .timeline-content {
+      margin-top: 32px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .timeline-item.active .timeline-content {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .timeline-content p:first-child {
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-content p:last-child {
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+    .timeline-item.active .timeline-content p:first-child {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+
+    /* Order Items */
+    #order-items .content-card {
+      padding: 16px;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: slideInFromLeft 0.5s ease-out forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #order-items .content-card:nth-child(1) { animation-delay: 0.1s; }
+    #order-items .content-card:nth-child(2) { animation-delay: 0.2s; }
+    #order-items .content-card:nth-child(3) { animation-delay: 0.3s; }
+    #order-items .content-card:nth-child(4) { animation-delay: 0.4s; }
+
+    #order-items .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    #order-items .content-card:hover::before {
+      left: 100%;
+    }
+
+    #order-items h5 {
+      color: #1f2937;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    #order-items p,
+    #order-items span {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    /* Order Details Animation */
+    #order-details {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    #order-details:not(.hidden) {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(59, 130, 246, 0.3);
+      border-radius: 50%;
+      border-top-color: #3b82f6;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    /* Pulse Animation */
+    .status-pulse {
+      animation: statusPulse 1s ease-in-out;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInFromTop {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 0 2px #3b82f6, 0 0 25px rgba(59, 130, 246, 0.8);
+      }
+    }
+
+    @keyframes checkmarkPop {
+      0% {
+        transform: translateX(-50%) scale(0);
+      }
+      50% {
+        transform: translateX(-50%) scale(1.2);
+      }
+      100% {
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes statusPulse {
+      0% {
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+      50% {
+        background-color: rgba(59, 130, 246, 0.3);
+      }
+      100% {
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background-color: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8);
+      border-radius: 3px;
+      transition: width 1s ease-in-out;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .content-card {
+        margin: 16px;
+      }
+
+      .timeline {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 40px;
+      }
+
+      .timeline::before {
+        top: 0;
+        left: 16px;
+        width: 4px;
+        height: 100%;
+      }
+
+      .timeline::after {
+        top: 0;
+        left: 16px;
+        width: 4px;
+        height: 0;
+      }
+
+      .timeline-item {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+
+      .timeline-item::before {
+        left: 12px;
+        top: 0;
+        transform: none;
+      }
+
+      .timeline-content {
+        margin-top: 0;
+        margin-left: 24px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="flex">
+  <!-- Mobile menu button -->
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
+
+  <aside class="sidebar w-80 flex flex-col justify-between">
+    <div>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold">Dashboard</h2>
+        <p id="username-greeting" class="text-sm mt-1">Welcome, User!</p>
+      </div>
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link">
+          <i class="fas fa-user"></i> Edit Profile
+        </a>
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link active">
+          <i class="fas fa-truck"></i> Order Tracking
+        </a>
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
+          <i class="fas fa-history"></i> Order History
+        </a>
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Back to Home
+        </a>
+      </nav>
+    </div>
+    <div class="p-6">
+      <button id="logout-button" class="w-full btn btn-logout">
+        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content flex-1 p-6 overflow-auto">
+    <div id="content-area" class="max-w-5xl mx-auto space-y-8">
+      <div id="order-tracking-section" class="content-card p-6">
+        <div class="section-header">
+          <h2><i class="fas fa-truck"></i> Order Tracking</h2>
+        </div>
+        <div id="error-message" class="hidden message message-error"></div>
+        <div id="success-message" class="hidden message message-success"></div>
+
+        <div class="mb-6">
+          <label for="order-select" class="form-label">Select an order to track</label>
+          <select id="order-select" class="w-full">
+            <option value="">Select an order</option>
+          </select>
+        </div>
+
+        <div id="order-details" class="hidden space-y-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="order-title" class="text-xl font-semibold text-gray-800"></h3>
+            <span id="order-date" class="text-sm text-gray-600"></span>
+          </div>
+          
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+          </div>
+
+          <p id="order-status" class="text-gray-600 mb-2"></p>
+          <p id="order-type" class="text-gray-600 mb-2"></p>
+          <p id="order-total" class="text-gray-600 mb-2"></p>
+          <p id="order-payment-status" class="text-gray-600 mb-2"></p>
+          <p id="order-table" class="text-gray-600 mb-2 hidden"></p>
+          <p id="order-note" class="text-gray-600 mb-2 hidden"></p>
+
+          <div class="timeline">
+            <div class="timeline-item" data-status="PENDING">
+              <div class="timeline-content">
+                <p class="font-medium">Order Placed</p>
+                <p class="text-sm text-gray-500">Your order has been placed.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="CONFIRMED">
+              <div class="timeline-content">
+                <p class="font-medium">Confirmed</p>
+                <p class="text-sm text-gray-500">Order confirmed by the restaurant.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="PREPARING">
+              <div class="timeline-content">
+                <p class="font-medium">Preparing</p>
+                <p class="text-sm text-gray-500">Order is being prepared.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="READY">
+              <div class="timeline-content">
+                <p class="font-medium">Ready</p>
+                <p class="text-sm text-gray-500">Order is ready for pickup or delivery.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="DELIVERING">
+              <div class="timeline-content">
+                <p class="font-medium">Delivering</p>
+                <p class="text-sm text-gray-500">Order is on the way.</p>
+              </div>
+            </div>
+            <div class="timeline-item" data-status="COMPLETED">
+              <div class="timeline-content">
+                <p class="font-medium">Delivered</p>
+                <p class="text-sm text-gray-500">Order has been delivered.</p>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Items</h4>
+          <div id="order-items" class="space-y-4"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080';
+    let currentPage = 0;
+    const pageSize = 20;
+    let stompClient = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    let pollingInterval = null;
+
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error("Invalid token:", e);
+        return null;
+      }
+    }
+
+    function isLoggedIn() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.warn("No accessToken found in localStorage");
+        return false;
+      }
+      const payload = parseJwt(token);
+      if (!payload) return false;
+      const isExpired = payload.exp * 1000 <= Date.now();
+      if (isExpired) console.warn("Token expired:", payload.exp);
+      return payload && !isExpired;
+    }
+
+    async function fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id || payload.sub;
+        if (!userId) throw new Error("No userId found in JWT payload");
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch user info');
+        const data = await response.json();
+        return data.result.username || 'User';
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        return 'User';
+      }
+    }
+
+    async function updateUI() {
+      const usernameGreeting = document.getElementById('username-greeting');
+      if (isLoggedIn() && usernameGreeting) {
+        const username = await fetchUserInfo();
+        usernameGreeting.textContent = `Welcome, ${username}!`;
+        console.log("Updated UI with username:", username);
+      } else if (usernameGreeting) {
+        usernameGreeting.textContent = 'Welcome, User!';
+        console.log("Updated UI for guest");
+      }
+    }
+
+    function logout() {
+      console.log("Logging out: Clearing token, WebSocket, and selected order");
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('cart');
+      localStorage.removeItem('selectedOrderId');
+      if (stompClient) {
+        stompClient.disconnect(() => {
+          console.log("WebSocket disconnected");
+        });
+        stompClient = null;
+      }
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+      }
+      window.location.href = 'login.html';
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        document.getElementById('success-message').classList.add('hidden');
+        console.error("Showing error:", message);
+      } else {
+        console.error("Error message element not found");
+      }
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      if (successDiv) {
+        successDiv.textContent = message;
+        successDiv.classList.remove('hidden');
+        document.getElementById('error-message').classList.add('hidden');
+        console.log("Showing success:", message);
+      } else {
+        console.error("Success message element not found");
+      }
+    }
+
+    function setLoadingState(elementId, isLoading) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.style.opacity = isLoading ? '0.7' : '1';
+        element.style.pointerEvents = isLoading ? 'none' : 'auto';
+        if (isLoading) {
+          element.classList.add('loading');
+          element.innerHTML += '<span class="loading-spinner ml-2"></span>';
+        } else {
+          element.classList.remove('loading');
+          const spinner = element.querySelector('.loading-spinner');
+          if (spinner) spinner.remove();
+        }
+      } else {
+        console.warn(`Element with ID ${elementId} not found`);
+      }
+    }
+
+    async function fetchUserOrders() {
+      if (!isLoggedIn()) {
+        showError('Please log in to track orders!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      setLoadingState('order-select', true);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id || payload.sub;
+        if (!userId) {
+          throw new Error("No userId found in JWT payload");
+        }
+        console.log('Fetching orders for user ID:', userId);
+        const response = await fetch(`${API_BASE_URL}/orders/user/${userId}?page=${currentPage}&size=${pageSize}&orderBy=createdAt`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          let errorMessage = 'Error fetching orders';
+          try {
+            const error = await response.json();
+            errorMessage = error.message || errorMessage;
+          } catch (e) {}
+          if (response.status === 401) {
+            showError('Session expired. Please log in again.');
+            logout();
+          } else if (response.status === 403) {
+            showError('You do not have permission to view these orders.');
+          } else if (response.status === 404) {
+            showError('User not found.');
+          } else {
+            showError(errorMessage);
+          }
+          console.error(`API error: ${response.status} - ${errorMessage}`);
+          return;
+        }
+        const data = await response.json();
+        console.log("Order data:", data);
+        renderOrderSelect(data.result.content);
+        restoreSelectedOrder();
+      } catch (error) {
+        showError('Error fetching orders: ' + error.message);
+        console.error('Fetch error:', error);
+      } finally {
+        setLoadingState('order-select', false);
+      }
+    }
+
+    function renderOrderSelect(orders) {
+      const orderSelect = document.getElementById('order-select');
+      if (!orderSelect) {
+        console.error("Order select element not found");
+        return;
+      }
+      orderSelect.innerHTML = '<option value="">Select an order</option>';
+      orders.forEach(order => {
+        const option = document.createElement('option');
+        option.value = order.id;
+        option.textContent = `Order #${order.id} - ${new Date(order.createdAt).toLocaleDateString()}`;
+        orderSelect.appendChild(option);
+      });
+      console.log("Rendered order list with", orders.length, "orders");
+    }
+
+    async function fetchOrderDetails(orderId) {
+      if (!orderId) {
+        console.log("No orderId, skipping fetchOrderDetails");
+        return;
+      }
+      setLoadingState('order-details', true);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          let errorMessage = 'Error fetching order details';
+          try {
+            const error = await response.json();
+            errorMessage = error.message || errorMessage;
+          } catch (e) {}
+          if (response.status === 401) {
+            showError('Session expired. Please log in again.');
+            logout();
+          } else if (response.status === 403) {
+            showError('You do not have permission to view this order.');
+          } else if (response.status === 404) {
+            showError(`Order #${orderId} not found.`);
+            localStorage.removeItem('selectedOrderId');
+          } else {
+            showError(errorMessage);
+          }
+          console.error(`API error for order details: ${response.status} - ${errorMessage}`);
+          return;
+        }
+        const data = await response.json();
+        console.log("Fetched order details for order", orderId, ":", data.result);
+        renderOrder(data.result);
+        showSuccess(`Order #${data.result.id} updated: ${data.result.status}`);
+      } catch (error) {
+        showError('Error fetching order details: ' + error.message);
+        console.error('Fetch error:', error);
+      } finally {
+        setLoadingState('order-details', false);
+      }
+    }
+
+    function renderOrder(order) {
+      const orderDetails = document.getElementById('order-details');
+      if (!orderDetails) {
+        console.error("Order details element not found");
+        showError("Unable to display order details: DOM element missing");
+        return;
+      }
+
+      orderDetails.classList.remove('hidden');
+
+      const orderTitle = document.getElementById('order-title');
+      const orderDate = document.getElementById('order-date');
+      const orderStatus = document.getElementById('order-status');
+      const orderType = document.getElementById('order-type');
+      const orderTotal = document.getElementById('order-total');
+      const orderPaymentStatus = document.getElementById('order-payment-status');
+      const orderTable = document.getElementById('order-table');
+      const orderNote = document.getElementById('order-note');
+      const orderItems = document.getElementById('order-items');
+
+      if (!orderTitle || !orderDate || !orderStatus || !orderType || !orderTotal || !orderPaymentStatus || !orderTable || !orderNote || !orderItems) {
+        console.error("One or more order detail elements not found");
+        showError("Unable to display order details: DOM elements missing");
+        return;
+      }
+
+      orderTitle.textContent = `Order #${order.id}`;
+      orderDate.textContent = new Date(order.createdAt).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      orderStatus.textContent = `Status: ${order.status}`;
+      orderType.textContent = `Type: ${order.orderType}`;
+      orderTotal.textContent = `Total: $${order.totalAmount.toFixed(2)}`;
+      orderPaymentStatus.textContent = order.paymentStatus ? `Payment Status: ${order.paymentStatus}` : '';
+      orderTable.textContent = order.tableId ? `Table: ${order.tableNumber || order.tableId}` : '';
+      orderTable.classList.toggle('hidden', !order.tableId);
+      orderNote.textContent = order.note ? `Note: ${order.note}` : '';
+      orderNote.classList.toggle('hidden', !order.note);
+
+      const statusOrder = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERING', 'COMPLETED'];
+      const currentStatusIndex = statusOrder.indexOf(order.status);
+      const progressPercentage = ((currentStatusIndex + 1) / statusOrder.length) * 100;
+
+      const progressFill = document.getElementById('progress-fill');
+      if (progressFill) {
+        progressFill.style.width = `${progressPercentage}%`;
+        progressFill.classList.add('status-pulse');
+        setTimeout(() => {
+          progressFill.classList.remove('status-pulse');
+        }, 1000);
+      } else {
+        console.error("Progress fill element not found");
+        showError("Unable to update progress bar: DOM element missing");
+      }
+
+      const timelineItems = document.querySelectorAll('.timeline-item');
+      if (timelineItems.length === 0) {
+        console.error("No timeline items found");
+        showError("Unable to update timeline: DOM elements missing");
+      } else {
+        timelineItems.forEach(item => {
+          const status = item.getAttribute('data-status');
+          item.classList.toggle('active', statusOrder.indexOf(order.status) >= statusOrder.indexOf(status));
+        });
+      }
+
+      const timelineAfter = document.querySelector('.timeline::after');
+      if (timelineAfter) {
+        timelineAfter.style.width = `${progressPercentage}%`;
+      } else {
+        console.error("Timeline after element not found");
+      }
+
+      orderItems.innerHTML = order.orderItems?.map(item => `
+        <div class="content-card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h5 class="font-semibold text-gray-800">${item.menuItemName || 'Unknown Item'}</h5>
+            <span class="text-sm text-gray-600">x${item.quantity}</span>
+          </div>
+          <p class="text-gray-600">Price: $${item.price.toFixed(2)}</p>
+          <p class="text-gray-600">Status: ${item.status}</p>
+          ${item.note ? `<p class="text-gray-600">Note: ${item.note}</p>` : ''}
+        </div>
+      `).join('') || '<p class="text-gray-600">No items found.</p>';
+
+      console.log("Rendered order:", order.id, "with status:", order.status);
+    }
+
+    function initializeWebSocket() {
+      if (!isLoggedIn()) {
+        console.log("Not logged in, skipping WebSocket initialization");
+        showError('Please log in to receive real-time updates!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const token = localStorage.getItem('accessToken');
+      const payload = parseJwt(token);
+      const userId = payload.id || payload.sub;
+
+      if (!userId) {
+        showError('Invalid user session. Please log in again.');
+        logout();
+        return;
+      }
+
+      const socket = new SockJS(`${API_BASE_URL}/ws`);
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect(
+        { Authorization: `Bearer ${token}` },
+        () => {
+          console.log('WebSocket connected successfully');
+          reconnectAttempts = 0;
+
+          stompClient.subscribe(`/topic/orders/${userId}`, (message) => {
+            try {
+              const data = JSON.parse(message.body);
+              console.log('Received WebSocket message for order', data.id, ':', data);
+              const orderSelect = document.getElementById('order-select');
+              if (!orderSelect) {
+                console.error("Order select element not found");
+                return;
+              }
+              if (data && orderSelect.value == data.id) {
+                renderOrder(data);
+                showSuccess(`Order #${data.id} updated: ${data.status}`);
+              } else {
+                console.log(`Ignoring WebSocket message for order ${data.id}, selected order: ${orderSelect.value}`);
+              }
+            } catch (error) {
+              console.error('Error processing WebSocket message:', error);
+              showError('Error updating order in real-time');
+            }
+          });
+        },
+        (error) => {
+          console.error('WebSocket error:', error);
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(`Reconnecting WebSocket, attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
+            setTimeout(initializeWebSocket, 5000);
+          } else {
+            showError('Failed to connect to WebSocket after multiple attempts');
+            console.log("Starting polling as fallback");
+            startPolling();
+          }
+        }
+      );
+    }
+
+    function startPolling() {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+      pollingInterval = setInterval(() => {
+        const orderSelect = document.getElementById('order-select');
+        if (orderSelect && orderSelect.value && isLoggedIn()) {
+          console.log("Polling: Fetching details for order", orderSelect.value);
+          fetchOrderDetails(orderSelect.value);
+        } else {
+          console.log("Polling skipped: No order selected or not logged in");
+        }
+      }, 5000); // Poll every 5 seconds
+    }
+
+    function restoreSelectedOrder() {
+      const orderSelect = document.getElementById('order-select');
+      if (!orderSelect) {
+        console.error("Order select element not found");
+        return;
+      }
+      const selectedOrderId = localStorage.getItem('selectedOrderId');
+      if (selectedOrderId) {
+        const optionExists = Array.from(orderSelect.options).some(option => option.value === selectedOrderId);
+        if (optionExists) {
+          orderSelect.value = selectedOrderId;
+          console.log(`Restoring selected order: ${selectedOrderId}`);
+          fetchOrderDetails(selectedOrderId);
+          startPolling(); // Start polling for selected order
+        } else {
+          console.warn(`Selected order ${selectedOrderId} not found in order list`);
+          localStorage.removeItem('selectedOrderId');
+          showError(`Previously selected order #${selectedOrderId} is no longer available`);
+        }
+      } else {
+        console.log("No selected order in localStorage");
+      }
+    }
+
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) {
+        sidebar.classList.toggle('open');
+      } else {
+        console.error("Sidebar element not found");
+      }
+    }
+
+    document.getElementById('logout-button').addEventListener('click', logout);
+
+    document.getElementById('order-select').addEventListener('change', (e) => {
+      const orderId = e.target.value;
+      console.log("Selected order ID:", orderId);
+      if (orderId) {
+        localStorage.setItem('selectedOrderId', orderId);
+        fetchOrderDetails(orderId);
+        startPolling(); // Start polling when an order is selected
+      } else {
+        localStorage.removeItem('selectedOrderId');
+        const orderDetails = document.getElementById('order-details');
+        if (orderDetails) {
+          orderDetails.classList.add('hidden');
+        }
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          pollingInterval = null;
+        }
+        console.log("Hid order details due to no order selected");
+      }
+    });
+
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (window.innerWidth <= 768 && 
+          sidebar && menuBtn &&
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target) && 
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("Initializing ordertrack.html at", new Date().toLocaleTimeString());
+      updateUI();
+      if (isLoggedIn()) {
+        fetchUserOrders();
+        initializeWebSocket();
+      } else {
+        showError('Please log in to track orders!');
+        window.location.href = 'login.html';
+      }
+    });
+
+    const navLinks = document.querySelectorAll('.sidebar-link');
+    navLinks.forEach(link => {
+      link.setAttribute('title', link.textContent.trim());
+    });
+  </script>
+</body>
+</html>

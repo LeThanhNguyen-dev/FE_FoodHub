@@ -505,10 +505,10 @@
     <label class="form-label">Phương Thức Thanh Toán</label>
     <div class="payment-card">
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="payment-method" id="online-payment" value="ONLINE" checked>
+            <input class="form-check-input" type="radio" name="payment-method" id="online-payment" value="BANKING" checked>
             <label class="form-check-label" for="online-payment">
                 <i class="fas fa-credit-card me-2"></i>
-                Thanh toán Online (VNPay, Momo, Banking)
+                Thanh toán Online (PayOS)
             </label>
         </div>
         <p class="payment-description">
@@ -735,7 +735,7 @@ async function handleFormSubmission(e) {
         }
 
         // Xử lý redirect cho thanh toán online
-        if (paymentMethod === 'ONLINE' && orderResponse.payment?.paymentUrl) {
+        if (paymentMethod === 'BANKING' && orderResponse.payment?.paymentUrl) {
             alert('Đang chuyển đến trang thanh toán...');
             window.location.href = orderResponse.payment.paymentUrl;
         } else {

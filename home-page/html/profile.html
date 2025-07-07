@@ -8,179 +8,412 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    .gradient-bg {
-      background: #0F172B;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #FEA116;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background-color: #0F172B;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .sidebar-link {
-      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      color: #ffffff;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
     }
 
     .sidebar-link:hover {
       background-color: #FEA116;
-      transform: translateX(5px);
+      color: #334155;
     }
 
-    .content-area {
-      transition: all 0.3s ease;
-    }
-
-    .btn-orange {
+    .sidebar-link.active {
       background-color: #FEA116;
-      transition: all 0.3s ease;
+      color: white;
     }
 
-    .btn-orange:hover {
+    .sidebar-link.active:hover {
       background-color: #FEA116;
-      transform: translateY(-2px);
     }
 
-    .frame {
-      background-color: #0F172B;;
-      border: 2px solid #FEA116;
+    .sidebar-link i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
     }
 
-    .input-focus {
-      transition: all 0.3s ease;
+    /* Main Content */
+    .main-content {
+      background-color: #f8fafc;
+      min-height: 100vh;
     }
 
-    .input-focus:focus {
-      border-color: #FEA116;
-      box-shadow: 0 0 8px #FEA116;
+    .content-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Form Elements */
+    .form-label {
+      display: block;
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      color: #1f2937;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input:disabled {
+      background-color: #f9fafb;
+      color: #6b7280;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-primary:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    /* Messages */
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
+    }
+
+    .message-success {
+      background-color: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .message-error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header h3 {
+      color: #374151;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    /* Grid Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .content-card {
+        margin: 16px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
+    /* Loading state */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Input with icon */
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .input-with-icon .form-input {
+      padding-left: 40px;
+    }
+
+    /* Password strength indicator */
+    .password-strength {
+      margin-top: 8px;
+    }
+
+    .strength-bar {
+      width: 100%;
+      height: 4px;
+      background-color: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .strength-text {
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
     }
   </style>
 </head>
 
-<body class="gradient-bg min-h-screen flex font-sans">
+<body class="flex">
+  <!-- Mobile menu button -->
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
+
   <!-- Sidebar -->
-  <aside class="w-64 bg-[#0F172B] border-r-2 border-orange-500 shadow-lg flex flex-col justify-between">
+  <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
-      <div class="p-6 border-b border-orange-500">
-        <h2 class="text-2xl font-bold text-orange-500">User Dashboard</h2>
-        <p id="username-greeting" class="text-sm text-gray-300 mt-1">Welcome, User!</p>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold">Dashboard User</h2>
+        <p id="username-greeting" class="text-sm mt-1">Welcome back!</p>
       </div>
-      <nav class="mt-4">
-        <a href="#profile" id="profile-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
-          <i class="fas fa-user mr-3"></i> Edit Profile
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link active">
+          <i class="fas fa-user"></i> Edit Profile
         </a>
-        <a href="#password" id="password-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
-          <i class="fas fa-key mr-3"></i> Change Password
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
+          <i class="fas fa-truck"></i> Order Tracking
         </a>
-        <a href="#order-status" id="order-status-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
-          <i class="fas fa-shipping-fast mr-3"></i> Order Status
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
+          <i class="fas fa-history"></i> Order History
         </a>
-        <a href="#order-history" id="order-history-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
-          <i class="fas fa-history mr-3"></i> Order History
-        </a>
-        <a href="home.html" id="home-link"
-          class="sidebar-link flex items-center px-6 py-3 text-orange-500 font-semibold hover:text-white">
-          <i class="fas fa-home mr-3"></i> Back to Home
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Back to Home
         </a>
       </nav>
     </div>
-    <div class="p-6 border-t border-orange-500">
-      <button id="logout-button"
-        class="w-full flex items-center justify-center btn-orange text-white py-2 px-4 rounded-lg font-semibold">
+    <div class="p-6">
+      <button id="logout-button" class="w-full btn btn-danger">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout
       </button>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-8 overflow-auto">
-    <div id="content-area" class="content-area max-w-4xl mx-auto space-y-8">
+  <main class="main-content flex-1 p-6 overflow-auto">
+    <div class="max-w-6xl mx-auto">
       <!-- Profile Section -->
-      <div id="profile-section" class="frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Edit Profile</h2>
-        <div id="error-message" class="hidden bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center"></div>
-        <div id="success-message" class="hidden bg-green-100 text-green-700 p-3 rounded-lg mb-4 text-center"></div>
-        <div class="space-y-6">
-          <div class="relative">
-            <label for="username" class="block text-sm font-semibold text-orange-500 mb-1">Username</label>
-            <div class="flex items-center">
-              <i class="fas fa-user absolute ml-3 text-gray-300"></i>
-              <input type="text" id="username"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus" readonly>
-            </div>
-          </div>
-          <div class="relative">
-            <label for="email" class="block text-sm font-semibold text-orange-500 mb-1">Email</label>
-            <div class="flex items-center">
-              <i class="fas fa-envelope absolute ml-3 text-gray-300"></i>
-              <input type="email" id="email"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
-            </div>
-          </div>
-          <div class="relative">
-            <label for="phone" class="block text-sm font-semibold text-orange-500 mb-1">Phone Number</label>
-            <div class="flex items-center">
-              <i class="fas fa-phone absolute ml-3 text-gray-300"></i>
-              <input type="tel" id="phone"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
-            </div>
-          </div>
-          <div class="relative">
-            <label for="address" class="block text-sm font-semibold text-orange-500 mb-1">Address</label>
-            <div class="flex items-center">
-              <i class="fas fa-map-marker-alt absolute ml-3 text-gray-300"></i>
-              <input type="text" id="address"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
-            </div>
-          </div>
-          <button id="save-button"
-            class="w-full btn-orange text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center">
-            <i class="fas fa-save mr-2"></i> Save Changes
-          </button>
+      <div class="content-card p-6">
+        <div class="section-header">
+          <h2><i class="fas fa-user-edit"></i>Edit Profile</h2>
         </div>
-      </div>
 
-      <!-- Password Change Section -->
-      <div id="password-section" class="hidden frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Change Password</h2>
-        <div id="password-error-message" class="hidden bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center"></div>
-        <div id="password-success-message" class="hidden bg-green-100 text-green-700 p-3 rounded-lg mb-4 text-center">
-        </div>
-        <div class="space-y-6">
-          <div class="relative">
-            <label for="old-password" class="block text-sm font-semibold text-orange-500 mb-1">Current Password</label>
-            <div class="flex items-center">
-              <i class="fas fa-lock absolute ml-3 text-gray-300"></i>
-              <input type="password" id="old-password"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
-            </div>
-          </div>
-          <div class="relative">
-            <label for="new-password" class="block text-sm font-semibold text-orange-500 mb-1">New Password</label>
-            <div class="flex items-center">
-              <i class="fas fa-key absolute ml-3 text-gray-300"></i>
-              <input type="password" id="new-password"
-                class="pl-10 w-full bg-gray-700 text-white border-gray-600 rounded-lg shadow-sm input-focus">
-            </div>
-          </div>
-          <button id="change-password-button"
-            class="w-full btn-orange text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center">
-            <i class="fas fa-edit mr-2"></i> Change Password
-          </button>
-        </div>
-      </div>
+        <!-- Messages -->
+        <div id="error-message" class="hidden message message-error"></div>
+        <div id="success-message" class="hidden message message-success"></div>
+        <div id="password-error-message" class="hidden message message-error"></div>
+        <div id="password-success-message" class="hidden message message-success"></div>
 
-      <!-- Order Status Section -->
-      <div id="order-status-section" class="hidden frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Order Status</h2>
-        <div id="order-status-content" class="bg-gray-700 text-white p-4 rounded-lg">
-          <p>No active orders found.</p>
-        </div>
-      </div>
+        <div class="form-grid">
+          <!-- Profile Information -->
+          <div>
+            <div class="section-header">
+              <h3><i class="fas fa-user"></i>Profile Information</h3>
+            </div>
+            
+            <div class="form-group">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" id="username" class="form-input" readonly>
+            </div>
 
-      <!-- Order History Section -->
-      <div id="order-history-section" class="hidden frame rounded-2xl shadow-xl p-8">
-        <h2 class="text-3xl font-extrabold text-orange-500 mb-6">Order History</h2>
-        <div id="order-history-content" class="bg-gray-700 text-white p-4 rounded-lg">
-          <p>No order history available.</p>
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" id="email" class="form-input" placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" id="address" class="form-input" placeholder="Enter your address">
+            </div>
+
+            <button id="save-button" class="btn btn-primary w-full">
+              <i class="fas fa-save mr-2"></i> Save Changes
+            </button>
+          </div>
+
+          <!-- Change Password -->
+          <div>
+            <div class="section-header">
+              <h3><i class="fas fa-lock"></i>Change Password</h3>
+            </div>
+            
+            <div class="form-group">
+              <label for="old-password" class="form-label">Current Password</label>
+              <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+              <label for="new-password" class="form-label">New Password</label>
+              <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+              <div id="password-strength-container" class="password-strength hidden">
+                <div class="strength-bar">
+                  <div id="strength-fill" class="strength-fill"></div>
+                </div>
+                <div id="strength-text" class="strength-text"></div>
+              </div>
+            </div>
+
+            <button id="change-password-button" class="btn btn-primary w-full">
+              <i class="fas fa-key mr-2"></i> Change Password
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -258,6 +491,11 @@
         return;
       }
 
+      const saveBtn = document.getElementById('save-button');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<div class="loading mr-2"></div> Saving...';
+      saveBtn.disabled = true;
+
       const token = localStorage.getItem('accessToken');
       const payload = parseJwt(token);
       const userId = payload.id;
@@ -282,6 +520,9 @@
         showSuccess(data.message || 'Profile updated successfully!');
       } catch (error) {
         showError('Error updating: ' + error.message);
+      } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
       }
     }
 
@@ -302,6 +543,11 @@
         return;
       }
 
+      const changeBtn = document.getElementById('change-password-button');
+      const originalText = changeBtn.innerHTML;
+      changeBtn.innerHTML = '<div class="loading mr-2"></div> Changing...';
+      changeBtn.disabled = true;
+
       try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_BASE_URL}/users/change-password`, {
@@ -320,47 +566,9 @@
         document.getElementById('new-password').value = '';
       } catch (error) {
         showError('Error changing password: ' + error.message, 'password');
-      }
-    }
-
-    function switchSection(sectionId) {
-      document.querySelectorAll('#content-area > div').forEach(div => div.classList.add('hidden'));
-      document.getElementById(sectionId).classList.remove('hidden');
-      document.querySelectorAll('nav a').forEach(link => link.classList.remove('bg-orange-500', 'text-white'));
-      document.getElementById(`${sectionId}-link`).classList.add('bg-orange-500', 'text-white');
-    }
-
-    async function fetchOrderStatus() {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_BASE_URL}/orders/status`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!response.ok) throw new Error('Failed to fetch order status');
-        const data = await response.json();
-        const content = document.getElementById('order-status-content');
-        content.innerHTML = data.result.length
-          ? data.result.map(order => `<div class="mb-4"><p>Order #${order.id}: ${order.status}</p></div>`).join('')
-          : '<p>No active orders found.</p>';
-      } catch (error) {
-        showError('Error fetching order status: ' + error.message);
-      }
-    }
-
-    async function fetchOrderHistory() {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${API_BASE_URL}/orders/history`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!response.ok) throw new Error('Failed to fetch order history');
-        const data = await response.json();
-        const content = document.getElementById('order-history-content');
-        content.innerHTML = data.result.length
-          ? data.result.map(order => `<div class="mb-4"><p>Order #${order.id}: ${order.status} - ${new Date(order.date).toLocaleDateString()}</p></div>`).join('')
-          : '<p>No order history available.</p>';
-      } catch (error) {
-        showError('Error fetching order history: ' + error.message);
+      } finally {
+        changeBtn.innerHTML = originalText;
+        changeBtn.disabled = false;
       }
     }
 
@@ -371,22 +579,89 @@
         return;
       }
       fetchUserInfo();
-      switchSection('profile-section');
     }
 
+    // Password strength checker
+    function calculatePasswordStrength(password) {
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+      return Math.min(score, 4);
+    }
+
+    function updatePasswordStrength(password) {
+      const container = document.getElementById('password-strength-container');
+      const fill = document.getElementById('strength-fill');
+      const text = document.getElementById('strength-text');
+
+      if (!password) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      const strength = calculatePasswordStrength(password);
+      const percentage = (strength / 4) * 100;
+
+      fill.style.width = percentage + '%';
+
+      switch (strength) {
+        case 0:
+        case 1:
+          fill.style.backgroundColor = '#ef4444';
+          text.textContent = 'Weak';
+          text.style.color = '#ef4444';
+          break;
+        case 2:
+          fill.style.backgroundColor = '#f59e0b';
+          text.textContent = 'Fair';
+          text.style.color = '#f59e0b';
+          break;
+        case 3:
+          fill.style.backgroundColor = '#3b82f6';
+          text.textContent = 'Good';
+          text.style.color = '#3b82f6';
+          break;
+        case 4:
+          fill.style.backgroundColor = '#10b981';
+          text.textContent = 'Strong';
+          text.style.color = '#10b981';
+          break;
+      }
+    }
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    // Event Listeners
     document.getElementById('save-button').addEventListener('click', saveUserInfo);
     document.getElementById('change-password-button').addEventListener('click', changePassword);
     document.getElementById('logout-button').addEventListener('click', logout);
-    document.getElementById('profile-link').addEventListener('click', () => switchSection('profile-section'));
-    document.getElementById('password-link').addEventListener('click', () => switchSection('password-section'));
-    document.getElementById('order-status-link').addEventListener('click', () => {
-      switchSection('order-status-section');
-      fetchOrderStatus();
+    document.getElementById('new-password').addEventListener('input', (e) => {
+      updatePasswordStrength(e.target.value);
     });
-    document.getElementById('order-history-link').addEventListener('click', () => {
-      switchSection('order-history-section');
-      fetchOrderHistory();
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target) && 
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
     });
+
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', updateUI);
   </script>
 </body>

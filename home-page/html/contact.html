@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,278 +7,523 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
+    <!-- Chat JS -->
+    <script src="../js/chat.js"></script>
     <!-- Page-specific CSS -->
     <style>
-        
-/* Hero Section */
-.hero {
-    background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    position: relative;
-    overflow: hidden;
-}
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-    z-index: 1;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
 
-.hero .container {
-    position: relative;
-    z-index: 2;
-}
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
 
-.hero h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: #F7E6A3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 1rem;
-    animation: fadeInDown 1s ease-out;
-}
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
 
-.hero p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.25rem;
-    color: #e0e0e0;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 1s ease-out 0.3s;
-    animation-fill-mode: both;
-}
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
 
-/* Contact Section */
-#contact {
-    background: #f8f9fa;
-    padding: 5rem 0;
-    position: relative;
-}
+        #contact {
+            background: #f8f9fa;
+            padding: 5rem 0;
+            position: relative;
+        }
 
-.section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 3rem;
-    font-weight: 700;
-    color: #1A3C34;
-    text-align: center;
-    margin-bottom: 3rem;
-    position: relative;
-}
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1A3C34;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
 
-.section-title::after {
-    content: '';
-    display: block;
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(to right, #D4A017, #1A3C34);
-    margin: 1rem auto;
-}
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #D4A017, #1A3C34);
+            margin: 1rem auto;
+        }
 
-.contact-form {
-    background: #fff;
-    padding: 3rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    max-width: 700px;
-    margin: 0 auto;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+        .contact-form {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: 0 auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.contact-form:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
+        .contact-form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
 
-.contact-form .form-label {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    color: #1A3C34;
-    font-size: 1rem;
-}
+        .contact-form .form-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #1A3C34;
+            font-size: 1rem;
+        }
 
-.contact-form .form-control {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 12px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
+        .contact-form .form-control {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.contact-form .form-control:focus {
-    border-color: #D4A017;
-    box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
-    outline: none;
-}
+        .contact-form .form-control:focus {
+            border-color: #D4A017;
+            box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
+            outline: none;
+        }
 
-.contact-form textarea.form-control {
-    resize: vertical;
-    min-height: 120px;
-}
+        .contact-form textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
 
-.contact-form .btn-primary {
-    background: linear-gradient(90deg, #1A3C34, #D4A017);
-    border: none;
-    padding: 12px 30px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #fff;
-    border-radius: 8px;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
+        .contact-form .btn-primary {
+            background: linear-gradient(90deg, #1A3C34, #D4A017);
+            border: none;
+            padding: 12px 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #fff;
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
 
-.contact-form .btn-primary:hover {
-    background: linear-gradient(90deg, #D4A017, #1A3C34);
-    transform: translateY(-2px);
-}
+        .contact-form .btn-primary:hover {
+            background: linear-gradient(90deg, #D4A017, #1A3C34);
+            transform: translateY(-2px);
+        }
 
-.alert {
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-}
+        .alert {
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
 
-.login-prompt {
-    text-align: center;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
-    color: #333;
-    margin-top: 2rem;
-}
+        .login-prompt {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: #333;
+            margin-top: 2rem;
+        }
 
-.login-prompt a {
-    color: #D4A017;
-    font-weight: 600;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
+        .login-prompt a {
+            color: #D4A017;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
 
-.login-prompt a:hover {
-    color: #1A3C34;
-}
+        .login-prompt a:hover {
+            color: #1A3C34;
+        }
 
-/* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            margin: 0;
+        }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
+        }
 
-/* Responsive Design */
-@media (max-width: 992px) {
-    .hero h1 {
-        font-size: 3rem;
-    }
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
 
-    .hero p {
-        font-size: 1.1rem;
-    }
+        .modal-notification .modal-body a {
+            color: #15803d;
+            text-decoration: none;
+        }
 
-    .section-title {
-        font-size: 2.5rem;
-    }
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
 
-    .contact-form {
-        padding: 2rem;
-    }
-}
+        .modal-notification {
+            z-index: 1055;
+        }
 
-@media (max-width: 768px) {
-    .hero {
-        height: 50vh;
-    }
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 380px;
+            height: 550px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            z-index: 1060;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-    .hero h1 {
-        font-size: 2.5rem;
-    }
+        .chat-container.show {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
 
-    .hero p {
-        font-size: 1rem;
-    }
+        .chat-container.hidden {
+            transform: translateY(20px);
+            opacity: 0;
+        }
 
-    .section-title {
-        font-size: 2rem;
-    }
+        .chat-header {
+            background: #FEA116;
+            color: var(--dark-green);
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .contact-form {
-        padding: 1.5rem;
-    }
+        .chat-header button {
+            background: none;
+            border: none;
+            color: var(--dark-green);
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-    .contact-form .btn-primary {
-        width: 100%;
-        padding: 12px;
-    }
-}
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f5f5f5;
+            scroll-behavior: smooth;
+        }
 
-@media (max-width: 576px) {
-    .hero h1 {
-        font-size: 2rem;
-    }
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
 
-    .hero p {
-        font-size: 0.9rem;
-    }
+        .message.user {
+            background: #FEA116;
+            color: var(--dark-green);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
 
-    .section-title {
-        font-size: 1.8rem;
-    }
-}
+        .message.bot {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .bot ul, .bot ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .bot li {
+            margin-bottom: 6px;
+        }
+
+        .bot strong {
+            color: #FEA116;
+            font-weight: 600;
+        }
+
+        .bot code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bot pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #FEA116;
+            box-shadow: 0 0 0 2px rgba(254, 161, 22, 0.2);
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #e69114;
+        }
+
+        button.clear-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.clear-btn:hover {
+            background: #d0d0d0;
+        }
+
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1060;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .navbar {
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .navbar.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .contact-form {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 50vh;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .contact-form {
+                padding: 1.5rem;
+            }
+
+            .contact-form .btn-primary {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px;
+                top: 10px;
+            }
+
+            .chat-container {
+                width: 90%;
+                height: 70vh;
+                right: 10px;
+                bottom: 70px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
-
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
                 <i class="fa fa-utensils"></i>
-                <span>FoodHub</span> </a>
+                <span>FoodHub</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="menu.html">Thực Đơn</a>
@@ -288,24 +532,27 @@
                         <a class="nav-link" href="about.html">Giới Thiệu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Liên Hệ</a>
+                        <a class="nav-link active" href="contact.html">Liên Hệ</a>
                     </li>
+                    <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-                    <li class="nav-item d-none" id="user-nav-item">
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
                                 <span id="username-display"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                                <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item d-none" id="cart-nav-item">
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
                             <i class="bi bi-cart"></i>
                             <span class="badge" id="cart-count">0</span>
@@ -314,21 +561,49 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
+
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
+
+    <!-- Chat Window -->
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <span>FoodHub Chat</span>
+            <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }" />
+            <button onclick="try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }">Gửi</button>
+            <button class="clear-btn" onclick="try { clearChatHistory(); } catch(e) { console.error('Error clearing chat:', e); showNotification('Lỗi khi xóa chat: ' + e.message); }">Xóa</button>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>Liên hệ với FoodHub</h1>
-            <p>Chúng tôi luôn sẵn sàng lắng nghe ý kiến của bạn!</p>
+            <h1 class="fade-in">Liên hệ với FoodHub</h1>
+            <p class="fade-in">Chúng tôi luôn sẵn sàng lắng nghe ý kiến của bạn!</p>
         </div>
     </section>
 
     <!-- Contact Form Section -->
     <section id="contact" class="py-5">
         <div class="container">
-            <h2 class="section-title">Gửi phản hồi của bạn</h2>
-            <div class="contact-form" id="contact-form">
+            <h2 class="section-title fade-in">Gửi phản hồi của bạn</h2>
+            <div class="contact-form fade-in" id="contact-form">
                 <div id="feedback-message" class="alert d-none"></div>
                 <form id="feedback-form">
                     <div class="mb-3">
@@ -337,33 +612,30 @@
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn" required
-                            readonly>
+                        <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn" required readonly>
                     </div>
                     <div class="mb-3">
                         <label for="message" class="form-label">Phản hồi</label>
-                        <textarea class="form-control" id="message" rows="5"
-                            placeholder="Nhập ý kiến hoặc báo cáo của bạn" required></textarea>
+                        <textarea class="form-control" id="message" rows="5" placeholder="Nhập ý kiến hoặc báo cáo của bạn" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Gửi phản hồi</button>
                 </form>
             </div>
-            <div id="login-prompt" class="login-prompt"></div>
+            <div id="login-prompt" class="login-prompt fade-in"></div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer"
-        color: #F7E6A3; padding: 2rem 0; text-align: center;>
+    <footer class="footer" style="color: #F7E6A3; padding: 2rem 0; text-align: center;">
         <div class="container">
-            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
-            <p class="contact-info">1 FPT | Phone: (123) 456-7890 | Email: info@foodhub.com</p>
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold, #F7E6A3);">FoodHub</h3>
+            <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#" style="color: #F7E6A3; margin: 0 10px;">Facebook</a>
                 <a href="#" style="color: #F7E6A3; margin: 0 10px;">Instagram</a>
                 <a href="#" style="color: #F7E6A3; margin: 0 10px;">Twitter</a>
             </div>
-            <p class="mt-3">© 2025 FoodHub. All rights reserved.</p>
+            <p class="mt-3">© 2025 FoodHub. Bản quyền đã được bảo hộ.</p>
         </div>
     </footer>
 
@@ -371,55 +643,132 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
-    <!-- Form Submission JS -->
+    <script src="../js/notification.js"></script>
+    <!-- Page-specific JS -->
     <script>
-        // Khởi tạo UI
-        updateUI();
-
-        // Hàm cập nhật biểu mẫu dựa trên trạng thái đăng nhập
-        function updateContactForm() {
-            const contactForm = document.getElementById('contact-form');
-            const loginPrompt = document.getElementById('login-prompt');
-            const usernameInput = document.getElementById('username');
-            const emailInput = document.getElementById('email');
-
-            if (isLoggedIn()) {
-                contactForm.style.display = 'block';
-                loginPrompt.style.display = 'none';
-                const token = localStorage.getItem('accessToken');
-                const payload = parseJwt(token);
-                if (payload && payload.sub) {
-                    usernameInput.value = payload.sub || 'Customer';
-                    emailInput.value = payload.sub || 'customer@foodhub.com'; // Thay bằng email thực từ token nếu có
+        // Update cart badge
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cart-count').textContent = totalItems;
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+                document.getElementById('cart-count').textContent = '0';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật giỏ hàng: ' + error.message);
                 }
-            } else {
-                contactForm.style.display = 'none';
-                loginPrompt.style.display = 'block';
-                loginPrompt.innerHTML = 'Vui lòng <a href="login.html">đăng nhập</a> để gửi phản hồi.';
             }
         }
 
-        // Gọi hàm cập nhật biểu mẫu khi tải trang
-        updateContactForm();
+        // Navbar background change on scroll
+        function handleNavbarScroll() {
+            try {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                } else {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                }
+            } catch (error) {
+                console.error('Error in handleNavbarScroll:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý thanh điều hướng: ' + error.message);
+                }
+            }
+        }
 
-        // Xử lý gửi biểu mẫu
+        // Smooth scrolling for anchor links
+        function handleSmoothScrolling() {
+            try {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Error in handleSmoothScrolling:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý cuộn mượt: ' + error.message);
+                }
+            }
+        }
+
+        // Scroll animations
+        function handleScrollAnimations() {
+            try {
+                const elements = document.querySelectorAll('.fade-in');
+                elements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
+                });
+            } catch (error) {
+                console.error('Error in handleScrollAnimations:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý hiệu ứng cuộn: ' + error.message);
+                }
+            }
+        }
+
+        // Update contact form based on login status
+        function updateContactForm() {
+            try {
+                const contactForm = document.getElementById('contact-form');
+                const loginPrompt = document.getElementById('login-prompt');
+                const usernameInput = document.getElementById('username');
+                const emailInput = document.getElementById('email');
+                if (isLoggedIn()) {
+                    contactForm.style.display = 'block';
+                    loginPrompt.style.display = 'none';
+                    const token = localStorage.getItem('accessToken');
+                    const payload = parseJwt(token);
+                    if (payload && payload.sub) {
+                        usernameInput.value = payload.sub || 'Customer';
+                        emailInput.value = payload.email || 'customer@foodhub.com';
+                    }
+                } else {
+                    contactForm.style.display = 'none';
+                    loginPrompt.style.display = 'block';
+                    loginPrompt.innerHTML = 'Vui lòng <a href="login.html">đăng nhập</a> để gửi phản hồi.';
+                }
+            } catch (error) {
+                console.error('Error updating contact form:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật biểu mẫu liên hệ: ' + error.message);
+                }
+            }
+        }
+
+        // Handle form submission
         document.getElementById('feedback-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const feedbackMessage = document.getElementById('feedback-message');
-            feedbackMessage.classList.add('d-none');
-
-            if (!isLoggedIn()) {
-                feedbackMessage.classList.remove('d-none');
-                feedbackMessage.classList.add('alert-danger');
-                feedbackMessage.textContent = 'Vui lòng đăng nhập để gửi phản hồi!';
-                return;
-            }
-
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const message = document.getElementById('message').value;
-
             try {
+                const feedbackMessage = document.getElementById('feedback-message');
+                feedbackMessage.classList.add('d-none');
+
+                if (!isLoggedIn()) {
+                    feedbackMessage.classList.remove('d-none');
+                    feedbackMessage.classList.add('alert-danger');
+                    feedbackMessage.textContent = 'Vui lòng đăng nhập để gửi phản hồi!';
+                    return;
+                }
+
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
+
                 const response = await fetch('http://localhost:8080/api/feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -429,8 +778,12 @@
                 if (response.ok) {
                     feedbackMessage.classList.remove('d-none');
                     feedbackMessage.classList.add('alert-success');
-                    feedbackMessage.textContent = 'Phản hồi đã được gửi thành công vào lúc 09:00 PM +07, 17/06/2025!';
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    const dateString = now.toLocaleDateString('vi-VN');
+                    feedbackMessage.textContent = `Phản hồi đã được gửi thành công vào lúc ${timeString}, ${dateString}!`;
                     document.getElementById('feedback-form').reset();
+                    updateContactForm();
                 } else {
                     const error = await response.text();
                     feedbackMessage.classList.remove('d-none');
@@ -438,12 +791,46 @@
                     feedbackMessage.textContent = error || 'Lỗi khi gửi phản hồi';
                 }
             } catch (error) {
+                const feedbackMessage = document.getElementById('feedback-message');
                 feedbackMessage.classList.remove('d-none');
                 feedbackMessage.classList.add('alert-danger');
                 feedbackMessage.textContent = 'Lỗi khi gửi phản hồi: ' + error.message;
             }
         });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
+                    fetchUserOrders().then(() => startPolling());
+                }
+                if (typeof initializeWebSocket === 'function') initializeWebSocket();
+                if (typeof loadChatHistory === 'function') loadChatHistory();
+                const chatToggle = document.getElementById('chat-toggle');
+                if (chatToggle) chatToggle.style.display = 'flex';
+                updateCartBadge();
+                updateContactForm();
+                handleNavbarScroll();
+                handleSmoothScrolling();
+                handleScrollAnimations();
+
+                // Add event listeners
+                window.addEventListener('scroll', () => {
+                    handleScrollAnimations();
+                    handleNavbarScroll();
+                });
+                window.addEventListener('load', () => {
+                    handleScrollAnimations();
+                    handleNavbarScroll();
+                });
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
+                }
+            }
+        });
     </script>
 </body>
-
 </html>

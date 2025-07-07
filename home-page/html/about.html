@@ -9,43 +9,83 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <!-- Shared CSS -->
     <link href="../css/styles.css" rel="stylesheet">
+    <!-- Chat JS -->
+    <script src="../js/chat.js"></script>
     <!-- Page-specific CSS -->
     <style>
-        .about-hero {
-            background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
-            background-size: cover;
-            background-position: center;
-            height: 50vh;
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
             display: flex;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            color: white;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
         }
 
-        .about-hero h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            color: var(--gold);
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
         }
 
-        .about-hero p {
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            color: var(--light-gold);
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
         }
 
         .section-title {
             font-family: 'Montserrat', sans-serif;
-            color: var(--dark-green);
+            color: var(--dark-green, #1a3c34);
             font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 2rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gold, #F7E6A3);
         }
 
         .about-section {
@@ -83,7 +123,7 @@
 
         .team-member h5 {
             font-family: 'Montserrat', sans-serif;
-            color: var(--dark-green);
+            color: var(--dark-green, #1a3c34);
             font-size: 1.4rem;
             margin-bottom: 0.5rem;
         }
@@ -118,12 +158,227 @@
             border: 0;
         }
 
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            margin: 0;
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d;
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-notification {
+            z-index: 1055;
+        }
+
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 380px;
+            height: 550px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            z-index: 1060;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .chat-container.show {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .chat-container.hidden {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .chat-header {
+            background: #FEA116;
+            color: var(--dark-green);
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: var(--dark-green);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f5f5f5;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #FEA116;
+            color: var(--dark-green);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .bot ul, .bot ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .bot li {
+            margin-bottom: 6px;
+        }
+
+        .bot strong {
+            color: #FEA116;
+            font-weight: 600;
+        }
+
+        .bot code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bot pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #FEA116;
+            box-shadow: 0 0 0 2px rgba(254, 161, 22, 0.2);
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #e69114;
+        }
+
+        button.clear-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.clear-btn:hover {
+            background: #d0d0d0;
+        }
+
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1060;
+        }
+
         @media (max-width: 768px) {
-            .about-hero h1 {
+            .hero h1 {
                 font-size: 2rem;
             }
 
-            .about-hero p {
+            .hero p {
                 font-size: 0.9rem;
             }
 
@@ -143,49 +398,108 @@
             .map-container {
                 padding-bottom: 75%; /* Tỷ lệ 4:3 cho màn hình nhỏ */
             }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px;
+                top: 10px;
+            }
+
+            .chat-container {
+                width: 90%;
+                height: 70vh;
+                right: 10px;
+                bottom: 70px;
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .navbar {
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .navbar.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
     </style>
 </head>
 <body>
     <!-- Thanh Điều Hướng -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
                 <i class="fa fa-utensils"></i>
-                <span>FoodHub</span> </a>
+                <span>FoodHub</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="home.html">Trang Chủ</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="menu.html">Thực Đơn</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="about.html">Giới Thiệu</a>
+                        <a class="nav-link active" href="about.html">Giới Thiệu</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
+                    <!-- Đăng nhập (hiện khi chưa login) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-                    <li class="nav-item d-none" id="user-nav-item">
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
                                 <span id="username-display"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                                <li><a class="dropdown-item" href="">Xem Đơn Hàng</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item d-none" id="cart-nav-item">
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
                             <i class="bi bi-cart"></i>
                             <span class="badge" id="cart-count">0</span>
@@ -194,28 +508,51 @@
                 </ul>
             </div>
         </div>
-        </nav>
+    </nav>
+
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
+
+    <!-- Chat Window -->
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <span>FoodHub Chat</span>
+            <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }" />
+            <button onclick="try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }">Gửi</button>
+            <button class="clear-btn" onclick="try { clearChatHistory(); } catch(e) { console.error('Error clearing chat:', e); showNotification('Lỗi khi xóa chat: ' + e.message); }">Xóa</button>
+        </div>
+    </div>
 
     <!-- Phần Giới Thiệu -->
-    <section class="about-hero">
+    <section class="hero">
         <div class="container">
-            <h1>Giới thiệu về FoodHub</h1>
-            <p>Khám phá câu chuyện và niềm đam mê ẩm thực của chúng tôi.</p>
-            
+            <h1 class="fade-in">Giới thiệu về FoodHub</h1>
+            <p class="fade-in">Khám phá câu chuyện và niềm đam mê ẩm thực của chúng tôi.</p>
         </div>
     </section>
 
     <!-- Câu Chuyện Của Chúng Tôi -->
     <section class="about-section">
         <div class="container">
-            <h2 class="section-title">Câu Chuyện Của Chúng Tôi</h2>
-            <div class="about-content">
-                <p>FoodHub được thành lập với một sứ mệnh đơn giản: kết nối mọi người qua niềm vui ẩm thực. Được thành
-                    lập từ năm 2020, chúng tôi đã phát triển từ một quán ăn nhỏ thành một địa điểm ẩm thực được yêu
-                    thích, nổi tiếng với cam kết về chất lượng, sự bền vững và dịch vụ xuất sắc.</p>
-                <p>Các đầu bếp của chúng tôi chế biến từng món ăn với nguyên liệu tươi ngon nhất, được chọn lọc từ các
-                    nông trại và nhà cung cấp địa phương. Chúng tôi tin rằng mỗi bữa ăn là một câu chuyện, và chúng tôi
-                    luôn cố gắng tạo ra những trải nghiệm đáng nhớ cho thực khách.</p>
+            <h2 class="section-title fade-in">Câu Chuyện Của Chúng Tôi</h2>
+            <div class="about-content fade-in">
+                <p>FoodHub được thành lập với một sứ mệnh đơn giản: kết nối mọi người qua niềm vui ẩm thực. Được thành lập từ năm 2020, chúng tôi đã phát triển từ một quán ăn nhỏ thành một địa điểm ẩm thực được yêu thích, nổi tiếng với cam kết về chất lượng, sự bền vững và dịch vụ xuất sắc.</p>
+                <p>Các đầu bếp của chúng tôi chế biến từng món ăn với nguyên liệu tươi ngon nhất, được chọn lọc từ các nông trại và nhà cung cấp địa phương. Chúng tôi tin rằng mỗi bữa ăn là một câu chuyện, và chúng tôi luôn cố gắng tạo ra những trải nghiệm đáng nhớ cho thực khách.</p>
             </div>
         </div>
     </section>
@@ -223,28 +560,27 @@
     <!-- Đội Ngũ Của Chúng Tôi -->
     <section class="about-section">
         <div class="container">
-            <h2 class="section-title">Gặp Gỡ Đội Ngũ</h2>
+            <h2 class="section-title fade-in">Gặp Gỡ Đội Ngũ</h2>
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Thành viên đội ngũ">
+                    <div class="team-member fade-in">
+                        <img src="https://picsum.photos/150" alt="Thành viên đội ngũ" onerror="this.src='../images/fallback.jpg'">
                         <h5>Nguyễn Văn A</h5>
                         <p>Bếp Trưởng</p>
                         <p>Với hơn 15 năm kinh nghiệm, bếp trưởng A mang đến sự sáng tạo và đam mê cho từng món ăn.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Thành viên đội ngũ">
+                    <div class="team-member fade-in">
+                        <img src="https://picsum.photos/150" alt="Thành viên đội ngũ" onerror="this.src='../images/fallback.jpg'">
                         <h5>Trần Thị B</h5>
                         <p>Quản Lý Nhà Hàng</p>
-                        <p>Chị B luôn đảm bảo mỗi khách hàng ra về với nụ cười, quản lý hoạt động với sự ấm áp và hiệu
-                            quả.</p>
+                        <p>Chị B luôn đảm bảo mỗi khách hàng ra về với nụ cười, quản lý hoạt động với sự ấm áp và hiệu quả.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Thành viên đội ngũ">
+                    <div class="team-member fade-in">
+                        <img src="https://picsum.photos/150" alt="Thành viên đội ngũ" onerror="this.src='../images/fallback.jpg'">
                         <h5>Lê Văn C</h5>
                         <p>Đầu Bếp Bánh</p>
                         <p>Những món tráng miệng của anh C là cái kết ngọt ngào mỗi bữa ăn, được làm với sự tỉ mỉ.</p>
@@ -257,12 +593,9 @@
     <!-- Bản Đồ Vị Trí -->
     <section class="map-section">
         <div class="container">
-            <h2 class="section-title">Địa Chỉ Của Chúng Tôi</h2>
-            <div class="map-container">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3835.863084371478!2d108.25943217485829!3d15.968524865546536!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142116949840599%3A0x365b35580f52e8d5!2zxJDhuqFpIGjhu41jIEZQVCDEkMOgIE7hurVuZw!5e0!3m2!1svi!2s!4v1750065400680!5m2!1svi!2s"
-                    style="border:0;" allowfullscreen="" loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <h2 class="section-title fade-in">Địa Chỉ Của Chúng Tôi</h2>
+            <div class="map-container fade-in">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3835.863084371478!2d108.25943217485829!3d15.968524865546536!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142116949840599%3A0x365b35580f52e8d5!2zxJDhuqFpIGjhu41jIEZQVCDEkMOgIE7hurVuZw!5e0!3m2!1svi!2s!4v1750065400680!5m2!1svi!2s" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
@@ -270,7 +603,7 @@
     <!-- Chân Trang -->
     <footer id="contact" class="footer">
         <div class="container">
-            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold, #F7E6A3);">FoodHub</h3>
             <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#">Facebook</a>
@@ -285,6 +618,117 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Shared JS -->
     <script src="../js/auth.js"></script>
-</body>
+    <script src="../js/notification.js"></script>
+    <!-- Page-specific JS -->
+    <script>
+        // Update cart badge
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cart-count').textContent = totalItems;
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+                document.getElementById('cart-count').textContent = '0';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật giỏ hàng: ' + error.message);
+                }
+            }
+        }
 
+        // Navbar background change on scroll
+        function handleNavbarScroll() {
+            try {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                } else {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                }
+            } catch (error) {
+                console.error('Error in handleNavbarScroll:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý thanh điều hướng: ' + error.message);
+                }
+            }
+        }
+
+        // Smooth scrolling for anchor links
+        function handleSmoothScrolling() {
+            try {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Error in handleSmoothScrolling:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý cuộn mượt: ' + error.message);
+                }
+            }
+        }
+
+        // Scroll animations
+        function handleScrollAnimations() {
+            try {
+                const elements = document.querySelectorAll('.fade-in');
+                elements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
+                });
+            } catch (error) {
+                console.error('Error in handleScrollAnimations:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý hiệu ứng cuộn: ' + error.message);
+                }
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
+                    fetchUserOrders().then(() => startPolling());
+                }
+                if (typeof initializeWebSocket === 'function') initializeWebSocket();
+                if (typeof loadChatHistory === 'function') loadChatHistory();
+                const chatToggle = document.getElementById('chat-toggle');
+                if (chatToggle) chatToggle.style.display = 'flex';
+                updateCartBadge();
+                handleNavbarScroll();
+                handleSmoothScrolling();
+                handleScrollAnimations();
+
+                // Add event listeners
+                window.addEventListener('scroll', () => {
+                    handleScrollAnimations();
+                    handleNavbarScroll();
+                });
+                window.addEventListener('load', () => {
+                    handleScrollAnimations();
+                    handleNavbarScroll();
+                });
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
 </html>
