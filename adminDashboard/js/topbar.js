@@ -24,38 +24,20 @@ async function loadTopbar() {
 // Hàm mới để lấy thông tin user
 async function loadUserInfo() {
     try {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        if (!token) {
-            // Chuyển hướng đến trang thông báo lỗi thay vì login trực tiếp
-            setTimeout(() => window.location.href = '/adminDashboard/components/access-denied.html', 1000);
-            return;
-        }
-
-        console.log('Sending request with token:', token.substring(0, 20) + '...'); // Log một phần token
-        const response = await fetch('http://localhost:8080/users/my-info', { // Sử dụng full URL
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        // Sử dụng apiFetch thay vì fetch trực tiếp
+        const response = await apiFetch('/users/my-info', {
+            method: 'GET'
         });
 
-        console.log('Response status:', response.status); // Log status
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Không thể lấy thông tin user. Status: ${response.status}, Text: ${errorText}`);
-        }
-        const data = await response.json();
-        console.log('Response data:', data);
+        console.log('Response data:', response);
 
         // Kiểm tra role của user
-        if (data.result && data.result.roleName && data.result.roleName.name) {
-            const roleName = data.result.roleName.name.toUpperCase();
+        if (response.result && response.result.roleName && response.result.roleName.name) {
+            const roleName = response.result.roleName.name.toUpperCase();
             
             // Nếu role không phải ADMIN, chuyển hướng về trang thông báo lỗi
             if (roleName !== 'ADMIN') {
                 console.log('Access denied: User is not admin, role:', roleName);
-                // Chuyển hướng đến trang thông báo lỗi
                 setTimeout(() => window.location.href = '/adminDashboard/components/access-denied.html', 1000);
                 return;
             }
@@ -68,15 +50,15 @@ async function loadUserInfo() {
 
         // Nếu là admin, hiển thị thông tin user
         const userNameElement = document.getElementById('user-name');
-        if (userNameElement && data.result) {
-            const displayName = data.result.username || data.result.email || 'Admin';
+        if (userNameElement && response.result) {
+            const displayName = response.result.username || response.result.email || 'Admin';
             userNameElement.textContent = displayName;
         }
         
     } catch (error) {
         console.error('Lỗi khi lấy thông tin user:', error);
         
-        // Nếu có lỗi, cũng chuyển về trang thông báo lỗi để đảm bảo bảo mật
+        // Chuyển hướng đến trang access-denied chỉ khi lỗi không được xử lý bởi apiFetch
         console.log('Access denied: Error occurred during authentication');
         setTimeout(() => window.location.href = '/adminDashboard/components/access-denied.html', 1000);
     }
@@ -88,7 +70,7 @@ function checkAdminAccess() {
     if (!token) {
         window.location.href = '/adminDashboard/components/access-denied.html';
         return false;
-    }
+    }   
     return true;
 }
 
