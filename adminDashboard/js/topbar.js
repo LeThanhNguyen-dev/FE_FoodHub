@@ -1,5 +1,6 @@
 async function loadTopbar() {
     try {
+        // Lấy nội dung topbar.html (không phải backend API, nên giữ nguyên fetch)
         const response = await fetch('/adminDashboard/components/topbar.html');
         if (!response.ok) throw new Error('Không thể tải topbar');
         const topbarHtml = await response.text();
@@ -21,41 +22,22 @@ async function loadTopbar() {
     }
 }
 
-// Hàm mới để lấy thông tin user
+// Hàm lấy thông tin user (đã sử dụng apiFetch, giữ nguyên)
 async function loadUserInfo() {
     try {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        if (!token) {
-            // Chuyển hướng đến trang thông báo lỗi thay vì login trực tiếp
-            setTimeout(() => window.location.href = '/adminDashboard/components/access-denied.html', 1000);
-            return;
-        }
-
-        console.log('Sending request with token:', token.substring(0, 20) + '...'); // Log một phần token
-        const response = await fetch('http://localhost:8080/users/my-info', { // Sử dụng full URL
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        const response = await apiFetch('/users/my-info', {
+            method: 'GET'
         });
 
-        console.log('Response status:', response.status); // Log status
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Không thể lấy thông tin user. Status: ${response.status}, Text: ${errorText}`);
-        }
-        const data = await response.json();
-        console.log('Response data:', data);
+        console.log('Response data:', response);
 
         // Kiểm tra role của user
-        if (data.result && data.result.roleName && data.result.roleName.name) {
-            const roleName = data.result.roleName.name.toUpperCase();
+        if (response.result && response.result.roleName && response.result.roleName.name) {
+            const roleName = response.result.roleName.name.toUpperCase();
             
             // Nếu role không phải ADMIN, chuyển hướng về trang thông báo lỗi
             if (roleName !== 'ADMIN') {
                 console.log('Access denied: User is not admin, role:', roleName);
-                // Chuyển hướng đến trang thông báo lỗi
                 setTimeout(() => window.location.href = '/adminDashboard/components/access-denied.html', 1000);
                 return;
             }
@@ -68,21 +50,19 @@ async function loadUserInfo() {
 
         // Nếu là admin, hiển thị thông tin user
         const userNameElement = document.getElementById('user-name');
-        if (userNameElement && data.result) {
-            const displayName = data.result.username || data.result.email || 'Admin';
+        if (userNameElement && response.result) {
+            const displayName = response.result.username || response.result.email || 'Admin';
             userNameElement.textContent = displayName;
         }
         
     } catch (error) {
         console.error('Lỗi khi lấy thông tin user:', error);
-        
-        // Nếu có lỗi, cũng chuyển về trang thông báo lỗi để đảm bảo bảo mật
         console.log('Access denied: Error occurred during authentication');
         setTimeout(() => window.location.href = '/adminDashboard/components/access-denied.html', 1000);
     }
 }
 
-// Hàm bổ sung để kiểm tra quyền truy cập cho các trang khác
+// Hàm kiểm tra quyền truy cập cơ bản
 function checkAdminAccess() {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) {
@@ -92,37 +72,23 @@ function checkAdminAccess() {
     return true;
 }
 
-// Hàm để kiểm tra quyền truy cập với API
+// Hàm kiểm tra quyền truy cập với API (đã sử dụng apiFetch, giữ nguyên)
 async function validateAdminAccess() {
     try {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        if (!token) {
-            window.location.href = '/adminDashboard/components/access-denied.html';
-            return false;
-        }
-
-        const response = await fetch('http://localhost:8080/users/my-info', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        const response = await apiFetch('/users/my-info', {
+            method: 'GET'
         });
 
-        if (!response.ok) {
-            throw new Error('Token validation failed');
-        }
-
-        const data = await response.json();
-        
-        if (data.result && data.result.roleName && data.result.roleName.name) {
-            const roleName = data.result.roleName.name.toUpperCase();
+        if (response.result && response.result.roleName && response.result.roleName.name) {
+            const roleName = response.result.roleName.name.toUpperCase();
             if (roleName !== 'ADMIN') {
+                console.log('Access denied: User is not admin, role:', roleName);
                 window.location.href = '/adminDashboard/components/access-denied.html';
                 return false;
             }
             return true;
         } else {
+            console.log('Access denied: No role information found');
             window.location.href = '/adminDashboard/components/access-denied.html';
             return false;
         }
@@ -133,7 +99,7 @@ async function validateAdminAccess() {
     }
 }
 
-// Các hàm khác giữ nguyên...
+// Hàm set tiêu đề topbar (giữ nguyên)
 function setTopbarTitle() {
     const currentPath = window.location.pathname.toLowerCase();
     let title = 'FoodHub Admin';
@@ -162,6 +128,7 @@ function setTopbarTitle() {
     }
 }
 
+// Hàm xem hồ sơ (sửa để dùng apiFetch)
 async function viewProfile() {
     try {
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -170,22 +137,14 @@ async function viewProfile() {
             return;
         }
 
-        const response = await fetch('http://localhost:8080/users/my-info', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        // Sử dụng apiFetch thay vì fetch
+        const response = await apiFetch('/users/my-info', {
+            method: 'GET'
         });
 
-        if (!response.ok) {
-            throw new Error('Không thể tải thông tin hồ sơ');
-        }
-
-        const data = await response.json();
-        
-        if (data.code === 0 && data.result) {
-            showProfileModal(data.result);
+        // Kiểm tra response từ apiFetch
+        if (response.result) {
+            showProfileModal(response.result);
         } else {
             throw new Error('Không thể lấy thông tin hồ sơ');
         }
@@ -195,6 +154,7 @@ async function viewProfile() {
     }
 }
 
+// Hàm hiển thị modal hồ sơ (giữ nguyên)
 function showProfileModal(userInfo) {
     const modalHtml = `
         <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
@@ -278,9 +238,7 @@ function showProfileModal(userInfo) {
     });
 }
 
-
-
-
+// Hàm chỉnh sửa hồ sơ (sửa để dùng apiFetch)
 async function editProfile() {
     try {
         const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -289,22 +247,12 @@ async function editProfile() {
             return;
         }
 
-        // Lấy thông tin user hiện tại để có ID
-        const response = await fetch('http://localhost:8080/users/my-info', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        // Sử dụng apiFetch thay vì fetch
+        const response = await apiFetch('/users/my-info', {
+            method: 'GET'
         });
 
-        if (!response.ok) {
-            throw new Error('Không thể lấy thông tin user');
-        }
-
-        const data = await response.json();
-        
-        if (data.code === 0 && data.result && data.result.id) {
+        if (response.result && response.result.id) {
             // Đóng modal hiện tại
             const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
             if (modal) {
@@ -312,7 +260,7 @@ async function editProfile() {
             }
             
             // Chuyển hướng đến trang chỉnh sửa profile với ID
-            window.location.href = `/adminDashboard/components/edit-profile.html?id=${data.result.id}`;
+            window.location.href = `/adminDashboard/components/edit-profile.html?id=${response.result.id}`;
         } else {
             throw new Error('Không tìm thấy ID người dùng');
         }
@@ -322,18 +270,17 @@ async function editProfile() {
     }
 }
 
+// Hàm đăng xuất (giữ nguyên)
 function handleLogout() {
     if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('accessToken');
-        
         window.location.href = '/home-page/html/login.html';
     }
 }
 
-// Thêm hàm để kiểm tra quyền truy cập khi tải trang
+// Kiểm tra quyền truy cập khi tải trang (giữ nguyên)
 document.addEventListener('DOMContentLoaded', function() {
-    // Kiểm tra quyền truy cập ngay khi trang được tải
     if (window.location.pathname.includes('adminDashboard') || 
         window.location.pathname.includes('admin')) {
         checkAdminAccess();

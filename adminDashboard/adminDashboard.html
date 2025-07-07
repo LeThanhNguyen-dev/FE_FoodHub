@@ -204,7 +204,8 @@
             100% { transform: rotate(360deg); }
         }
 
-        .modal-overlay {
+       
+.modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -220,27 +221,55 @@
 
         .modal-content {
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 20px;
             overflow-y: auto;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-height: calc(85vh - 80px);
         }
 
-        .modal-content h3 {
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        .modal-content .btn-close {
+        .btn-close {
             background: none;
             border: none;
-            font-size: 1.2rem;
-            color: var(--dark);
+            color: white;
+            font-size: 1.5rem;
             cursor: pointer;
-            float: right;
+            padding: 5px 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .btn-close:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .table-list {
@@ -493,133 +522,145 @@
     </div>
 
     <!-- Table Management Modals -->
-    <div class="modal-overlay" id="tableListModal">
+ <div class="modal-overlay" id="tableListModal">
         <div class="modal-content">
-            <button class="btn-close" onclick="closeTableModal('tableListModal')">×</button>
-            <h3>Danh sách bàn</h3>
-            <div class="filter-group">
-                <div class="form-group">
-                    <label>Số bàn</label>
-                    <input type="text" id="filterTableNumber" placeholder="Nhập số bàn">
-                </div>
-                <div class="form-group">
-                    <label>Trạng thái</label>
-                    <select id="filterStatus">
-                        <option value="">Tất cả</option>
-                        <option value="AVAILABLE">AVAILABLE</option>
-                        <option value="OCCUPIED">OCCUPIED</option>
-                        <option value="UNAVAILABLE">UNAVAILABLE</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Khu vực</label>
-                    <input type="text" id="filterArea" placeholder="Nhập khu vực">
-                </div>
-                <div class="form-group">
-                    <label>Sắp xếp theo</label>
-                    <select id="orderBy">
-                        <option value="tableNumber">Số bàn</option>
-                        <option value="area">Khu vực</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Thứ tự</label>
-                    <select id="sort">
-                        <option value="ASC">Tăng dần</option>
-                        <option value="DESC">Giảm dần</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn btn-primary" onclick="applyTableFilters()">Lọc</button>
-                </div>
+            <div class="modal-header">
+                <h3><i class="fas fa-table me-2"></i>Quản lý bàn</h3>
+                <button class="btn-close" onclick="closeTableModal('tableListModal')">×</button>
             </div>
-            <button class="btn btn-primary mb-3" onclick="showAddTableModal()">Thêm bàn mới</button>
-            <table class="table-list">
-                <thead>
-                    <tr>
-                        <th>Số bàn</th>
-                        <th>QR Code</th>
-                        <th>Trạng thái</th>
-                        <th>Khu vực</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody id="tableListBody"></tbody>
-            </table>
+            <div class="modal-body">
+                <div class="filter-group">
+                    <div class="form-group">
+                        <label>Số bàn</label>
+                        <input type="text" id="filterTableNumber" placeholder="Nhập số bàn">
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select id="filterStatus">
+                            <option value="">Tất cả</option>
+                            <option value="AVAILABLE">AVAILABLE</option>
+                            <option value="OCCUPIED">OCCUPIED</option>
+                            <option value="UNAVAILABLE">UNAVAILABLE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Khu vực</label>
+                        <input type="text" id="filterArea" placeholder="Nhập khu vực">
+                    </div>
+                    <div class="form-group">
+                        <label>Sắp xếp theo</label>
+                        <select id="orderBy">
+                            <option value="tableNumber">Số bàn</option>
+                            <option value="area">Khu vực</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Thứ tự</label>
+                        <select id="sort">
+                            <option value="ASC">Tăng dần</option>
+                            <option value="DESC">Giảm dần</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-primary" onclick="applyTableFilters()">Lọc</button>
+                    </div>
+                </div>
+                <button class="btn btn-primary mb-3" onclick="showAddTableModal()">Thêm bàn mới</button>
+                <table class="table-list">
+                    <thead>
+                        <tr>
+                            <th>Số bàn</th>
+                            <th>QR Code</th>
+                            <th>Trạng thái</th>
+                            <th>Khu vực</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableListBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="addTableModal">
         <div class="modal-content">
-            <button class="btn-close" onclick="closeTableModal('addTableModal')">×</button>
-            <h3>Thêm bàn mới</h3>
-            <form id="addTableForm">
-                <div class="form-group">
-                    <label>Số bàn</label>
-                    <input type="text" id="addTableNumber" required>
-                    <div class="error-message" id="addTableNumberError">Số bàn đã tồn tại</div>
-                </div>
-                <div class="form-group">
-                    <label>QR Code</label>
-                    <input type="text" id="addQrCode" required>
-                    <div class="error-message" id="addQrCodeError">Vui lòng nhập QR Code</div>
-                </div>
-                <div class="form-group">
-                    <label>Trạng thái</label>
-                    <select id="addStatus" required>
-                        <option value="AVAILABLE">AVAILABLE</option>
-                        <option value="OCCUPIED">OCCUPIED</option>
-                    </select>
-                    <div class="error-message" id="addStatusError">Vui lòng chọn trạng thái</div>
-                </div>
-                <div class="form-group">
-                    <label>Khu vực</label>
-                    <input type="text" id="addArea" required>
-                    <div class="error-message" id="addAreaError">Vui lòng nhập khu vực</div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-save">Lưu</button>
-                    <button type="button" class="btn btn-cancel" onclick="closeTableModal('addTableModal')">Hủy</button>
-                </div>
-            </form>
+            <div class="modal-header">
+                <h3><i class="fas fa-plus me-2"></i>Thêm bàn mới</h3>
+                <button class="btn-close" onclick="closeTableModal('addTableModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="addTableForm">
+                    <div class="form-group">
+                        <label>Số bàn</label>
+                        <input type="text" id="addTableNumber" required>
+                        <div class="error-message" id="addTableNumberError">Số bàn đã tồn tại</div>
+                    </div>
+                    <div class="form-group">
+                        <label>QR Code</label>
+                        <input type="text" id="addQrCode" required>
+                        <div class="error-message" id="addQrCodeError">Vui lòng nhập QR Code</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select id="addStatus" required>
+                            <option value="AVAILABLE">AVAILABLE</option>
+                            <option value="OCCUPIED">OCCUPIED</option>
+                        </select>
+                        <div class="error-message" id="addStatusError">Vui lòng chọn trạng thái</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Khu vực</label>
+                        <input type="text" id="addArea" required>
+                        <div class="error-message" id="addAreaError">Vui lòng nhập khu vực</div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-save">Lưu</button>
+                        <button type="button" class="btn btn-cancel" onclick="closeTableModal('addTableModal')">Hủy</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="editTableModal">
         <div class="modal-content">
-            <button class="btn-close" onclick="closeTableModal('editTableModal')">×</button>
-            <h3>Sửa thông tin bàn</h3>
-            <form id="editTableForm">
-                <input type="hidden" id="editTableId">
-                <div class="form-group">
-                    <label>Số bàn</label>
-                    <input type="text" id="editTableNumber" required>
-                    <div class="error-message" id="editTableNumberError">Số bàn đã tồn tại</div>
-                </div>
-                <div class="form-group">
-                    <label>QR Code</label>
-                    <input type="text" id="editQrCode" required>
-                    <div class="error-message" id="editQrCodeError">Vui lòng nhập QR Code</div>
-                </div>
-                <div class="form-group">
-                    <label>Trạng thái</label>
-                    <select id="editStatus" required>
-                        <option value="AVAILABLE">AVAILABLE</option>
-                        <option value="OCCUPIED">OCCUPIED</option>
-                    </select>
-                    <div class="error-message" id="editStatusError">Vui lòng chọn trạng thái</div>
-                </div>
-                <div class="form-group">
-                    <label>Khu vực</label>
-                    <input type="text" id="editArea" required>
-                    <div class="error-message" id="editAreaError">Vui lòng nhập khu vực</div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-save">Lưu</button>
-                    <button type="button" class="btn btn-cancel" onclick="closeTableModal('editTableModal')">Hủy</button>
-                </div>
-            </form>
+            <div class="modal-header">
+                <h3><i class="fas fa-edit me-2"></i>Sửa thông tin bàn</h3>
+                <button class="btn-close" onclick="closeTableModal('editTableModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="editTableForm">
+                    <input type="hidden" id="editTableId">
+                    <div class="form-group">
+                        <label>Số bàn</label>
+                        <input type="text" id="editTableNumber" required>
+                        <div class="error-message" id="editTableNumberError">Số bàn đã tồn tại</div>
+                    </div>
+                    <div class="form-group">
+                        <label>QR Code</label>
+                        <input type="text" id="editQrCode" required>
+                        <div class="error-message" id="editQrCodeError">Vui lòng nhập QR Code</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select id="editStatus" required>
+                            <option value="AVAILABLE">AVAILABLE</option>
+                            <option value="OCCUPIED">OCCUPIED</option>
+                        </select>
+                        <div class="error-message" id="editStatusError">Vui lòng chọn trạng thái</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Khu vực</label>
+                        <input type="text" id="editArea" required>
+                        <div class="error-message" id="editAreaError">Vui lòng nhập khu vực</div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-save">Lưu</button>
+                        <button type="button" class="btn btn-cancel" onclick="closeTableModal('editTableModal')">Hủy</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -1137,7 +1178,7 @@ async function deleteTable(tableId, status) {
             fetchTableCount().catch(error => console.error('Lỗi fetchTableCount:', error));
             console.log('Đã gửi tất cả yêu cầu fetch.');
         }
-
+    
         // Sự kiện DOM loaded
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Kiểm tra DOM:', {
@@ -1151,6 +1192,7 @@ async function deleteTable(tableId, status) {
             loadTopbar();
             showDashboard();
         });
+        
     </script>
 </body>
 </html>
