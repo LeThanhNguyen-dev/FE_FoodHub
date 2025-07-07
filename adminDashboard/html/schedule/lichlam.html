@@ -20,8 +20,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/sidebar.css">
-    <link rel="stylesheet" href="/css/lichlam.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/lichlam.css">
 </head>
 
 <body>
@@ -31,33 +31,9 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="d-flex align-items-center">
-                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h4 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Lịch Ca Làm Việc</h4>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i>Admin
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></hr>
-                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
+         <div id="topbar-container"></div>
         <div class="container" id="container">
-            <div class="top-nav">
-                <a href="/staff-manager/staffList.html" class="home-btn">← Quay Lại</a>
-            </div>
-
+         
             <div class="header">
                 <h1>Lịch Ca Làm Việc</h1>
                 <p>Quản lý ca làm việc nhà hàng</p>
@@ -230,12 +206,13 @@
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Custom JS -->
+      <script src="../../js/topbar.js"></script>
     <script src="/js/fetch-api.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="../../js/sidebar.js"></script>
     <script>
         async function loadSidebar() {
             try {
-                const response = await fetch('/components/sidebar.html');
+                const response = await fetch('../../components/sidebar.html');
                 if (!response.ok) throw new Error('Không thể tải sidebar');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -316,6 +293,7 @@
 
         async function init() {
             await loadSidebar();
+            await loadTopbar();
             await renderCalendar();
         }
 
