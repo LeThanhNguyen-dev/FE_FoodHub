@@ -2,10 +2,10 @@
 
 // async function RefreshToken() {
 //     const oldToken = localStorage.getItem("accessToken");
-//     const contextPath = getContextPath();
+
 
 //     try {
-//         const response = await fetch(`${contextPath}/auth/refresh`, {
+//         const response = await fetch(`${BACKEND_BASE_URL}/auth/refresh`, {
 //             method: "POST",
 //             headers: {
 //                 "Content-Type": "application/json"
@@ -21,35 +21,39 @@
 //             return true;
 //         } else {
 //             console.error("❌ Lỗi khi làm mới token:", data.message);
-//             window.location.href = `${contextPath}/login.html`;
+//             window.location.href = '/login.html';
 //             return false;
 //         }
 //     } catch (error) {
-//         console.error("❌ Lỗi khi gọi refresh token:", error);
-//         window.location.href = `${contextPath}/login.html`;
+//         window.location.href = `/login.html`;
 //         return false;
 //     }
 // }
 
 // async function apiFetch(endpoint, options = {}) {
 //     const url = `${BACKEND_BASE_URL}${endpoint}`;
-
 //     const fetchWithToken = async () => {
-//         const latestToken = localStorage.getItem("accessToken"); // lấy lại token mới nhất ✅
-//         return await fetch(url, {
-//             ...options,
-//             headers: {
-//                 ...(options.headers || {}),
-//                 'Content-Type': 'application/json',
-//                 ...(latestToken ? { 'Authorization': `Bearer ${latestToken}` } : {})
-//             }
-//         });
-        
+//         const latestToken = localStorage.getItem("accessToken");
+//         console.log("latest token: ", latestToken);
+//         try {
+//             const response = await fetch(url, {
+//                 ...options,
+//                 headers: {
+//                     ...(options.headers || {}),
+//                     'Content-Type': 'application/json',
+//                     ...(latestToken ? { 'Authorization': `Bearer ${latestToken}` } : {})
+//                 }
+//             });
+//             return response;
+//         } catch (error) {
+//             console.error("Lỗi khi gửi yêu cầu:", error);
+//             throw error;
+//         }
 //     };
 
 //     let response = await fetchWithToken();
 //     const contentType = response.headers.get('Content-Type') || '';
-
+//     console.log("status: ", response.status);
 //     if (response.status === 401) {
 //         console.warn("⚠️ Access token hết hạn. Đang thử làm mới token...");
 //         const refreshed = await RefreshToken();
@@ -82,17 +86,11 @@
 // }
 const BACKEND_BASE_URL = "http://localhost:8080";
 
-// Hàm lấy context path - cần sửa lại
-function getContextPath() {
-    // Trả về đường dẫn backend thay vì frontend
-    return BACKEND_BASE_URL;
-}
-
 async function RefreshToken() {
     const oldToken = localStorage.getItem("accessToken");
-    
+
+
     try {
-        // Sửa URL để gọi đúng backend endpoint
         const response = await fetch(`${BACKEND_BASE_URL}/auth/refresh`, {
             method: "POST",
             headers: {
@@ -103,29 +101,25 @@ async function RefreshToken() {
 
         const data = await response.json();
 
-        // Kiểm tra response code chính xác theo backend
-        if (data.code === 1000 && data.result && data.result.token) {
+        if (data.code === 0 && data.result.authenticated) {
             localStorage.setItem("accessToken", data.result.token);
             console.log("✅ Refresh token thành công");
             return true;
         } else {
             console.error("❌ Lỗi khi làm mới token:", data.message);
-            // Chuyển hướng về trang login của frontend
             redirectToLogin();
             return false;
         }
     } catch (error) {
-        console.error("❌ Lỗi khi gọi refresh token:", error);
-        // Chuyển hướng về trang login của frontend
         redirectToLogin();
         return false;
     }
 }
 
+
 // Hàm chuyển hướng về login (tách riêng để dễ quản lý)
 function redirectToLogin() {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     window.location.href = "/home-page/html/login.html";
 }
 
@@ -233,6 +227,5 @@ function isTokenValid() {
 // Hàm logout
 function handleLogout() {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     window.location.href = "/login.html";
 }

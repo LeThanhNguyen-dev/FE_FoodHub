@@ -61,7 +61,7 @@
     async function fetchUsers() {
         try {
 
-            const data = await apiFetch('/users', {
+            const data = await apiFetch('/users', { 
                 method: 'GET',
             });
             renderUserTable(data.result);
