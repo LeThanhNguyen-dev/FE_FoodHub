@@ -1,0 +1,694 @@
+  <!DOCTYPE html>
+  <html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href= "css/style.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    
+    <div class="brand">
+    <h3><i class="brand-icon fas fa-utensils"></i><span class="brand-text">FoodHub</span></h3>
+    <div class="subtitle">Cashier System</div>
+</div>
+    <nav class="sidebar-nav">
+
+
+      
+      <div class="nav-item">
+        <button class="nav-link" onclick="showSection('transactions')" id="sidebarTransactions">
+          <i class="fas fa-list-alt"></i><span>Transactions</span>
+        </button>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link" onclick="showSection('revenue')" id="sidebarRevenue">
+          <i class="fas fa-chart-line"></i><span>Revenue</span>
+        </button>
+      </div>
+
+
+
+ <div class="nav-item">
+                <button class="nav-link" onclick="showSection('schedule')" id="sidebarSchedule">
+                    <i class="fas fa-calendar-alt"></i><span>Schedule</span>
+                </button>
+            </div>
+      
+
+            
+
+      <div class="nav-item">
+        <button class="nav-link" onclick="logout()" id="sidebarLogout">
+            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </button>
+    </div>
+     
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="toggle-sidebar" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1>Cashier Dashboard</h1>
+      </div>
+      <div class="user-info">
+      <span id="cashier-name">👤 Cashier: Loading...</span>
+        <span>|</span>
+        <span id="current-time"></span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="message" class="success"></div>
+      <div id="error" class="error"></div>
+
+  <!-- Notification Bar -->
+  <div id="successNotification" class="notification" style="display: none;">
+  </div>
+
+  <div id="deleteSuccessNotification" class="notification" style="display: none;">
+    </div>
+
+  <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+
+   <!-- Home Section -->
+    <div class="section active" id="homeSection">
+      <!-- Enhanced Carousel -->
+      <div class="carousel">
+        <div class="carousel-item active">
+          <img src="images/pho-nha-lam.jpg" alt="Phở Bò Thơm Ngon">
+          <div class="carousel-text">🍜 Phở Bò Thơm Ngon</div>
+        </div>
+        <div class="carousel-item">
+          <img src="images/42c930c5-2a1a-429c-a002-eb2c57d700f5.jpg" alt="Cơm Tấm Sườn Nướng">
+          <div class="carousel-text">🍖 Cơm Tấm Sườn Nướng</div>
+        </div>
+        <div class="carousel-item">
+          <img src="images/top-1-mon-sandwich-ngon-nhat-the-gioi-goi-ten-banh-my-viet-nam1710498007-182420240316092132.jpg" alt="Bánh Mì VN">
+          <div class="carousel-text">🥖 Bánh Mì Việt Nam</div>
+        </div>
+        <div class="carousel-item">
+          <img src="images/bunbohue.jpg" alt="Bún Bò Huế">
+          <div class="carousel-text">🌶️ Bún Bò Huế</div>
+        </div>
+        <button class="carousel-arrow prev" onclick="prevSlide()">‹</button>
+        <button class="carousel-arrow next" onclick="nextSlide()">›</button>
+        <div class="carousel-nav">
+          <div class="nav-dot active" onclick="currentSlide(1)"></div>
+          <div class="nav-dot" onclick="currentSlide(2)"></div>
+          <div class="nav-dot" onclick="currentSlide(3)"></div>
+          <div class="nav-dot" onclick="currentSlide(4)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Section -->
+    <div class="section" id="transactionsSection">
+    <div class="form-container">
+        <div class="form-header">
+            <h1>Transactions Today</h1>
+            <p>Hiển thị giao dịch của ngày hôm nay: <span id="currentDate"></span></p>
+        </div>
+    </div>
+
+    <!-- Filter and Search Row -->
+    <div class="filter-search-row">
+        <!-- Filter Section -->
+        <div class="filter-container" id="filterContainer">
+            <div class="filter-buttons-row">
+                <button class="filter-btn" id="statusFilterBtn" onclick="showFilterMenu('status')">Lọc Theo Trạng Thái</button>
+                <button class="filter-btn" id="priceFilterBtn" onclick="showPriceFilter()">Lọc Theo Giá</button>
+                <button class="filter-btn" id="sortPriceBtn" onclick="showFilterMenu('sortPrice')">Sắp xếp Theo Giá</button>
+                <button class="filter-btn" id="methodFilterBtn" onclick="showFilterMenu('method')">Lọc Theo Phương Thức</button>
+            </div>
+            <div class="filter-menu" id="statusFilterMenu" style="display: none;">
+                <div class="filter-item" onclick="applyFilter('status', 'all')">Tất cả</div>
+                <div class="filter-item" onclick="applyFilter('status', 'PENDING')">Đang chờ</div>
+                <div class="filter-item" onclick="applyFilter('status', 'CANCELLED')">Đã hủy</div>
+                <div class="filter-item" onclick="applyFilter('status', 'PAID')">Đã thanh toán</div>
+            </div>
+            <div class="filter-menu" id="priceFilterMenu" style="display: none; width: 250px; padding: 10px;">
+                <div class="price-range">
+                    <label for="priceRange">Mức giá: <span id="priceRangeValue">0 - 1.200.000</span> VNĐ</label>
+                    <input type="range" id="priceRange" min="0" max="1200000" step="10000" value="0" oninput="updatePriceRange()">
+                    <input type="range" id="priceRangeMax" min="0" max="1200000" step="10000" value="1200000" oninput="updatePriceRange()">
+                    <div id="priceRangeDisplay">0 - 1.200.000 VNĐ</div>
+                    <button class="apply-btn" onclick="applyPriceFilter()">Áp dụng</button>
+                </div>
+                <div class="price-options">
+                    <div class="filter-item" onclick="applyPriceFilter(null)">Lọc Tất cả</div>
+                    <div class="filter-item" onclick="applyPriceFilter('0-5000000')">Dưới 5 triệu</div>
+                    <div class="filter-item" onclick="applyPriceFilter('0-7000000')">Dưới 7 triệu</div>
+                    <div class="filter-item" onclick="applyPriceFilter('1000000-2000000')">1 đến 2 triệu</div>
+                    <div class="filter-item" onclick="applyPriceFilter('1000000-3000000')">1 đến 3 triệu</div>
+                    <div class="filter-item" onclick="applyPriceFilter('0-1000000')">Dưới 1 triệu</div>
+                    <div class="filter-item" onclick="applyPriceFilter('0-200000')">Từ 0-200k</div>
+                    <div class="filter-item" onclick="applyPriceFilter('200000-500000')">Từ 200-500k</div>
+                    <div class="filter-item" onclick="applyPriceFilter('500000-1000000')">Từ 500-1000k</div>
+                    <div class="filter-item" onclick="applyPriceFilter('7000000-12000000')">Trên 7 triệu</div>
+                </div>
+                <button class="close-btn" onclick="hidePriceFilter()">Thu gọn</button>
+            </div>
+            <div class="filter-menu" id="sortPriceFilterMenu" style="display: none;">
+                <div class="filter-item" onclick="applySortFilter('price', null)">Tất cả</div>
+                <div class="filter-item" onclick="applySortFilter('price', 'asc')">Giá tăng dần</div>
+                <div class="filter-item" onclick="applySortFilter('price', 'desc')">Giá giảm dần</div>
+            </div>
+            <div class="filter-menu" id="methodFilterMenu" style="display: none;">
+                <div class="filter-item" onclick="applyFilter('method', null)">Tất cả</div>
+                <div class="filter-item" onclick="applyFilter('method', 'VNPAY')">VNPAY</div>
+                <div class="filter-item" onclick="applyFilter('method', 'CASH')">CASH</div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-container" id="searchContainer">
+            <div class="input-wrapper">
+                <input type="text" id="searchTransactionInput" class="form-input" 
+                       placeholder="Nhập Order ID, Transaction ID..." autocomplete="off">
+                <div id="suggestionBox" class="suggestion-box" style="display: none;"></div>
+            </div>
+            <div class="search-buttons">
+                <button type="button" id="searchTransactionBtn" class="submit-btn">Tìm Kiếm</button>
+                <button type="button" id="reloadSearchBtn" class="submit-btn reload-btn">Tải Lại</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="transactionsResult">
+        <table id="transactionsTable">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Transaction ID</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="transactionsBody"></tbody>
+        </table>
+        <div id="transactionCount" style="margin-top: 10px;"></div>
+    </div>
+
+    <!-- Invoice Section -->
+    <div id="invoice" class="invoice" style="display: none;">
+        <div class="invoice-header">
+            <h3>HÓA ĐƠN THANH TOÁN</h3>
+            <div class="invoice-subtitle">FoodHub Restaurant</div>
+        </div>
+        
+        <div class="invoice-main">
+            <div class="invoice-info">
+                <p><strong>🆔 Số HĐ:</strong> <span id="invoiceId"></span></p>
+                <p><strong>📅 Ngày:</strong> <span id="paymentDate"></span></p>
+                <p><strong>🍽️ Bàn:</strong> <span id="tableNumber"></span></p>
+                <p><strong>👤 Khách:</strong> <span id="customerName"></span></p>
+                <p><strong>📧 Email:</strong> <span id="displayCustomerEmail"></span></p>
+                <p><strong>🔗 Mã GD:</strong> <span id="transactionId"></span></p>
+            </div>
+            <div class="invoice-table-wrapper">
+                <table id="invoiceTable">
+                    <thead>
+                        <tr>
+                            <th>🍽️ Tên món</th>
+                            <th>📊 S.L</th>
+                            <th>💰 Đơn giá</th>
+                            <th>💵 Tổng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceItems"></tbody>
+                </table>
+            </div>
+            <div class="invoice-summary">
+                <div class="invoice-total">
+                    <span>💰 TỔNG CỘNG:</span>
+                    <span id="totalAmount"></span>
+                </div>
+                <div class="invoice-details">
+                    <div class="invoice-detail-item">
+                        <strong>💳 Phương thức:</strong>
+                        <span class="payment-badge" id="paymentMethodDisplay"></span>
+                    </div>
+                    <div class="invoice-detail-item">
+                        <strong>📊 Trạng thái:</strong>
+                        <span class="status-badge status-success" id="status"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="invoice-footer">
+            <strong>🍴 FoodHub Restaurant</strong><br>
+            Chuyên món lẩu và nướng<br>
+            📞 Hotline: 1900-1234 | 🌐 www.foodhub.vn<br>
+            <em>Cảm ơn quý khách!</em>
+        </div>
+    </div>
+</div>
+
+  <!-- Revenue Section -->
+ <!-- Revenue Section -->
+<div class="section" id="revenueSection">
+  <div class="form-container">
+    <div class="form-header">
+      <h1>Revenue Analysis</h1>
+      <p>Hiển thị doanh thu của ngày hôm nay: <span id="revenueCurrentDate"></span></p>
+    </div>
+  </div>
+  <div id="revenueResult">
+    <div class="chart-container">
+      <canvas id="dailyRevenueChart"></canvas>
+    </div>
+    <div class="revenue-stats-container">
+      <div class="revenue-stats-row">
+        <!-- Hàng 1: 3 thẻ -->
+      </div>
+      <div class="revenue-stats-row">
+        <!-- Hàng 2: 3 thẻ -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Schedule Section -->
+<div class="section" id="scheduleSection">
+  <div class="form-container">
+    <div class="form-header">
+      <h1>Lịch Ca Làm Việc</h1>
+      <p>Quản lý ca làm việc nhàn hàng</p>
+    </div>
+    <div class="filter-search-row">
+      <div class="filter-container">
+        <button class="filter-btn" id="prevWeekBtn" onclick="changeWeek(-1)">Tuần trước</button>
+        <span id="scheduleWeekRange"></span>
+        <button class="filter-btn" id="nextWeekBtn" onclick="changeWeek(1)">Tuần sau</button>
+      </div>
+    </div>
+  </div>
+  <div id="scheduleResult">
+    <table id="scheduleTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Thứ Hai</th>
+          <th>Thứ Ba</th>
+          <th>Thứ Tư</th>
+          <th>Thứ Năm</th>
+          <th>Thứ Sáu</th>
+          <th>Thứ Bảy</th>
+          <th>Chủ Nhật</th>
+        </tr>
+      </thead>
+      <tbody id="scheduleBody">
+        <tr>
+          <td>Ngày</td>
+          <td id="monDate"></td>
+          <td id="tueDate"></td>
+          <td id="wedDate"></td>
+          <td id="thuDate"></td>
+          <td id="friDate"></td>
+          <td id="satDate"></td>
+          <td id="sunDate"></td>
+        </tr>
+        <tr>
+          <td>Ca làm việc</td>
+          <td id="monShift"></td>
+          <td id="tueShift"></td>
+          <td id="wedShift"></td>
+          <td id="thuShift"></td>
+          <td id="friShift"></td>
+          <td id="satShift"></td>
+          <td id="sunShift"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="scheduleMessage" style="margin-top: 10px;"></div>
+  </div>
+</div>
+
+</div>
+
+
+<!-- biểu đồ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- // Thư viện Font Awesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- // Thư viện html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment-timezone-with-data-10-years.min.js"></script>
+<script src="js/notification.js"></script>
+<script src="js/revenue2.js"></script>
+<script src="js/transaction.js"></script>
+<script src="js/util.js"></script>
+<script src="js/workSchedule.js"></script>
+
+  <script>
+    
+      const API_BASE_URL = 'http://localhost:8080';
+
+//=================================================================================
+
+async function clearData() {
+    try {
+        console.log('Calling clearData API...');
+        const response = await fetch(`${API_BASE_URL}/auth/admin/clear-data`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        const data = await response.json();
+        console.log('Clear data response:', data);
+        if (data.result === 'clearToken') {
+            console.log('Removing token from localStorage...');
+            localStorage.removeItem('accessToken');
+            console.log('Reloading page...');
+            window.location.reload();
+        } else {
+            console.error('No clearToken action in response');
+        }
+    } catch (err) {
+        console.error('Error clearing data:', err.message);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+
+    // Thiết lập tên nhân viên thu ngân
+    const token = getToken();
+    const cashierNameElement = document.getElementById('cashier-name');
+    console.log('cashierNameElement:', cashierNameElement);
+
+    if (token && cashierNameElement) {
+        const payload = parseJwt(token);
+        if (payload && (payload.sub || payload.email)) {
+            cashierNameElement.innerText = `👤 Cashier: ${payload.sub || payload.email}`;
+            console.log('Email set to:', payload.sub || payload.email);
+        } else {
+            cashierNameElement.innerText = '👤 Cashier: Unknown';
+            console.error('No email found in token payload or invalid token');
+        }
+    } else {
+        if (!token) console.error('No token found in localStorage');
+        if (!cashierNameElement) console.error('Element with id "cashier-name" not found');
+        if (cashierNameElement) cashierNameElement.innerText = '👤 Cashier: Unknown';
+    }
+
+    // Gắn sự kiện cho nút clearData
+    document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
+
+    // Gắn sự kiện cho tìm kiếm giao dịch
+    const searchInput = document.getElementById('searchTransactionInput');
+    const searchButton = document.getElementById('searchTransactionBtn');
+    const reloadSearchBtn = document.getElementById('reloadSearchBtn');
+
+    console.log('searchInput:', searchInput);
+    console.log('searchButton:', searchButton);
+    console.log('reloadSearchBtn:', reloadSearchBtn);
+
+    if (searchInput && searchButton && reloadSearchBtn) {
+        console.log('Elements found, attaching events');
+
+        // Debounce cho cả gợi ý và tìm kiếm
+        const debouncedSearch = debounce(async () => {
+            await fetchSuggestions(); // Hiển thị gợi ý
+            await searchTransactions(); // Lọc và hiển thị bảng giao dịch
+        }, 300);
+
+        // Gắn sự kiện input
+        searchInput.addEventListener('input', debouncedSearch);
+
+        // Sự kiện Enter
+        searchInput.addEventListener('keypress', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                console.log('Enter key pressed, calling searchTransactions');
+                await searchTransactions(event);
+            }
+        });
+
+        // Sự kiện nút tìm kiếm
+        searchButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+            console.log('Search button clicked, calling searchTransactions');
+            await searchTransactions(event);
+        });
+
+        // Sự kiện reload
+        reloadSearchBtn.addEventListener('click', async () => {
+            console.log('Reload button clicked, resetting search');
+            await reloadSearch();
+        });
+    } else {
+        console.error('Error: One or more elements not found');
+        if (!searchInput) console.error('searchTransactionInput not found in DOM');
+        if (!searchButton) console.error('searchTransactionBtn not found in DOM');
+        if (!reloadSearchBtn) console.error('reloadSearchBtn not found in DOM');
+        console.log('Full DOM:', document.body.innerHTML); // Log để debug
+    }
+
+    // Ẩn gợi ý khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        const suggestionBox = document.getElementById('suggestionBox');
+        const inputWrapper = document.querySelector('.search-container .input-wrapper');
+        if (suggestionBox && inputWrapper && !inputWrapper.contains(e.target)) {
+            suggestionBox.style.display = 'none';
+        }
+    });
+});
+
+
+     function showSection(sectionId) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => section.classList.remove('active'));
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    const sidebarLink = document.getElementById(`sidebar${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
+    if (sidebarLink) sidebarLink.classList.add('active');
+    document.getElementById(`${sectionId}Section`).classList.add('active');
+    
+    // Gắn sự kiện khi section transactions được hiển thị
+    if (sectionId === 'transactions') {
+        const searchInput = document.getElementById('searchTransactionInput');
+        const searchButton = document.getElementById('searchTransactionBtn');
+        const reloadSearchBtn = document.getElementById('reloadSearchBtn');
+
+        if (searchInput && searchButton && reloadSearchBtn) {
+            console.log('Attaching events to searchInput, searchButton, and reloadSearchBtn');
+            searchInput.addEventListener('keypress', async (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    console.log('Enter key pressed, calling searchTransactions');
+                    await searchTransactions(event);
+                }
+            });
+            searchButton.addEventListener('click', async (event) => {
+                event.preventDefault();
+                console.log('Search button clicked, calling searchTransactions');
+                await searchTransactions(event);
+            });
+            reloadSearchBtn.addEventListener('click', async () => {
+                console.log('Reload button clicked, resetting search');
+                await reloadSearch();
+            });
+        } else {
+            console.error('Error: One or more elements not found in transactions section');
+            if (!searchInput) console.error('searchTransactionInput not found in DOM');
+            if (!searchButton) console.error('searchTransactionBtn not found in DOM');
+            if (!reloadSearchBtn) console.error('reloadSearchBtn not found in DOM');
+        }
+    }
+
+    if (sectionId === 'revenue') {
+        refreshRevenue();
+    } else if (sectionId === 'transactions') {
+        refreshTransactions();
+    }
+}
+
+
+
+
+
+//==================================================================================//==================================================================================
+     
+  
+
+      // Chuyển đổi trạng thái sidebar
+      function toggleSidebar() {
+          const sidebar = document.getElementById('sidebar');
+          const mainContent = document.getElementById('mainContent');
+          sidebar.classList.toggle('collapsed');
+          mainContent.classList.toggle('expanded');
+      }
+
+      // Tạo hiệu ứng particle động
+      function createParticles() {
+          for (let i = 0; i < 20; i++) {
+              const particle = document.createElement('div');
+              particle.className = 'particle';
+              particle.style.left = Math.random() * 100 + '%';
+              particle.style.animationDelay = Math.random() * 6 + 's';
+              particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+              document.body.appendChild(particle);
+          }
+      }
+      createParticles();
+
+      // Xử lý carousel
+      let currentSlideIndex = 0;
+      const slides = document.querySelectorAll('.carousel-item');
+      const dots = document.querySelectorAll('.nav-dot');
+      const totalSlides = slides.length;
+
+      function showSlide(index) {
+          slides.forEach(slide => slide.classList.remove('active'));
+          dots.forEach(dot => dot.classList.remove('active'));
+          slides[index].classList.add('active');
+          dots[index].classList.add('active');
+      }
+
+      function nextSlide() {
+          currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+          showSlide(currentSlideIndex);
+      }
+
+      function prevSlide() {
+          currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+          showSlide(currentSlideIndex);
+      }
+
+      function currentSlide(n) {
+          currentSlideIndex = n - 1;
+          showSlide(currentSlideIndex);
+      }
+
+      let autoSlideInterval = setInterval(nextSlide, 5000);
+      const carousel = document.querySelector('.carousel');
+      carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+      carousel.addEventListener('mouseleave', () => autoSlideInterval = setInterval(nextSlide, 5000));
+      document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevSlide();
+          else if (e.key === 'ArrowRight') nextSlide();
+      });
+
+      let touchStartX = 0;
+      let touchEndX = 0;
+      carousel.addEventListener('touchstart', (e) => touchStartX = e.changedTouches[0].screenX);
+      carousel.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+      });
+
+      function handleSwipe() {
+          if (touchEndX < touchStartX - 50) nextSlide();
+          if (touchEndX > touchStartX + 50) prevSlide();
+      }
+
+
+
+//==================================================================================//==================================================================================
+    
+
+//==================================================================================//==================================================================================
+
+
+
+
+
+
+
+
+//==================================================================================
+
+
+
+
+    // ===============================================================================
+     async function logout() {
+  const confirmLogout = confirm('Bạn có chắc muốn đăng xuất không?');
+  if (!confirmLogout) {
+    return; // Ở lại cashier.html nếu nhấn Cancel
+  }
+
+  const token = getToken();
+  const loginUrl = '../../home-page/html/login.html';
+
+  // Xóa accessToken trước để đảm bảo logout an toàn
+  localStorage.removeItem('accessToken');
+
+  try {
+    if (token) {
+      console.log('Sending logout request with token:', token);
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token })
+      });
+      if (!response.ok) {
+        throw new Error(`Lỗi khi gọi API logout: ${response.status} ${response.statusText}`);
+      }
+      console.log('Logout API called successfully:', await response.text());
+    } else {
+      console.warn('No token found, skipping API call');
+    }
+    // Thay thế lịch sử để xóa cashier.html
+    window.history.replaceState({ redirect: 'login' }, '', loginUrl);
+    window.location.href = loginUrl;
+  } catch (err) {
+    console.error('Lỗi khi đăng xuất:', err);
+    // Thay thế lịch sử ngay cả khi API thất bại
+    window.history.replaceState({ redirect: 'login' }, '', loginUrl);
+    window.location.href = loginUrl;
+  }
+}
+
+
+
+
+
+          // Lấy token từ localStorage
+      function getToken() {
+          return localStorage.getItem('accessToken') || '';
+      }
+    // ===============================================================================
+
+
+      
+    // ===============================================================================
+
+
+
+//==================================================================================
+
+
+
+
+
+
+
+
+      
+  </script>
+
+  </body>
+  </html>
