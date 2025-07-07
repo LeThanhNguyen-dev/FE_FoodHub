@@ -1370,18 +1370,36 @@ function updatePagination() {
 function showErrorState(errorMessage) {
     const ordersGrid = document.getElementById('ordersGrid');
     if (ordersGrid) {
-        ordersGrid.innerHTML = `
-            <div class="text-center text-danger">
-                <i class="fas fa-exclamation-triangle mb-2"></i>
-                <div>Lỗi tải dữ liệu đơn hàng</div>
-                <small>${errorMessage}</small>
-                <div class="mt-2">
-                    <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">
-                        <i class="fas fa-refresh"></i> Thử lại
-                    </button>
+        // Kiểm tra nếu không có lịch làm việc
+        if (!hasWorkSchedule) {
+            ordersGrid.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">Hiện tại bạn không đang trong ca làm việc</h5>
+                        <p class="text-muted mb-4">
+                            Bạn không thể xem đơn hàng khi không có ca làm việc được phân công.
+                        </p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        } else {
+            // Hiển thị lỗi bình thường khi có lịch làm việc
+            ordersGrid.innerHTML = `
+                <div class="text-center text-danger">
+                    <i class="fas fa-exclamation-triangle mb-2"></i>
+                    <div>Lỗi tải dữ liệu đơn hàng</div>
+                    <small>${errorMessage}</small>
+                    <div class="mt-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">
+                            <i class="fas fa-refresh"></i> Thử lại
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
     }
 }
 
@@ -1408,10 +1426,6 @@ async function showOrders() {
     document.getElementById('dashboardContent').style.display = 'none';
     document.getElementById('dynamicContent').style.display = 'block';
     document.getElementById('errorMessage').style.display = 'none';
-    const noWorkScheduleMsg = document.getElementById('noWorkScheduleMessage');
-    if (noWorkScheduleMsg) {
-        noWorkScheduleMsg.style.display = 'none';
-    }
 
     // Update active navigation
     updateActiveNav('orders');

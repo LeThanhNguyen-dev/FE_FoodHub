@@ -186,29 +186,6 @@
         </div>
       </div>
     </div>
-    <!-- No Work Schedule Message -->
-    <div id="noWorkScheduleMessage" style="display: none; text-align: center; padding: 50px;">
-      <div class="alert alert-warning" role="alert" style="max-width: 600px; margin: 0 auto;">
-        <i class="fas fa-calendar-times"
-          style="font-size: 3rem; color: #856404; margin-bottom: 1rem; display: block;"></i>
-        <h4 class="alert-heading">Không có ca làm việc hôm nay</h4>
-        <p class="mb-3">Hệ thống không tìm thấy lịch làm việc của bạn cho ngày hôm nay. Điều này có thể do:</p>
-        <ul class="text-start mb-3" style="display: inline-block;">
-          <li>Bạn không được phân công ca làm việc hôm nay</li>
-          <li>Lịch làm việc chưa được cập nhật</li>
-          <li>Có lỗi trong hệ thống phân công</li>
-        </ul>
-        <hr>
-        <div class="d-flex gap-2 justify-content-center">
-          <button class="btn btn-outline-primary" onclick="loadWorkSchedule()">
-            <i class="fas fa-refresh me-2"></i>Thử lại
-          </button>
-          <button class="btn btn-primary" onclick="contactManager()">
-            <i class="fas fa-phone me-2"></i>Liên hệ quản lý
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- Error Message -->
     <div id="errorMessage" style="display: none; text-align: center; padding: 50px;">
@@ -225,9 +202,6 @@
       <!-- Content will be loaded here dynamically -->
     </div>
   </div>
-
-
-
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -313,14 +287,6 @@
 
     // Function to handle navigation clicks
     function handleNavClick(section) {
-      // Check if user has work schedule
-      if (!hasWorkSchedule) {
-        // Show no work schedule message for any navigation attempt
-        showNoWorkScheduleMessage();
-        return;
-      }
-
-      // If has work schedule, proceed with normal navigation
       switch (section) {
         case 'dashboard':
           showDashboard();
@@ -345,54 +311,51 @@
           currentWorkSchedule = data.result;
           hasWorkSchedule = true;
           displayWorkSchedule(data.result);
-          showDashboard();
           initializeWebSocket(currentWorkSchedule);
         } else {
-          throw new Error(data.message || 'Invalid response format');
+          // Không có lịch làm việc - hiển thị thông báo trong welcome-section
+          hasWorkSchedule = false;
+          displayNoWorkSchedule();
         }
+
+        // Luôn hiển thị dashboard
+        showDashboard();
+
+        // Khởi tạo dashboard orders với trạng thái đúng
         if (document.getElementById('dashboardOrdersSection')) {
-          console.log('init order');
+          console.log('init order with hasWorkSchedule:', hasWorkSchedule);
           initDashboardOrders();
         }
       } catch (error) {
         console.error('Error loading work schedule:', error);
-        handleWorkScheduleError(error);
+        if (document.getElementById('dashboardOrdersSection')) {
+          console.log("start init dashboard order");
+          initDashboardOrders();
+        }
+        hasWorkSchedule = false;
+        displayNoWorkSchedule();
+        showDashboard();
       }
+    }
+
+
+    function displayNoWorkSchedule() {
+      // Hiển thị thông báo không có ca làm việc trong welcome-section
+      document.getElementById('shiftDate').innerHTML =
+        `<i class="fas fa-calendar me-2"></i>Ngày: ${new Date().toLocaleDateString('vi-VN')}`;
+
+      document.getElementById('shiftTime').innerHTML =
+        `<i class="fas fa-clock me-2"></i>Ca làm: Không có ca hôm nay`;
+
+      document.getElementById('shiftType').innerHTML =
+        `<i class="fas fa-info-circle me-2"></i>Trạng thái: Không được phân ca`;
     }
 
     // Function to handle work schedule errors
     function handleWorkScheduleError(error) {
       hasWorkSchedule = false;
-
-      // Check if error message contains work schedule not found
-      const errorMessage = error.message || '';
-
-      if (errorMessage.includes('Work schedule not found') ||
-        errorMessage.includes('1041') ||
-        errorMessage.includes('404')) {
-        showNoWorkScheduleMessage();
-      } else {
-        showError(errorMessage);
-      }
-    }
-
-    // Function to show no work schedule message
-    function showNoWorkScheduleMessage() {
-      document.getElementById('dashboardContent').style.display = 'none';
-      document.getElementById('errorMessage').style.display = 'none';
-      document.getElementById('noWorkScheduleMessage').style.display = 'block';
-      document.getElementById('dynamicContent').style.display = 'none';
-
-      // Update page title based on current attempted navigation
-      document.getElementById('pageTitle').textContent = 'Thông báo - Không có ca làm việc';
-
-      // Ensure user name is displayed even without work schedule
-      if (currentUserInfo) {
-        document.getElementById('chefName').textContent = currentUserInfo.username || 'Chef';
-      }
-
-      // Update active nav state
-      updateActiveNav('dashboard');
+      displayNoWorkSchedule();
+      showDashboard(); // Vẫn hiển thị dashboard
     }
 
     // Function to update active navigation
@@ -539,11 +502,6 @@
     }
 
     function showDashboard() {
-      if (!hasWorkSchedule) {
-        showNoWorkScheduleMessage();
-        return;
-      }
-
       // Update page title
       document.getElementById('pageTitle').textContent = 'Dashboard - Ca Làm Việc';
 
@@ -551,41 +509,18 @@
       document.getElementById('dashboardContent').style.display = 'block';
       document.getElementById('dynamicContent').style.display = 'none';
       document.getElementById('errorMessage').style.display = 'none';
-      document.getElementById('noWorkScheduleMessage').style.display = 'none';
 
       // Update active navigation
       updateActiveNav('dashboard');
     }
 
-
-
     // Placeholder functions for other navigation items
     function showOrders() {
-      if (!hasWorkSchedule) {
-        showNoWorkScheduleMessage();
-        return;
-      }
-      // Implementation for orders view
       console.log('Show orders');
       updateActiveNav('orders');
     }
 
-    function showTables() {
-      if (!hasWorkSchedule) {
-        showNoWorkScheduleMessage();
-        return;
-      }
-      // Implementation for tables view
-      console.log('Show tables');
-      updateActiveNav('tables');
-    }
-
     function showReports() {
-      if (!hasWorkSchedule) {
-        showNoWorkScheduleMessage();
-        return;
-      }
-      // Implementation for reports view
       console.log('Show reports');
       updateActiveNav('reports');
     }
@@ -912,13 +847,25 @@
     }
 
     function initDashboardOrders() {
-      loadDashboardOrders();
+      // Kiểm tra trạng thái lịch làm việc trước khi load orders
+      console.log("initDashboardOrders - hasWorkSchedule:", hasWorkSchedule);
+      if (!hasWorkSchedule) {
+        showDashboardNoWorkSchedule();
+      } else {
+        loadDashboardOrders();
+      }
     }
-
 
     // Load orders for dashboard (recent orders only)
     async function loadDashboardOrders() {
       try {
+        // Kiểm tra nếu không có lịch làm việc
+        if (!hasWorkSchedule) {
+          console.log("loadDashboardOrders - hasWorkSchedule:", hasWorkSchedule);
+          showDashboardNoWorkSchedule();
+          return;
+        }
+
         showDashboardLoading();
 
         // Build query parameters for recent orders
@@ -945,9 +892,6 @@
 
         if (typeof updateStats === 'function') updateStats();
 
-        // THÊM: Hoặc có thể load full stats nếu muốn độ chính xác cao hơn
-        // await loadFullOrdersStats();
-
       } catch (error) {
         console.error('Error loading dashboard orders:', error);
         showDashboardError(error.message);
@@ -955,6 +899,32 @@
     }
 
 
+    function showDashboardNoWorkSchedule() {
+      console.log("in showDashboardNoWorkSchedule");
+      const loadingElement = document.getElementById('dashboardOrdersLoading');
+      const contentElement = document.getElementById('dashboardOrdersContent');
+      const emptyElement = document.getElementById('dashboardOrdersEmpty');
+
+      // Hide loading and content
+      if (loadingElement) {
+        loadingElement.style.display = 'none';
+      }
+      if (contentElement) {
+        contentElement.style.display = 'none';
+      }
+
+      // Show no work schedule message
+      if (emptyElement) {
+        emptyElement.innerHTML = `
+      <div class="text-center py-4">
+        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+        <h6 class="text-muted">Hiện tại không có ca làm</h6>
+        <p class="text-muted small">Đơn hàng sẽ hiển thị khi bạn có ca làm việc</p>
+      </div>
+    `;
+        emptyElement.style.display = 'block';
+      }
+    }
 
     // Render orders in dashboard
     function renderDashboardOrders(orders) {

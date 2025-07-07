@@ -1,15 +1,10 @@
 // Function to show reports section
 async function showReports() {
-    if (!hasWorkSchedule) {
-        showNoWorkScheduleMessage();
-        return;
-    }
 
     document.getElementById('pageTitle').textContent = 'Báo cáo ca làm việc';
     document.getElementById('dashboardContent').style.display = 'none';
     document.getElementById('dynamicContent').style.display = 'block';
     document.getElementById('errorMessage').style.display = 'none';
-    document.getElementById('noWorkScheduleMessage').style.display = 'none';
 
     updateActiveNav('reports');
 
