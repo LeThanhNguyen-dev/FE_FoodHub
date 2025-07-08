@@ -84,6 +84,18 @@
                             </select>
                         </div>
                         <div class="col-md-3">
+                            <label for="statusFilter" class="form-label fw-bold">Trạng thái</label>
+                            <select id="statusFilter" class="form-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="PENDING">Chờ xử lý</option>
+                                <option value="CONFIRMED">Đã xác nhận</option>
+                                <option value="PREPARING">Đang chuẩn bị</option>
+                                <option value="READY">Sẵn sàng</option>
+                                <option value="COMPLETED">Hoàn thành</option>
+                                <option value="CANCELLED">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <label for="minPrice" class="form-label fw-bold">Tổng tiền từ</label>
                             <input type="number" id="minPrice" class="form-control" placeholder="Tổng tiền từ">
                         </div>
@@ -117,24 +129,24 @@
                     <!-- Order Table -->
                     <div id="orderTable" class="table-responsive">
                         <table class="table table-hover align-middle">
-                           <thead>
-    <tr>
-        <th style="width: 60px;">STT</th>
-        <th onclick="sortTable('id')" style="cursor: pointer;">
-            Mã <span id="sort-id" class="sort-arrow"></span>
-        </th>
-        <th onclick="sortTable('createdAt')" style="cursor: pointer;">
-            Ngày đặt <span id="sort-createdAt" class="sort-arrow"></span>
-        </th>
-        <th>Khách hàng</th>
-        <th onclick="sortTable('totalAmount')" style="cursor: pointer;">
-            Tổng tiền <span id="sort-totalAmount" class="sort-arrow"></span>
-        </th>
-        <th>Loại đơn</th>
-        <th>Thanh toán</th>
-        <th style="width: 150px;">Thao tác</th>
-    </tr>
-</thead>
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">STT</th>
+                                    <th onclick="sortTable('id')" style="cursor: pointer;">
+                                        Mã <span id="sort-id" class="sort-arrow"></span>
+                                    </th>
+                                    <th onclick="sortTable('createdAt')" style="cursor: pointer;">
+                                        Ngày đặt <span id="sort-createdAt" class="sort-arrow"></span>
+                                    </th>
+                                    <th>Khách hàng</th>
+                                    <th onclick="sortTable('totalAmount')" style="cursor: pointer;">
+                                        Tổng tiền <span id="sort-totalAmount" class="sort-arrow"></span>
+                                    </th>
+                                    <th>Loại đơn</th>
+                                    <th>Thanh toán</th>
+                                    <th style="width: 150px;">Thao tác</th>
+                                </tr>
+                            </thead>
                             <tbody id="orderTableBody">
                                 <!-- Data will be loaded here -->
                             </tbody>
@@ -203,7 +215,7 @@
     <!-- Custom JS -->
     <script src="/js/fetch-api.js"></script>
     <script src="../../js/sidebar.js"></script>
-     <script src="../../js/topbar.js"></script>
+    <script src="../../js/topbar.js"></script>
     <script>
         let summaryChart;
         let currentPage = 0;
@@ -269,61 +281,63 @@
             }).replace(/\//g, '/');
         }
 
-       function formatPaymentMethod(method) {
-    // Kiểm tra null/undefined hoặc giá trị rỗng
-    if (!method || method.trim() === '') {
-        return 'Chưa xác định';
-    }
-    
-    // Xử lý các phương thức thanh toán
-    switch (method.toUpperCase()) {
-        case 'CASH': 
-            return 'CASH';
-        case 'CARD': 
-            return 'Thẻ';
-        case 'BANKING': 
-            return 'BANKING';
-        case 'VNPAY': 
-            return 'VNPAY';
-        case 'QR_CODE': 
-            return 'QR Code';
-        default: 
-            return method; // Trả về giá trị gốc nếu không khớp với case nào
-    }
-}
+        function formatPaymentMethod(method) {
+            if (!method || method.trim() === '') {
+                return 'Chưa xác định';
+            }
+            switch (method.toUpperCase()) {
+                case 'CASH': return 'CASH';
+                case 'CARD': return 'Thẻ';
+                case 'BANKING': return 'BANKING';
+                case 'VNPAY': return 'VNPAY';
+                case 'QR_CODE': return 'QR Code';
+                default: return method;
+            }
+        }
+
+        function formatStatus(status) {
+            if (!status || status.trim() === '') {
+                return 'Chưa xác định';
+            }
+            switch (status.toUpperCase()) {
+                case 'PENDING': return 'Chờ xử lý';
+                case 'CONFIRMED': return 'Đã xác nhận';
+                case 'PREPARING': return 'Đang chuẩn bị';
+                case 'READY': return 'Sẵn sàng';
+                case 'COMPLETED': return 'Hoàn thành';
+                case 'CANCELLED': return 'Đã hủy';
+                default: return status;
+            }
+        }
 
         function getQueryParams() {
             const period = document.getElementById('period').value;
             let params = `page=${currentPage}&size=${pageSize}&orderBy=${sortBy}&sort=${sortDirection}`;
             
-           if (period === 'custom') {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        
-        if (!startDate || !endDate) {
-            showNotification('Vui lòng chọn ngày bắt đầu và kết thúc.', 'error');
-            return null;
-        }
-        
-        const startDateObj = new Date(startDate);
-        const endDateObj = new Date(endDate);
-        
-        if (startDateObj > endDateObj) {
-            showNotification('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.', 'error');
-            return null;
-        }
-        
-        // SỬA: Đổi từ period=custom thành period=specific và format UTC
-        const startISO = `${startDate}T00:00:00Z`;
-        const endISO = `${endDate}T23:59:59Z`;
-        
-        console.log('startISO:', startISO);
-        console.log('endISO:', endISO);
-        
-        params += `&period=specific&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
-    } else {
-        params += `&period=${period}`;
-    }
+            if (period === 'custom') {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                if (!startDate || !endDate) {
+                    showNotification('Vui lòng chọn ngày bắt đầu và kết thúc.', 'error');
+                    return null;
+                }
+                
+                const startDateObj = new Date(startDate);
+                const endDateObj = new Date(endDate);
+                
+                if (startDateObj > endDateObj) {
+                    showNotification('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.', 'error');
+                    return null;
+                }
+                
+                const startISO = `${startDate}T00:00:00Z`;
+                const endISO = `${endDate}T23:59:59Z`;
+                
+                params += `&period=specific&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
+            } else {
+                params += `&period=${period}`;
+            }
             
             const search = document.getElementById('searchInput').value.trim();
             if (search) params += `&search=${encodeURIComponent(search)}`;
@@ -340,73 +354,74 @@
             const paymentMethod = document.getElementById('paymentMethodFilter').value;
             if (paymentMethod) params += `&paymentMethod=${encodeURIComponent(paymentMethod)}`;
             
+            const status = document.getElementById('statusFilter').value;
+            if (status) params += `&status=${encodeURIComponent(status)}`;
+            
             console.log('Final query params:', params);
             return params;
         }
+
         async function fetchTotalAmount() {
-    const params = getQueryParams();
-    if (!params) return 0;
-    
-    try {
-        // Gọi API với size rất lớn để lấy tất cả đơn hàng
-        const allOrdersParams = params.replace(`page=${currentPage}&size=${pageSize}`, 'page=0&size=10000');
-        const response = await apiFetch(`/orders/completed/filtered?${allOrdersParams}`);
-        
-        if (response.code === 0 && response.result.content) {
-            return response.result.content.reduce((total, order) => total + order.totalAmount, 0);
+            const params = getQueryParams();
+            if (!params) return 0;
+            
+            try {
+                const allOrdersParams = params.replace(`page=${currentPage}&size=${pageSize}`, 'page=0&size=10000');
+                const response = await apiFetch(`/orders/filtered?${allOrdersParams}`);
+                
+                if (response.code === 0 && response.result.content) {
+                    return response.result.content.reduce((total, order) => total + order.totalAmount, 0);
+                }
+                return 0;
+            } catch (error) {
+                console.error('Lỗi tính tổng tiền:', error);
+                return 0;
+            }
         }
-        return 0;
-    } catch (error) {
-        console.error('Lỗi tính tổng tiền:', error);
-        return 0;
-    }
-}
 
         async function fetchOrders() {
-    showLoading();
-    const params = getQueryParams();
-    if (!params) return;
+            showLoading();
+            const params = getQueryParams();
+            if (!params) return;
 
-    try {
-        // THÊM: Tính tổng tiền từ tất cả trang
-        const totalAmountPromise = fetchTotalAmount();
-        const ordersPromise = apiFetch(`/orders/completed/filtered?${params}`);
-        
-        const [totalAmount, response] = await Promise.all([totalAmountPromise, ordersPromise]);
-        totalAmountAllPages = totalAmount; // LUU TỔNG TIỀN
-        
-        hideLoading();
-        if (response.code === 0) {
-            const data = response.result;
-            renderOrderTable(data.content, data.totalElements);
-            renderPagination(data.totalPages, data.number);
-        } else {
-            showNotification(response.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
-            document.getElementById('emptyState').style.display = 'block';
-            document.getElementById('orderTableBody').innerHTML = '';
-        }
-    } catch (error) {
-        hideLoading();
-        showNotification(error.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
-        document.getElementById('emptyState').style.display = 'block';
-        document.getElementById('orderTableBody').innerHTML = '';
-    }
-}
-
-        function renderOrderTable(orders, totalElements = 0) {
-            const tbody = document.getElementById('orderTableBody');
-            
-            const orderTableCard = document.querySelector('.card:has(#orderTable)');
-            let totalOrdersElement = orderTableCard.querySelector('.total-orders-info');
-            
-            if (!totalOrdersElement) {
-                totalOrdersElement = document.createElement('div');
-                totalOrdersElement.className = 'total-orders-info alert alert-info mb-3';
-                orderTableCard.querySelector('.card-body').insertBefore(totalOrdersElement, orderTableCard.querySelector('#loadingSpinner'));
+            try {
+                const totalAmountPromise = fetchTotalAmount();
+                const ordersPromise = apiFetch(`/orders/filtered?${params}`);
+                
+                const [totalAmount, response] = await Promise.all([totalAmountPromise, ordersPromise]);
+                totalAmountAllPages = totalAmount;
+                
+                hideLoading();
+                if (response.code === 0) {
+                    const data = response.result;
+                    renderOrderTable(data.content, data.totalElements);
+                    renderPagination(data.totalPages, data.number);
+                } else {
+                    showNotification(response.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('orderTableBody').innerHTML = '';
+                }
+            } catch (error) {
+                hideLoading();
+                showNotification(error.message || 'Lỗi tải dữ liệu đơn hàng.', 'error');
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('orderTableBody').innerHTML = '';
             }
+        }
 
-            
-           totalOrdersElement.innerHTML = `
+       function renderOrderTable(orders, totalElements = 0) {
+    const tbody = document.getElementById('orderTableBody');
+    
+    const orderTableCard = document.querySelector('.card:has(#orderTable)');
+    let totalOrdersElement = orderTableCard.querySelector('.total-orders-info');
+    
+    if (!totalOrdersElement) {
+        totalOrdersElement = document.createElement('div');
+        totalOrdersElement.className = 'total-orders-info alert alert-info mb-3';
+        orderTableCard.querySelector('.card-body').insertBefore(totalOrdersElement, orderTableCard.querySelector('#loadingSpinner'));
+    }
+
+    totalOrdersElement.innerHTML = `
         <div class="row">
             <div class="col-md-6">
                 <i class="fas fa-shopping-cart me-2"></i>
@@ -414,22 +429,22 @@
             </div>
             <div class="col-md-6">
                 <i class="fas fa-money-bill-wave me-2"></i>
-               <strong>Tổng tiền:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
-<i class="fas fa-exclamation-circle text-warning ms-1" 
-   data-bs-toggle="tooltip" 
-   data-bs-placement="top" 
-   title="Lưu ý: Doanh thu của cửa hàng được xác định dựa trên các giao dịch thanh toán thành công, nên có thể không hoàn toàn khớp với tổng tiền của các đơn hàng."
-   style="cursor: help;"></i>
+                <strong>Tổng tiền:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
+                <i class="fas fa-exclamation-circle text-warning ms-1" 
+                   data-bs-toggle="tooltip" 
+                   data-bs-placement="top" 
+                   title="Lưu ý: Doanh thu của cửa hàng được xác định dựa trên các giao dịch thanh toán thành công, nên có thể không hoàn toàn khớp với tổng tiền của các đơn hàng."
+                   style="cursor: help;"></i>
             </div>
         </div>
     `;
-    // Khởi tạo tooltip
-setTimeout(() => {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-}, 100);
+
+    setTimeout(() => {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }, 100);
     
     if (!orders || orders.length === 0) {
         document.getElementById('emptyState').style.display = 'block';
@@ -437,9 +452,16 @@ setTimeout(() => {
         return;
     }
 
-               document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
     tbody.innerHTML = orders.map((order, index) => {
         const stt = currentPage * pageSize + index + 1;
+        
+        // Lấy paymentMethod từ order.payment.paymentMethod giống như trong popup
+        let paymentMethodText = 'Chưa xác định';
+        if (order.payment && order.payment.paymentMethod) {
+            paymentMethodText = formatPaymentMethod(order.payment.paymentMethod);
+        }
+        
         return `
             <tr>
                 <td><div class="text-center fw-bold">${stt}</div></td>
@@ -447,8 +469,8 @@ setTimeout(() => {
                 <td><div>${formatDate(order.createdAt)}</div></td>
                 <td><div>${order.username || 'Khách lẻ'}</div></td>
                 <td><div class="fw-bold text-success">${formatCurrency(order.totalAmount)}</div></td>
-                <td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
-                <td><div>${formatPaymentMethod(order.paymentMethod)}</div></td>
+<td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
+                <td><div>${paymentMethodText}</div></td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn btn-outline-primary btn-sm" onclick="showOrderDetail(${order.id})" title="Xem chi tiết">
@@ -459,7 +481,7 @@ setTimeout(() => {
             </tr>
         `;
     }).join('');
-        }
+}
 
         function renderPagination(totalPages, currentPageIndex) {
             const pagination = document.getElementById('pagination');
@@ -525,21 +547,19 @@ setTimeout(() => {
             const period = document.getElementById('period').value;
             let params = '';
             
-          if (period === 'custom') {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        
-        if (!startDate || !endDate) return;
-        
-        // SỬA: Đổi từ period=custom thành period=specific và format UTC
-        const startISO = `${startDate}T00:00:00Z`;
-        const endISO = `${endDate}T23:59:59Z`;
-        
-        params = `period=specific&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
-    } else {
-        params = `period=${period}`;
-    }
-
+            if (period === 'custom') {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                if (!startDate || !endDate) return;
+                
+                const startISO = `${startDate}T00:00:00Z`;
+                const endISO = `${endDate}T23:59:59Z`;
+                
+                params = `period=specific&startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
+            } else {
+                params = `period=${period}`;
+            }
 
             try {
                 const data = await apiFetch(`/orders/summary?${params}`);
@@ -654,98 +674,96 @@ setTimeout(() => {
             }
         }
 
-       async function showOrderDetail(orderId) {
-    try {
-        const data = await apiFetch(`/orders/${orderId}`);
-        const order = data.result;
-        
-        // Xử lý an toàn cho payment method
-        let paymentMethodText = 'Chưa xác định';
-        if (order.payment && order.payment.paymentMethod) {
-            paymentMethodText = formatPaymentMethod(order.payment.paymentMethod);
+        async function showOrderDetail(orderId) {
+            try {
+                const data = await apiFetch(`/orders/${orderId}`);
+                const order = data.result;
+                
+                let paymentMethodText = 'Chưa xác định';
+                if (order.payment && order.payment.paymentMethod) {
+                    paymentMethodText = formatPaymentMethod(order.payment.paymentMethod);
+                }
+                
+                let statusText = formatStatus(order.status);
+                
+                document.getElementById('orderDetailModalLabel').textContent = `Chi tiết đơn hàng ${order.id}`;
+                document.getElementById('orderDetails').innerHTML = `
+                    <div class="col-md-6">
+                        <p><strong>Mã:</strong> ${order.id}</p>
+                        <p><strong>Ngày đặt:</strong> ${formatDate(order.createdAt)}</p>
+                        <p><strong>Khách hàng:</strong> ${order.username || 'Khách lẻ'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
+                        <p><strong>Loại đơn:</strong> ${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</p>
+                        <p><strong>Bàn:</strong> ${order.tableNumber || 'N/A'}</p>
+                        <p><strong>Phương thức thanh toán:</strong> ${paymentMethodText}</p>
+                        <p><strong>Trạng thái:</strong> ${statusText}</p>
+                    </div>
+                `;
+                
+                document.getElementById('itemsTableBody').innerHTML = order.orderItems.map(item => `
+                    <tr>
+                        <td>${item.menuItemName}</td>
+                        <td>${item.quantity}</td>
+                        <td>${formatCurrency(item.price)}</td>
+                        <td>${formatCurrency(item.quantity * item.price)}</td>
+                    </tr>
+                `).join('');
+                
+                document.getElementById('orderNote').innerHTML = order.note ? `<strong>Ghi chú:</strong> ${order.note}` : '';
+                new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
+            } catch (error) {
+                console.error('Chi tiết lỗi:', error);
+                showNotification(`Không thể tải chi tiết đơn hàng: ${error.message}`, 'error');
+            }
         }
-        
-        document.getElementById('orderDetailModalLabel').textContent = `Chi tiết đơn hàng ${order.id}`;
-        document.getElementById('orderDetails').innerHTML = `
-            <div class="col-md-6">
-                <p><strong>Mã:</strong> ${order.id}</p>
-                <p><strong>Ngày đặt:</strong> ${formatDate(order.createdAt)}</p>
-                <p><strong>Khách hàng:</strong> ${order.username || 'Khách lẻ'}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
-                <p><strong>Loại đơn:</strong> ${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</p>
-                <p><strong>Bàn:</strong> ${order.tableNumber || 'N/A'}</p>
-                <p><strong>Phương thức thanh toán:</strong> ${paymentMethodText}</p>
-            </div>
-        `;
-        
-        document.getElementById('itemsTableBody').innerHTML = order.orderItems.map(item => `
-            <tr>
-                <td>${item.menuItemName}</td>
-                <td>${item.quantity}</td>
-                <td>${formatCurrency(item.price)}</td>
-                <td>${formatCurrency(item.quantity * item.price)}</td>
-            </tr>
-        `).join('');
-        
-        document.getElementById('orderNote').innerHTML = order.note ? `<strong>Ghi chú:</strong> ${order.note}` : '';
-        new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
-    } catch (error) {
-        console.error('Chi tiết lỗi:', error);
-        showNotification(`Không thể tải chi tiết đơn hàng: ${error.message}`, 'error');
-    }
-}
 
         function sortTable(column) {
-    // Xóa tất cả class sort cũ
-    document.querySelectorAll('.sort-arrow').forEach(arrow => {
-        arrow.className = 'sort-arrow';
-    });
-    
-    if (sortBy === column) {
-        sortDirection = sortDirection === 'ASC' ? 'DESC' : 'ASC';
-    } else {
-        sortBy = column;
-        sortDirection = 'ASC';
-    }
-    
-    // Thêm class cho cột đang sort
-    const currentArrow = document.getElementById(`sort-${column}`);
-    if (currentArrow) {
-        currentArrow.className = `sort-arrow ${sortDirection.toLowerCase()}`;
-    }
-    
-    fetchOrders();
-}
+            document.querySelectorAll('.sort-arrow').forEach(arrow => {
+                arrow.className = 'sort-arrow';
+            });
+            
+            if (sortBy === column) {
+                sortDirection = sortDirection === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                sortBy = column;
+                sortDirection = 'ASC';
+            }
+            
+            const currentArrow = document.getElementById(`sort-${column}`);
+            if (currentArrow) {
+                currentArrow.className = `sort-arrow ${sortDirection.toLowerCase()}`;
+            }
+            
+            fetchOrders();
+        }
 
-       function initPeriodFromQueryParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const period = urlParams.get('period') || 'month';
-    const specificDate = urlParams.get('specificDate');
-    const startDate = urlParams.get('startDate');
-    const endDate = urlParams.get('endDate');
-    
-    const periodSelect = document.getElementById('period');
-    
-    // SỬA: Xử lý trường hợp từ dashboard chuyển sang với period=custom
-    if (period === 'custom' && startDate && endDate && startDate === endDate) {
-        // Trường hợp từ dashboard specific date
-        periodSelect.value = 'custom';
-        document.getElementById('customDate').style.display = 'block';
-        document.getElementById('startDate').value = startDate;
-        document.getElementById('endDate').value = endDate;
-    } else if (period === 'specific' && specificDate) {
-        // Trường hợp cũ (để tương thích ngược)
-        periodSelect.value = 'custom';
-        document.getElementById('customDate').style.display = 'block';
-        document.getElementById('startDate').value = specificDate;
-        document.getElementById('endDate').value = specificDate;
-    } else {
-        periodSelect.value = period === 'specific' ? 'custom' : period;
-        document.getElementById('customDate').style.display = period === 'custom' ? 'block' : 'none';
-    }
-}
+        function initPeriodFromQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const period = urlParams.get('period') || 'month';
+            const specificDate = urlParams.get('specificDate');
+            const startDate = urlParams.get('startDate');
+            const endDate = urlParams.get('endDate');
+            
+            const periodSelect = document.getElementById('period');
+            
+            if (period === 'custom' && startDate && endDate && startDate === endDate) {
+                periodSelect.value = 'custom';
+                document.getElementById('customDate').style.display = 'block';
+                document.getElementById('startDate').value = startDate;
+                document.getElementById('endDate').value = endDate;
+            } else if (period === 'specific' && specificDate) {
+                periodSelect.value = 'custom';
+                document.getElementById('customDate').style.display = 'block';
+                document.getElementById('startDate').value = specificDate;
+                document.getElementById('endDate').value = specificDate;
+            } else {
+                periodSelect.value = period === 'specific' ? 'custom' : period;
+                document.getElementById('customDate').style.display = period === 'custom' ? 'block' : 'none';
+            }
+        }
+
         async function updateData() {
             await Promise.all([fetchOrders(), updateChart()]);
         }
@@ -806,6 +824,11 @@ setTimeout(() => {
             });
 
             document.getElementById('paymentMethodFilter').addEventListener('change', function() {
+                currentPage = 0;
+                updateData();
+            });
+
+            document.getElementById('statusFilter').addEventListener('change', function() {
                 currentPage = 0;
                 updateData();
             });
