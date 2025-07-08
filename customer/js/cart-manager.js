@@ -99,8 +99,12 @@ class CartManager {
         if (!this.storage.isLocalStorageAvailable) {
             setInterval(() => {
                 this.syncCart();
-            }, 1000);
+            }, 500);
         }
+        window.addEventListener('pageshow', () => {
+            this.syncCart();
+            this.notifyCallbacks();
+        });
     }
 
     // Tải giỏ hàng từ storage
@@ -432,6 +436,7 @@ class CartUIManager {
         }
     }
 
+
     updateCartModal() {
         const cartItemCount = document.getElementById('cartItemCount');
         const emptyCart = document.getElementById('emptyCart');
@@ -462,13 +467,26 @@ class CartUIManager {
             if (cartItems) {
                 const cartHeader = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted" style="font-size: 14px;">Danh sách món đã chọn</span>
-                        <button class="btn p-1" onclick="event.stopPropagation(); cartUIManager.clearAllItems()"
-                            style="background: none; border-radius: 20px; padding: 4px 10px; color: #dc3545; font-size: 12px;"
-                            title="Xóa toàn bộ giỏ hàng">
-                            Xoá toàn bộ giỏ hàng
-                        </button>
-                    </div>
+    <span class="text-muted" style="font-size: 14px;">Danh sách món đã chọn</span>
+
+    <button class="btn p-1 d-flex align-items-center"
+        onclick="event.stopPropagation(); cartUIManager.clearAllItems()"
+        style="background: none; border: 1px solid #dc3545; border-radius: 20px; padding: 4px 10px; color: #dc3545; font-size: 12px;"
+        title="Xóa toàn bộ giỏ hàng">
+        
+        <!-- Icon thùng rác -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 4px;">
+            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+        </svg>
+
+        Xoá toàn bộ giỏ hàng
+    </button>
+</div>
+
                 `;
 
                 const cartItemsHTML = items.map(item => `
@@ -482,7 +500,7 @@ class CartUIManager {
         <div class="food-name">${item.name}</div>
         <div class="food-price">${formatPrice(item.price)}</div>
         ${item.note ? `<div class="food-note"><i class="fas fa-sticky-note me-1"></i>${item.note}</div>` : ''}
-        <a href="view-food-detail.html?itemId=${item.id}" class="food-edit-link">Chỉnh sửa</a>
+        <span class="food-edit-link" onclick="viewFoodDetail(${item.id})">Chỉnh sửa</span>
     </div>
     <div class="d-flex align-items-center gap-2">
         <button class="btn cart-btn cart-remove-btn"
@@ -509,6 +527,8 @@ class CartUIManager {
             }
         }
     }
+
+
 
     toggleCart() {
         const cartModal = document.getElementById('cartModal');
@@ -549,7 +569,7 @@ class CartUIManager {
         }
     }
 
-    clearAllItems() {
+    clearAllItems(e) {
         // Ngăn chặn event bubbling
         event?.stopPropagation();
 
@@ -571,69 +591,147 @@ class CartUIManager {
     }
 
     async placeOrder(event) {
-    // Lấy tableNumber từ URL parameters
-    const getUrlParameter = (name) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    };
+        // Lấy tableNumber từ URL parameters
+        const getUrlParameter = (name) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        };
 
-    const tableNumber = getUrlParameter('tableNumber');
-    const BACKEND_BASE_URL = "http://localhost:8080";
+        const tableNumber = getUrlParameter('tableNumber');
 
-    if (this.cartManager.isEmpty()) {
-        alert('Giỏ hàng trống!');
-        return;
-    }
-
-    if (!tableNumber) {
-        alert('Không tìm thấy thông tin bàn!');
-        return;
-    }
-
-    try {
-        // Hiển thị loading state
-        const originalText = event?.target?.textContent;
-        if (event?.target) {
-            event.target.textContent = 'Đang đặt món...';
-            event.target.disabled = true;
+        // Validation cơ bản
+        if (this.cartManager.isEmpty()) {
+            this.showNotification('Giỏ hàng trống!', 'warning');
+            return;
         }
 
-        // Bước 1: Tìm table info dựa trên tableNumber
-        console.log('Finding table info for table number:', tableNumber);
+        if (!tableNumber) {
+            this.showNotification('Không tìm thấy thông tin bàn!', 'error');
+            return;
+        }
 
-        const tableResponse = await fetch(`${BACKEND_BASE_URL}/tables?tableNumber=${encodeURIComponent(tableNumber)}`, {
+        // Lưu trạng thái button
+        const originalText = event?.target?.textContent;
+        const button = event?.target;
+
+        try {
+            this.setButtonLoading(button, 'Đang đặt món...');
+
+            // Kiểm tra token trong TokenManager
+            const sessionData = window.tokenManager.getSessionData();
+            const token = sessionData.token;
+
+            if (!window.tokenManager.isTokenValid()) {
+                throw new Error('TOKEN_EXPIRED');
+            }
+
+            // Validate với server 1 lần nữa
+            const isValid = await window.tokenManager.validateTokenWithServer(token);
+            if (!isValid) {
+                throw new Error('INVALID_QR_TOKEN');
+            }
+
+            // Lấy thông tin bàn
+            const tableInfo = await this.getTableInfo(tableNumber, token);
+
+            // Kiểm tra đơn hàng hiện tại
+            const orderContext = await this.getOrderContext(tableInfo.id, token);
+
+            // Chuẩn bị dữ liệu order items
+            const orderItems = this.prepareOrderItems();
+
+            // Thực hiện đặt món
+            const orderResult = await this.executeOrder(orderContext, orderItems, tableInfo, token);
+
+            // Xử lý kết quả thành công
+            await this.handleOrderSuccess(orderResult, tableNumber, orderContext.isNewOrder);
+
+        } catch (error) {
+            console.error('Error placing order:', error);
+            this.handleOrderError(error);
+        } finally {
+            this.resetButtonState(button, originalText);
+        }
+    }
+
+    // // validateAndRefreshToken không cần nữa nên bỏ
+
+
+    // // Hàm kiểm tra và refresh token - CẦN SỬA ĐỔI
+    // async validateAndRefreshToken() {
+    //     let sessionData = {};
+    //     let token = null;
+
+    //     if (window.tokenManager) {
+    //         // Lấy session data ban đầu
+    //         sessionData = window.tokenManager.getSessionData();
+    //         token = sessionData.token;
+    //         console.log("Session Data từ TokenManager:", sessionData);
+
+    //         // Kiểm tra và refresh token nếu cần
+    //         const tokenCheck = await window.tokenManager.checkAndRefreshToken();
+    //         if (tokenCheck.needNewSession) {
+    //             throw new Error('TOKEN_EXPIRED');
+    //         }
+
+    //         // *** QUAN TRỌNG: Lấy lại session data SAU KHI refresh ***
+    //         // Vì có thể token đã được refresh trong checkAndRefreshToken()
+    //         sessionData = window.tokenManager.getSessionData();
+    //         token = sessionData.token;
+
+    //         console.log("Updated Session Data after refresh:", sessionData);
+    //     }
+
+    //     return { token: token, sessionData };
+    // }
+
+    // Hàm lấy thông tin bàn
+    async getTableInfo(tableNumber, token) {
+        console.log('Finding table info for table number:', tableNumber);
+        console.log('Đang gọi /tables với token:', token);
+        // token = localStorage.getItem('s') || token;
+        const response = await fetch(`${BACKEND_BASE_URL}/tables?tableNumber=${encodeURIComponent(tableNumber)}`, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
             }
         });
 
-        if (!tableResponse.ok) {
-            throw new Error('Lỗi khi tìm thông tin bàn');
+        if (!response.ok) {
+            throw new Error('TABLE_FETCH_ERROR');
         }
 
-        const tableData = await tableResponse.json();
-        const table = tableData.result[0]; // Vì tableNumber unique nên chỉ có 1 kết quả
-        const tableId = table.id;
+        const data = await response.json();
 
-        console.log('Found table:', { id: tableId, number: table.tableNumber, status: table.status });
+        if (!data.result || data.result.length === 0) {
+            throw new Error('TABLE_NOT_FOUND');
+        }
 
-        // Bước 2: Kiểm tra xem bàn đã có đơn hàng active chưa
+        const table = data.result[0];
+        console.log('Found table:', { id: table.id, number: table.tableNumber, status: table.status });
+
+        return table;
+    }
+
+    // Hàm kiểm tra đơn hàng hiện tại
+    async getOrderContext(tableId, token) {
         let existingOrder = null;
         let isNewOrder = true;
 
         try {
-            const currentOrderResponse = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current`, {
+            const response = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current`, {
                 method: 'GET',
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
                 }
             });
 
-            if (currentOrderResponse.ok) {
-                const currentOrderData = await currentOrderResponse.json();
-                existingOrder = currentOrderData.result;
-                
+            if (response.ok) {
+                const data = await response.json();
+                existingOrder = data.result;
+
                 // Kiểm tra status của đơn hàng hiện tại
                 const activeStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
                 if (existingOrder && activeStatuses.includes(existingOrder.status)) {
@@ -645,189 +743,282 @@ class CartUIManager {
             console.log('No existing order found, will create new order');
         }
 
-        // Bước 3: Chuẩn bị dữ liệu order items
-        const orderItems = this.cartManager.getItems().map(item => ({
-            menuItemId: item.id,
-            quantity: item.quantity,
-            note: item.note || '',
-        }));
+        return { existingOrder, isNewOrder };
+    }
 
-        let orderResponse;
-        let orderResult;
+    // Hàm chuẩn bị order items
+    prepareOrderItems() {
+        return this.cartManager.getItems().map(item => {
+            // Validate item data
+            if (!item.id || !item.quantity || item.quantity <= 0) {
+                throw new Error(`Invalid item data: ${item.name}`);
+            }
+
+            return {
+                menuItemId: item.id,
+                quantity: item.quantity,
+                note: item.note || '',
+                status: 'PENDING'
+            };
+        });
+    }
+
+    // Hàm thực hiện đặt món
+    async executeOrder(orderContext, orderItems, tableInfo, token) {
+        const { existingOrder, isNewOrder } = orderContext;
+
+        let response;
+        let requestData;
 
         if (isNewOrder) {
-            // Tạo đơn hàng mới
             console.log('Creating new order...');
-            
-            const orderData = {
-                tableId: tableId,
+
+            requestData = {
+                tableId: tableInfo.id,
                 userId: null,
                 orderType: 'DINE_IN',
+                status: 'PENDING',
+                note: '',
                 orderItems: orderItems,
+                ...(token && { token: token })
             };
+            console.log("Dữ liệu gửi lên tạo order:", requestData);
 
-            console.log('Sending new order data:', orderData);
-
-            orderResponse = await fetch(`${BACKEND_BASE_URL}/orders`, {
+            response = await fetch(`${BACKEND_BASE_URL}/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
                 },
-                body: JSON.stringify(orderData)
+                body: JSON.stringify(requestData)
             });
         } else {
-            // Thêm món vào đơn hàng hiện tại
             console.log('Adding items to existing order:', existingOrder.id);
-            
-            const addItemsData = {
+
+            requestData = {
                 orderItems: orderItems,
+                ...(token && { token: token })
             };
 
-            console.log('Sending add items data:', addItemsData);
-
-            orderResponse = await fetch(`${BACKEND_BASE_URL}/orders/${existingOrder.id}/items`, {
+            response = await fetch(`${BACKEND_BASE_URL}/orders/${existingOrder.id}/items`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
                 },
-                body: JSON.stringify(addItemsData)
+                body: JSON.stringify(requestData)
             });
         }
 
-        if (!orderResponse.ok) {
-            // Xử lý response lỗi từ server
-            let errorMessage = 'Có lỗi xảy ra khi đặt món';
-
-            try {
-                const errorResponse = await orderResponse.json();
-                console.error('Server error response:', errorResponse);
-
-                if (errorResponse.message) {
-                    errorMessage = errorResponse.message;
-                } else if (errorResponse.code) {
-                    switch (errorResponse.code) {
-                        case 'TABLE_NOT_EXISTED':
-                            errorMessage = 'Bàn không tồn tại';
-                            break;
-                        case 'TABLE_NOT_AVAILABLE':
-                            errorMessage = 'Bàn đang được sử dụng';
-                            break;
-                        case 'MENU_ITEM_NOT_EXISTED':
-                            errorMessage = 'Món ăn không tồn tại';
-                            break;
-                        case 'MENU_ITEM_NOT_AVAILABLE':
-                            errorMessage = 'Món ăn hiện không có sẵn';
-                            break;
-                        case 'USER_NOT_EXISTED':
-                            errorMessage = 'Người dùng không tồn tại';
-                            break;
-                        case 'ORDER_NOT_EXISTED':
-                            errorMessage = 'Đơn hàng không tồn tại';
-                            break;
-                        default:
-                            errorMessage = `Lỗi: ${errorResponse.code}`;
-                    }
-                }
-            } catch (parseError) {
-                console.error('Cannot parse error response:', parseError);
-                switch (orderResponse.status) {
-                    case 400:
-                        errorMessage = 'Dữ liệu đơn hàng không hợp lệ';
-                        break;
-                    case 404:
-                        errorMessage = 'Không tìm thấy thông tin cần thiết';
-                        break;
-                    case 500:
-                        errorMessage = 'Lỗi server nội bộ';
-                        break;
-                    default:
-                        errorMessage = `Lỗi HTTP: ${orderResponse.status}`;
-                }
-            }
-
-            throw new Error(errorMessage);
+        if (!response.ok) {
+            const errorData = await this.parseErrorResponse(response);
+            throw new Error(errorData.code || 'ORDER_FAILED');
         }
 
-        const apiResponse = await orderResponse.json();
-        console.log('Order operation completed successfully:', apiResponse);
+        const result = await response.json();
+        console.log('Order operation completed successfully:', result);
 
-        if (apiResponse.result) {
-            orderResult = apiResponse.result;
+        return { ...result.result, isNewOrder };
+    }
 
-            // Lưu order ID vào storage nếu có thể
-            try {
-                if (this.cartManager.storage.isLocalStorageAvailable) {
-                    localStorage.setItem('currentOrderId', orderResult.id);
-
-                    // Lưu thông tin đơn hàng chi tiết để hiển thị trên trang xác nhận
-                    const orderDetails = {
-                        ...orderResult,
-                        tableNumber: tableNumber,
-                        items: this.cartManager.getItems().map(item => ({
-                            name: item.name,
-                            quantity: item.quantity,
-                            price: item.price,
-                            note: item.note || ''
-                        })),
-                        isNewOrder: isNewOrder
-                    };
-                    localStorage.setItem('orderConfirmationData', JSON.stringify(orderDetails));
-                }
-            } catch (error) {
-                console.warn('Cannot save order details:', error);
-            }
-
-            // Clear cart
-            this.cartManager.clearCart();
-            this.toggleCart();
-
-            // Hiển thị thông báo thành công
-            const successMessage = isNewOrder ? 
-                'Đặt món thành công!' : 
-                'Thêm món vào đơn hàng thành công!';
-            
-            // Có thể thay alert bằng toast notification đẹp hơn
-            // alert(successMessage);
-
-            // Chuyển hướng đến trang xác nhận đơn hàng
-            const confirmationUrl = `order-confirmation.html?orderId=${orderResult.id}&tableNumber=${encodeURIComponent(tableNumber)}`;
-            window.location.href = confirmationUrl;
-
-        } else {
-            console.warn('Unexpected API response format:', apiResponse);
-            // Fallback: vẫn chuyển đến trang xác nhận với thông tin cơ bản
-            this.cartManager.clearCart();
-            this.toggleCart();
-
-            const confirmationUrl = `order-confirmation.html?tableNumber=${encodeURIComponent(tableNumber)}`;
-            window.location.href = confirmationUrl;
-        }
-
-    } catch (error) {
-        console.error('Error placing order:', error);
-
-        let userMessage;
-        if (error.message.includes('Failed to fetch')) {
-            userMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
-        } else if (error.message.includes('NetworkError')) {
-            userMessage = 'Lỗi mạng. Vui lòng thử lại sau.';
-        } else if (error.message.includes('CORS')) {
-            userMessage = 'Lỗi kết nối. Vui lòng liên hệ quản trị viên.';
-        } else {
-            userMessage = error.message;
-        }
-
-        alert(userMessage);
-    } finally {
-        // Reset button state
-        if (event?.target) {
-            event.target.textContent = originalText || 'Đặt món';
-            event.target.disabled = false;
+    // Hàm parse error response
+    async parseErrorResponse(response) {
+        try {
+            const errorData = await response.json();
+            return {
+                code: errorData.code || 'UNKNOWN_ERROR',
+                message: errorData.message || 'Có lỗi xảy ra khi đặt món'
+            };
+        } catch (parseError) {
+            return {
+                code: `HTTP_${response.status}`,
+                message: this.getHttpErrorMessage(response.status)
+            };
         }
     }
-}
+
+    // Hàm xử lý thành công
+    async handleOrderSuccess(orderResult, tableNumber, isNewOrder) {
+        // Cập nhật session với orderId
+        if (window.tokenManager && orderResult.id) {
+            const sessionData = window.tokenManager.getSessionData();
+            const updatedSessionData = {
+                ...sessionData,
+                orderId: orderResult.id,
+                isReservationToken: false
+            };
+            window.tokenManager.saveSessionData(updatedSessionData);
+        }
+
+        // Lưu thông tin order
+        this.saveOrderDetails(orderResult, tableNumber, isNewOrder);
+
+        // Clear cart
+        this.cartManager.clearCart();
+
+        // Đóng cart modal nếu có
+        if (typeof this.toggleCart === 'function') {
+            this.toggleCart();
+        }
+
+        // Hiển thị thông báo thành công
+        this.showNotification(
+            isNewOrder ? 'Đặt món thành công!' : 'Thêm món thành công!',
+            'success'
+        );
+
+        // Delay nhỏ để user thấy thông báo
+        setTimeout(() => {
+            const confirmationUrl = `order-confirmation.html?orderId=${orderResult.id}&tableNumber=${encodeURIComponent(tableNumber)}`;
+            window.location.href = confirmationUrl;
+        }, 1000);
+    }
+
+    // Hàm lưu chi tiết order
+    saveOrderDetails(orderResult, tableNumber, isNewOrder) {
+        try {
+            if (this.cartManager.storage.isLocalStorageAvailable) {
+                localStorage.setItem('currentOrderId', orderResult.id);
+
+                const orderDetails = {
+                    ...orderResult,
+                    tableNumber: tableNumber,
+                    items: this.cartManager.getItems().map(item => ({
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                        note: item.note || ''
+                    })),
+                    isNewOrder: isNewOrder,
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('orderConfirmationData', JSON.stringify(orderDetails));
+            }
+        } catch (error) {
+            console.warn('Cannot save order details:', error);
+        }
+    }
+
+    // Hàm xử lý lỗi
+    handleOrderError(error) {
+        let userMessage = 'Có lỗi xảy ra khi đặt món';
+        let shouldRedirect = false;
+
+        // Mapping các loại lỗi
+        switch (error.message) {
+            case 'TOKEN_EXPIRED':
+                userMessage = 'Phiên làm việc đã hết hạn. Vui lòng quét lại mã QR.';
+                shouldRedirect = true;
+                break;
+            case 'TABLE_FETCH_ERROR':
+                userMessage = 'Không thể lấy thông tin bàn. Vui lòng thử lại.';
+                break;
+            case 'TABLE_NOT_FOUND':
+                userMessage = 'Không tìm thấy thông tin bàn.';
+                break;
+            case 'TABLE_NOT_EXISTED':
+                userMessage = 'Bàn không tồn tại.';
+                break;
+            case 'TABLE_NOT_AVAILABLE':
+                userMessage = 'Bàn đang được sử dụng bởi khách khác.';
+                break;
+            case 'MENU_ITEM_NOT_EXISTED':
+                userMessage = 'Một số món ăn không tồn tại.';
+                break;
+            case 'MENU_ITEM_NOT_AVAILABLE':
+                userMessage = 'Một số món ăn hiện không có sẵn.';
+                break;
+            case 'ORDER_NOT_MODIFIABLE':
+                userMessage = 'Đơn hàng không thể chỉnh sửa.';
+                break;
+            case 'INVALID_QR_TOKEN':
+                userMessage = 'Mã QR không hợp lệ hoặc đã hết hạn.';
+                shouldRedirect = true;
+                break;
+            case 'HTTP_400':
+                userMessage = 'Dữ liệu đơn hàng không hợp lệ.';
+                break;
+            case 'HTTP_401':
+                userMessage = 'Phiên làm việc đã hết hạn.';
+                shouldRedirect = true;
+                break;
+            case 'HTTP_403':
+                userMessage = 'Không có quyền thực hiện thao tác này.';
+                break;
+            case 'HTTP_404':
+                userMessage = 'Không tìm thấy thông tin cần thiết.';
+                break;
+            case 'HTTP_500':
+                userMessage = 'Lỗi server nội bộ.';
+                break;
+            default:
+                // Xử lý lỗi network
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    userMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                } else if (error.message.includes('CORS')) {
+                    userMessage = 'Lỗi kết nối. Vui lòng liên hệ quản trị viên.';
+                } else if (error.message.startsWith('Invalid item data:')) {
+                    userMessage = error.message;
+                }
+        }
+
+        this.showNotification(userMessage, 'error');
+
+        // if (shouldRedirect) {
+        //     setTimeout(() => {
+        //         window.location.href = 'index.html';
+        //     }, 2000);
+        // }
+    }D
+
+    // Hàm utility
+    getHttpErrorMessage(status) {
+        const errorMessages = {
+            400: 'Dữ liệu không hợp lệ',
+            401: 'Phiên làm việc đã hết hạn',
+            403: 'Không có quyền truy cập',
+            404: 'Không tìm thấy thông tin',
+            500: 'Lỗi server nội bộ',
+            502: 'Lỗi kết nối server',
+            503: 'Dịch vụ tạm thời không khả dụng'
+        };
+
+        return errorMessages[status] || `Lỗi HTTP: ${status}`;
+    }
+
+    // Hàm set button loading
+    setButtonLoading(button, text) {
+        if (button) {
+            button.textContent = text;
+            button.disabled = true;
+            button.classList.add('loading');
+        }
+    }
+
+    // Hàm reset button state
+    resetButtonState(button, originalText) {
+        if (button) {
+            button.textContent = originalText || 'Đặt món';
+            button.disabled = false;
+            button.classList.remove('loading');
+        }
+    }
+
+    // Hàm hiển thị thông báo
+    showNotification(message, type = 'info') {
+        // Nếu có notification system
+        if (typeof this.showToast === 'function') {
+            this.showToast(message, type);
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification(message, type);
+        } else {
+            // Nếu không có hệ thống thông báo, sử dụng alert
+            alert(message);
+        }
+    }
 
     // Debug functions
     exportCartData() {
@@ -843,6 +1034,12 @@ class CartUIManager {
 
 // Tạo instance global cho UI manager
 const cartUIManager = new CartUIManager(cartManager);
+
+function viewFoodDetail(foodId) {
+    const tableNumber = getUrlParameter('tableNumber') || '';
+    const url = `view-food-detail.html?itemId=${foodId}&tableNumber=${encodeURIComponent(tableNumber)}`;
+    window.location.replace(url); // Thay thế mục lịch sử hiện tại
+}
 
 // Global functions để sử dụng trong HTML
 function toggleCart() {
