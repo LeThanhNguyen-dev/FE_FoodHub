@@ -104,23 +104,23 @@
             document.getElementById('tableNumber').textContent = String(tableNumber);
             const customerName = localStorage.getItem('customerName') || 'Khách hàng';
             document.getElementById('customerName').textContent = customerName;
-            // Cập nhật số lượng giỏ hàng
-            updateCartCount();
+            // // Cập nhật số lượng giỏ hàng
+            // updateCartCount();
         }
 
-        // Cập nhật số lượng giỏ hàng
-        function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        // // Cập nhật số lượng giỏ hàng
+        // function updateCartCount() {
+        //     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        //     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-            const cartCountElement = document.getElementById('cartCount');
-            if (totalItems > 0) {
-                cartCountElement.textContent = totalItems;
-                cartCountElement.style.display = 'flex';
-            } else {
-                cartCountElement.style.display = 'none';
-            }
-        }
+        //     const cartCountElement = document.getElementById('cartCount');
+        //     if (totalItems > 0) {
+        //         cartCountElement.textContent = totalItems;
+        //         cartCountElement.style.display = 'flex';
+        //     } else {
+        //         cartCountElement.style.display = 'none';
+        //     }
+        // }
 
         // Chuyển đến trang menu
         function goToMenu() {
@@ -128,11 +128,6 @@
             window.location.href = `view-food-list.html?tableNumber=${tableNumber}`;
         }
 
-        // Xem giỏ hàng
-        function viewCart() {
-            const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
-            window.location.href = `cart.html?tableNumber=${tableNumber}`;
-        }
 
         // Xem đơn hàng
         function viewOrders() {
@@ -158,8 +153,6 @@
         document.addEventListener('DOMContentLoaded', function () {
             initializeData();
 
-            // Cập nhật cart count mỗi 5 giây
-            setInterval(updateCartCount, 5000);
         });
     </script>
 </body>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao diện thanh toán FoodHub</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        h2 {
+            color: #ff6200;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .order-summary, .payment-methods {
+            margin-bottom: 20px;
+        }
+        .order-summary h3, .payment-methods h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .total {
+            font-weight: bold;
+            color: #ff6200;
+        }
+        .payment-methods label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .payment-methods input[type="radio"] {
+            margin-right: 10px;
+        }
+        .confirm-button {
+            background-color: #ff6200;
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .confirm-button:hover {
+            background-color: #e55a00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Thanh Toán Đơn Hàng</h2>
+        
+        <div class="order-summary">
+            <h3>Tóm tắt đơn hàng</h3>
+            <div class="order-item">
+                <span>Gà rán (2 miếng)</span>
+                <span>60,000 VNĐ</span>
+            </div>
+            <div class="order-item">
+                <span>Khoai tây chiên</span>
+                <span>25,000 VNĐ</span>
+            </div>
+            <div class="order-item total">
+                <span>Tổng cộng</span>
+                <span>85,000 VNĐ</span>
+            </div>
+        </div>
+
+        <div class="payment-methods">
+            <h3>Phương thức thanh toán</h3>
+            <label><input type="radio" name="payment" value="cash" checked> Tiền mặt</label>
+            <label><input type="radio" name="payment" value="vnpay"> VNPay</label>
+        </div>
+
+        <button class="confirm-button" onclick="confirmPayment()">Xác nhận thanh toán</button>
+    </div>
+
+    <script>
+        function confirmPayment() {
+            alert("Đơn hàng của bạn đã được xác nhận! Cảm ơn bạn đã sử dụng FoodHub.");
+        }
+    </script>
+</body>
+</html>

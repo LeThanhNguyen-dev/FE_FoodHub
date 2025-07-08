@@ -267,11 +267,12 @@ let currentOrderData = null;
         }
 
         function trackOrder() {
-            if (currentOrderData && currentOrderData.id) {
-                // Navigate to order tracking page with order ID
-                alert(`Theo dõi đơn hàng #${currentOrderData.id}\n(Chức năng sẽ có trong phiên bản tiếp theo)`);
+            const tableNumber = getUrlParameter('tableNumber') ||
+                (currentOrderData && currentOrderData.tableNumber);
+            if (tableNumber) {
+                window.location.href = `order-history.html?tableNumber=${encodeURIComponent(tableNumber)}`;
             } else {
-                alert('Chức năng theo dõi đơn hàng sẽ có trong phiên bản tiếp theo!');
+                window.location.href = 'view-food-list.html';
             }
         }
 
