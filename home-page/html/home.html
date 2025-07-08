@@ -3,291 +3,811 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodHub - Menu</title>
+    <title>FoodHub - Home</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!-- Shared CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
+    <!-- Chat JS -->
+    <script src="../js/chat.js"></script>
+    <!-- Page-specific CSS -->
     <style>
-        :root {
-            --dark-green: #02052f;
-            --gold: #D4A017;
-            --light-gold: #F7E6A3;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .navbar {
-            background-color: var(--dark-green);
-        }
-
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gold) !important;
-        }
-
-        .nav-link {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            color: var(--light-gold) !important;
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover {
-            color: var(--gold) !important;
-        }
-
-        .btn-login {
-            background-color: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            padding: 8px 20px;
-            transition: all 0.3s;
-        }
-
-        .btn-login:hover {
-            background-color: var(--gold);
-            color: var(--dark-green);
-        }
-
         .hero {
             background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
             background-size: cover;
             background-position: center;
-            height: 50vh;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), rgba(26, 60, 52, 0.1));
+            animation: shimmer 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
+
+        .hero-btn {
+            background: #FEA116;
+            color: var(--dark-green);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 1rem;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px #FEA116;
+            color: var(--dark-green);
+        }
+
+        .carousel-item .hero {
+            height: 60vh;
+            position: relative;
+            background-size: cover;
+            background-position: center;
             display: flex;
             align-items: center;
             text-align: center;
             color: white;
         }
 
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: var(--gold);
+        .carousel-item .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
         }
 
-        .hero p {
+        .carousel-item .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .stats-section {
+            background: var(--dark-green);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--gold);
             font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
             font-size: 1.1rem;
-            color: var(--light-gold);
+            margin-top: 0.5rem;
+        }
+
+        .features-section {
+            padding: 5rem 0;
+            background: var(--cream);
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            background: linear-gradient(45deg, var(--gold), #FEA116);
+            color: var(--dark-green);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .feature-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+        }
+
+        .menu-preview {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--dark-green), var(--light-green));
+            color: rgb(0, 0, 0);
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .menu-item-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item-price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FEA116;
+        }
+
+        .testimonials {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .testimonial-card {
+            background: var(--cream);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-gray);
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .stars {
+            color: #FEA116;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .section-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Montserrat', sans-serif;
             color: var(--dark-green);
             font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 2rem;
+            position: relative;
         }
 
-        .menu-card {
-            background-color: white;
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
         }
 
-        .menu-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .menu-card img {
-            height: 200px;
-            object-fit: cover;
-            width: 100%;
-        }
-
-        .menu-card .card-body {
-            padding: 1.5rem;
+        .section-subtitle {
             text-align: center;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .menu-card .card-title {
-            font-family: 'Playfair Display', serif;
-            color: var(--dark-green);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .menu-card .card-text {
-            font-family: 'Montserrat', sans-serif;
-            color: #555;
-            font-size: 0.95rem;
-            flex-grow: 1;
-        }
-
-        .menu-card .card-price {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gold);
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .menu-nav .btn {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            margin: 0 0.5rem;
-            border: 2px solid var(--dark-green);
-            color: var(--dark-green);
-            background-color: transparent;
-            transition: all 0.3s;
-        }
-
-        .menu-nav .btn.active, .menu-nav .btn:hover {
-            background-color: var(--dark-green);
-            color: var(--gold);
-        }
-
-        .menu-content {
-            display: none;
-        }
-
-        .menu-content.active {
-            display: block;
-        }
-
-        .footer {
-            background-color: var(--dark-green);
-            color: var(--light-gold);
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .footer a {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gold);
-            text-decoration: none;
-            margin: 0 1rem;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            color: var(--light-gold);
-        }
-
-        .footer .contact-info {
-            font-family: 'Montserrat', sans-serif;
+        .welcome-message {
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 25px;
+            padding: 1rem 2rem;
             margin-top: 1rem;
+            border: 2px solid var(--gold);
         }
 
-        .loading-spinner {
-            text-align: center;
-            padding: 2rem;
-            font-family: 'Montserrat', sans-serif;
-            color: var(--dark-green);
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            margin: 0;
         }
 
-        .error-message {
-            text-align: center;
-            padding: 2rem;
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
             font-family: 'Montserrat', sans-serif;
-            color: #dc3545;
             font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d;
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-notification {
+            z-index: 1055;
+        }
+
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 380px;
+            height: 550px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            z-index: 1060;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .chat-container.show {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .chat-container.hidden {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .chat-header {
+            background: #FEA116;
+            color: var(--dark-green);
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: var(--dark-green);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f5f5f5;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #FEA116;
+            color: var(--dark-green);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .bot ul, .bot ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .bot li {
+            margin-bottom: 6px;
+        }
+
+        .bot strong {
+            color: #FEA116;
+            font-weight: 600;
+        }
+
+        .bot code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bot pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #FEA116;
+            box-shadow: 0 0 0 2px rgba(254, 161, 22, 0.2);
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #e69114;
+        }
+
+        button.clear-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.clear-btn:hover {
+            background: #d0d0d0;
+        }
+
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1060;
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 0.9rem; }
+            .section-title { font-size: 2rem; }
+            .stat-number { font-size: 2rem; }
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px;
+                top: 10px;
             }
+            .chat-container {
+                width: 90%;
+                height: 70vh;
+                right: 10px;
+                bottom: 70px;
+            }
+        }
 
-            .hero p {
-                font-size: 0.9rem;
-            }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
 
-            .section-title {
-                font-size: 2rem;
-            }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-            .menu-nav .btn {
-                font-size: 0.9rem;
-                padding: 8px 15px;
-            }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar {
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .navbar.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
-            <a class="navbar-brand" href="index.html">FoodHub</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+                <i class="fa fa-utensils"></i>
+                <span>FoodHub</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#home">Home</a>
+                        <a class="nav-link active" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="menu.html">Menu</a>
+                        <a class="nav-link" href="menu.html">Thực Đơn</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#about">About</a>
+                        <a class="nav-link" href="about.html">Giới Thiệu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#contact">Contact</a>
+                        <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-login" href="login.html">Login</a>
+                    <!-- Đăng nhập (hiện khi chưa login) -->
+                    <li class="nav-item" id="auth-nav-item">
+                        <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
+                    </li>
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
+                        <div class="user-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span id="username-display"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
+                        <a class="nav-link cart-icon" href="cart.html">
+                            <i class="bi bi-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="menu-hero" class="hero">
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
+
+    <!-- Chat Window -->
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <span>FoodHub Chat</span>
+            <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }" />
+            <button onclick="try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }">Gửi</button>
+            <button class="clear-btn" onclick="try { clearChatHistory(); } catch(e) { console.error('Error clearing chat:', e); showNotification('Lỗi khi xóa chat: ' + e.message); }">Xóa</button>
+        </div>
+    </div>
+
+    <!-- Phần Chào Mừng -->
+    <section id="hero-carousel" class="carousel slide hero" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <div class="hero d-flex align-items-center"
+                    style="background-image: url('https://images.unsplash.com/photo-1555992336-cbf8f63ba2e3'); background-size: cover; background-position: center;">
+                    <div class="container text-center text-white">
+                        <h1>Chào Mừng Đến Với FoodHub</h1>
+                        <p>Thưởng thức hương vị tuyệt hảo trong từng món ăn.</p>
+                        <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Khám Phá Thực Đơn</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-item">
+                <div class="hero d-flex align-items-center"
+                    style="background-image: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092'); background-size: cover; background-position: center;">
+                    <div class="container text-center text-white">
+                        <h1>Món Ăn Tươi Ngon Mỗi Ngày</h1>
+                        <p>Được chế biến từ nguyên liệu chất lượng cao.</p>
+                        <a href="menu.html" class="btn btn-warning px-4 py-2 mt-3">Xem Ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Điều hướng -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#hero-carousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Trước</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#hero-carousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Tiếp</span>
+        </button>
+    </section>
+
+    <!-- Phần Thống Kê -->
+    <section class="stats-section">
         <div class="container">
-            <h1>Our Menu</h1>
-            <p>Explore our delicious offerings, crafted with passion and the finest ingredients.</p>
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Khách Hàng Hài Lòng</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Món Ăn Ngon</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Năm Kinh Nghiệm</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item fade-in">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Phục Vụ Mọi Lúc</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Menu Section -->
-    <section id="menu" class="py-5">
+    <!-- Phần Lý Do Chọn FoodHub -->
+    <section class="features-section">
         <div class="container">
-            <h2 class="section-title">Explore Our Menu</h2>
-            <div class="menu-nav text-center mb-4">
-                <button class="btn active" onclick="showCategory('dishes')">Dishes</button>
-                <button class="btn" onclick="showCategory('drinks')">Drinks</button>
-                <button class="btn" onclick="showCategory('desserts')">Desserts</button>
-            </div>
-            <div id="dishes" class="menu-content active">
-                <div class="row g-4" id="dishes-content">
-                    <div class="loading-spinner">Đang tải...</div>
+            <h2 class="section-title fade-in">Vì Sao Chọn FoodHub?</h2>
+            <p class="section-subtitle fade-in">Chúng tôi cam kết mang đến cho bạn trải nghiệm ẩm thực tốt nhất với chất lượng và dịch vụ tuyệt vời.</p>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <h3 class="feature-title">Chất Lượng Cao Cấp</h3>
+                        <p>Chúng tôi chỉ sử dụng những nguyên liệu tốt nhất từ các nhà cung cấp uy tín để đảm bảo món ăn luôn đạt chuẩn cao nhất.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <h3 class="feature-title">Giao Hàng Nhanh Chóng</h3>
+                        <p>Hệ thống giao hàng hiệu quả giúp món ăn đến tay bạn luôn nóng hổi và tươi ngon trong thời gian ngắn nhất.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="bi bi-heart"></i>
+                        </div>
+                        <h3 class="feature-title">Chế Biến Bằng Tâm Huyết</h3>
+                        <p>Mỗi món ăn đều được chế biến với niềm đam mê và sự tỉ mỉ bởi các đầu bếp giàu kinh nghiệm và yêu nghề.</p>
+                    </div>
                 </div>
             </div>
-            <div id="drinks" class="menu-content">
-                <div class="row g-4" id="drinks-content">
-                    <div class="loading-spinner">Đang tải...</div>
+        </div>
+    </section>
+
+    <!-- Phần Xem Trước Thực Đơn -->
+    <section id="menu-preview" class="menu-preview">
+        <div class="container">
+            <h2 class="section-title text-black fade-in">Món Ăn Nổi Bật</h2>
+            <p class="section-subtitle text-black fade-in">
+                Khám phá những món ăn được yêu thích nhất và được đầu bếp đề xuất – chắc chắn sẽ làm say mê vị giác của bạn.
+            </p>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="menu-item fade-in">
+                        <img src="https://mycayseouly.vn/Images/image/mycay/Lau-Thai-Bo-My.jpg" alt="Lẩu kim chi bò mỹ">
+                        <h3 class="menu-item-title">Lẩu Kim Chi Bò Mỹ</h3>
+                        <p>Lẩu kim chi với thịt bò Mỹ tươi, nấm, đậu phụ và rau xanh trong nước dùng cay nồng đậm vị Hàn Quốc.</p>
+                        <div class="menu-item-price">289.000₫</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="menu-item fade-in">
+                        <img src="https://cdn-www.vinid.net/2020/01/Buzza-BBQ-voi-uu-dai-200.000-dong-tu-app-VinID-1024x576.jpg" alt="Ba chỉ bò mỹ nướng">
+                        <h3 class="menu-item-title">Ba Chỉ Bò Mỹ Nướng</h3>
+                        <p>Ba chỉ bò Mỹ nướng than hồng, tẩm ướp đậm đà, dùng kèm rau xanh và nước chấm đặc biệt.</p>
+                        <div class="menu-item-price">129.000₫</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="menu-item fade-in">
+                        <img src="https://mcdn.coolmate.me/image/July2023/cocktail-trai-cay-1734_240.jpg" alt="Cocktail trái cây">
+                        <h3 class="menu-item-title">Cocktail Trái Cây</h3>
+                        <p>Cocktail trái cây tươi mát, kết hợp dưa hấu, dứa, kiwi và cam mọng nước, hòa quyện trong lớp syrup ngọt nhẹ và đá viên mát lạnh.</p>
+                        <div class="menu-item-price">60.000₫</div>
+                    </div>
                 </div>
             </div>
-            <div id="desserts" class="menu-content">
-                <div class="row g-4" id="desserts-content">
-                    <div class="loading-spinner">Đang tải...</div>
+            <div class="text-center mt-4">
+                <a href="menu.html" class="hero-btn">Xem Toàn Bộ Thực Đơn</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title fade-in">Về Chúng Tôi</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="fade-in">
+                        <p class="lead">FoodHub cam kết mang đến cho bạn trải nghiệm ẩm thực tuyệt vời nhất với các nguyên liệu tươi ngon và dịch vụ đặc biệt.</p>
+                        <p>Được thành lập với niềm đam mê về sự xuất sắc trong ẩm thực, chúng tôi kết hợp các phương pháp nấu ăn truyền thống với sự đổi mới hiện đại để tạo ra những món ăn không chỉ có hương vị tuyệt vời mà còn kể một câu chuyện. Cam kết về chất lượng của chúng tôi mở rộng từ các nguyên liệu được lựa chọn cẩn thận đến đội ngũ nhân viên được đào tạo chuyên nghiệp của chúng tôi.</p>
+                        <p>Cho dù bạn đang ăn tại chỗ hay đặt giao hàng, chúng tôi đảm bảo mọi bữa ăn đều được chế biến với cùng mức độ chăm chút và chú ý đến từng chi tiết đã khiến chúng tôi trở thành một phần được yêu mến của cộng đồng.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2" alt="Restaurant Interior"
+                        class="img-fluid rounded fade-in" style="box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                 </div>
             </div>
         </div>
@@ -296,88 +816,127 @@
     <!-- Footer -->
     <footer id="contact" class="footer">
         <div class="container">
-            <h3 style="font-family: 'Playfair Display', serif; color: var(--gold);">FoodHub</h3>
-            <p class="contact-info">1 FPT | Phone: (123) 456-7890 | Email: info@foodhub.com</p>
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
+            <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#">Facebook</a>
                 <a href="#">Instagram</a>
                 <a href="#">Twitter</a>
-                <a href="#">Reservation</a>
             </div>
-            <p class="mt-3">© 2025 FoodHub. All rights reserved.</p>
+            <p class="mt-3">© 2025 FoodHub. Bản quyền đã được bảo hộ.</p>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
+    <!-- Shared JS -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/notification.js"></script>
+    <!-- Page-specific JS -->
     <script>
-        function showCategory(category) {
-            document.querySelectorAll('.menu-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(category).classList.add('active');
-
-            document.querySelectorAll('.menu-nav .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`.menu-nav .btn[onclick="showCategory('${category}')"]`).classList.add('active');
-        }
-
-        async function fetchMenuItems() {
+        // Update cart badge
+        function updateCartBadge() {
             try {
-                const data = await apiFetch('/menu-items', {
-                    method: 'GET'
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cart-count').textContent = totalItems;
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+                document.getElementById('cart-count').textContent = '0';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật giỏ hàng: ' + error.message);
+                }
+            }
+        }
+
+        // Scroll animations
+        function handleScrollAnimations() {
+            try {
+                const elements = document.querySelectorAll('.fade-in');
+                elements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
                 });
-
-                const menuItems = data.result || [];
-
-                // Nhóm món ăn theo danh mục
-                const dishes = menuItems.filter(item => item.category?.toLowerCase() === 'dishes');
-                const drinks = menuItems.filter(item => item.category?.toLowerCase() === 'drinks');
-                const desserts = menuItems.filter(item => item.category?.toLowerCase() === 'desserts');
-
-                // Hiển thị món ăn cho từng danh mục
-                renderMenuItems(dishes, 'dishes-content');
-                renderMenuItems(drinks, 'drinks-content');
-                renderMenuItems(desserts, 'desserts-content');
-            } catch (err) {
-                console.error('Lỗi khi tải món ăn:', err);
-                // Hiển thị thông báo lỗi thay vì nội dung tĩnh
-                document.getElementById('dishes-content').innerHTML = `<div class="error-message">${err.message}</div>`;
-                document.getElementById('drinks-content').innerHTML = `<div class="error-message">${err.message}</div>`;
-                document.getElementById('desserts-content').innerHTML = `<div class="error-message">${err.message}</div>`;
+            } catch (error) {
+                console.error('Error in handleScrollAnimations:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý hiệu ứng cuộn: ' + error.message);
+                }
             }
         }
 
-        function renderMenuItems(items, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            if (items.length === 0) {
-                container.innerHTML = '<div class="col-12 text-center">Không có món ăn nào</div>';
-                return;
+        // Navbar background change on scroll
+        function handleNavbarScroll() {
+            try {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                } else {
+                    navbar.style.background = '#0F172B';
+                    navbar.classList.add('visible');
+                }
+            } catch (error) {
+                console.error('Error in handleNavbarScroll:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý thanh điều hướng: ' + error.message);
+                }
             }
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'col-md-4';
-                card.innerHTML = `
-                    <div class="card menu-card">
-                        <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0'}" class="card-img-top" alt="${item.name}">
-                        <div class="card-body">
-                            <h5 class="card-title">${item.name}</h5>
-                            <p class="card-text">${item.description || 'Không có mô tả'}</p>
-                            <p class="card-price">$${item.price ? item.price.toFixed(2) : 'N/A'}</p>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
         }
 
-        // Tải danh sách món ăn khi trang được tải
-        document.addEventListener('DOMContentLoaded', fetchMenuItems);
+        // Smooth scrolling for anchor links
+        function handleSmoothScrolling() {
+            try {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Error in handleSmoothScrolling:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi xử lý cuộn mượt: ' + error.message);
+                }
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
+                    fetchUserOrders().then(() => startPolling());
+                }
+                if (typeof initializeWebSocket === 'function') initializeWebSocket();
+                if (typeof loadChatHistory === 'function') loadChatHistory();
+                document.getElementById('chat-toggle').style.display = 'flex';
+                updateCartBadge();
+                handleScrollAnimations();
+                handleNavbarScroll();
+                handleSmoothScrolling();
+
+                // Add event listeners
+                window.addEventListener('scroll', () => {
+                    handleScrollAnimations();
+                    handleNavbarScroll();
+                });
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
+                }
+            }
+        });
     </script>
-    <script src="../../js/fetch-api.js"></script>
-
 </body>
 </html>

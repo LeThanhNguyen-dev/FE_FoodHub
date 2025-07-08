@@ -60,13 +60,9 @@
 <script>
     async function fetchUsers() {
         try {
-            const token = localStorage.getItem('accessToken');
 
-            const data = await apiFetch('/users', {
+            const data = await apiFetch('/users', { 
                 method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
             });
             renderUserTable(data.result);
         } catch (error) {

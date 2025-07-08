@@ -1,0 +1,391 @@
+  <!DOCTYPE html>
+  <html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <title>FoodHub Admin - Tạo Nhân Viên</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/create-staff.css">
+
+    <!-- Goong Map JavaScript SDK -->
+    <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7bVxaW"></script>
+  </head>
+  <body>
+  <!-- Hidden inputs to trick autofill -->
+  <div style="display: none;">
+    <input type="text" name="fake_username">
+    <input type="password" name="fake_password">
+  </div>
+
+  <!-- Sidebar Include -->
+  <div id="sidebar-container"></div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmCreateModal" tabindex="-1" aria-labelledby="confirmCreateModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmCreateModalLabel">Xác nhận tạo nhân viên</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Bạn có chắc chắn muốn tạo nhân viên mới này?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="confirmCreateBtn">Xác nhận</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-user-plus me-2"></i>Tạo Nhân Viên Mới</h5>
+        </div>
+        <div class="card-body">
+          <form id="createEmployeeForm" class="row g-3" autocomplete="off">
+            <div class="col-md-6">
+              <label for="username" class="form-label">Tên đăng nhập</label>
+              <input type="text" class="form-control" id="username" name="username"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <div class="invalid-feedback" id="username-error"></div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <div class="invalid-feedback" id="email-error"></div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="password" class="form-label">Mật khẩu</label>
+              <div class="password-field">
+                <input type="password" class="form-control" id="password" name="password"
+                      autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                <i class="fas fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+              </div>
+              <div class="invalid-feedback" id="password-error"></div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Số điện thoại</label>
+              <input type="tel" class="form-control" id="phone" name="phone"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <div class="invalid-feedback" id="phone-error"></div>
+            </div>
+
+            <div class="col-md-6 position-relative">
+              <label for="address" class="form-label">Địa chỉ</label>
+              <input type="text" class="form-control" id="address" name="address"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <div id="addressSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
+              <div class="invalid-feedback" id="address-error"></div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="roleName" class="form-label">Vai trò</label>
+              <select class="form-select" id="roleName" name="roleName" required>
+                <option value="" disabled selected>Chọn vai trò</option>
+                <option value="CASHIER">CASHIER</option>
+                <option value="CHEF">CHEF</option>
+                <option value="WAITER">WAITER</option>
+              </select>
+              <div class="invalid-feedback" id="roleName-error"></div>
+            </div>
+
+            <div class="col-12 text-end">
+              <button type="button" class="btn btn-secondary me-2" onclick="goBack()">Hủy</button>
+              <button type="button" class="btn btn-primary" onclick="validateAndShowConfirm()">Tạo nhân viên</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/fetch-api.js"></script>
+  <script src="../../js/sidebar.js"></script>
+  <script src="../../js/topbar.js"></script>
+  <script>
+    // Xóa lỗi và viền đỏ
+    function clearErrors() {
+      const inputs = document.querySelectorAll('.form-control, .form-select');
+      inputs.forEach(input => {
+        input.classList.remove('is-invalid');
+        const errorDiv = document.getElementById(`${input.id}-error`);
+        if (errorDiv) errorDiv.textContent = '';
+      });
+    }
+
+    // Hiển thị thông báo
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
+      notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 5000);
+    }
+
+    // Disable autocomplete và thêm tên ngẫu nhiên cho input
+    function disableAutocomplete() {
+      const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
+      inputs.forEach(input => {
+        input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
+        input.setAttribute('data-form-type', 'other');
+        if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
+          input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
+        }
+      });
+    }
+
+    // Tải sidebar
+    async function loadSidebar() {
+      try {
+        const response = await fetch('../../components/sidebar.html');
+        if (!response.ok) throw new Error('Không thể tải sidebar');
+        const sidebarHtml = await response.text();
+        document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+        setActiveNavLink();
+      } catch (error) {
+        console.error('Lỗi khi tải sidebar:', error);
+        showNotification('Lỗi tải sidebar!', 'error');
+        document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+      }
+    }
+
+    // Gợi ý địa chỉ với Goong Map
+    function setupAddressAutocomplete() {
+      const addressInput = document.getElementById('address');
+      const suggestionsContainer = document.getElementById('addressSuggestions');
+      let debounceTimeout;
+
+      addressInput.addEventListener('input', () => {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(async () => {
+          const input = addressInput.value.trim();
+          if (input.length < 3) {
+            suggestionsContainer.style.display = 'none';
+            return;
+          }
+
+          try {
+            const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
+              method: 'GET'
+            });
+            if (response.predictions) {
+              suggestionsContainer.innerHTML = '';
+              response.predictions.forEach(prediction => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'autocomplete-suggestion';
+                suggestion.textContent = prediction.description;
+                suggestion.addEventListener('click', () => {
+                  addressInput.value = prediction.description;
+                  suggestionsContainer.style.display = 'none';
+                });
+                suggestionsContainer.appendChild(suggestion);
+              });
+              suggestionsContainer.style.display = response.predictions.length > 0 ? 'block' : 'none';
+            } else {
+              suggestionsContainer.style.display = 'none';
+            }
+          } catch (error) {
+            console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+            suggestionsContainer.style.display = 'none';
+          }
+        }, 300);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+          suggestionsContainer.style.display = 'none';
+        }
+      });
+    }
+
+    // Validate form và hiển thị modal
+    function validateAndShowConfirm() {
+      clearErrors();
+      const formData = {
+        username: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        roleName: document.getElementById('roleName').value
+      };
+
+      let hasError = false;
+
+      if (!formData.username || formData.username.length < 5 || formData.username.length > 255) {
+        document.getElementById('username').classList.add('is-invalid');
+        document.getElementById('username-error').textContent = !formData.username ? 'Tên đăng nhập không được để trống' : 'Tên đăng nhập phải từ 5 đến 255 ký tự';
+        hasError = true;
+      }
+
+      if (!formData.password || formData.password.length < 8 || formData.password.length > 255) {
+        document.getElementById('password').classList.add('is-invalid');
+        document.getElementById('password-error').textContent = !formData.password ? 'Mật khẩu không được để trống' : 'Mật khẩu phải từ 8 đến 255 ký tự';
+        hasError = true;
+      }
+
+      if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        document.getElementById('email').classList.add('is-invalid');
+        document.getElementById('email-error').textContent = !formData.email ? 'Email không được để trống' : 'Email không hợp lệ';
+        hasError = true;
+      }
+
+      if (!formData.phone || !/^[0-9]{10}$/.test(formData.phone)) {
+        document.getElementById('phone').classList.add('is-invalid');
+        document.getElementById('phone-error').textContent = !formData.phone ? 'Số điện thoại không được để trống' : 'Số điện thoại phải có đúng 10 chữ số';
+        hasError = true;
+      }
+
+      if (!formData.address) {
+        document.getElementById('address').classList.add('is-invalid');
+        document.getElementById('address-error').textContent = 'Địa chỉ không được để trống';
+        hasError = true;
+      }
+
+      if (!formData.roleName || !['MANAGER', 'CASHIER', 'CHEF', 'WAITER'].includes(formData.roleName)) {
+        document.getElementById('roleName').classList.add('is-invalid');
+        document.getElementById('roleName-error').textContent = 'Vui lòng chọn vai trò';
+        hasError = true;
+      }
+
+      if (!hasError) {
+        const modal = new bootstrap.Modal(document.getElementById('confirmCreateModal'));
+        modal.show();
+      }
+    }
+
+    // Tạo nhân viên
+    async function createEmployee(data) {
+      try {
+        const response = await apiFetch('/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (response.code === 0) {
+          showNotification('Tạo nhân viên thành công!', 'success');
+          setTimeout(() => goBack(), 1500);
+        } else {
+          throw new Error(response.message || 'Lỗi khi tạo nhân viên!');
+        }
+      } catch (error) {
+        clearErrors();
+        const errorMessage = error.message || 'Có lỗi xảy ra khi tạo nhân viên!';
+        const errorCode = error.code || (errorMessage.match(/code (\d+)/) ? errorMessage.match(/code (\d+)/)[1] : null);
+        if (errorCode === '1054' || errorMessage.toLowerCase().includes('username')) {
+          document.getElementById('username').classList.add('is-invalid');
+          document.getElementById('username-error').textContent = errorMessage.toLowerCase().includes('username') ? errorMessage : 'Tên đăng nhập đã tồn tại';
+          showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
+        } else if (errorCode === '1055' || errorMessage.toLowerCase().includes('email')) {
+          document.getElementById('email').classList.add('is-invalid');
+          document.getElementById('email-error').textContent = errorMessage.toLowerCase().includes('email') ? errorMessage : 'Email đã tồn tại';
+          showNotification('Email đã tồn tại, vui lòng chọn email khác!', 'error');
+        } else {
+          showNotification(errorMessage, 'error');
+        }
+      }
+    }
+
+    // Quay lại danh sách
+    function goBack() {
+      window.location.href = 'staffList.html';
+    }
+
+    // Toggle mật khẩu hiển thị/ẩn
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('togglePassword');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserInfo(); 
+      loadSidebar();
+      disableAutocomplete();
+      document.querySelectorAll('input').forEach(input => {
+        if (input.type !== 'hidden') {
+          input.value = '';
+        }
+      });
+
+      setupAddressAutocomplete();
+
+      document.getElementById('confirmCreateBtn').addEventListener('click', () => {
+        const formData = {
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          address: document.getElementById('address').value.trim(),
+          roleName: document.getElementById('roleName').value
+        };
+        createEmployee(formData);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmCreateModal'));
+        modal.hide();
+      });
+
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('focus', function() {
+          this.setAttribute('autocomplete', this.type === 'password' ? 'new-password' : 'off');
+          if (this.id === 'password' || this.id === 'username' || this.id === 'email') {
+            this.setAttribute('name', `${this.id}_${Math.random().toString(36).substring(2, 15)}`);
+          }
+        });
+      });
+    });
+
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        disableAutocomplete();
+        const passwordField = document.getElementById('password');
+        if (passwordField) {
+          passwordField.value = '';
+        }
+      }, 100);
+    });
+  </script>
+  </body>
+  </html>

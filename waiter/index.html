@@ -1158,7 +1158,7 @@
         }
 
         // Hàm mới: Format tiền tệ theo định dạng Việt Nam
-        
+
 
         function formatCurrency(amount) {
             if (!amount) return '0₫';
@@ -1253,8 +1253,13 @@
                 }
 
                 // Fetch orders
+                const token = localStorage.getItem('accessToken');
+                console.log("current token: ", token);
                 const data = await apiFetch(`/orders/waiter/work-shift-orders?${params.toString()}`, {
-                    method: 'GET'
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 const orderPage = data.result;

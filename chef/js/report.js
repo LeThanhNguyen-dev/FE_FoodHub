@@ -95,10 +95,6 @@ function displayShiftReport(orderData) {
                                 <i class="fas fa-clock"></i>
                                 ${formattedStartTime} - ${formattedEndTime}
                             </span>
-                            <span class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                Khu vực: ${currentWorkSchedule.area}
-                            </span>
                         </div>
                     </div>
                     <div class="header-actions">

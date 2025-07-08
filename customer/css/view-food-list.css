@@ -1,12 +1,14 @@
 :root {
     --primary-color: #f97316;
     --primary-hover: #ea580c;
+    --secondary-color: #F7931E;
 }
 
 body {
     background-color: #f8f9fa;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    scroll-behavior: smooth; /* Làm mượt hành động cuộn */
+    scroll-behavior: smooth;
+    /* Làm mượt hành động cuộn */
 }
 
 .header-sticky {
@@ -14,19 +16,20 @@ body {
     top: 0;
     z-index: 1000;
     background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .restaurant-logo {
-    width: 32px;
-    height: 32px;
-    background: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
 }
+
 
 .cart-badge {
     position: absolute;
@@ -44,14 +47,17 @@ body {
 }
 
 .btn-primary {
+    width: 38px;
+    height: 40px;
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-hover);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-color: var(--primary-hover);
 }
+
 
 .category-btn {
     border-radius: 20px;
@@ -107,7 +113,7 @@ body {
     font-size: 0.75rem;
 }
 
-.floating-cart {
+/* .floating-cart {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
@@ -119,12 +125,46 @@ body {
     padding: 12px 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: all 0.2s;
+} */
+
+.floating-cart {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+    z-index: 999;
+    font-weight: 600;
+    /* animation: bounce 2s infinite; */
 }
 
 .floating-cart:hover {
     background: var(--primary-hover);
     color: white;
     transform: scale(1.05);
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-5px);
+    }
+
+    60% {
+        transform: translateY(-3px);
+    }
 }
 
 .cart-modal {
@@ -298,7 +338,8 @@ body {
 }
 
 #menuContainer {
-    min-height: 60vh; /* Đảm bảo chiều cao tối thiểu để tránh giật */
+    min-height: 60vh;
+    /* Đảm bảo chiều cao tối thiểu để tránh giật */
 }
 
 .quantity-controls {
@@ -324,12 +365,14 @@ body {
     font-size: 1.2rem;
 }
 
-.quantity-minus, .quantity-plus {
+.quantity-minus,
+.quantity-plus {
     width: 30px;
     height: 30px;
     padding: 0;
     border-radius: 50%;
 }
+
 @media (max-width: 576px) {
     .container-custom {
         max-width: 100%;
@@ -337,4 +380,3 @@ body {
         padding-right: 1rem;
     }
 }
-

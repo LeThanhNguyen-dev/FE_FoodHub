@@ -9,12 +9,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
     <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="css/sidebar.css">
     <style>
         :root {
             --primary: #FEA116;
@@ -33,12 +33,9 @@
         }
 
         body {
-            font-family: 'Nunito', sans-serif;
+            font-family: 'Poppins', 'Nunito', sans-serif;
             background-color: var(--light);
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
-            color: #121826;
+            color: #495057;
         }
 
         .main-content {
@@ -64,7 +61,8 @@
             background: none;
             border: none;
             color: var(--dark);
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
         .dashboard-cards {
@@ -111,6 +109,30 @@
             font-weight: 700;
             color: #121826;
             margin-bottom: 5px;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #e8960f;
+            border-color: #e8960f;
         }
 
         .btn-manage {
@@ -182,6 +204,165 @@
             100% { transform: rotate(360deg); }
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .modal-content .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--dark);
+            cursor: pointer;
+            float: right;
+        }
+
+        .table-list {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-list th, .table-list td {
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .table-list th {
+            background: #f1f8ff;
+            color: var(--dark);
+        }
+
+        .table-list tr:hover {
+            background: #f9fafb;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .btn-edit {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-restore {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-restore:hover {
+            background: #059669;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #6b7280;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .form-group input.error, .form-group select.error {
+            border-color: var(--danger);
+        }
+
+        .form-group .error-message {
+            color: var(--danger);
+            font-size: 0.75rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .btn-save {
+            background: var(--success);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-save:hover {
+            background: #059669;
+        }
+
+        .btn-cancel {
+            background: #6b7280;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-cancel:hover {
+            background: #4b5563;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
         @media (max-width: 1200px) {
             .dashboard-cards {
                 grid-template-columns: repeat(2, 1fr);
@@ -198,6 +379,9 @@
             .welcome-section h2 {
                 font-size: 1.5rem;
             }
+            .filter-group .form-group {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
@@ -208,27 +392,7 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="d-flex align-items-center">
-                <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h4 class="mb-0" id="pageTitle"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h4>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i>Admin
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <div id="topbar-container"></div>
 
         <!-- Dashboard Content -->
         <div id="dashboardContent">
@@ -240,7 +404,7 @@
                         <p class="mb-0">Quản lý toàn bộ hệ thống nhà hàng của bạn một cách hiệu quả và dễ dàng.</p>
                     </div>
                     <div class="col-md-4 text-center">
-                        <i class="fas fa-utensils management-icon"></i>
+                        <i class="fas fa-utensils management-icon"> FoodHub</i>
                     </div>
                 </div>
             </div>
@@ -306,6 +470,21 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Table Management Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-table me-2"></i>Quản lý bàn</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-table management-icon"></i>
+                        <div class="stats-number" id="tableCount"><span class="loading-spinner"></span>Đang tải...</div>
+                        <p class="text-muted mb-3">Tổng số bàn</p>
+                        <button class="btn btn-manage" onclick="showTableManagement()">
+                            <i class="fas fa-cog me-2"></i>Quản lý
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -313,15 +492,147 @@
         <div id="dynamicContent" style="display: none;"></div>
     </div>
 
+    <!-- Table Management Modals -->
+    <div class="modal-overlay" id="tableListModal">
+        <div class="modal-content">
+            <button class="btn-close" onclick="closeTableModal('tableListModal')">×</button>
+            <h3>Danh sách bàn</h3>
+            <div class="filter-group">
+                <div class="form-group">
+                    <label>Số bàn</label>
+                    <input type="text" id="filterTableNumber" placeholder="Nhập số bàn">
+                </div>
+                <div class="form-group">
+                    <label>Trạng thái</label>
+                    <select id="filterStatus">
+                        <option value="">Tất cả</option>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="OCCUPIED">OCCUPIED</option>
+                        <option value="UNAVAILABLE">UNAVAILABLE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Khu vực</label>
+                    <input type="text" id="filterArea" placeholder="Nhập khu vực">
+                </div>
+                <div class="form-group">
+                    <label>Sắp xếp theo</label>
+                    <select id="orderBy">
+                        <option value="tableNumber">Số bàn</option>
+                        <option value="area">Khu vực</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Thứ tự</label>
+                    <select id="sort">
+                        <option value="ASC">Tăng dần</option>
+                        <option value="DESC">Giảm dần</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyTableFilters()">Lọc</button>
+                </div>
+            </div>
+            <button class="btn btn-primary mb-3" onclick="showAddTableModal()">Thêm bàn mới</button>
+            <table class="table-list">
+                <thead>
+                    <tr>
+                        <th>Số bàn</th>
+                        <th>QR Code</th>
+                        <th>Trạng thái</th>
+                        <th>Khu vực</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="tableListBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addTableModal">
+        <div class="modal-content">
+            <button class="btn-close" onclick="closeTableModal('addTableModal')">×</button>
+            <h3>Thêm bàn mới</h3>
+            <form id="addTableForm">
+                <div class="form-group">
+                    <label>Số bàn</label>
+                    <input type="text" id="addTableNumber" required>
+                    <div class="error-message" id="addTableNumberError">Số bàn đã tồn tại</div>
+                </div>
+                <div class="form-group">
+                    <label>QR Code</label>
+                    <input type="text" id="addQrCode" required>
+                    <div class="error-message" id="addQrCodeError">Vui lòng nhập QR Code</div>
+                </div>
+                <div class="form-group">
+                    <label>Trạng thái</label>
+                    <select id="addStatus" required>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="OCCUPIED">OCCUPIED</option>
+                    </select>
+                    <div class="error-message" id="addStatusError">Vui lòng chọn trạng thái</div>
+                </div>
+                <div class="form-group">
+                    <label>Khu vực</label>
+                    <input type="text" id="addArea" required>
+                    <div class="error-message" id="addAreaError">Vui lòng nhập khu vực</div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-save">Lưu</button>
+                    <button type="button" class="btn btn-cancel" onclick="closeTableModal('addTableModal')">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editTableModal">
+        <div class="modal-content">
+            <button class="btn-close" onclick="closeTableModal('editTableModal')">×</button>
+            <h3>Sửa thông tin bàn</h3>
+            <form id="editTableForm">
+                <input type="hidden" id="editTableId">
+                <div class="form-group">
+                    <label>Số bàn</label>
+                    <input type="text" id="editTableNumber" required>
+                    <div class="error-message" id="editTableNumberError">Số bàn đã tồn tại</div>
+                </div>
+                <div class="form-group">
+                    <label>QR Code</label>
+                    <input type="text" id="editQrCode" required>
+                    <div class="error-message" id="editQrCodeError">Vui lòng nhập QR Code</div>
+                </div>
+                <div class="form-group">
+                    <label>Trạng thái</label>
+                    <select id="editStatus" required>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="OCCUPIED">OCCUPIED</option>
+                    </select>
+                    <div class="error-message" id="editStatusError">Vui lòng chọn trạng thái</div>
+                </div>
+                <div class="form-group">
+                    <label>Khu vực</label>
+                    <input type="text" id="editArea" required>
+                    <div class="error-message" id="editAreaError">Vui lòng nhập khu vực</div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-save">Lưu</button>
+                    <button type="button" class="btn btn-cancel" onclick="closeTableModal('editTableModal')">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="/js/fetch-api.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/topbar.js"></script>
     <script>
         // Hàm tải sidebar
         async function loadSidebar() {
             try {
-                const response = await fetch('/components/sidebar.html');
+                const response = await fetch('components/sidebar.html');
                 if (!response.ok) throw new Error('Không thể tải sidebar');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
@@ -386,20 +697,16 @@
         }
 
         // Hàm đăng xuất
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
-                document.body.style.opacity = '0.5';
-                document.body.style.transition = 'opacity 0.5s';
-                setTimeout(() => {
-                    alert('Đã đăng xuất thành công!');
-                    document.body.style.opacity = '1';
-                }, 1000);
-            }
-        }
 
         // Hàm hiển thị dashboard
         function showDashboard() {
-            document.getElementById('pageTitle').innerHTML = '<i class="fas fa-tachometer-alt me-2"></i>Dashboard';
+            const welcomeTitle = document.querySelector('.welcome-section h2');
+            if (welcomeTitle) {
+                welcomeTitle.innerHTML = '<i class="fas fa-tachometer-alt me-2"></i>Dashboard';
+            } else {
+                console.warn('Không tìm thấy tiêu đề trong welcome-section');
+                showNotification('Không thể hiển thị tiêu đề trang!', 'error');
+            }
             document.getElementById('dashboardContent').style.display = 'block';
             document.getElementById('dynamicContent').style.display = 'none';
             const navElement = document.querySelector('[onclick="showDashboard()"]');
@@ -411,23 +718,23 @@
 
         // Hàm điều hướng
         function showMenuManagement() {
-            window.location.href = "/menu-manager/menu.html";
+            window.location.href = "html/menu-manager/menu.html";
         }
 
         function showStaffManagement() {
-            window.location.href = "/staff-manager/staffList.html";
+            window.location.href = "html/staff-manager/staffList.html";
         }
 
         function showFinanceManagement() {
-            window.location.href = "/revenue-report/revenue-report.html";
+            window.location.href = "html/revenue-report/revenue-report.html";
         }
 
         function showCustomerManagement() {
-            window.location.href = "/customer-manager/customerList.html";
+            window.location.href = "html/customer-manager/customerList.html";
         }
 
         function showOrders() {
-            window.location.href = "/orders.html";
+            window.location.href = "html/orders.html";
         }
 
         // Hàm fetch số lượng khách hàng
@@ -529,6 +836,297 @@
             }
         }
 
+        // Hàm fetch số lượng bàn
+        async function fetchTableCount() {
+            const tableCountElement = document.getElementById('tableCount');
+            tableCountElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+            const timeoutId = setTimeout(() => {
+                tableCountElement.textContent = 'N/A';
+                showNotification('Không thể tải số lượng bàn. Hết thời gian chờ.', 'error');
+            }, 10000);
+
+            try {
+                const response = await apiFetch('/tables');
+                console.log('Phản hồi bàn:', response);
+                if (response.code !== 0) throw new Error(response.message || 'Không thể tải số lượng bàn!');
+                const count = response.result.length;
+                tableCountElement.textContent = count.toLocaleString('vi-VN');
+                hideError();
+            } catch (error) {
+                console.error('Lỗi fetchTableCount:', error);
+                tableCountElement.textContent = 'N/A';
+                showNotification(error.message, 'error');
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        // Hàm kiểm tra số bàn đã tồn tại
+        async function checkTableNumberExists(tableNumber, excludeTableId = null) {
+            try {
+                const response = await apiFetch('/tables');
+                if (response.code !== 0) throw new Error('Không thể kiểm tra số bàn!');
+                return response.result.some(table => 
+                    table.tableNumber === tableNumber && (!excludeTableId || table.id !== excludeTableId)
+                );
+            } catch (error) {
+                console.error('Lỗi checkTableNumberExists:', error);
+                return false;
+            }
+        }
+
+        // Hàm validate form
+        function validateForm(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                const errorElement = document.getElementById(`${input.id}Error`);
+                if (!input.value.trim()) {
+                    input.classList.add('error');
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                } else {
+                    input.classList.remove('error');
+                    errorElement.style.display = 'none';
+                }
+            });
+
+            return isValid;
+        }
+
+        // Hàm hiển thị modal danh sách bàn
+        async function showTableManagement() {
+            const modal = document.getElementById('tableListModal');
+            modal.style.display = 'flex';
+            applyTableFilters();
+        }
+
+        // Hàm áp dụng bộ lọc và sắp xếp
+        async function applyTableFilters() {
+            const tableListBody = document.getElementById('tableListBody');
+            tableListBody.innerHTML = '<tr><td colspan="5"><span class="loading-spinner"></span>Đang tải...</td></tr>';
+
+            const tableNumber = document.getElementById('filterTableNumber').value;
+            const status = document.getElementById('filterStatus').value;
+            const area = document.getElementById('filterArea').value;
+            const orderBy = document.getElementById('orderBy').value;
+            const sort = document.getElementById('sort').value;
+
+            const queryParams = new URLSearchParams();
+            if (tableNumber) queryParams.append('tableNumber', tableNumber);
+            if (status) queryParams.append('status', status);
+            if (area) queryParams.append('area', area);
+            queryParams.append('orderBy', orderBy);
+            queryParams.append('sort', sort);
+
+            try {
+                const response = await apiFetch(`/tables?${queryParams.toString()}`);
+                if (response.code !== 0) throw new Error(response.message || 'Không thể tải danh sách bàn!');
+                tableListBody.innerHTML = '';
+                response.result.forEach(table => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${table.tableNumber}</td>
+                        <td>${table.qrCode}</td>
+                        <td>${table.status}</td>
+                        <td>${table.area}</td>
+                        <td>
+                            <button class="btn btn-action btn-edit" onclick="showEditTableModal(${table.id})"><i class="fas fa-edit"></i></button>
+                            ${table.status === 'UNAVAILABLE' 
+                                ? `<button class="btn btn-action btn-restore" onclick="restoreTable(${table.id})"><i class="fas fa-undo"></i></button>` 
+                                : `<button class="btn btn-action btn-delete" onclick="deleteTable(${table.id}, '${table.status}')"><i class="fas fa-trash"></i></button>`}
+                        </td>
+                    `;
+                    tableListBody.appendChild(row);
+                });
+                hideError();
+            } catch (error) {
+                console.error('Lỗi showTableManagement:', error);
+                tableListBody.innerHTML = '<tr><td colspan="5">Không thể tải danh sách bàn!</td></tr>';
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Hàm đóng modal
+        function closeTableModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+            if (modalId === 'addTableModal' || modalId === 'editTableModal') {
+                showTableManagement();
+            }
+            // Xóa lỗi khi đóng modal
+            const inputs = document.querySelectorAll(`#${modalId} input, #${modalId} select`);
+            inputs.forEach(input => {
+                input.classList.remove('error');
+                const errorElement = document.getElementById(`${input.id}Error`);
+                if (errorElement) errorElement.style.display = 'none';
+            });
+        }
+
+        // Hàm hiển thị modal thêm bàn
+        function showAddTableModal() {
+            document.getElementById('addTableForm').reset();
+            document.getElementById('tableListModal').style.display = 'none';
+            document.getElementById('addTableModal').style.display = 'flex';
+        }
+
+        // Hàm xử lý thêm bàn
+        document.getElementById('addTableForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validateForm('addTableForm')) {
+                showNotification('Vui lòng điền đầy đủ thông tin!', 'error');
+                return;
+            }
+
+            const tableNumber = document.getElementById('addTableNumber').value;
+            const tableNumberError = document.getElementById('addTableNumberError');
+
+            // Kiểm tra số bàn đã tồn tại
+            if (await checkTableNumberExists(tableNumber)) {
+                document.getElementById('addTableNumber').classList.add('error');
+                tableNumberError.style.display = 'block';
+                showNotification('Số bàn đã tồn tại!', 'error');
+                return;
+            } else {
+                document.getElementById('addTableNumber').classList.remove('error');
+                tableNumberError.style.display = 'none';
+            }
+
+            const tableData = {
+                tableNumber: tableNumber,
+                qrCode: document.getElementById('addQrCode').value,
+                status: document.getElementById('addStatus').value,
+                area: document.getElementById('addArea').value
+            };
+
+            try {
+                const response = await apiFetch('/tables', {
+                    method: 'POST',
+                    body: JSON.stringify(tableData)
+                });
+                if (response.code !== 0) throw new Error(response.message || 'Không thể thêm bàn!');
+                showNotification('Thêm bàn thành công!', 'success');
+                closeTableModal('addTableModal');
+                fetchTableCount();
+            } catch (error) {
+                console.error('Lỗi thêm bàn:', error);
+                showNotification(error.message, 'error');
+            }
+        });
+
+        // Hàm hiển thị modal sửa bàn
+        async function showEditTableModal(tableId) {
+            document.getElementById('tableListModal').style.display = 'none';
+            document.getElementById('editTableModal').style.display = 'flex';
+            try {
+                const response = await apiFetch(`/tables/${tableId}`);
+                if (response.code !== 0) throw new Error(response.message || 'Không thể tải thông tin bàn!');
+                const table = response.result;
+                document.getElementById('editTableId').value = table.id;
+                document.getElementById('editTableNumber').value = table.tableNumber;
+                document.getElementById('editQrCode').value = table.qrCode;
+                document.getElementById('editStatus').value = table.status;
+                document.getElementById('editArea').value = table.area;
+                hideError();
+            } catch (error) {
+                console.error('Lỗi showEditTableModal:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Hàm xử lý sửa bàn
+        document.getElementById('editTableForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validateForm('editTableForm')) {
+                showNotification('Vui lòng điền đầy đủ thông tin!', 'error');
+                return;
+            }
+
+            const tableId = document.getElementById('editTableId').value;
+            const tableNumber = document.getElementById('editTableNumber').value;
+            const tableNumberError = document.getElementById('editTableNumberError');
+
+            // Kiểm tra số bàn đã tồn tại (loại trừ bàn hiện tại)
+            if (await checkTableNumberExists(tableNumber, parseInt(tableId))) {
+                document.getElementById('editTableNumber').classList.add('error');
+                tableNumberError.style.display = 'block';
+                showNotification('Số bàn đã tồn tại!', 'error');
+                return;
+            } else {
+                document.getElementById('editTableNumber').classList.remove('error');
+                tableNumberError.style.display = 'none';
+            }
+
+            const tableData = {
+                tableNumber: tableNumber,
+                qrCode: document.getElementById('editQrCode').value,
+                status: document.getElementById('editStatus').value,
+                area: document.getElementById('editArea').value
+            };
+
+            try {
+                const response = await apiFetch(`/tables/${tableId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(tableData)
+                });
+                if (response.code !== 0) throw new Error(response.message || 'Không thể cập nhật bàn!');
+                showNotification('Cập nhật bàn thành công!', 'success');
+                closeTableModal('editTableModal');
+                fetchTableCount();
+            } catch (error) {
+                console.error('Lỗi sửa bàn:', error);
+                showNotification(error.message, 'error');
+            }
+        });
+
+        
+async function deleteTable(tableId, status) {
+    if (status === 'OCCUPIED') {
+        showNotification('Không thể xóa bàn đang có khách!', 'error');
+        return;
+    }
+    if (!confirm('Bạn có chắc chắn muốn xóa bàn này?')) return;
+    try {
+        const response = await apiFetch(`/tables/${tableId}`, {
+            method: 'DELETE'
+        });
+        // Debug phản hồi APIs
+        // Kiểm tra thành công dựa trên code
+        if (response.code === 0) {
+            await applyTableFilters(); // Làm mới danh sách ngay sau khi xóa
+            fetchTableCount(); // Cập nhật số lượng bàn
+        } else {
+          
+            await applyTableFilters();
+        }
+    } catch (error) {
+        await applyTableFilters();
+    }
+
+}
+
+
+
+
+        // Hàm khôi phục bàn
+        async function restoreTable(tableId) {
+            if (!confirm('Bạn có chắc chắn muốn khôi phục bàn này?')) return;
+            try {
+                const response = await apiFetch(`/tables/restore/${tableId}`, {
+                    method: 'POST'
+                });
+                if (response.code !== 0) throw new Error(response.message || 'Không thể khôi phục bàn!');
+                showNotification('Khôi phục bàn thành công!', 'success');
+                applyTableFilters(); // Làm mới danh sách ngay sau khi khôi phục
+                fetchTableCount();
+            } catch (error) {
+                console.error('Lỗi khôi phục bàn:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
         // Hàm tải dữ liệu dashboard
         async function fetchDashboardData() {
             console.log('Bắt đầu tải dữ liệu dashboard...');
@@ -536,24 +1134,21 @@
             fetchUserCount().catch(error => console.error('Lỗi fetchUserCount:', error));
             fetchMenuItemCount().catch(error => console.error('Lỗi fetchMenuItemCount:', error));
             fetchTodayRevenue().catch(error => console.error('Lỗi fetchTodayRevenue:', error));
+            fetchTableCount().catch(error => console.error('Lỗi fetchTableCount:', error));
             console.log('Đã gửi tất cả yêu cầu fetch.');
         }
 
         // Sự kiện DOM loaded
         document.addEventListener('DOMContentLoaded', () => {
-            // Kiểm tra DOM
             console.log('Kiểm tra DOM:', {
                 customerCount: document.getElementById('customerCount'),
                 userCount: document.getElementById('userCount'),
                 menuItemCount: document.getElementById('menuItemCount'),
-                todayRevenue: document.getElementById('todayRevenue')
+                todayRevenue: document.getElementById('todayRevenue'),
+                tableCount: document.getElementById('tableCount')
             });
-
-            // Xóa accessToken
-            localStorage.removeItem("accessToken");
-            console.log("Đã xóa accessToken:", localStorage.getItem("accessToken"));
-
             loadSidebar();
+            loadTopbar();
             showDashboard();
         });
     </script>
