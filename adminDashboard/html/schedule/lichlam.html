@@ -60,15 +60,12 @@
                     <div class="employee-card cashier" style="width: 15px; height: 15px;"></div>
                     <span>Thu ngân</span>
                 </div>
-                <div class="legend-item">
-                    <div class="employee-card manager" style="width: 15px; height: 15px;"></div>
-                    <span>Quản lý</span>
-                </div>
             </div>
 
             <div class="shift-times-table">
                 <table>
                     <thead>
+                        
                         <tr>
                             <th>Ca</th>
                             <th>Giờ bắt đầu</th>
@@ -76,6 +73,11 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                <td>Cả Ngày</td>
+                <td>08:30</td>
+                <td>22:30</td>
+            </tr>
                         <tr>
                             <td>Ca Sáng</td>
                             <td>08:30</td>
@@ -153,7 +155,6 @@
                         <option value="chef">Bếp trưởng (Chef)</option>
                         <option value="waiter">Phục vụ (Waiter)</option>
                         <option value="cashier">Thu ngân (Cashier)</option>
-                        <option value="manager">Quản lý (Manager)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -178,11 +179,13 @@
                 <div class="form-group">
                     <label for="shiftType">Ca làm việc</label>
                     <select id="shiftType" name="shiftType" required>
-                        <option value="">Chọn ca...</option>
-                        <option value="morning">Ca Sáng</option>
-                        <option value="afternoon">Ca Chiều</option>
-                        <option value="night">Ca Tối</option>
-                    </select>
+    <option value="">Chọn ca...</option>
+       <option value="FULL_DAY"selected>Cả Ngày</option>
+    <option value="MORNING">Ca Sáng</option>
+    <option value="AFTERNOON">Ca Chiều</option>
+    <option value="EVENING">Ca Tối</option>
+ 
+</select>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
@@ -356,28 +359,29 @@
                         return shiftDate === dateStr;
                     });
 
-                    const groupedShifts = {
-                        morning: dayShifts.filter(s => s.shift.toLowerCase() === 'morning'),
-                        afternoon: dayShifts.filter(s => s.shift.toLowerCase() === 'afternoon'),
-                        night: dayShifts.filter(s => s.shift.toLowerCase() === 'night')
-                    };
+                 const groupedShifts = {
+    morning: dayShifts.filter(s => s.shift.toLowerCase() === 'morning'),
+    afternoon: dayShifts.filter(s => s.shift.toLowerCase() === 'afternoon'),
+    evening: dayShifts.filter(s => s.shift.toLowerCase() === 'evening'),
+    full_day: dayShifts.filter(s => s.shift.toLowerCase() === 'full_day')
+};
 
-                    let shiftsHtml = '';
-                    ['morning', 'afternoon', 'night'].forEach(shiftType => {
-                        if (groupedShifts[shiftType].length > 0) {
-                            shiftsHtml += `
-                                <div class="shift-group">
-                                    <div class="shift-header">${shiftType === 'morning' ? 'Ca Sáng' : shiftType === 'afternoon' ? 'Ca Chiều' : 'Ca Tối'}</div>
-                                    ${groupedShifts[shiftType].map(shift => `
-                                        <div class="employee-card ${shift.role.toLowerCase()}" onclick="showShiftInfo(${shift.id}, '${shift.name}', '${shift.role}', '${shift.area || ''}', '${shift.date}', '${shift.shift}', '${formatTime(shift.startTime)}', '${formatTime(shift.endTime)}')">
-                                            <span class="employee-name">${shift.name}</span>
-                                            ${shift.area ? `<span class="area-tag">${shift.area}</span>` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `;
-                        }
-                    });
+let shiftsHtml = '';
+['full_day','morning', 'afternoon', 'evening' ].forEach(shiftType => {
+    if (groupedShifts[shiftType].length > 0) {
+        shiftsHtml += `
+            <div class="shift-group">
+                <div class="shift-header">${getShiftDisplayName(shiftType)}</div>
+                ${groupedShifts[shiftType].map(shift => `
+                    <div class="employee-card ${shift.role.toLowerCase()}" onclick="showShiftInfo(${shift.id}, '${shift.name}', '${shift.role}', '${shift.area || ''}', '${shift.date}', '${shift.shift}', '${formatTime(shift.startTime)}', '${formatTime(shift.endTime)}')">
+                        <span class="employee-name">${shift.name}</span>
+                        ${shift.area ? `<span class="area-tag">${shift.area}</span>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+});
 
                     dayCell.innerHTML = `
                         <div class="day-number">${currentDay.getDate()}</div>
@@ -435,20 +439,24 @@
                 return;
             }
 
-            if (shiftDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
-                if (shiftType === 'morning' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 30))) {
-                    showAlert('Không thể thêm ca sáng vì đã qua giờ bắt đầu (08:30).', 'Lỗi', 'error');
-                    return;
-                }
-                if (shiftType === 'afternoon' && (currentHours > 12 || (currentHours === 12 && currentMinutes >= 30))) {
-                    showAlert('Không thể thêm ca chiều vì đã qua giờ bắt đầu (12:30).', 'Lỗi', 'error');
-                    return;
-                }
-                if (shiftType === 'night' && (currentHours > 17 || (currentHours === 17 && currentMinutes >= 30))) {
-                    showAlert('Không thể thêm ca tối vì đã qua giờ bắt đầu (17:30).', 'Lỗi', 'error');
-                    return;
-                }
-            }
+         if (shiftDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
+    if (shiftType === 'MORNING' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 40))) {
+        showAlert('Không thể thêm ca sáng vì đã qua giờ bắt đầu (08:30).', 'Lỗi', 'error');
+        return;
+    }
+    if (shiftType === 'AFTERNOON' && (currentHours > 12 || (currentHours === 12 && currentMinutes >= 40))) {
+        showAlert('Không thể thêm ca chiều vì đã qua giờ bắt đầu (12:30).', 'Lỗi', 'error');
+        return;
+    }
+    if (shiftType === 'EVENING' && (currentHours > 17 || (currentHours === 17 && currentMinutes >= 40))) {
+        showAlert('Không thể thêm ca tối vì đã qua giờ bắt đầu (17:30).', 'Lỗi', 'error');
+        return;
+    }
+    if (shiftType === 'FULL_DAY' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 40))) {
+        showAlert('Không thể thêm ca cả ngày vì đã qua giờ bắt đầu .', 'Lỗi', 'error');
+        return;
+    }
+}
 
             const newShifts = employeeNames.map(name => ({
                 name,
@@ -552,19 +560,19 @@
                 'chef': 'Bếp trưởng',
                 'waiter': 'Phục vụ',
                 'cashier': 'Thu ngân',
-                'manager': 'Quản lý'
             };
             return roleMap[role.toLowerCase()] || role;
         }
 
-        function getShiftDisplayName(shift) {
-            const shiftMap = {
-                'morning': 'Ca Sáng',
-                'afternoon': 'Ca Chiều',
-                'night': 'Ca Tối'
-            };
-            return shiftMap[shift.toLowerCase()] || shift;
-        }
+      function getShiftDisplayName(shift) {
+    const shiftMap = {
+        'full_day': 'Cả Ngày',
+        'morning': 'Ca Sáng',
+        'afternoon': 'Ca Chiều', 
+        'evening': 'Ca Tối'
+    };
+    return shiftMap[shift.toLowerCase()] || shift;
+}
 
         async function removeShift(shiftId) {
             try {

@@ -409,72 +409,80 @@
             }
         }
 
-        function renderOrderTable(orders, totalElements = 0) {
-            const tbody = document.getElementById('orderTableBody');
-            
-            const orderTableCard = document.querySelector('.card:has(#orderTable)');
-            let totalOrdersElement = orderTableCard.querySelector('.total-orders-info');
-            
-            if (!totalOrdersElement) {
-                totalOrdersElement = document.createElement('div');
-                totalOrdersElement.className = 'total-orders-info alert alert-info mb-3';
-                orderTableCard.querySelector('.card-body').insertBefore(totalOrdersElement, orderTableCard.querySelector('#loadingSpinner'));
-            }
+      // Thay thế phần renderOrderTable hiện tại
+function renderOrderTable(orders, totalElements = 0) {
+    const tbody = document.getElementById('orderTableBody');
+    
+    const orderTableCard = document.querySelector('.card:has(#orderTable)');
+    let totalOrdersElement = orderTableCard.querySelector('.total-orders-info');
+    
+    if (!totalOrdersElement) {
+        totalOrdersElement = document.createElement('div');
+        totalOrdersElement.className = 'total-orders-info alert alert-info mb-3';
+        orderTableCard.querySelector('.card-body').insertBefore(totalOrdersElement, orderTableCard.querySelector('#loadingSpinner'));
+    }
 
-            totalOrdersElement.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        <strong>Tổng số đơn hàng:</strong> ${totalElements.toLocaleString('vi-VN')} đơn
-                    </div>
-                    <div class="col-md-6">
-                        <i class="fas fa-money-bill-wave me-2"></i>
-                        <strong>Tổng tiền:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
-                        <i class="fas fa-exclamation-circle text-warning ms-1" 
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
-                           title="Lưu ý: Doanh thu của cửa hàng được xác định dựa trên các giao dịch thanh toán thành công, nên có thể không hoàn toàn khớp với tổng tiền của các đơn hàng."
-                           style="cursor: help;"></i>
-                    </div>
-                </div>
-            `;
+    totalOrdersElement.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <i class="fas fa-shopping-cart me-2"></i>
+                <strong>Tổng số đơn hàng:</strong> ${totalElements.toLocaleString('vi-VN')} đơn
+            </div>
+            <div class="col-md-6">
+                <i class="fas fa-money-bill-wave me-2"></i>
+                <strong>Tổng tiền:</strong> <span class="text-success fw-bold">${formatCurrency(totalAmountAllPages)}</span>
+                <i class="fas fa-exclamation-circle text-warning ms-1" 
+                   data-bs-toggle="tooltip" 
+                   data-bs-placement="top" 
+                   title="Lưu ý: Doanh thu của cửa hàng được xác định dựa trên các giao dịch thanh toán thành công, nên có thể không hoàn toàn khớp với tổng tiền của các đơn hàng."
+                   style="cursor: help;"></i>
+            </div>
+        </div>
+    `;
 
-            setTimeout(() => {
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-            }, 100);
-            
-            if (!orders || orders.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
-                tbody.innerHTML = '';
-                return;
-            }
+    setTimeout(() => {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }, 100);
+    
+    if (!orders || orders.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        tbody.innerHTML = '';
+        return;
+    }
 
-            document.getElementById('emptyState').style.display = 'none';
-            tbody.innerHTML = orders.map((order, index) => {
-                const stt = currentPage * pageSize + index + 1;
-                return `
-                    <tr>
-                        <td><div class="text-center fw-bold">${stt}</div></td>
-                        <td><div class="fw-bold">${order.id}</div></td>
-                        <td><div>${formatDate(order.createdAt)}</div></td>
-                        <td><div>${order.username || 'Khách lẻ'}</div></td>
-                        <td><div class="fw-bold text-success">${formatCurrency(order.totalAmount)}</div></td>
-                        <td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
-                        <td><div>${formatPaymentMethod(order.paymentMethod)}</div></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-outline-primary btn-sm" onclick="showOrderDetail(${order.id})" title="Xem chi tiết">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+    document.getElementById('emptyState').style.display = 'none';
+    tbody.innerHTML = orders.map((order, index) => {
+        const stt = currentPage * pageSize + index + 1;
+        
+        // Lấy paymentMethod từ order.payment.paymentMethod giống như trong popup
+        let paymentMethodText = 'Chưa xác định';
+        if (order.payment && order.payment.paymentMethod) {
+            paymentMethodText = formatPaymentMethod(order.payment.paymentMethod);
         }
+        
+        return `
+            <tr>
+                <td><div class="text-center fw-bold">${stt}</div></td>
+                <td><div class="fw-bold">${order.id}</div></td>
+                <td><div>${formatDate(order.createdAt)}</div></td>
+                <td><div>${order.username || 'Khách lẻ'}</div></td>
+                <td><div class="fw-bold text-success">${formatCurrency(order.totalAmount)}</div></td>
+                <td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
+                <td><div>${paymentMethodText}</div></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline-primary btn-sm" onclick="showOrderDetail(${order.id})" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
 
         function renderPagination(totalPages, currentPageIndex) {
             const pagination = document.getElementById('pagination');
