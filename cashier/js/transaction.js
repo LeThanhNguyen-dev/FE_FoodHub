@@ -3,10 +3,12 @@
 let paymentList = [];
 
 
+//====================================================================================
 
 // Biến toàn cục cho phân trang
 let currentPage = 1;
 const itemsPerPage = 10;
+//====================================================================================
 
   // Đối tượng lưu trữ bộ lọc
       let filters = {
@@ -797,7 +799,7 @@ async function fetchSuggestions() {
             suggestions.forEach(suggestion => {
                 const div = document.createElement('div');
                 div.className = 'suggestion-item';
-                div.textContent = suggestion; // Hiển thị toàn bộ gợi ý (ví dụ: "2- TXN-20250701-002")
+                div.textContent = suggestion; 
                 // Lấy orderId từ đầu chuỗi (phần số)
                 const orderId = suggestion.match(/^\d+/)[0]; // Trích xuất số đầu tiên (ví dụ: "2")
                 div.dataset.suggestionValue = orderId; // Lưu chỉ orderId (ví dụ: "2")
@@ -1264,9 +1266,24 @@ showDeleteSuccessNotification();
       }
 
 
-function viewInvoicePdf(orderId) {
-    const pdfUrl = `${API_BASE_URL}/payments/invoice/${orderId}/pdf`;
-    window.open(pdfUrl, '_blank'); // Mở PDF trong tab mới
+
+      async function viewInvoicePdf(orderId) {
+    try {
+        // Gọi API để nhận link URL cố định
+        const data = await apiFetch(`/payments/invoice/${orderId}/pdf`, { method: 'GET' });
+
+        if (!data) {
+            showError("error", "❌ Không lấy được link hóa đơn.");
+            return;
+        }
+
+        // Mở tab mới với URL trả về
+        window.open(data, '_blank');
+    } catch (error) {
+        console.error('Lỗi khi tải hóa đơn:', error);
+        showError("error", `❌ ${error.message || 'Không thể tải hóa đơn, vui lòng thử lại.'}`);
+    }
 }
+
 
 //==================================================================================

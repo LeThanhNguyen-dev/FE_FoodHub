@@ -216,7 +216,7 @@ async function showChartPopup(stats = null) {
   const popupChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Total', 'CASH', 'VNPAY', 'Pending', 'Paid', 'Cancelled'],
+labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', 'Đã hủy'],
       datasets: [{
         label: 'Doanh thu (VNĐ)',
         data: [
@@ -399,14 +399,14 @@ async function refreshRevenue() {
     if (data.result) {
       const stats = data.result;
       
-      // Cập nhật stats global
+      // Cập nhật số liệu toàn cục
       updateGlobalStats(stats);
 
-      // Cập nhật thống kê với design hiện đại
+      // Cập nhật thống kê với thiết kế hiện đại
       const row1Stats = [
-        { title: 'Total Revenue', value: stats.totalRevenue, color: '#FF6B35' },
-        { title: 'CASH Revenue', value: stats.cashRevenue, color: '#FF5722' },
-        { title: 'VNPAY Revenue', value: stats.vnpayRevenue, color: '#FFA726' }
+        { title: 'Doanh thu Tổng', value: stats.totalRevenue, color: '#FF6B35' },
+        { title: 'Doanh thu Tiền mặt', value: stats.cashRevenue, color: '#FF5722' },
+        { title: 'Doanh thu VNPAY', value: stats.vnpayRevenue, color: '#FFA726' }
       ].map(stat => `
         <div class="stat-card" style="border-left: 4px solid ${stat.color}; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.1);">
           <h4 style="color: ${stat.color};">${stat.title}</h4>
@@ -415,9 +415,9 @@ async function refreshRevenue() {
       `).join('');
 
       const row2Stats = [
-        { title: 'Pending', value: stats.pendingRevenue, color: '#F57C00' },
-        { title: 'Paid', value: stats.paidRevenue, color: '#FFB74D' },
-        { title: 'Cancelled', value: stats.cancelledRevenue, color: '#D84315' }
+        { title: 'Đang chờ', value: stats.pendingRevenue, color: '#F57C00' },
+        { title: 'Đã thanh toán', value: stats.paidRevenue, color: '#FFB74D' },
+        { title: 'Đã hủy', value: stats.cancelledRevenue, color: '#D84315' }
       ].map(stat => `
         <div class="stat-card" style="border-left: 4px solid ${stat.color}; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.1);">
           <h4 style="color: ${stat.color};">${stat.title}</h4>
@@ -437,7 +437,7 @@ async function refreshRevenue() {
       const ctx = document.getElementById('dailyRevenueChart').getContext('2d');
       if (window.revenueChart) window.revenueChart.destroy();
 
-      // Tạo gradients cho biểu đồ chính
+      // Tạo gradient cho biểu đồ chính
       const mainGradients = [
         createGradient(ctx, '#FF8C42', '#FF6B35', 300),
         createGradient(ctx, '#FF7043', '#FF5722', 300),
@@ -450,7 +450,7 @@ async function refreshRevenue() {
       window.revenueChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Total', 'CASH', 'VNPAY', 'Pending', 'Paid', 'Cancelled'],
+          labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', 'Đã hủy'],
           datasets: [{
             label: 'Doanh thu (VNĐ)',
             data: [
@@ -556,7 +556,7 @@ async function refreshRevenue() {
         }
       });
 
-      // Thêm hover effect cho container
+      // Thêm hiệu ứng hover cho container
       const chartContainer = document.getElementById('dailyRevenueChart').parentElement;
       if (chartContainer) {
         chartContainer.style.cssText += `
@@ -565,7 +565,7 @@ async function refreshRevenue() {
           border-radius: 12px;
           overflow: hidden;
         `;
-        chartContainer.title = '🖱️ Click để xem biểu đồ chi tiết toàn màn hình';
+        chartContainer.title = '🖱️ Nhấp để xem biểu đồ chi tiết toàn màn hình';
         
         chartContainer.onmouseenter = () => {
           chartContainer.style.transform = 'translateY(-2px)';
@@ -577,17 +577,17 @@ async function refreshRevenue() {
           chartContainer.style.boxShadow = 'none';
         };
         
-        // Click event để mở popup - không truyền stats cũ
+        // Sự kiện click để mở popup - không truyền stats cũ
         chartContainer.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           if (!isModalOpen) {
-            showChartPopup(); // Không truyền stats để luôn lấy data mới
+            showChartPopup(); // Không truyền stats để luôn lấy dữ liệu mới
           }
         });
       }
 
-      document.getElementById("message").textContent = "🎉 Revenue stats loaded with modern design!";
+      document.getElementById("message").textContent = "🎉 Thống kê doanh thu đã được tải với thiết kế hiện đại!";
     } else {
       showError("error", `❌ ${data.message || "Không thể tải doanh thu."}`);
     }

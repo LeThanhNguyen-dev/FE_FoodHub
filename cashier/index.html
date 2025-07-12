@@ -24,13 +24,13 @@
       
       <div class="nav-item">
         <button class="nav-link" onclick="showSection('transactions')" id="sidebarTransactions">
-          <i class="fas fa-list-alt"></i><span>Transactions</span>
+          <i class="fas fa-list-alt"></i><span>Giao Dịch</span>
         </button>
       </div>
 
       <div class="nav-item">
         <button class="nav-link" onclick="showSection('revenue')" id="sidebarRevenue">
-          <i class="fas fa-chart-line"></i><span>Revenue</span>
+          <i class="fas fa-chart-line"></i><span>Doanh thu</span>
         </button>
       </div>
 
@@ -38,7 +38,7 @@
 
  <div class="nav-item">
                 <button class="nav-link" onclick="showSection('schedule')" id="sidebarSchedule">
-                    <i class="fas fa-calendar-alt"></i><span>Schedule</span>
+                    <i class="fas fa-calendar-alt"></i><span>Lịch Làm</span>
                 </button>
             </div>
       
@@ -47,7 +47,7 @@
 
       <div class="nav-item">
         <button class="nav-link" onclick="logout()" id="sidebarLogout">
-            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            <i class="fas fa-sign-out-alt"></i><span>Đăng Xuất</span>
         </button>
     </div>
      
@@ -84,42 +84,12 @@
 
   <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
 
-   <!-- Home Section -->
-    <div class="section active" id="homeSection">
-      <!-- Enhanced Carousel -->
-      <div class="carousel">
-        <div class="carousel-item active">
-          <img src="images/pho-nha-lam.jpg" alt="Phở Bò Thơm Ngon">
-          <div class="carousel-text">🍜 Phở Bò Thơm Ngon</div>
-        </div>
-        <div class="carousel-item">
-          <img src="images/42c930c5-2a1a-429c-a002-eb2c57d700f5.jpg" alt="Cơm Tấm Sườn Nướng">
-          <div class="carousel-text">🍖 Cơm Tấm Sườn Nướng</div>
-        </div>
-        <div class="carousel-item">
-          <img src="images/top-1-mon-sandwich-ngon-nhat-the-gioi-goi-ten-banh-my-viet-nam1710498007-182420240316092132.jpg" alt="Bánh Mì VN">
-          <div class="carousel-text">🥖 Bánh Mì Việt Nam</div>
-        </div>
-        <div class="carousel-item">
-          <img src="images/bunbohue.jpg" alt="Bún Bò Huế">
-          <div class="carousel-text">🌶️ Bún Bò Huế</div>
-        </div>
-        <button class="carousel-arrow prev" onclick="prevSlide()">‹</button>
-        <button class="carousel-arrow next" onclick="nextSlide()">›</button>
-        <div class="carousel-nav">
-          <div class="nav-dot active" onclick="currentSlide(1)"></div>
-          <div class="nav-dot" onclick="currentSlide(2)"></div>
-          <div class="nav-dot" onclick="currentSlide(3)"></div>
-          <div class="nav-dot" onclick="currentSlide(4)"></div>
-        </div>
-      </div>
-    </div>
 
     <!-- Transactions Section -->
     <div class="section" id="transactionsSection">
     <div class="form-container">
         <div class="form-header">
-            <h1>Transactions Today</h1>
+            <h1>Giao Dịch Hôm Nay</h1>
             <p>Hiển thị giao dịch của ngày hôm nay: <span id="currentDate"></span></p>
         </div>
     </div>
@@ -267,7 +237,7 @@
 <div class="section" id="revenueSection">
   <div class="form-container">
     <div class="form-header">
-      <h1>Revenue Analysis</h1>
+      <h1>Doanh Thu</h1>
       <p>Hiển thị doanh thu của ngày hôm nay: <span id="revenueCurrentDate"></span></p>
     </div>
   </div>
@@ -290,7 +260,7 @@
   <div class="form-container">
     <div class="form-header">
       <h1>Lịch Ca Làm Việc</h1>
-      <p>Quản lý ca làm việc nhàn hàng</p>
+      <p>Quản lý ca làm việc nhà hàng</p>
     </div>
     <div class="filter-search-row">
       <div class="filter-container">
@@ -364,6 +334,8 @@
 
 //=================================================================================
 
+
+
 async function clearData() {
     try {
         console.log('Calling clearData API...');
@@ -387,141 +359,89 @@ async function clearData() {
 }
 
 
+
+
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
+        console.log('DOM fully loaded');
+        const token = getToken();
+        const cashierNameElement = document.getElementById('cashier-name');
 
-    // Thiết lập tên nhân viên thu ngân
-    const token = getToken();
-    const cashierNameElement = document.getElementById('cashier-name');
-    console.log('cashierNameElement:', cashierNameElement);
-
-    if (token && cashierNameElement) {
-        const payload = parseJwt(token);
-        if (payload && (payload.sub || payload.email)) {
-            cashierNameElement.innerText = `👤 Cashier: ${payload.sub || payload.email}`;
-            console.log('Email set to:', payload.sub || payload.email);
-        } else {
-            cashierNameElement.innerText = '👤 Cashier: Unknown';
-            console.error('No email found in token payload or invalid token');
-        }
-    } else {
-        if (!token) console.error('No token found in localStorage');
-        if (!cashierNameElement) console.error('Element with id "cashier-name" not found');
-        if (cashierNameElement) cashierNameElement.innerText = '👤 Cashier: Unknown';
-    }
-
-    // Gắn sự kiện cho nút clearData
-    document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
-
-    // Gắn sự kiện cho tìm kiếm giao dịch
-    const searchInput = document.getElementById('searchTransactionInput');
-    const searchButton = document.getElementById('searchTransactionBtn');
-    const reloadSearchBtn = document.getElementById('reloadSearchBtn');
-
-    console.log('searchInput:', searchInput);
-    console.log('searchButton:', searchButton);
-    console.log('reloadSearchBtn:', reloadSearchBtn);
-
-    if (searchInput && searchButton && reloadSearchBtn) {
-        console.log('Elements found, attaching events');
-
-        // Debounce cho cả gợi ý và tìm kiếm
-        const debouncedSearch = debounce(async () => {
-            await fetchSuggestions(); // Hiển thị gợi ý
-            await searchTransactions(); // Lọc và hiển thị bảng giao dịch
-        }, 300);
-
-        // Gắn sự kiện input
-        searchInput.addEventListener('input', debouncedSearch);
-
-        // Sự kiện Enter
-        searchInput.addEventListener('keypress', async (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                console.log('Enter key pressed, calling searchTransactions');
-                await searchTransactions(event);
+        if (token && cashierNameElement) {
+            const payload = parseJwt(token);
+            if (payload && (payload.sub || payload.email)) {
+                cashierNameElement.innerText = `👤 Cashier: ${payload.sub || payload.email}`;
+                console.log('Email set to:', payload.sub || payload.email);
+            } else {
+                cashierNameElement.innerText = '👤 Cashier: Unknown';
+                console.error('No email found in token payload or invalid token');
             }
-        });
-
-        // Sự kiện nút tìm kiếm
-        searchButton.addEventListener('click', async (event) => {
-            event.preventDefault();
-            console.log('Search button clicked, calling searchTransactions');
-            await searchTransactions(event);
-        });
-
-        // Sự kiện reload
-        reloadSearchBtn.addEventListener('click', async () => {
-            console.log('Reload button clicked, resetting search');
-            await reloadSearch();
-        });
-    } else {
-        console.error('Error: One or more elements not found');
-        if (!searchInput) console.error('searchTransactionInput not found in DOM');
-        if (!searchButton) console.error('searchTransactionBtn not found in DOM');
-        if (!reloadSearchBtn) console.error('reloadSearchBtn not found in DOM');
-        console.log('Full DOM:', document.body.innerHTML); // Log để debug
-    }
-
-    // Ẩn gợi ý khi click ra ngoài
-    document.addEventListener('click', function(e) {
-        const suggestionBox = document.getElementById('suggestionBox');
-        const inputWrapper = document.querySelector('.search-container .input-wrapper');
-        if (suggestionBox && inputWrapper && !inputWrapper.contains(e.target)) {
-            suggestionBox.style.display = 'none';
+        } else {
+            if (!token) console.error('No token found in localStorage');
+            if (!cashierNameElement) console.error('Element with id "cashier-name" not found');
+            if (cashierNameElement) cashierNameElement.innerText = '👤 Cashier: Unknown';
         }
-    });
-});
 
+        document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
 
-     function showSection(sectionId) {
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(section => section.classList.remove('active'));
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => link.classList.remove('active'));
-    const sidebarLink = document.getElementById(`sidebar${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
-    if (sidebarLink) sidebarLink.classList.add('active');
-    document.getElementById(`${sectionId}Section`).classList.add('active');
-    
-    // Gắn sự kiện khi section transactions được hiển thị
-    if (sectionId === 'transactions') {
         const searchInput = document.getElementById('searchTransactionInput');
         const searchButton = document.getElementById('searchTransactionBtn');
         const reloadSearchBtn = document.getElementById('reloadSearchBtn');
 
         if (searchInput && searchButton && reloadSearchBtn) {
-            console.log('Attaching events to searchInput, searchButton, and reloadSearchBtn');
+            console.log('Elements found, attaching events');
+            const debouncedSearch = debounce(async () => {
+                await fetchSuggestions();
+                await searchTransactions();
+            }, 300);
+
+            searchInput.addEventListener('input', debouncedSearch);
             searchInput.addEventListener('keypress', async (event) => {
                 if (event.key === 'Enter') {
                     event.preventDefault();
-                    console.log('Enter key pressed, calling searchTransactions');
                     await searchTransactions(event);
                 }
             });
             searchButton.addEventListener('click', async (event) => {
                 event.preventDefault();
-                console.log('Search button clicked, calling searchTransactions');
                 await searchTransactions(event);
             });
-            reloadSearchBtn.addEventListener('click', async () => {
-                console.log('Reload button clicked, resetting search');
-                await reloadSearch();
-            });
+            reloadSearchBtn.addEventListener('click', async () => await reloadSearch());
         } else {
-            console.error('Error: One or more elements not found in transactions section');
-            if (!searchInput) console.error('searchTransactionInput not found in DOM');
-            if (!searchButton) console.error('searchTransactionBtn not found in DOM');
-            if (!reloadSearchBtn) console.error('reloadSearchBtn not found in DOM');
+            console.error('Error: One or more elements not found');
+        }
+
+        document.addEventListener('click', function(e) {
+            const suggestionBox = document.getElementById('suggestionBox');
+            const inputWrapper = document.querySelector('.search-container .input-wrapper');
+            if (suggestionBox && inputWrapper && !inputWrapper.contains(e.target)) {
+                suggestionBox.style.display = 'none';
+            }
+        });
+    });
+
+    function showSection(sectionId) {
+        console.log('Showing section at:', new Date().toLocaleTimeString(), sectionId);
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => section.classList.remove('active'));
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => link.classList.remove('active'));
+        const sidebarLink = document.getElementById(`sidebar${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
+        if (sidebarLink) sidebarLink.classList.add('active');
+        const sectionElement = document.getElementById(`${sectionId}Section`);
+        if (sectionElement) {
+            sectionElement.classList.add('active');
+            if (sectionId === 'transactions') {
+                if (typeof attachTransactionEvents === 'function') attachTransactionEvents();
+                if (typeof refreshTransactions === 'function') refreshTransactions();
+            } else if (sectionId === 'revenue') {
+                if (typeof refreshRevenue === 'function') refreshRevenue();
+            } else if (sectionId === 'schedule') {
+                if (typeof initializeSchedule === 'function') initializeSchedule();
+            }
+        } else {
+            console.error('Section', sectionId, 'not found at:', new Date().toLocaleTimeString());
         }
     }
-
-    if (sectionId === 'revenue') {
-        refreshRevenue();
-    } else if (sectionId === 'transactions') {
-        refreshTransactions();
-    }
-}
-
 
 
 
@@ -538,89 +458,12 @@ document.addEventListener('DOMContentLoaded', function() {
           mainContent.classList.toggle('expanded');
       }
 
-      // Tạo hiệu ứng particle động
-      function createParticles() {
-          for (let i = 0; i < 20; i++) {
-              const particle = document.createElement('div');
-              particle.className = 'particle';
-              particle.style.left = Math.random() * 100 + '%';
-              particle.style.animationDelay = Math.random() * 6 + 's';
-              particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
-              document.body.appendChild(particle);
-          }
-      }
-      createParticles();
-
-      // Xử lý carousel
-      let currentSlideIndex = 0;
-      const slides = document.querySelectorAll('.carousel-item');
-      const dots = document.querySelectorAll('.nav-dot');
-      const totalSlides = slides.length;
-
-      function showSlide(index) {
-          slides.forEach(slide => slide.classList.remove('active'));
-          dots.forEach(dot => dot.classList.remove('active'));
-          slides[index].classList.add('active');
-          dots[index].classList.add('active');
-      }
-
-      function nextSlide() {
-          currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
-          showSlide(currentSlideIndex);
-      }
-
-      function prevSlide() {
-          currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
-          showSlide(currentSlideIndex);
-      }
-
-      function currentSlide(n) {
-          currentSlideIndex = n - 1;
-          showSlide(currentSlideIndex);
-      }
-
-      let autoSlideInterval = setInterval(nextSlide, 5000);
-      const carousel = document.querySelector('.carousel');
-      carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-      carousel.addEventListener('mouseleave', () => autoSlideInterval = setInterval(nextSlide, 5000));
-      document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowLeft') prevSlide();
-          else if (e.key === 'ArrowRight') nextSlide();
-      });
-
-      let touchStartX = 0;
-      let touchEndX = 0;
-      carousel.addEventListener('touchstart', (e) => touchStartX = e.changedTouches[0].screenX);
-      carousel.addEventListener('touchend', (e) => {
-          touchEndX = e.changedTouches[0].screenX;
-          handleSwipe();
-      });
-
-      function handleSwipe() {
-          if (touchEndX < touchStartX - 50) nextSlide();
-          if (touchEndX > touchStartX + 50) prevSlide();
-      }
-
-
-
 //==================================================================================//==================================================================================
     
 
-//==================================================================================//==================================================================================
 
 
 
-
-
-
-
-
-//==================================================================================
-
-
-
-
-    // ===============================================================================
      async function logout() {
   const confirmLogout = confirm('Bạn có chắc muốn đăng xuất không?');
   if (!confirmLogout) {
@@ -663,31 +506,6 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 
-
-
-
-          // Lấy token từ localStorage
-      function getToken() {
-          return localStorage.getItem('accessToken') || '';
-      }
-    // ===============================================================================
-
-
-      
-    // ===============================================================================
-
-
-
-//==================================================================================
-
-
-
-
-
-
-
-
-      
   </script>
 
   </body>

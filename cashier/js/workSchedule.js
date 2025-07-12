@@ -29,6 +29,8 @@ const SHIFTS = {
     borderColor: '#9E9E9E'   // Viền xám
   }
 };
+//====================================================================================
+//====================================================================================
 
 // Hàm xác định ca dựa trên giờ bắt đầu và kết thúc - cải tiến
 function determineShift(startTime, endTime) {
@@ -49,6 +51,9 @@ function determineShift(startTime, endTime) {
     borderColor: SHIFTS['Ca Tùy chọn'].borderColor
   };
 }
+//====================================================================================
+
+//====================================================================================
 
 // Lấy ngày thứ Hai của tuần hiện tại
 function getMondayOfCurrentWeek() {
@@ -57,6 +62,8 @@ function getMondayOfCurrentWeek() {
   const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Điều chỉnh để lấy thứ Hai
   return new Date(today.setDate(diff));
 }
+
+//====================================================================================
 
 // Biến lưu trữ ngày bắt đầu tuần hiện tại
 let currentWeekStart = getMondayOfCurrentWeek();
@@ -69,6 +76,7 @@ function updateWeekRangeDisplay() {
   const weekEndStr = weekEnd.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit' });
   document.getElementById('scheduleWeekRange').textContent = `Tuần: ${weekStart} đến ${weekEndStr}/${weekEnd.getFullYear()}`;
 }
+//====================================================================================
 
 // Lấy thông tin user từ token
 function getCurrentUserInfo() {
@@ -80,6 +88,7 @@ function getCurrentUserInfo() {
   }
   return null;
 }
+//====================================================================================
 
 // Tạo và hiển thị popup
 function showPopup(schedule) {
@@ -105,6 +114,7 @@ function showPopup(schedule) {
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
 }
+//====================================================================================
 
 // Hàm tạo shift item với style đơn giản
 function createShiftItem(schedule, shiftInfo) {
@@ -148,6 +158,8 @@ function createShiftItem(schedule, shiftInfo) {
   
   return formDiv;
 }
+//====================================================================================
+//====================================================================================
 
 // Tải lịch làm việc của user hiện tại - cải tiến
 async function loadSchedule() {
@@ -235,12 +247,14 @@ async function loadSchedule() {
     showError('error', `❌ ${error.message || 'Lỗi kết nối hệ thống, vui lòng thử lại.'}`);
   }
 }
+//====================================================================================
 
 // Điều hướng tuần trước/sau
 function changeWeek(offset) {
   currentWeekStart.setDate(currentWeekStart.getDate() + offset * 7);
   loadSchedule();
 }
+
 
 // Cập nhật showSection để tải lịch khi hiển thị
 function showSection(sectionId) {
@@ -308,3 +322,5 @@ window.addEventListener('load', () => {
         loadSchedule();
     }
 });
+
+//====================================================================================

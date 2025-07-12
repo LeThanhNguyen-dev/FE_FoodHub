@@ -11,11 +11,10 @@ async function apiFetch(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : API_BASE_URL + endpoint;
     const response = await fetch(url, { ...options, headers });
 
-    // Kiểm tra xem phản hồi có hợp lệ không
     if (!response.ok) {
         let errorMessage = 'Lỗi khi gọi API';
         try {
-            const errorData = await response.text(); // Dùng text() để tránh lỗi json()
+            const errorData = await response.text();
             errorMessage = errorData || response.statusText;
         } catch (e) {
             errorMessage = response.statusText || 'Lỗi không xác định';
@@ -23,16 +22,17 @@ async function apiFetch(endpoint, options = {}) {
         throw new Error(errorMessage);
     }
 
-    // Kiểm tra Content-Type để đảm bảo là JSON
     const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Phản hồi từ server không phải JSON');
+    if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+    } else if (contentType && contentType.includes('text/plain')) {
+        return await response.text(); // Trả về chuỗi cho URL
+    } else if (contentType && contentType.includes('application/pdf')) {
+        return await response.blob(); // Hỗ trợ file PDF nếu cần
+    } else {
+        throw new Error('Phản hồi từ server không được hỗ trợ');
     }
-
-    const data = await response.json();
-    return data;
 }
-
 
 
 
@@ -158,9 +158,4 @@ function initializeDashboard() {
         console.warn('No payload/sub at:', new Date().toLocaleTimeString(), 'Using default');
         document.getElementById('cashier-name').innerText = `👤 Cashier: Unknown`;
     }
-    showSection('home');
-}
-
-function showSection(sectionId) {
-    console.log('Showing section at:', new Date().toLocaleTimeString(), sectionId);
 }
