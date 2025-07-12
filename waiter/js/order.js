@@ -81,11 +81,11 @@ function renderOrdersTemplate() {
 // Setup event listeners after HTML is loaded
 async function setupEventListeners() {
     console.log('=== setupEventListeners() được gọi ===');
-    
+
     // Setup jump to page input event listener
     const jumpInput = document.getElementById('jumpToOrderPage');
     if (jumpInput) {
-        jumpInput.addEventListener('keypress', function(e) {
+        jumpInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 jumpToOrderPage();
             }
@@ -145,17 +145,8 @@ async function loadOrders(pageSize = 20) {
         params.append('orderBy', sortBy);
         params.append('sort', sortDirection);
 
-        // Add area and startTime from currentWorkSchedule
-        if (currentWorkSchedule && currentWorkSchedule.area) {
-            params.append('area', currentWorkSchedule.area);
-        }
-        if (currentWorkSchedule && currentWorkSchedule.startTime) {
-            params.append('startTime', currentWorkSchedule.startTime);
-        }
-        console.log("area: ", currentWorkSchedule.area);
-        console.log("start time: ", currentWorkSchedule.startTime);
         // Fetch orders with filters
-        const data = await apiFetch(`/orders/waiter/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders/waiter/work-shift-orders/${currentUserInfo.id}?${params.toString()}`, {
             method: 'GET'
         });
 
@@ -174,13 +165,19 @@ async function loadOrders(pageSize = 20) {
 
     } catch (error) {
         console.error('Error fetching orders:', error);
-        showErrorState(error.message);
+
+        showErrorState(error.code, error.message);
+
+
     }
 }
 
 async function generateTableOptions() {
     try {
-        
+        if (!hasWorkSchedule) {
+            return;
+        }
+
         // Lấy element filter trước khi gọi API
         const tableFilter = document.getElementById('tableNumberFilter');
         if (!tableFilter) {
@@ -190,51 +187,51 @@ async function generateTableOptions() {
 
         // Lưu giá trị hiện tại
         const currentValue = tableFilter.value;
-        
+
         // Hiển thị loading
         tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
-        
+
         // Gọi API /tables để lấy danh sách bàn
-        const data = await apiFetch(`/tables?area=${currentWorkSchedule.area}`, {
+        const data = await apiFetch(`/tables/waiter/${currentUserInfo.id}`, {
             method: 'GET'
         });
-        
-        
+
+
         // Kiểm tra dữ liệu trả về
         if (!data || !data.result || !Array.isArray(data.result)) {
             console.error('Dữ liệu bàn không hợp lệ:', data);
             tableFilter.innerHTML = '<option value="">Không có dữ liệu bàn</option>';
             return '<option value="">Không có dữ liệu bàn</option>';
         }
-        
+
         // Tạo danh sách tùy chọn từ dữ liệu API - sử dụng tableNumber làm value
         const options = data.result.map(table => {
             return `<option value="${table.tableNumber}">Bàn ${table.tableNumber}</option>`;
         }).join('');
-        
-        
+
+
         // Cập nhật trực tiếp vào dropdown filter
         const finalOptions = '<option value="">Tất cả bàn</option>' + options;
         tableFilter.innerHTML = finalOptions;
-        
+
         // Khôi phục giá trị đã chọn trước đó (nếu có)
         if (currentValue) {
             tableFilter.value = currentValue;
             console.log('Đã khôi phục giá trị:', currentValue);
         }
-                
+
         // Trả về options cho các mục đích khác (như showCart)
         return options;
-        
+
     } catch (error) {
         console.error('Lỗi khi lấy danh sách bàn:', error);
-        
+
         // Cập nhật UI hiển thị lỗi
         const tableFilter = document.getElementById('tableNumberFilter');
         if (tableFilter) {
             tableFilter.innerHTML = '<option value="">Lỗi tải danh sách bàn</option>';
         }
-        
+
         // Trả về option lỗi
         return '<option value="">Lỗi tải danh sách bàn</option>';
     }
@@ -252,26 +249,26 @@ async function loadTableOptions() {
 
         const currentValue = tableFilter.value; // Lưu giá trị hiện tại
         console.log('Giá trị hiện tại của filter:', currentValue);
-        
+
         // Thêm loading indicator
         tableFilter.innerHTML = '<option value="">Đang tải danh sách bàn...</option>';
-        
+
         // Lấy danh sách bàn - await đúng cách như trong showCart()
         const tableOptions = await generateTableOptions();
         console.log('Table options nhận được:', tableOptions);
-        
+
         // Cập nhật dropdown với danh sách bàn
         const finalOptions = '<option value="">Tất cả bàn</option>' + tableOptions;
         tableFilter.innerHTML = finalOptions;
-        
+
         // Khôi phục giá trị đã chọn trước đó (nếu có)
         if (currentValue) {
             tableFilter.value = currentValue;
             console.log('Đã khôi phục giá trị:', currentValue);
         }
-        
+
         console.log('Load table options thành công');
-        
+
     } catch (error) {
         console.error('Lỗi khi load danh sách bàn:', error);
         const tableFilter = document.getElementById('tableNumberFilter');
@@ -1017,14 +1014,26 @@ async function refreshOrders() {
 }
 
 // Show error state
-function showErrorState(message) {
+function showErrorState(code, message) {
     const orderTableBody = document.getElementById('orderTableBody');
     if (!orderTableBody) {
         console.error('orderTableBody element not found for error state');
         return;
     }
-
-    orderTableBody.innerHTML = `
+    if (code == 1041 || code == 1048) {
+        orderTableBody.innerHTML = `
+        <tr>
+            <td colspan="7">
+                <div class="empty-orders-state">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">Hiện tại bạn đang không trong ca làm</h6>
+                    <p class="text-muted small">Đơn hàng sẽ hiển thị khi bạn có ca làm việc</p>
+                </div>
+            </td>
+        </tr>
+    `;
+    } else {
+        orderTableBody.innerHTML = `
         <tr>
             <td colspan="7">
                 <div class="empty-orders-state">
@@ -1038,6 +1047,7 @@ function showErrorState(message) {
             </td>
         </tr>
     `;
+    }
 }
 
 // Helper functions for order type
@@ -1102,13 +1112,12 @@ function updateActiveNavigation(currentFunction) {
 
 // Hàm định dạng thời gian
 function formatDateTime(dateString) {
-    console.log("date string: ", dateString);
-    
+
     // Remove 'Z' suffix if present and treat as local time
     const cleanDateString = dateString.replace('Z', '');
     const date = new Date(cleanDateString);
     const now = new Date();
-    
+
     // Calculate difference in milliseconds
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
@@ -1126,7 +1135,7 @@ function formatDateTime(dateString) {
         const absDiffMins = Math.abs(diffMins);
         const absDiffHours = Math.abs(diffHours);
         const absDiffDays = Math.abs(diffDays);
-        
+
         if (absDiffMins < 60) {
             return `Trong ${absDiffMins} phút`;
         } else if (absDiffHours < 24) {
@@ -1238,17 +1247,17 @@ async function displayOrderDetails(orderData) {
         // Format dữ liệu - parse trực tiếp mà không chuyển đổi múi giờ
         const formatDateTime = (dateStr) => {
             if (!dateStr) return 'Chưa cập nhật';
-            
+
             // Parse date string trực tiếp mà không để JS tự động chuyển đổi timezone
             const date = new Date(dateStr.replace('Z', ''));
-            
+
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
-            
+
             return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
         };
 
@@ -1281,7 +1290,7 @@ async function displayOrderDetails(orderData) {
             itemNode.querySelector('.item-details').textContent = `SL: ${item.quantity} × ${formatCurrency(item.price)}`;
             itemNode.querySelector('.item-status .badge').className = `badge ${getStatusBadgeClass(item.status)}`;
             itemNode.querySelector('.item-status .badge').textContent = getStatusText(item.status);
-            
+
             // Thêm ghi chú cho item nếu có
             const itemNoteElement = itemNode.querySelector('.item-note');
             if (item.note && item.note.trim() !== '') {
@@ -1290,7 +1299,7 @@ async function displayOrderDetails(orderData) {
             } else {
                 itemNoteElement.style.display = 'none';
             }
-            
+
             return itemNode.querySelector('.order-item').outerHTML;
         }).join('');
 

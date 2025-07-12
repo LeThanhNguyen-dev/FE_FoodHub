@@ -531,7 +531,7 @@ async function loadTableOptions() {
         tableDropdownMenu.innerHTML = '<div class="table-option loading">Đang tải...</div>';
 
         // Gọi API để lấy danh sách bàn
-        const data = await apiFetch(`/tables?area=${currentWorkSchedule.area}`, {
+        const data = await apiFetch(`/tables/waiter/${currentUserInfo.id}`, {
             method: 'GET'
         });
 

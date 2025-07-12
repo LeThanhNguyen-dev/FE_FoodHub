@@ -124,7 +124,6 @@ function redirectToLogin() {
 
 async function apiFetch(endpoint, options = {}) {
     const url = `${BACKEND_BASE_URL}${endpoint}`;
-
     const fetchWithToken = async () => {
         const latestToken = localStorage.getItem("accessToken");
         return await fetch(url, {
@@ -169,17 +168,21 @@ async function apiFetch(endpoint, options = {}) {
         if (!response.ok) {
             if (contentType.includes('application/json')) {
                 const errorData = await response.json();
-                
+
                 // Kiểm tra lỗi Access Denied hoặc phân quyền
-                if (errorData.code === 9999 && 
-                    (errorData.message.includes("Access Denied") || 
-                     errorData.message.includes("Uncategorized error : Access Denied"))) {
+                if (errorData.code === 9999 &&
+                    (errorData.message.includes("Access Denied") ||
+                        errorData.message.includes("Uncategorized error : Access Denied"))) {
                     console.warn("Access Denied - Chuyển hướng về trang login");
                     redirectToLogin();
                     throw new Error("Bạn không có quyền truy cập. Vui lòng đăng nhập lại.");
                 }
-                
-                throw new Error(errorData.message || `Lỗi HTTP ${response.status}`);
+
+                const error = new Error(errorData.message || `Lỗi HTTP ${response.status}`);
+                if (errorData.code) {
+                    error.code = errorData.code; // Gắn mã lỗi từ backend
+                }
+                throw error;
             } else {
                 const errorText = await response.text();
                 throw new Error(`Lỗi server (${response.status}): ${errorText}`);
@@ -198,10 +201,10 @@ async function apiFetch(endpoint, options = {}) {
         // Bắt lỗi network/fetch và các lỗi khác
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
             console.error("Lỗi kết nối mạng:", error);
-              window.location.href = "/home-page/html/login.html";
+            window.location.href = "/home-page/html/login.html";
             throw new Error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
         }
-        
+
         // Re-throw các lỗi khác để component xử lý
         throw error;
     }
@@ -211,7 +214,7 @@ async function apiFetch(endpoint, options = {}) {
 function isTokenValid() {
     const token = localStorage.getItem("accessToken");
     if (!token) return false;
-    
+
     try {
         // Decode JWT token để kiểm tra exp
         const payload = JSON.parse(atob(token.split('.')[1]));
@@ -224,7 +227,18 @@ function isTokenValid() {
 }
 
 // Hàm logout
-function handleLogout() {
-    localStorage.removeItem("accessToken");
-    window.location.href = "/login.html";
+async function handleLogout() {
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(`${BACKEND_BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token: accessToken })
+    });
+
+    const data = await response.json();
+    if (data.code === 0) {
+        redirectToLogin();
+    }
 }

@@ -11,7 +11,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999; /* Tăng z-index để đảm bảo modal luôn ở trên cùng */
 }
 
 /* Modal Content */

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Chấm Công - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #FEA116;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: #0F172B;
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 4px 12px;
+            border-radius: 8px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background-color: #FEA116;
+            color: #334155;
+        }
+
+        .sidebar-link.active {
+            background-color: #FEA116;
+            color: white;
+        }
+
+        .sidebar-link.active:hover {
+            background-color: #FEA116;
+        }
+
+        .sidebar-link i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .content-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border: 1px solid;
+        }
+
+
+        .message-error {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section-header h2 {
+            color: #1f2937;
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-header i {
+            margin-right: 12px;
+            color: #3b82f6;
+        }
+
+        /* Week Navigation */
+        .week-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .week-nav button {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .week-nav button:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .week-nav button:disabled {
+            background-color: #f9fafb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .week-info {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 16px;
+        }
+
+        .current-week-badge {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .table td {
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-on-time {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-late {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-left-early {
+            background-color: #fde68a;
+            color: #92400e;
+        }
+
+        .status-late-and-left-early {
+            background-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .status-absent {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-unscheduled {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #d1d5db;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                height: 100vh;
+                width: 280px;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .content-card {
+                margin: 16px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .table-container {
+                margin: 0 -16px;
+                border-radius: 0;
+            }
+
+            .week-nav {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .week-nav .week-info {
+                order: -1;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+    </style>
+</head>
+
+<body class="flex">
+    <!-- Mobile menu button -->
+    <button
+        class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+        <i class="fas fa-bars text-gray-600"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar w-80 flex flex-col justify-between">
+        <div>
+            <div class="sidebar-header p-6">
+                <h2 class="text-xl font-semibold">Dashboard User</h2>
+                <p id="username-greeting" class="text-sm mt-1">Welcome back!</p>
+            </div>
+            <nav class="mt-2 px-3">
+                <a href="profile.html" id="profile-link" class="sidebar-link">
+                    <i class="fas fa-user"></i> Edit Profile
+                </a>
+                <a href="work-schedule.html" id="work-schedule-link" class="sidebar-link hidden">
+                    <i class="fas fa-calendar-alt"></i> Lịch Làm Việc
+                </a>
+                <a href="work-shift-log.html" id="work-shift-log-link" class="sidebar-link active hidden">
+                    <i class="fas fa-clock"></i> Lịch Sử Chấm Công
+                </a>
+                <a href="home.html" id="home-link" class="sidebar-link">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </nav>
+        </div>
+        <div class="p-6">
+            <button id="logout-button" class="w-full btn btn-danger">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content flex-1 p-6 overflow-auto">
+        <div class="max-w-7xl mx-auto">
+            <!-- Work Shift Log Section -->
+            <div class="content-card p-6">
+                <div class="section-header">
+                    <h2><i class="fas fa-clock"></i>Lịch Sử Chấm Công</h2>
+                </div>
+
+                <!-- Week Navigation -->
+                <div class="week-nav">
+                    <button id="prev-week-btn" class="btn btn-outline">
+                        <i class="fas fa-chevron-left mr-2"></i> Tuần trước
+                    </button>
+                    <div class="week-info">
+                        <span id="week-display">Tuần hiện tại</span>
+                        <span id="current-week-badge" class="current-week-badge hidden">Tuần hiện tại</span>
+                    </div>
+                    <button id="next-week-btn" class="btn btn-outline">
+                        Tuần sau <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Messages -->
+                <div id="error-message" class="hidden message message-error"></div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-spinner hidden">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state hidden">
+                    <i class="fas fa-clock"></i>
+                    <h3 class="text-lg font-medium mb-2">Chưa có dữ liệu chấm công</h3>
+                    <p>Không có dữ liệu chấm công cho tuần này.</p>
+                </div>
+
+                <!-- Table -->
+                <div id="table-container" class="table-container hidden">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Thứ</th>
+                                <th>Giờ Vào</th>
+                                <th>Giờ Ra</th>
+                                <th>Trạng Thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shift-log-tbody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+
+        // Global variables for week navigation
+        let currentWeekStart = null;
+        let currentWeekEnd = null;
+        let allShiftLogs = [];
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Invalid token:", e);
+                return null;
+            }
+        }
+
+        function isLoggedIn() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) return false;
+            const payload = parseJwt(token);
+            return payload && payload.exp * 1000 > Date.now();
+        }
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('cart');
+            window.location.href = 'login.html';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+        }
+
+
+
+        function hideMessages() {
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        function showLoading() {
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('table-container').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-state').classList.add('hidden');
+        }
+
+        function showEmptyState() {
+            document.getElementById('empty-state').classList.remove('hidden');
+            document.getElementById('table-container').classList.add('hidden');
+        }
+
+        function showTable() {
+            document.getElementById('table-container').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+        }
+
+        // Week calculation functions
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+            return new Date(d.setDate(diff));
+        }
+
+        function getWeekEnd(weekStart) {
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            return weekEnd;
+        }
+
+        function getCurrentWeek() {
+            const today = new Date();
+            const weekStart = getWeekStart(today);
+            const weekEnd = getWeekEnd(weekStart);
+            return { start: weekStart, end: weekEnd };
+        }
+
+        function formatDateRange(start, end) {
+            const startStr = start.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const endStr = end.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            return `${startStr} - ${endStr}`;
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function formatTime(isoString) {
+            if (!isoString) return '-'; // Trường hợp null hoặc undefined
+
+            const date = new Date(isoString);
+
+            // Lấy giờ và phút theo UTC (không bị lệch múi giờ như Việt Nam +7)
+            const hours = date.getUTCHours().toString().padStart(2, '0');
+            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+
+            return `${hours}:${minutes}`; // Trả về chuỗi dạng HH:mm
+        }
+
+
+        function getDayOfWeek(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            return days[date.getDay()];
+        }
+
+        function getStatusInfo(status) {
+            const statusMap = {
+                'ON_TIME': {
+                    text: 'Đúng giờ',
+                    class: 'status-on-time',
+                },
+                'LATE': {
+                    text: 'Đi muộn',
+                    class: 'status-late',
+                },
+                'LEFT_EARLY': {
+                    text: 'Về sớm',
+                    class: 'status-left-early',
+                },
+                'LATE_AND_LEFT_EARLY': {
+                    text: 'Muộn & Về sớm',
+                    class: 'status-late-and-left-early',
+                },
+                'ABSENT': {
+                    text: 'Vắng mặt',
+                    class: 'status-absent',
+                },
+                'UNSCHEDULED': {
+                    text: 'Chưa đến giờ',
+                    class: 'status-unscheduled',
+                }
+            };
+
+            return statusMap[status] || {
+                text: status,
+                class: 'status-unscheduled',
+            };
+        }
+
+        function isCurrentWeek(start, end) {
+            const current = getCurrentWeek();
+            return start.getTime() === current.start.getTime() &&
+                end.getTime() === current.end.getTime();
+        }
+
+        function updateWeekDisplay() {
+            const weekDisplay = document.getElementById('week-display');
+            const currentWeekBadge = document.getElementById('current-week-badge');
+
+            weekDisplay.textContent = formatDateRange(currentWeekStart, currentWeekEnd);
+
+            if (isCurrentWeek(currentWeekStart, currentWeekEnd)) {
+                currentWeekBadge.classList.remove('hidden');
+            } else {
+                currentWeekBadge.classList.add('hidden');
+            }
+
+            // Update navigation buttons
+            const nextBtn = document.getElementById('next-week-btn');
+            const current = getCurrentWeek();
+
+            // Disable next button if current week is the actual current week
+            if (currentWeekStart.getTime() >= current.start.getTime()) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        function filterShiftLogsByWeek(shiftLogs, weekStart, weekEnd) {
+            return shiftLogs.filter(log => {
+                // Use workScheduleDate instead of checkInTime/checkOutTime for filtering
+                const logDate = new Date(log.workScheduleDate);
+                return logDate >= weekStart && logDate <= weekEnd;
+            });
+        }
+
+        function renderShiftLogTable(shiftLogs) {
+            const tbody = document.getElementById('shift-log-tbody');
+            tbody.innerHTML = '';
+            console.log('log: ', shiftLogs);
+            if (!shiftLogs || shiftLogs.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Sort logs by workScheduleDate
+            const sortedLogs = [...shiftLogs].sort((a, b) => {
+                const dateA = new Date(a.workScheduleDate);
+                const dateB = new Date(b.workScheduleDate);
+                return dateA - dateB;
+            });
+
+            sortedLogs.forEach((log, index) => {
+                const statusInfo = getStatusInfo(log.status);
+                const row = document.createElement('tr');
+                console.log('check in: ', log.checkInTime);
+                row.innerHTML = `
+                    <td>${formatDate(log.workScheduleDate)}</td>
+                    <td class="font-medium">${getDayOfWeek(log.workScheduleDate)}</td>
+                    <td>${formatTime(log.checkInTime)}</td>
+                    <td>${formatTime(log.checkOutTime)}</td>
+                    <td>
+                        <span class="status-badge ${statusInfo.class}">
+                            ${statusInfo.text}
+                        </span>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            showTable();
+        }
+
+        function displayCurrentWeekData() {
+            const weekLogs = filterShiftLogsByWeek(allShiftLogs, currentWeekStart, currentWeekEnd);
+            renderShiftLogTable(weekLogs);
+            updateWeekDisplay();
+        }
+
+        function goToPreviousWeek() {
+            const newStart = new Date(currentWeekStart);
+            newStart.setDate(currentWeekStart.getDate() - 7);
+            currentWeekStart = newStart;
+            currentWeekEnd = getWeekEnd(currentWeekStart);
+            displayCurrentWeekData();
+        }
+
+        function goToNextWeek() {
+            const newStart = new Date(currentWeekStart);
+            newStart.setDate(currentWeekStart.getDate() + 7);
+            currentWeekStart = newStart;
+            currentWeekEnd = getWeekEnd(currentWeekStart);
+            displayCurrentWeekData();
+        }
+
+        async function fetchShiftLogs() {
+            if (!isLoggedIn()) {
+                showError('Vui lòng đăng nhập để xem lịch sử chấm công!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            showLoading();
+            hideMessages();
+
+            try {
+                const data = await apiFetch('/shifts/my-work-shift-log', {
+                    method: 'GET'
+                });
+
+                if (data.code === 1000) {
+                    allShiftLogs = data.result || [];
+                    console.log("shift log: ", allShiftLogs);
+                    // Initialize current week
+                    const currentWeek = getCurrentWeek();
+                    currentWeekStart = currentWeek.start;
+                    currentWeekEnd = currentWeek.end;
+
+                    displayCurrentWeekData();
+                } else {
+                    throw new Error(data.message || 'Lỗi khi tải dữ liệu');
+                }
+            } catch (error) {
+                console.error('Error fetching shift logs:', error);
+                showError('Lỗi khi tải dữ liệu: ' + error.message);
+                showEmptyState();
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function updateSidebarByRole(scope) {
+            const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
+            const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+            const isStaff = staffRoles.includes(role);
+
+            const workScheduleLink = document.getElementById('work-schedule-link');
+            const workShiftLogLink = document.getElementById('work-shift-log-link');
+
+            if (isStaff) {
+                workScheduleLink.classList.remove('hidden');
+                workShiftLogLink.classList.remove('hidden');
+            } else {
+                redirectToLogin();
+            }
+        }
+
+        async function fetchUserInfo() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const payload = parseJwt(token);
+                const userId = payload.id;
+
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch user info');
+
+                const data = await response.json();
+                const user = data.result;
+
+                document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
+                updateSidebarByRole(payload.scope);
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function initializePage() {
+            if (!isLoggedIn()) {
+                showError('Vui lòng đăng nhập để truy cập trang này!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            fetchUserInfo();
+            fetchShiftLogs();
+        }
+
+        // Event Listeners
+        document.getElementById('logout-button').addEventListener('click', logout);
+        document.getElementById('prev-week-btn').addEventListener('click', goToPreviousWeek);
+        document.getElementById('next-week-btn').addEventListener('click', goToNextWeek);
+        document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(e.target) &&
+                !menuBtn.contains(e.target) &&
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+    <script src="../../js/fetch-api.js"></script>
+</body>
+
+</html>

@@ -14,6 +14,7 @@
 
 <body>
   <!-- Sidebar -->
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
   <div class="sidebar d-flex flex-column" id="sidebar">
     <div class="brand">
       <h3>
@@ -49,7 +50,7 @@
     <div class="logout-section">
       <button class="logout-btn" onclick="handleLogout()">
         <i class="fas fa-sign-out-alt"></i>
-        <span class="btn-text">Kết Thúc Ca Làm</span>
+        <span class="btn-text">Đăng Xuất</span>
       </button>
     </div>
   </div>
@@ -62,7 +63,7 @@
         <button class="toggle-sidebar me-3" onclick="toggleSidebar()">
           <i class="fas fa-bars"></i>
         </button>
-        <h4 class="mb-0" id="pageTitle">Dashboard - Ca Làm Việc</h4>
+        <h4 class="mb-0" id="pageTitle">Dashboard</h4>
       </div>
       <div class="d-flex align-items-center">
         <div class="notification-bell" onclick="toggleNotificationDropdown()">
@@ -88,13 +89,14 @@
             <i class="fas fa-user-circle me-2"></i><span id="chefName">Đang tải...</span>
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ Sơ</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-clock me-2"></i>Lịch Làm Việc</a></li>
+            <li><a class="dropdown-item" href="../home-page/html/profile.html#profile"><i
+                  class="fas fa-user me-2"></i>Hồ Sơ</a></li>
+            <li><a class="dropdown-item" href="../home-page/html/work-schedule.html"><i
+                  class="fas fa-clock me-2"></i>Lịch Làm Việc</a></li>
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Kết
-                Thúc Ca</a></li>
+            <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
           </ul>
         </div>
       </div>
@@ -111,7 +113,12 @@
             <p class="mb-0" id="shiftType"><i class="fas fa-sun me-2"></i>Loại ca: Đang tải...</p>
           </div>
           <div class="col-md-4 text-center">
-            <i class="fas fa-chef-hat" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
+            <div class="btn-container">
+              <button class="btn shift-btn" onclick="checkInShift()">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Vào ca</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -228,7 +235,9 @@
     document.addEventListener('DOMContentLoaded', function () {
       // Khởi tạo AudioContext khi user click lần đầu tiên
       const enableAudio = () => {
-        initializeAudioContext();
+        if (typeof initializeAudioContext === 'function') {
+          initializeAudioContext();
+        }
         // Remove listener sau khi đã khởi tạo
         document.removeEventListener('click', enableAudio);
         document.removeEventListener('keydown', enableAudio);
@@ -238,13 +247,54 @@
       document.addEventListener('click', enableAudio);
       document.addEventListener('keydown', enableAudio);
       document.addEventListener('touchstart', enableAudio);
-
+      
       // Load existing functions
-      updateNotificationCount();
-      loadUserInfo();
-      loadWorkSchedule();
+      if (typeof updateNotificationCount === 'function') {
+        updateNotificationCount();
+      }
+      if (typeof loadUserInfo === 'function') {
+        loadUserInfo();
+      }
+      if (typeof loadWorkSchedule === 'function') {
+        loadWorkSchedule();
+      }
 
+      // Load saved sidebar state for desktop
+      if (!isMobile()) {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        if (wasCollapsed) {
+          sidebar.classList.add('collapsed');
+          mainContent.classList.add('expanded');
+        }
+      }
+
+      // Add resize event listener
+      window.addEventListener('resize', handleResize);
+
+      // Close mobile sidebar when clicking on navigation items
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function () {
+          if (isMobile()) {
+            setTimeout(() => {
+              closeMobileSidebar();
+            }, 100);
+          }
+        });
+      });
     });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isMobile()) {
+        closeMobileSidebar();
+      }
+    });
+
+    function isMobile() {
+      return window.innerWidth <= 768;
+    }
 
     // Function to load user information from API
     async function loadUserInfo() {
@@ -287,6 +337,7 @@
 
     // Function to handle navigation clicks
     function handleNavClick(section) {
+      // Your existing navigation logic
       switch (section) {
         case 'dashboard':
           showDashboard();
@@ -297,6 +348,48 @@
         case 'reports':
           showReports();
           break;
+      }
+
+      // Close mobile sidebar after navigation
+      if (isMobile()) {
+        closeMobileSidebar();
+      }
+
+      // Remove active class from all nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+
+      // Add active class to clicked nav link
+      if (event && event.target) {
+        event.target.closest('.nav-link').classList.add('active');
+      }
+    }
+
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      const mobileOverlay = document.getElementById('mobileOverlay');
+
+      if (!isMobile()) {
+        // Desktop view
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+
+        // Restore desktop sidebar state
+        const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (wasCollapsed) {
+          sidebar.classList.add('collapsed');
+          mainContent.classList.add('expanded');
+        } else {
+          sidebar.classList.remove('collapsed');
+          mainContent.classList.remove('expanded');
+        }
+      } else {
+        // Mobile view
+        sidebar.classList.remove('collapsed');
+        mainContent.classList.remove('expanded');
       }
     }
 
@@ -311,10 +404,10 @@
           currentWorkSchedule = data.result;
           hasWorkSchedule = true;
           displayWorkSchedule(data.result);
-          initializeWebSocket(currentWorkSchedule);
         } else {
           // Không có lịch làm việc - hiển thị thông báo trong welcome-section
           hasWorkSchedule = false;
+          console.log("has work schedule: ", hasWorkSchedule);
           displayNoWorkSchedule();
         }
 
@@ -333,6 +426,7 @@
           initDashboardOrders();
         }
         hasWorkSchedule = false;
+        console.log("has work schedule: ", hasWorkSchedule);
         displayNoWorkSchedule();
         showDashboard();
       }
@@ -345,10 +439,10 @@
         `<i class="fas fa-calendar me-2"></i>Ngày: ${new Date().toLocaleDateString('vi-VN')}`;
 
       document.getElementById('shiftTime').innerHTML =
-        `<i class="fas fa-clock me-2"></i>Ca làm: Không có ca hôm nay`;
+        `<i class="fas fa-clock me-2"></i>Ca làm: Bạn đang không trong ca làm`;
 
       document.getElementById('shiftType').innerHTML =
-        `<i class="fas fa-info-circle me-2"></i>Trạng thái: Không được phân ca`;
+        `<i class="fas fa-info-circle me-2"></i>Trạng thái: Bạn đang không trong ca làm`;
     }
 
     // Function to handle work schedule errors
@@ -368,7 +462,6 @@
       const navItems = {
         'dashboard': '[onclick="handleNavClick(\'dashboard\')"]',
         'orders': '[onclick="handleNavClick(\'orders\')"]',
-        'tables': '[onclick="handleNavClick(\'tables\')"]',
         'reports': '[onclick="handleNavClick(\'reports\')"]'
       };
 
@@ -380,12 +473,10 @@
       }
     }
 
-    // Function to contact manager
-    function contactManager() {
-      alert('Vui lòng liên hệ với quản lý qua:\n\n' +
-        '📞 Hotline: 1900-xxxx\n' +
-        '📧 Email: manager@foodhub.com\n' +
-        '💬 Hoặc liên hệ trực tiếp tại quầy lễ tân');
+    function formatTimeFromISOString(isoString) {
+      // Tách phần giờ và phút từ chuỗi "2025-07-09T17:30:00Z"
+      const timePart = isoString.split('T')[1].split(':');
+      return `${timePart[0]}:${timePart[1]}`; // HH:mm
     }
 
     // Function to display work schedule data
@@ -402,19 +493,8 @@
       document.getElementById('shiftDate').innerHTML =
         `<i class="fas fa-calendar me-2"></i>Ngày: ${formattedDate}`;
 
-      // Parse and format time
-      const startTime = new Date(schedule.startTime);
-      const endTime = new Date(schedule.endTime);
-
-      const formattedStartTime = startTime.toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      const formattedEndTime = endTime.toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      const formattedStartTime = formatTimeFromISOString(schedule.startTime);
+      const formattedEndTime = formatTimeFromISOString(schedule.endTime);
 
       document.getElementById('shiftTime').innerHTML =
         `<i class="fas fa-clock me-2"></i>Ca làm: ${formattedStartTime} - ${formattedEndTime}`;
@@ -425,7 +505,10 @@
       document.getElementById('shiftType').innerHTML =
         `<i class="fas fa-${shiftIcon} me-2"></i>Loại ca: ${shiftTypeText}`;
 
+      // Check work shift log to determine button display
+      checkWorkShiftLog();
     }
+
 
 
 
@@ -435,7 +518,6 @@
         'MORNING': 'Ca sáng',
         'AFTERNOON': 'Ca chiều',
         'EVENING': 'Ca tối',
-        'NIGHT': 'Ca đêm'
       };
       return shiftTypes[shift] || shift;
     }
@@ -451,30 +533,43 @@
       return shiftIcons[shift] || 'clock';
     }
 
-    // Function to show error message
-    function showError(errorText) {
-      document.getElementById('dashboardContent').style.display = 'none';
-      document.getElementById('noWorkScheduleMessage').style.display = 'none';
-      document.getElementById('errorMessage').style.display = 'block';
-      document.getElementById('dynamicContent').style.display = 'none';
-      document.getElementById('errorText').textContent = errorText;
-
-      // Update page title
-      document.getElementById('pageTitle').textContent = 'Lỗi - Không thể tải dữ liệu';
-    }
-
     // Existing functions updated to check work schedule
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const mainContent = document.getElementById('mainContent');
 
-      sidebar.classList.toggle('collapsed');
-
-      if (mainContent) {
+      if (isMobile()) {
+        // Mobile behavior
+        if (sidebar.classList.contains('mobile-open')) {
+          closeMobileSidebar();
+        } else {
+          openMobileSidebar();
+        }
+      } else {
+        // Desktop behavior
+        sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('expanded');
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
       }
+    }
 
-      window.sidebarCollapsed = sidebar.classList.contains('collapsed');
+    function openMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mobileOverlay = document.getElementById('mobileOverlay');
+
+      sidebar.classList.add('mobile-open');
+      mobileOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent body scrolling
+    }
+
+    // Close mobile sidebar
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mobileOverlay = document.getElementById('mobileOverlay');
+
+      sidebar.classList.remove('mobile-open');
+      mobileOverlay.classList.remove('active');
+      document.body.style.overflow = ''; // Restore body scrolling
     }
 
     function setActiveNav(element) {
@@ -484,26 +579,11 @@
       element.classList.add('active');
     }
 
-    function handleLogout() {
-      if (confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
-        document.body.style.opacity = '0.5';
-        document.body.style.transition = 'opacity 0.5s';
 
-        setTimeout(() => {
-          alert('Đã kết thúc ca làm việc! Cảm ơn bạn đã làm việc chăm chỉ.');
-          document.body.style.opacity = '1';
-          // Clear saved data
-          currentUserInfo = null;
-          currentWorkSchedule = null;
-          // Redirect to login or home page
-          // window.location.href = '/login';
-        }, 1000);
-      }
-    }
 
     function showDashboard() {
       // Update page title
-      document.getElementById('pageTitle').textContent = 'Dashboard - Ca Làm Việc';
+      document.getElementById('pageTitle').textContent = 'Dashboard';
 
       // Show dashboard content and hide others
       document.getElementById('dashboardContent').style.display = 'block';
@@ -874,13 +954,8 @@
         params.append('size', '10'); // Only show 10 recent orders
         params.append('orderBy', 'createdAt');
         params.append('sort', 'DESC');
-
-        if (currentWorkSchedule && currentWorkSchedule.startTime) {
-          params.append('startTime', currentWorkSchedule.startTime);
-        }
-
         // Fetch orders
-        const data = await apiFetch(`/orders/chef/work-shift-orders?${params.toString()}`, {
+        const data = await apiFetch(`/orders/chef/work-shift-orders/${currentUserInfo.id}?${params.toString()}`, {
           method: 'GET'
         });
 
@@ -894,7 +969,14 @@
 
       } catch (error) {
         console.error('Error loading dashboard orders:', error);
-        showDashboardError(error.message);
+        console.log('error code: ', error.code);
+        if (error.code == 1041 || error.code == 1048) {
+          console.log('in error');
+          showDashboardNoWorkSchedule();
+        } else {
+          console.log('in else');
+          showDashboardError(error.message);
+        }
       }
     }
 
@@ -918,7 +1000,7 @@
         emptyElement.innerHTML = `
       <div class="text-center py-4">
         <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-        <h6 class="text-muted">Hiện tại không có ca làm</h6>
+        <h6 class="text-muted">Hiện tại bạn đang không trong ca làm</h6>
         <p class="text-muted small">Đơn hàng sẽ hiển thị khi bạn có ca làm việc</p>
       </div>
     `;
@@ -1087,6 +1169,222 @@
         }) + ` ${timeStr}`;
       }
     }
+
+    async function checkInShift() {
+      if (!currentWorkSchedule || !currentWorkSchedule.id) {
+        showNotification('Không có ca làm việc để check-in', 'error');
+        return;
+      }
+
+      if (!confirm('Bạn có chắc chắn muốn vào ca làm việc?')) {
+        return;
+      }
+
+      try {
+        const requestBody = {
+          shiftId: currentWorkSchedule.id
+        };
+
+        console.log('work shift id: ', requestBody);
+        const data = await apiFetch('/shifts/check-in', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (data.code === 1000 && data.result) {
+          showNotification(data.message, 'success');
+
+          // Disable check-in button and enable check-out button
+          showCheckOutButton();
+
+          // Reload dashboard orders since check-in might affect order visibility
+          if (hasWorkSchedule) {
+            loadDashboardOrders();
+          }
+
+          // Initialize WebSocket
+          initializeWebSocket(currentWorkSchedule);
+
+          // Re-check work shift log to update status display
+          checkWorkShiftLog();
+        } else {
+          showNotification(`Check-in thất bại: ${data.message || 'Lỗi không xác định'}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error during check-in:', error);
+        showNotification(error.message, 'error');
+      }
+    }
+
+    // Updated checkOutShift function
+    async function checkOutShift() {
+      if (!currentWorkSchedule || !currentWorkSchedule.id) {
+        showNotification('Không có ca làm việc để check-out', 'error');
+        return;
+      }
+
+      if (!confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
+        return;
+      }
+
+      try {
+        const requestBody = {
+          shiftId: currentWorkSchedule.id
+        };
+
+        const data = await apiFetch('/shifts/check-out', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (data.code === 1000 && data.result) {
+          showNotification('Check-out thành công', 'success');
+
+          // Disable both buttons
+          disableAllShiftButtons();
+
+          // Disconnect WebSocket
+          disconnectWebSocket();
+
+          // Update dashboard to reflect no work schedule
+          showDashboardNoWorkSchedule();
+
+          // Re-check work shift log to update status display
+          checkWorkShiftLog();
+
+        } else {
+          showNotification(`Check-out thất bại: ${data.message || 'Lỗi không xác định'}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error during check-out:', error);
+        showNotification(error.message, 'error');
+      }
+    }
+
+
+    async function checkWorkShiftLog() {
+      if (!currentWorkSchedule || !currentWorkSchedule.id) {
+        console.log('No work schedule available');
+        disableAllShiftButtons();
+        return;
+      }
+
+      try {
+        const data = await apiFetch(`/shifts/work-shift-log/work-schedule/${currentWorkSchedule.id}`, {
+          method: 'GET'
+        });
+
+        if (data.code === 1000 && data.result) {
+          // User has checked in
+          const shiftLog = data.result;
+          console.log('Work shift log:', shiftLog);
+          if (shiftLog.checkInTime) {
+            if (shiftLog.checkOutTime) {
+              // User has checked out - disable both buttons
+              disableAllShiftButtons();
+              updateShiftStatusDisplay(shiftLog);
+            } else {
+              // User has checked in but not checked out - show check-out button active, check-in disabled
+              showCheckOutButton();
+              updateShiftStatusDisplay(shiftLog);
+            }
+          } else {
+            showCheckInButton();
+          }
+        } else {
+          console.error('Error checking work shift log:', data.message);
+          disableAllShiftButtons();
+        }
+      } catch (error) {
+        console.error('Error checking work shift log:', error);
+        disableAllShiftButtons();
+      }
+    }
+
+    // Function to show check-in button as active (clickable)
+    function showCheckInButton() {
+      const shiftButton = document.querySelector('.shift-btn');
+      if (shiftButton) {
+        shiftButton.disabled = false;
+        shiftButton.onclick = checkInShift;
+        shiftButton.innerHTML = `
+      <i class="fas fa-sign-in-alt"></i>
+      <span>Vào ca</span>
+    `;
+      }
+    }
+
+    // Function to show check-out button as active (clickable)
+    function showCheckOutButton() {
+      console.log('in show check out button');
+      const shiftButton = document.querySelector('.shift-btn');
+      if (shiftButton) {
+        shiftButton.disabled = false;
+        shiftButton.onclick = checkOutShift;
+        shiftButton.innerHTML = `
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="btn-text">Check-out</span>
+    `;
+      }
+    }
+
+    // Function to show check-out button as disabled (already checked out)
+    function showCheckOutButtonDisabled() {
+      console.log('in show check out disable');
+      const shiftButton = document.querySelector('.shift-btn');
+      if (shiftButton) {
+        shiftButton.disabled = true;
+        shiftButton.onclick = null;
+        shiftButton.innerHTML = '<i class="fas fa-check"></i> <span class="btn-text">Đã check-out</span>';
+      }
+    }
+
+
+    // Function to disable all shift buttons
+    function disableAllShiftButtons() {
+      showCheckOutButtonDisabled();
+    }
+
+    // Function to update shift status display based on shift log
+    function updateShiftStatusDisplay(shiftLog) {
+      if (shiftLog.checkInTime) {
+        const checkInTime = formatTimeFromISOString(shiftLog.checkInTime);
+
+        let statusText = '';
+        let statusIcon = '';
+
+        if (shiftLog.checkOutTime) {
+          // User has checked out
+          const checkOutTime = formatTimeFromISOString(shiftLog.checkOutTime);
+          statusText = `Đã hoàn thành ca (${checkInTime} - ${checkOutTime})`;
+          statusIcon = 'fa-check-circle';
+        } else {
+          // User has checked in but not out
+          statusText = `Đã check-in lúc ${checkInTime}`;
+          statusIcon = 'fa-clock';
+        }
+
+        // Update status display
+        document.getElementById('shiftType').innerHTML =
+          `<i class="fas ${statusIcon} me-2"></i>Trạng thái: ${statusText}`;
+
+        // Show status badge if late
+        if (shiftLog.status === 'LATE') {
+          const statusBadge = document.createElement('span');
+          statusBadge.className = 'badge bg-warning ms-2';
+          statusBadge.textContent = 'Đi muộn';
+          document.getElementById('shiftType').appendChild(statusBadge);
+        }
+      }
+    }
+
+
     // Disconnect WebSocket when page unloads
     window.addEventListener('beforeunload', function () {
       disconnectWebSocket();

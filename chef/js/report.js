@@ -1,7 +1,7 @@
 // Function to show reports section
 async function showReports() {
 
-    document.getElementById('pageTitle').textContent = 'Báo cáo ca làm việc';
+    document.getElementById('pageTitle').textContent = 'Báo Cáo Ca Làm';
     document.getElementById('dashboardContent').style.display = 'none';
     document.getElementById('dynamicContent').style.display = 'block';
     document.getElementById('errorMessage').style.display = 'none';
@@ -27,9 +27,8 @@ async function loadShiftReport() {
     `;
 
     try {
-        const startTime = currentWorkSchedule.startTime;
 
-        const data = await apiFetch(`/orders/chef/work-shift-orders?startTime=${encodeURIComponent(startTime)}&size=100`, {
+        const data = await apiFetch(`/orders/chef/work-shift-orders/${currentUserInfo.id}?&size=100`, {
             method: 'GET',
         });
 
@@ -40,16 +39,26 @@ async function loadShiftReport() {
         }
     } catch (error) {
         console.error('Error loading shift report:', error);
-        dynamicContent.innerHTML = `
+        if (error.code == 1041 || error.code == 1048) {
+            dynamicContent.innerHTML = `
+            <div class="alert text-center">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h6 class="text-muted">Hiện tại bạn đang không trong ca làm</h6>
+                <p class="text-muted small">Đơn hàng sẽ hiển thị khi bạn có ca làm việc</p>
+            </div>
+        `;
+        } else {
+            dynamicContent.innerHTML = `
             <div class="alert alert-danger text-center">
                 <i class="fas fa-exclamation-triangle mb-2" style="font-size: 2rem;"></i>
                 <h5>Không thể tải báo cáo</h5>
                 <p>${error.message}</p>
-                <button class="btn btn-primary" onclick="loadShiftReport()">
+                <button class="btn-report btn-primary" onclick="loadShiftReport()">
                     <i class="fas fa-refresh me-2"></i>Thử lại
                 </button>
             </div>
         `;
+        }
     }
 }
 
@@ -63,17 +72,8 @@ function displayShiftReport(orderData) {
         month: '2-digit',
         day: '2-digit'
     });
-    const startTime = new Date(currentWorkSchedule.startTime);
-    const endTime = new Date(currentWorkSchedule.endTime);
-
-    const formattedStartTime = startTime.toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    const formattedEndTime = endTime.toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const formattedStartTime = formatTimeFromISOString(currentWorkSchedule.startTime);
+    const formattedEndTime = formatTimeFromISOString(currentWorkSchedule.endTime);
 
     const dynamicContent = document.getElementById('dynamicContent');
     dynamicContent.innerHTML = `
@@ -84,7 +84,7 @@ function displayShiftReport(orderData) {
                     <div class="header-info">
                         <h2 class="report-title">
                             <i class="fas fa-chart-line"></i>
-                            Báo cáo ca làm việc
+                            Báo Cáo Ca Làm
                         </h2>
                         <div class="shift-details">
                             <span class="detail-item">
@@ -98,11 +98,11 @@ function displayShiftReport(orderData) {
                         </div>
                     </div>
                     <div class="header-actions">
-                        <button class="btn btn-secondary" onclick="exportReport()">
+                        <button class="btn-report btn-secondary" onclick="exportReport()">
                             <i class="fas fa-download"></i>
                             Xuất báo cáo
                         </button>
-                        <button class="btn btn-primary" onclick="loadShiftReport()">
+                        <button class="btn-report btn-primary" onclick="loadShiftReport()">
                             <i class="fas fa-sync-alt"></i>
                             Làm mới
                         </button>
@@ -297,7 +297,7 @@ function displayShiftReport(orderData) {
         }
 
         /* Button Styles */
-        .btn {
+        .btn-report {
             padding: 10px 20px;
             border-radius: var(--radius-sm);
             border: none;
@@ -552,6 +552,7 @@ function displayShiftReport(orderData) {
             .header-content {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 8px;
             }
 
             .header-actions {
@@ -582,6 +583,12 @@ function displayShiftReport(orderData) {
 
             .report-title {
                 font-size: 24px;
+            }
+            
+            .header-actions {
+                justify-content: center;
+                margin-top: 16px;
+                flex-wrap: wrap;
             }
         }
 
