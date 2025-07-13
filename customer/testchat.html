@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Waiter Chat Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+  <h2>Waiter Chat Console</h2>
+  <div>
+    <label>Table Area:</label>
+    <input type="text" id="tableArea" value="A">
+  </div>
+  <div>
+    <label>Table Number:</label>
+    <input type="text" id="tableNumber" value="A1">
+  </div>
+  <div>
+    <label>Message:</label>
+    <input type="text" id="messageText">
+    <button onclick="sendMessage()">Send to Customer</button>
+  </div>
+  <div>
+    <h4>Incoming Messages from Customer:</h4>
+    <ul id="messageList"></ul>
+  </div>
+  <script src="js/backend-url.js"></script>
+  <script>
+    let stompClient = null;
+
+    function connectWebSocket() {
+      const socket = new SockJS(`${BACKEND_BASE_URL}/ws`);
+      stompClient = Stomp.over(socket);
+      const area = document.getElementById('tableArea').value;
+
+      stompClient.connect({}, function () {
+        console.log('Connected as Waiter');
+        stompClient.subscribe(`/topic/chat/waiter/area/${area}`, function (msg) {
+          const message = JSON.parse(msg.body);
+          const li = document.createElement('li');
+          li.innerText = `[From ${message.sender}] ${message.message}`;
+          document.getElementById('messageList').appendChild(li);
+        });
+      });
+    }
+
+    function sendMessage() {
+      const tableNumber = document.getElementById('tableNumber').value;
+      const msg = document.getElementById('messageText').value;
+      stompClient.send(`/app/chat/table/${tableNumber}`, {}, JSON.stringify({
+        sender: 'WAITER',
+        message: msg
+      }));
+    }
+
+    window.onload = connectWebSocket;
+  </script>
+</body>
+</html>

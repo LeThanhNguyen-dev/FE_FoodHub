@@ -4,11 +4,470 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>FoodHub - Trang chủ</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/home-page.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header-section {
+            background: white;
+            padding: 1rem 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .restaurant-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .restaurant-logo {
+            width: 40px;
+            height: 40px;
+            background: #ff6b35;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .restaurant-details h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .restaurant-details p {
+            margin: 0;
+            color: #666;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #ff6b35;
+        }
+
+        .welcome-section {
+            background: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            margin: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .welcome-section h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-section p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 0 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            border-color: #ff6b35;
+            color: #ff6b35;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+        }
+
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .menu-icon {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+        }
+
+        .order-icon {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .chat-icon {
+            background: linear-gradient(135deg, #007bff, #6f42c1);
+        }
+
+        .payment-icon {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .action-btn h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-section {
+            background: white;
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .info-card i {
+            color: #ff6b35;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card h6 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .container-custom {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Chat Widget Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .chat-toggle .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .chat-popup {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ff6b35;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message.sent .message-avatar {
+            background: #007bff;
+        }
+
+        .message-content {
+            max-width: 70%;
+        }
+
+        .message-bubble {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            word-wrap: break-word;
+        }
+
+        .message.sent .message-bubble {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+
+        .message.sent .message-time {
+            text-align: left;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: #ff6b35;
+        }
+
+        .chat-send {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .chat-send:hover {
+            background: #e55a2b;
+        }
+
+        .chat-send:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .connection-status {
+            padding: 0.5rem 1rem;
+            background: #d4edda;
+            color: #155724;
+            font-size: 0.8rem;
+            text-align: center;
+            display: none;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .chat-popup {
+                width: 300px;
+                height: 400px;
+            }
+            
+            .chat-widget {
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .restaurant-details h5 {
+                font-size: 1.1rem;
+            }
+            
+            .chat-popup {
+                width: calc(100vw - 30px);
+                height: 70vh;
+                bottom: 90px;
+                right: -10px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -64,7 +523,7 @@
                 <h6>Đơn hàng</h6>
             </a>
 
-            <a href="#" class="action-btn" onclick="chatWithStaff()">
+            <a href="#" class="action-btn" onclick="openChat()">
                 <div class="action-icon chat-icon">
                     <i class="fas fa-comments"></i>
                 </div>
@@ -97,6 +556,49 @@
         </div>
     </div>
 
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <button class="chat-toggle" onclick="toggleChat()">
+            <i class="fas fa-comments"></i>
+            <span class="notification-badge" id="chatNotification">0</span>
+        </button>
+        
+        <div class="chat-popup" id="chatPopup">
+            <div class="chat-header">
+                <h6>
+                    <i class="fas fa-headset me-2"></i>
+                    Hỗ trợ khách hàng
+                </h6>
+                <button class="chat-close" onclick="closeChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="connection-status" id="connectionStatus">
+                <i class="fas fa-wifi me-1"></i>
+                Đang kết nối...
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be populated here -->
+            </div>
+
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." 
+                       onkeypress="handleKeyPress(event)">
+                <button class="chat-send" onclick="sendMessage()" id="sendButton">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="js/backend-url.js"></script>
+    <script src="js/chat-realtime.js"></script>
     <script>
         // Khởi tạo dữ liệu từ localStorage
         function initializeData() {
@@ -104,23 +606,7 @@
             document.getElementById('tableNumber').textContent = String(tableNumber);
             const customerName = localStorage.getItem('customerName') || 'Khách hàng';
             document.getElementById('customerName').textContent = customerName;
-            // // Cập nhật số lượng giỏ hàng
-            // updateCartCount();
         }
-
-        // // Cập nhật số lượng giỏ hàng
-        // function updateCartCount() {
-        //     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        //     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-        //     const cartCountElement = document.getElementById('cartCount');
-        //     if (totalItems > 0) {
-        //         cartCountElement.textContent = totalItems;
-        //         cartCountElement.style.display = 'flex';
-        //     } else {
-        //         cartCountElement.style.display = 'none';
-        //     }
-        // }
 
         // Chuyển đến trang menu
         function goToMenu() {
@@ -128,31 +614,72 @@
             window.location.href = `view-food-list.html?tableNumber=${tableNumber}`;
         }
 
-
         // Xem đơn hàng
         function viewOrders() {
             const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
             window.location.href = `order-history.html?tableNumber=${tableNumber}`;
         }
 
-        // Chat với nhân viên
-        function chatWithStaff() {
-            alert('Chức năng chat sẽ được phát triển trong phiên bản tiếp theo.');
+        // Mở chat
+        function openChat() {
+            toggleChat();
         }
 
         // Gọi thanh toán
         function callPayment() {
             const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
-
             if (confirm(`Bạn có muốn gọi nhân viên đến thanh toán cho bàn ${tableNumber} không?`)) {
                 alert('Đã gửi yêu cầu thanh toán. Nhân viên sẽ đến trong giây lát.');
+            }
+        }
+
+        // Chat functions
+        function toggleChat() {
+            const popup = document.getElementById('chatPopup');
+            const isVisible = popup.style.display === 'flex';
+            
+            if (isVisible) {
+                popup.style.display = 'none';
+            } else {
+                popup.style.display = 'flex';
+                // Initialize chat when opened
+                if (window.chatManager) {
+                    window.chatManager.loadChatHistory();
+                }
+                // Reset notification
+                document.getElementById('chatNotification').style.display = 'none';
+            }
+        }
+
+        function closeChat() {
+            document.getElementById('chatPopup').style.display = 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message && window.chatManager) {
+                window.chatManager.sendMessage(message);
+                input.value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
         }
 
         // Khởi tạo khi trang load
         document.addEventListener('DOMContentLoaded', function () {
             initializeData();
-
+            
+            // Initialize chat
+            const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
+            if (tableNumber && window.ChatManager) {
+                window.chatManager = new window.ChatManager(tableNumber);
+            }
         });
     </script>
 </body>
