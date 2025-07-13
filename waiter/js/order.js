@@ -1673,7 +1673,7 @@ function startSmartRefresh() {
     if (refreshInterval) clearInterval(refreshInterval);
 
     refreshInterval = setInterval(async () => {
-        if (ordersData.length > 0 && !isReloading) {
+        if (!isReloading) {
             await loadOrders(true); // Auto-refresh mode
         }
     }, 30000); // 30 seconds
