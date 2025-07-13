@@ -10,7 +10,6 @@ let totalPages = 0;
 let pageSize = 10;
 
 // API Configuration
-const BACKEND_BASE_URL = 'http://172.20.10.7:8080';
 const API_BASE_URL = `${BACKEND_BASE_URL}/menu-items`;
 const CATEGORIES_API_URL = `${BACKEND_BASE_URL}/categories`;
 const tableNumber = getUrlParameter('tableNumber');
@@ -140,7 +139,7 @@ function hideError() {
 function renderCategories() {
     const container = document.getElementById('categoriesContainer');
     if (!container) return;
-    
+
     container.innerHTML = '';
 
     const allButton = document.createElement('button');
@@ -169,7 +168,7 @@ function getFilteredItems() {
 function renderMenuItems() {
     const container = document.getElementById('menuContainer');
     if (!container) return;
-    
+
     const filteredItems = getFilteredItems();
 
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -190,36 +189,40 @@ function renderMenuItems() {
             const showQuantityControls = cartQuantity > 0;
 
             return `
-                <div class="menu-item ${item.status !== 'AVAILABLE' ? 'unavailable' : ''}" data-item-id="${item.id}">
-                    <div class="d-flex" onclick="viewItemDetail(${item.id})">
-                        ${item.image && !item.image.startsWith('data:') ?
-                            `<img src="${item.image}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'placeholder-image\\'>${DEFAULT_EMOJI}</div>'">` :
-                            `<div class="placeholder-image">${DEFAULT_EMOJI}</div>`
-                        }
-                        <div class="flex-fill p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="fw-semibold mb-0">${item.name}</h6>
-                                <span class="price-text">${formatPrice(item.price)}</span>
-                            </div>
-                            <p class="text-muted small mb-2 line-clamp-2">${item.description}</p>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-end align-items-center p-3 pt-0">
-                        <div class="quantity-controls" style="display: ${showQuantityControls ? 'flex' : 'none'};" data-item-id="${item.id}">
-                            <button class="btn btn-outline-secondary btn-sm quantity-minus" onclick="event.stopPropagation(); changeCartQuantity(${item.id}, -1)">-</button>
-                            <span class="quantity-value mx-2" id="quantity-${item.id}">${cartQuantity}</span>
-                            <button class="btn btn-outline-secondary btn-sm quantity-plus" onclick="event.stopPropagation(); changeCartQuantity(${item.id}, 1)">+</button>
-                        </div>
-                        <button class="btn btn-primary btn-sm add-button"
-                                data-item-id="${item.id}"
-                                style="display: ${showQuantityControls ? 'none' : 'block'};"
-                                ${item.status !== 'AVAILABLE' ? 'disabled' : ''}
-                                onclick="event.stopPropagation(); addToCart(${item.id}, 1)">
-                            ${item.status === 'AVAILABLE' ? '+' : 'Hết hàng'}
-                        </button>
-                    </div>
+    <div class="menu-item ${item.status !== 'AVAILABLE' ? 'unavailable' : ''}" data-item-id="${item.id}">
+        <div class="d-flex" onclick="viewItemDetail(${item.id})">
+            ${item.image && !item.image.startsWith('data:') ?
+                    `<img src="${item.image}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'placeholder-image\\'>${DEFAULT_EMOJI}</div>'">` :
+                    `<div class="placeholder-image">${DEFAULT_EMOJI}</div>`
+                }
+            <div class="flex-fill p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-semibold mb-0">${item.name}</h6>
+                    <span class="price-text">${formatPrice(item.price)}</span>
                 </div>
-            `;
+                <p class="text-muted small mb-2 line-clamp-2">${item.description}</p>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center p-3 pt-0">
+            ${item.status === 'AVAILABLE' ? `
+                    <div class="quantity-controls" style="display: ${showQuantityControls ? 'flex' : 'none'};" data-item-id="${item.id}">
+                        <button class="btn btn-outline-secondary btn-sm quantity-minus" onclick="event.stopPropagation(); changeCartQuantity(${item.id}, -1)">-</button>
+                        <span class="quantity-value mx-2" id="quantity-${item.id}">${cartQuantity}</span>
+                        <button class="btn btn-outline-secondary btn-sm quantity-plus" onclick="event.stopPropagation(); changeCartQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <button class="btn btn-primary btn-sm add-button"
+                            data-item-id="${item.id}"
+                            style="display: ${showQuantityControls ? 'none' : 'block'};"
+                            onclick="event.stopPropagation(); addToCart(${item.id}, 1)">
+                        +
+                    </button>
+                ` : `
+                    <button class="btn btn-secondary btn-sm" disabled style="border-radius: 20px;>Hết hàng</button>
+                `
+                }
+        </div>
+    </div>
+`;
         }).join('');
     }
 
@@ -233,7 +236,7 @@ function renderMenuItems() {
 function updatePaginationUI() {
     const paginationContainer = document.getElementById('paginationContainer');
     if (!paginationContainer) return;
-    
+
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
     const pageNumbers = document.getElementById('pageNumbers');
@@ -336,7 +339,7 @@ function changeCartQuantity(itemId, change) {
     } else {
         cartManager.updateItemQuantity(itemId, change);
     }
-    
+
     updateMenuItemDisplay(itemId);
 }
 
@@ -377,7 +380,7 @@ let lastSearchTerm = '';
 function filterItems() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) return;
-    
+
     const newSearchTerm = searchInput.value;
     currentPage = 0;
     if (newSearchTerm !== lastSearchTerm) {
@@ -403,6 +406,18 @@ function goBack() {
     }
 }
 
+
+
+function goToHome() {
+    const tableNumber = getUrlParameter('tableNumber') ||
+        (currentOrderData && currentOrderData.tableNumber);
+    if (tableNumber) {
+        window.location.href = `home-page.html?tableNumber=${encodeURIComponent(tableNumber)}`;
+    } else {
+        window.location.href = 'home-page.html';
+    }
+}
+
 // Đăng ký callback để cập nhật UI khi cart thay đổi
 cartManager.addCallback(() => {
     // Cập nhật hiển thị tất cả menu items
@@ -418,11 +433,29 @@ document.addEventListener('DOMContentLoaded', function () {
         tableNumberElement.textContent = tableNumber;
     }
     loadMenuData(0);
-    
+
     // Setup search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', filterItems);
     }
+
+    // Lắng nghe sự kiện cartUIUpdate
+    window.addEventListener('cartUIUpdate', function () {
+        console.log('Received cartUIUpdate event, updating UI');
+        menuItems.forEach(item => {
+            updateMenuItemDisplay(item.id);
+        });
+    });
+
+    // Lắng nghe sự kiện pageshow
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            console.log('Page restored from BFCache, updating UI');
+            menuItems.forEach(item => {
+                updateMenuItemDisplay(item.id);
+            });
+        }
+    });
 });
 

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FoodHub - Đang xử lý...</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .loading-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loading-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo-container i {
+            font-size: 2rem;
+            color: white;
+            z-index: 1;
+            position: relative;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6b35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-text {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .sub-text {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35, #f7931e);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .error-container {
+            color: #dc3545;
+        }
+
+        .error-container i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .success-container {
+            color: #28a745;
+        }
+
+        .success-container i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-retry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+            color: white;
+        }
+
+        .btn-retry:hover::before {
+            left: 100%;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .floating-icon {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .floating-icon:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .floating-icon:nth-child(3) { bottom: 20%; left: 15%; animation-delay: 2s; }
+        .floating-icon:nth-child(4) { bottom: 10%; right: 20%; animation-delay: 3s; }
+
+        /* .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        } */
+
+        @media (max-width: 768px) {
+            .loading-card {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+            
+            .logo-container {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .logo-container i {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="floating-icon"><i class="fas fa-utensils" style="font-size: 2rem;"></i></div>
+        <div class="floating-icon"><i class="fas fa-coffee" style="font-size: 1.5rem;"></i></div>
+        <div class="floating-icon"><i class="fas fa-pizza-slice" style="font-size: 1.8rem;"></i></div>
+        <div class="floating-icon"><i class="fas fa-hamburger" style="font-size: 1.6rem;"></i></div>
+    </div>
+
+    <!-- Toast Container
+    <div class="toast-container"></div> -->
+
+    <!-- Main Content -->
+    <div class="loading-container">
+        <div class="loading-card" id="statusCard">
+            <div class="logo-container">
+                <i class="fas fa-utensils"></i>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingContent">
+                <div class="spinner"></div>
+                <h4 class="status-text">Đang xử lý QR Code...</h4>
+                <p class="sub-text">Vui lòng đợi trong giây lát</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorContent" style="display: none;" class="error-container">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4 class="status-text">Có lỗi xảy ra</h4>
+                <p class="sub-text" id="errorMessage">QR Code không hợp lệ hoặc bàn không khả dụng</p>
+                <button class="btn btn-retry" onclick="retryQRScan()">
+                    <i class="fas fa-redo me-2"></i>Thử lại
+                </button>
+            </div>
+
+            <!-- Success State -->
+            <div id="successContent" style="display: none;" class="success-container">
+                <i class="fas fa-check-circle"></i>
+                <h4 class="status-text">Quét QR thành công!</h4>
+                <p class="sub-text">Đang chuyển hướng...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/backend-url.js"></script>
+    <script src="js/token-manager.js"></script>
+    <script>
+        class QRProcessor {
+            constructor() {
+                this.API_ENDPOINTS = {
+                    scanQR: '/qr/scan',
+                    validateToken: '/qr/validate'
+                };
+                this.progressSteps = [
+                    { text: 'Đang xử lý QR Code...', progress: 20 },
+                    { text: 'Đang xác thực thông tin...', progress: 50 },
+                    { text: 'Đang thiết lập phiên làm việc...', progress: 80 },
+                    { text: 'Hoàn tất xử lý...', progress: 100 }
+                ];
+                this.currentStep = 0;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.startProcessing();
+            }
+
+            setupEventListeners() {
+                // Xử lý session expired
+                window.addEventListener('sessionExpired', (event) => {
+                    console.log('Session expired:', event.detail);
+                    this.showError('Phiên làm việc đã hết hạn. Vui lòng quét lại mã QR.');
+                });
+
+                // Xử lý session cleared
+                window.addEventListener('sessionCleared', () => {
+                    console.log('Session cleared');
+                });
+
+                // Xử lý khi trang được đóng
+                window.addEventListener('beforeunload', () => {
+                    if (window.tokenManager) {
+                        const sessionData = window.tokenManager.getSessionData();
+                        if (sessionData.token && sessionData.isReservationToken) {
+                            window.tokenManager.finishSession();
+                        }
+                    }
+                });
+            }
+
+            // Lấy QR code từ URL parameter
+            getQRCodeFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('qrCode') || urlParams.get('code') || urlParams.get('qr');
+            }
+
+            // Bắt đầu xử lý
+            async startProcessing() {
+                const qrCode = this.getQRCodeFromURL();
+                
+                if (!qrCode) {
+                    this.showError('Không tìm thấy mã QR trong URL. Vui lòng quét mã QR từ bàn.');
+                    return;
+                }
+
+                // Delay nhỏ để UX mượt hơn
+                setTimeout(() => {
+                    this.handleQRScan(qrCode);
+                }, 800);
+            }
+
+            // Xử lý quét QR code
+            async handleQRScan(qrCode) {
+                try {
+                    this.showLoading();
+                    await this.animateProgress();
+                    
+                    // Gọi API scan QR
+                    const response = await fetch(`${BACKEND_BASE_URL}${this.API_ENDPOINTS.scanQR}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            qrCode: qrCode
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.result) {
+                        await this.handleSuccessfulScan(data.result);
+                    } else {
+                        const errorMsg = data.message || 'QR Code không hợp lệ hoặc bàn không khả dụng';
+                        this.showError(errorMsg);
+                    }
+
+                } catch (error) {
+                    console.error('Lỗi khi xử lý QR code:', error);
+                    this.showError('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.');
+                }
+            }
+
+            // Xử lý scan thành công
+            async handleSuccessfulScan(result) {
+                // Lưu thông tin phiên vào localStorage
+                const sessionData = {
+                    token: result.token,
+                    tableNumber: result.tableNumber,
+                    orderId: result.orderId,
+                    expiryTime: result.expiryTime,
+                    isReservationToken: result.isReservationToken,
+                    scanTime: new Date().toISOString()
+                };
+
+                // Sử dụng TokenManager để lưu session
+                if (window.tokenManager) {
+                    window.tokenManager.saveSessionData(sessionData);
+                } else {
+                    // Fallback nếu TokenManager chưa sẵn sàng
+                    localStorage.setItem('qrSession', JSON.stringify(sessionData));
+                    localStorage.setItem('tableNumber', result.tableNumber);
+                    localStorage.setItem('sessionToken', result.token);
+                }
+
+                // Hiển thị thành công
+                this.showSuccess();
+                // this.showToast('Quét QR thành công!', 'success');
+
+                // Chuyển hướng sau 2 giây
+                setTimeout(() => {
+                    this.redirectToNextPage(result);
+                }, 2000);
+            }
+
+            // Chuyển hướng đến trang tiếp theo
+            redirectToNextPage(result) {
+                if (result.orderId) {
+                    // Nếu đã có order, chuyển thẳng đến home page
+                    window.location.href = `home-page.html?tableNumber=${result.tableNumber}&orderId=${result.orderId}`;
+                } else {
+                    // Nếu chưa có order, chuyển đến trang nhập tên
+                    window.location.href = `enter-name.html?tableNumber=${result.tableNumber}`;
+                }
+            }
+
+            // Animation progress bar
+            async animateProgress() {
+                for (let i = 0; i < this.progressSteps.length; i++) {
+                    const step = this.progressSteps[i];
+                    
+                    // Cập nhật text
+                    document.querySelector('#loadingContent .status-text').textContent = step.text;
+                    
+                    // Animate progress bar
+                    const progressFill = document.getElementById('progressFill');
+                    progressFill.style.width = step.progress + '%';
+                    
+                    // Delay giữa các bước
+                    await new Promise(resolve => setTimeout(resolve, 600));
+                }
+            }
+
+            // Hiển thị trạng thái loading
+            showLoading() {
+                document.getElementById('loadingContent').style.display = 'block';
+                document.getElementById('errorContent').style.display = 'none';
+                document.getElementById('successContent').style.display = 'none';
+            }
+
+            // Hiển thị lỗi
+            showError(message) {
+                document.getElementById('loadingContent').style.display = 'none';
+                document.getElementById('errorContent').style.display = 'block';
+                document.getElementById('successContent').style.display = 'none';
+                document.getElementById('errorMessage').textContent = message;
+                
+                // this.showToast(message, 'error');
+            }
+
+            // Hiển thị thành công
+            showSuccess() {
+                document.getElementById('loadingContent').style.display = 'none';
+                document.getElementById('errorContent').style.display = 'none';
+                document.getElementById('successContent').style.display = 'block';
+            }
+
+            // Thử lại quét QR
+            retryQRScan() {
+                const qrCode = this.getQRCodeFromURL();
+                if (qrCode) {
+                    this.currentStep = 0;
+                    this.handleQRScan(qrCode);
+                } else {
+                    this.showError('Không tìm thấy mã QR. Vui lòng quét lại.');
+                }
+            }
+        }
+
+        // Global function cho button retry
+        function retryQRScan() {
+            if (window.qrProcessor) {
+                window.qrProcessor.retryQRScan();
+            }
+        }
+
+        // Khởi tạo khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Đảm bảo TokenManager đã được khởi tạo
+            if (typeof TokenManager !== 'undefined') {
+                // Khởi tạo TokenManager nếu chưa có
+                if (!window.tokenManager) {
+                    window.tokenManager = new TokenManager(BACKEND_BASE_URL);
+                }
+                
+                // Khởi tạo QR Processor
+                window.qrProcessor = new QRProcessor();
+            } else {
+                console.warn('TokenManager not found, using fallback');
+                window.qrProcessor = new QRProcessor();
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
