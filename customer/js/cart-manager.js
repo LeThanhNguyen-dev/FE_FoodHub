@@ -880,7 +880,7 @@ class CartUIManager {
     saveOrderDetails(orderResult, tableNumber, isNewOrder) {
         try {
             if (this.cartManager.storage.isLocalStorageAvailable) {
-                localStorage.setItem('currentOrderId', orderResult.id);
+                // localStorage.setItem('currentOrderId', orderResult.id);
 
                 const orderDetails = {
                     ...orderResult,
@@ -972,7 +972,7 @@ class CartUIManager {
         //         window.location.href = 'index.html';
         //     }, 2000);
         // }
-    }D
+    }
 
     // Hàm utility
     getHttpErrorMessage(status) {
@@ -1051,16 +1051,16 @@ function placeOrder(event) {
 }
 
 // Thêm hàm để test giỏ hàng với dữ liệu mẫu
-function addSampleItem() {
-    const sampleItem = {
-        id: Date.now(), // Sử dụng timestamp để tránh trùng ID
-        name: 'Phở Bò',
-        price: 65000,
-        image: '',
-        category: 'Món chính'
-    };
-    cartManager.addItem(sampleItem, 1, 'Ít cay');
-}
+// function addSampleItem() {
+//     const sampleItem = {
+//         id: Date.now(), // Sử dụng timestamp để tránh trùng ID
+//         name: 'Phở Bò',
+//         price: 65000,
+//         image: '',
+//         category: 'Món chính'
+//     };
+//     cartManager.addItem(sampleItem, 1, 'Ít cay');
+// }
 
 // Debug functions (có thể xóa trong production)
 function debugCart() {
