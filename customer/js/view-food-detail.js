@@ -1,13 +1,12 @@
 // App State
 let currentFood = null;
-let selectedQuantity = 1;
+let selectedQuantity = 0; // Changed: Start from 0 instead of 1
 let isFavorite = false;
 let customerNote = '';
 let relatedFoods = [];
 let isUpdatingExistingItem = false; // Flag to track if we're updating existing item
 
 // API Configuration
-const BACKEND_BASE_URL = "http://172.20.10.7:8080";
 const API_BASE_URL = `${BACKEND_BASE_URL}/menu-items`;
 
 // Default placeholder for images
@@ -81,18 +80,12 @@ function checkAndUpdateCartStatus() {
         document.getElementById('customerNote').value = customerNote;
         updateNoteCounter();
 
-        // Change button text and style
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
-        addToCartBtn.classList.remove('btn-primary');
-        addToCartBtn.classList.add('btn-warning');
-
         // Show update indicator
         showUpdateModeIndicator();
     } else {
         // Item doesn't exist - switch to add mode
         isUpdatingExistingItem = false;
-        selectedQuantity = 1;
+        selectedQuantity = 0; // Start from 0 for new items
         customerNote = '';
 
         // Update UI elements
@@ -100,17 +93,12 @@ function checkAndUpdateCartStatus() {
         document.getElementById('customerNote').value = customerNote;
         updateNoteCounter();
 
-        // Reset button text and style
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        addToCartBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Thêm vào giỏ hàng';
-        addToCartBtn.classList.remove('btn-warning');
-        addToCartBtn.classList.add('btn-primary');
-
         // Hide update indicator
         hideUpdateModeIndicator();
     }
 
     updateQuantityDisplay();
+    updateAddToCartButton(); // Update button based on quantity
 }
 
 // Show update mode indicator
@@ -316,6 +304,12 @@ function viewFoodDetail(foodId) {
     window.location.href = currentUrl.toString();
 }
 
+// function viewFoodDetail(foodId) {
+//     const tableNumber = getUrlParameter('tableNumber') || '';
+//     const url = `view-food-detail.html?itemId=${foodId}&tableNumber=${encodeURIComponent(tableNumber)}`;
+//     window.location.replace(url); // Thay thế mục lịch sử hiện tại
+// }
+
 // Render food detail
 function renderFoodDetail() {
     if (!currentFood) return;
@@ -336,15 +330,11 @@ function renderFoodDetail() {
 
     // Update status badge
     const statusBadge = document.getElementById('statusBadge');
-    const addToCartBtn = document.getElementById('addToCartBtn');
 
     if (currentFood.status === 'AVAILABLE') {
         statusBadge.innerHTML = '<span class="badge bg-success">Còn hàng</span>';
-        addToCartBtn.disabled = false;
     } else {
         statusBadge.innerHTML = '<span class="badge bg-danger">Hết hàng</span>';
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<i class="fas fa-ban me-2"></i>Hết hàng';
     }
 
     // Add fade-in animation
@@ -411,13 +401,14 @@ function toggleFavorite() {
     }
 }
 
-// Quantity Functions
+// Quantity Functions - Updated to handle 0 quantity
 function changeQuantity(delta) {
-    const newQuantity = Math.max(1, Math.min(30, selectedQuantity + delta));
+    const newQuantity = selectedQuantity + delta;
 
     if (newQuantity !== selectedQuantity) {
         selectedQuantity = newQuantity;
         updateQuantityDisplay();
+        updateAddToCartButton(); // Update button when quantity changes
     }
 }
 
@@ -428,11 +419,51 @@ function updateQuantityDisplay() {
     const decreaseBtn = document.getElementById('decreaseQty');
     const increaseBtn = document.getElementById('increaseQty');
 
-    decreaseBtn.disabled = selectedQuantity <= 1;
-    increaseBtn.disabled = selectedQuantity >= 30;
+    decreaseBtn.disabled = selectedQuantity <= 0; // Disable when quantity is 0
+    // increaseBtn.disabled = selectedQuantity >= 30;
 }
 
-// Cart Functions - Updated to handle both add and update
+// New function to update the Add to Cart button based on quantity and status
+function updateAddToCartButton() {
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    
+    if (!currentFood || currentFood.status !== 'AVAILABLE') {
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = '<i class="fas fa-ban me-2"></i>Hết hàng';
+        addToCartBtn.className = 'btn btn-secondary flex-fill';
+        return;
+    }
+
+    if (isUpdatingExistingItem) {
+        // Update mode
+        if (selectedQuantity === 0) {
+            // Remove from cart
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-trash me-2"></i>Xóa khỏi giỏ hàng';
+            addToCartBtn.className = 'btn btn-danger flex-fill';
+        } else {
+            // Update quantity
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
+            addToCartBtn.className = 'btn btn-warning flex-fill';
+        }
+    } else {
+        // Add mode
+        if (selectedQuantity === 0) {
+            // Cannot add 0 quantity
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Chọn số lượng';
+            addToCartBtn.className = 'btn btn-secondary flex-fill';
+        } else {
+            // Add to cart
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Thêm vào giỏ hàng';
+            addToCartBtn.className = 'btn btn-primary flex-fill';
+        }
+    }
+}
+
+// Cart Functions - Updated to handle both add, update, and remove
 function addToCart() {
     if (!currentFood || currentFood.status !== 'AVAILABLE') {
         showToast('Món ăn này hiện không có sẵn', 'error');
@@ -455,23 +486,49 @@ function addToCart() {
         };
 
         if (isUpdatingExistingItem) {
-            // Update existing item
-            cartManager.updateItem(currentFood.id, selectedQuantity, customerNote.trim());
+            if (selectedQuantity === 0) {
+                // Remove item from cart
+                cartManager.removeItem(currentFood.id);
+                showToast(`Đã xóa ${currentFood.name} khỏi giỏ hàng`);
 
-            showToast(`Đã cập nhật ${currentFood.name} trong giỏ hàng${customerNote ? ` (Ghi chú: ${customerNote})` : ''}`);
+                // Switch back to add mode
+                isUpdatingExistingItem = false;
+                hideUpdateModeIndicator();
 
-            // Show success animation on button
-            const addToCartBtn = document.getElementById('addToCartBtn');
-            addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã cập nhật!';
-            addToCartBtn.disabled = true;
+                // Show success animation
+                const addToCartBtn = document.getElementById('addToCartBtn');
+                addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã xóa!';
+                addToCartBtn.disabled = true;
+                addToCartBtn.className = 'btn btn-success flex-fill';
 
-            setTimeout(() => {
-                addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
-                addToCartBtn.disabled = false;
-            }, 1500);
+                setTimeout(() => {
+                    updateAddToCartButton();
+                }, 1500);
+
+            } else {
+                // Update existing item
+                cartManager.updateItem(currentFood.id, selectedQuantity, customerNote.trim());
+
+                showToast(`Đã cập nhật ${currentFood.name} trong giỏ hàng${customerNote ? ` (Ghi chú: ${customerNote})` : ''}`);
+
+                // Show success animation on button
+                const addToCartBtn = document.getElementById('addToCartBtn');
+                addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã cập nhật!';
+                addToCartBtn.disabled = true;
+                addToCartBtn.className = 'btn btn-success flex-fill';
+
+                setTimeout(() => {
+                    updateAddToCartButton();
+                }, 1500);
+            }
 
         } else {
             // Add new item
+            if (selectedQuantity === 0) {
+                showToast('Vui lòng chọn số lượng lớn hơn 0', 'error');
+                return;
+            }
+
             cartManager.addItem(item, selectedQuantity, customerNote.trim());
 
             showToast(`Đã thêm ${selectedQuantity} ${currentFood.name} vào giỏ hàng${customerNote ? ` (Ghi chú: ${customerNote})` : ''}`);
@@ -483,15 +540,18 @@ function addToCart() {
             const addToCartBtn = document.getElementById('addToCartBtn');
             addToCartBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã thêm!';
             addToCartBtn.disabled = true;
+            addToCartBtn.className = 'btn btn-success flex-fill';
 
             setTimeout(() => {
-                addToCartBtn.innerHTML = '<i class="fas fa-edit me-2"></i>Cập nhật món';
-                addToCartBtn.classList.remove('btn-primary');
-                addToCartBtn.classList.add('btn-warning');
-                addToCartBtn.disabled = false;
+                updateAddToCartButton();
                 showUpdateModeIndicator();
             }, 1500);
         }
+
+        // Gửi sự kiện tùy chỉnh để thông báo cập nhật giỏ hàng
+        window.dispatchEvent(new CustomEvent('cartUIUpdate', {
+            detail: { source: 'view-food-detail' }
+        }));
 
     } catch (error) {
         console.error('Error with cart operation:', error);
@@ -543,6 +603,16 @@ function goBack() {
     }
 }
 
+function goFoodList() {
+    const tableNumber = getUrlParameter('tableNumber') ||
+        (currentOrderData && currentOrderData.tableNumber);
+    if (tableNumber) {
+        window.location.href = `view-food-list.html?tableNumber=${encodeURIComponent(tableNumber)}`;
+    } else {
+        window.location.href = 'view-food-list.html';
+    }
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function () {
     initializeTableNumber();
@@ -555,8 +625,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Initialize quantity display
             updateQuantityDisplay();
+            updateAddToCartButton();
 
-            // ===== THAY ĐỔI CHÍNH Ở ĐÂY =====
             // Đăng ký callback để cập nhật UI khi cart thay đổi (giống như viewfoodlist.js)
             cartManager.addCallback(() => {
                 if (currentFood) {
@@ -595,6 +665,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
     document.addEventListener('dblclick', function (e) {
         e.preventDefault();
     }, { passive: false });
@@ -608,6 +679,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         lastTouchEnd = now;
     }, { passive: false });
+    // Thay thế trạng thái lịch sử hiện tại
+    // history.replaceState({ page: 'foodDetail' }, '', window.location.href);
+
+    // window.addEventListener('popstate', function (event) {
+    //     // Ngăn hành vi mặc định và chuyển hướng về View Food List
+    //     // event.preventDefault();
+    //     goFoodList();
+    // });
 });
 
 // Add CSS animations
@@ -713,6 +792,10 @@ style.textContent = `
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
     }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
 `;
 document.head.appendChild(style);
-

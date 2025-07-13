@@ -17,8 +17,12 @@
         <div class="container-custom py-3">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-light me-3" onclick="goBack()">
-                        <i class="fas fa-arrow-left"></i>
+                    <button class="back-btn" onclick="goToHome()">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            style="width: 24px; height: 24px; fill: none; stroke: #ff6b35; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round;">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9,22 9,12 15,12 15,22" />
+                        </svg>
                     </button>
                     <div class="restaurant-logo me-3">
                         <i class="fas fa-utensils"></i>
@@ -132,6 +136,8 @@
     </button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="js/backend-url.js"></script>
+    <script src="js/token-manager.js"></script>
     <script src="js/cart-manager.js"></script>
     <script src="js/view-food-list.js"></script>
     <script>
