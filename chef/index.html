@@ -1185,7 +1185,6 @@
           shiftId: currentWorkSchedule.id
         };
 
-        console.log('work shift id: ', requestBody);
         const data = await apiFetch('/shifts/check-in', {
           method: 'POST',
           headers: {
