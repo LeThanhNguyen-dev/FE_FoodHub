@@ -81,6 +81,7 @@
                                 <option value="CASH">CASH</option>
                                 <option value="BANKING">BANKING</option>
                                 <option value="VNPAY">VNPAY</option>
+                                  <option value="NULL">Chưa xác định</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -247,6 +248,10 @@
         function hideLoading() {
             document.getElementById('loadingSpinner').style.display = 'none';
         }
+              function hideQueryParams() {
+    const cleanUrl = window.location.pathname; // Lấy đường dẫn không chứa query parameters
+    history.pushState({}, '', cleanUrl); // Thay đổi URL hiển thị
+}
 
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -259,6 +264,7 @@
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 5000);
         }
+
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('vi-VN', {
@@ -746,9 +752,10 @@ function renderOrderTable(orders, totalElements = 0) {
             const specificDate = urlParams.get('specificDate');
             const startDate = urlParams.get('startDate');
             const endDate = urlParams.get('endDate');
+            const status = urlParams.get('status');
             
             const periodSelect = document.getElementById('period');
-            
+            const statusFilter = document.getElementById('statusFilter');
             if (period === 'custom' && startDate && endDate && startDate === endDate) {
                 periodSelect.value = 'custom';
                 document.getElementById('customDate').style.display = 'block';
@@ -763,6 +770,10 @@ function renderOrderTable(orders, totalElements = 0) {
                 periodSelect.value = period === 'specific' ? 'custom' : period;
                 document.getElementById('customDate').style.display = period === 'custom' ? 'block' : 'none';
             }
+            if(status){
+statusFilter.value = status;
+            }
+            hideQueryParams();
         }
 
         async function updateData() {

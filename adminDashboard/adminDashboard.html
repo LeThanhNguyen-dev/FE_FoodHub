@@ -65,45 +65,154 @@
             cursor: pointer;
         }
 
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 20px;
-        }
+     /* THAY THẾ CSS CHO .dashboard-cards */
+.dashboard-cards {
+    display: grid;
+       grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin: 20px;
+    padding: 10px;
+}
 
-        .card {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: left;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+/* THAY THẾ CSS CHO .card */
+.card {
+    background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+    padding: 30px 25px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 
+        0 15px 35px rgba(254, 161, 22, 0.15),
+        0 5px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(254, 161, 22, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
 
-        .card:hover {
-            transform: scale(1.03);
-            cursor: pointer;
-        }
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #FEA116, #ff8c42);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+.card:hover::before {
+    transform: translateX(0);
+}
 
-        .card-header h5 {
-            color: #6b7280;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin: 0;
-        }
 
-        .card-body {
-            padding: 0;
-        }
+/* THAY THẾ CSS CHO .card-header */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    background-color: transparent;
+    border-bottom: 2px solid rgba(254, 161, 22, 0.1);
+}
 
+.card-header h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-header i {
+    color: var(--primary);
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+/* THAY THẾ CSS CHO .management-icon */
+.management-icon {
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, #FEA116, #ff8c42);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    text-shadow: 0 4px 8px rgba(254, 161, 22, 0.3);
+}
+
+.card:hover .management-icon {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 6px 12px rgba(254, 161, 22, 0.4));
+}
+
+/* THAY THẾ CSS CHO .stats-number */
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #2d3748, #4a5568);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+
+
+/* THAY THẾ CSS CHO .btn-manage */
+.btn-manage {
+    background: linear-gradient(135deg, #FEA116, #ff8c42);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.4s ease;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(254, 161, 22, 0.3);
+}
+
+.btn-manage::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-manage:hover::before {
+    left: 100%;
+}
+
+.btn-manage:hover {
+    background: linear-gradient(135deg, #ff8c42, #FEA116);
+    box-shadow: 0 12px 30px rgba(254, 161, 22, 0.4);
+    color: white;
+}
+
+
+/* THAY THẾ CSS CHO .card-body */
+.card-body {
+    padding: 0;
+    position: relative;
+}
+
+.card-body p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
         .stats-number {
             font-size: 2rem;
             font-weight: 700;
@@ -415,6 +524,9 @@
     </style>
 </head>
 <body>
+    <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light); display: flex; justify-content: center; align-items: center; z-index: 10000;">
+        <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid var(--primary);"></div>
+    </div>
     <!-- Sidebar Include -->
     <div id="sidebar-container"></div>
 
@@ -514,6 +626,20 @@
                         </button>
                     </div>
                 </div>
+            <!-- Schedule Management Card -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-calendar-alt me-2"></i>Quản lý lịch làm</h5>
+    </div>
+    <div class="card-body text-center">
+        <i class="fas fa-calendar-alt management-icon"></i>
+        <div class="stats-number" id="todayDay"><span class="loading-spinner"></span>Đang tải...</div>
+        <p class="text-muted mb-3" id="todayDate"><span class="loading-spinner"></span>Đang tải...</p>
+        <button class="btn btn-manage" onclick="showScheduleManagement()">
+            <i class="fas fa-cog me-2"></i>Quản lý
+        </button>
+    </div>
+</div>
             </div>
         </div>
 
@@ -671,19 +797,6 @@
     <script src="js/topbar.js"></script>
     <script>
         // Hàm tải sidebar
-        async function loadSidebar() {
-            try {
-                const response = await fetch('components/sidebar.html');
-                if (!response.ok) throw new Error('Không thể tải sidebar');
-                const sidebarHtml = await response.text();
-                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
-                setActiveNavLink();
-            } catch (error) {
-                console.error('Lỗi khi tải sidebar:', error);
-                showNotification('Lỗi tải sidebar!', 'error');
-                document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
-            }
-        }
 
         // Hàm định dạng tiền tệ
         function formatCurrency(amount) {
@@ -759,7 +872,10 @@
 
         // Hàm điều hướng
         function showMenuManagement() {
-            window.location.href = "html/menu-manager/menu.html";
+             window.location.href = "html/menu-manager/menu.html"
+        }
+        function showScheduleManagement(){
+             window.location.href = "html/schedule/lichlam.html"
         }
 
         function showStaffManagement() {
@@ -901,6 +1017,37 @@
                 clearTimeout(timeoutId);
             }
         }
+    // Hàm hiển thị thứ và ngày tháng năm
+function fetchTodayDay() {
+    const todayDayElement = document.getElementById('todayDay');
+    const todayDateElement = document.getElementById('todayDate');
+    todayDayElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+    if (todayDateElement) {
+        todayDateElement.innerHTML = '<span class="loading-spinner"></span>Đang tải...';
+    }
+    
+    try {
+        const today = new Date();
+        const daysOfWeek = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+        const dayName = daysOfWeek[today.getDay()];
+        todayDayElement.textContent = dayName;
+        if (todayDateElement) {
+            const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+            todayDateElement.textContent = formattedDate;
+        }
+        hideError();
+    } catch (error) {
+        console.error('Lỗi fetchTodayDay:', error);
+        todayDayElement.textContent = 'N/A';
+        if (todayDateElement) {
+            todayDateElement.textContent = 'N/A';
+        }
+        showNotification('Không thể tải thông tin ngày!', 'error');
+    }
+}
+
+// Hàm điều hướng đến trang quản lý lịch làm
+
 
         // Hàm kiểm tra số bàn đã tồn tại
         async function checkTableNumberExists(tableNumber, excludeTableId = null) {
@@ -1176,22 +1323,43 @@ async function deleteTable(tableId, status) {
             fetchMenuItemCount().catch(error => console.error('Lỗi fetchMenuItemCount:', error));
             fetchTodayRevenue().catch(error => console.error('Lỗi fetchTodayRevenue:', error));
             fetchTableCount().catch(error => console.error('Lỗi fetchTableCount:', error));
+            fetchTodayDay();
             console.log('Đã gửi tất cả yêu cầu fetch.');
         }
     
         // Sự kiện DOM loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Kiểm tra DOM:', {
-                customerCount: document.getElementById('customerCount'),
-                userCount: document.getElementById('userCount'),
-                menuItemCount: document.getElementById('menuItemCount'),
-                todayRevenue: document.getElementById('todayRevenue'),
-                tableCount: document.getElementById('tableCount')
-            });
-            loadSidebar();
-            loadTopbar();
-            showDashboard();
-        });
+     document.addEventListener('DOMContentLoaded', async () => {
+    // Kiểm tra vai trò trước khi tải giao diện
+    const isAdmin = await validateAdminAccess(); // Hàm từ topbar.js
+    if (!isAdmin) {
+        return; // Thoát nếu không phải admin (chuyển hướng được xử lý trong validateAdminAccess)
+    }
+
+    // Ẩn màn hình tải
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+    }
+
+    // Tải giao diện sau khi xác thực
+    console.log('Kiểm tra DOM:', {
+        customerCount: document.getElementById('customerCount'),
+        userCount: document.getElementById('userCount'),
+        menuItemCount: document.getElementById('menuItemCount'),
+        todayRevenue: document.getElementById('todayRevenue'),
+        tableCount: document.getElementById('tableCount'),
+        todayDay: document.getElementById('todayDay')
+    });
+    loadSidebar();
+    loadTopbar();
+    showDashboard();
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.classList.add('collapsed');
+        }
+    }
+});
         
     </script>
 </body>
