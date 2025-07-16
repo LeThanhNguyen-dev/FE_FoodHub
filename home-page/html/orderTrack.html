@@ -17,8 +17,6 @@
       box-sizing: border-box;
     }
 
-
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #f8fafc;
@@ -223,7 +221,7 @@
       height: 4px;
       background: linear-gradient(to right, #3b82f6, #2563eb, #1d4ed8);
       border-radius: 2px;
-      transition: width 1s ease-in-out;
+      transition: width 1.5s ease-in-out;
       z-index: 2;
       box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     }
@@ -234,8 +232,8 @@
       text-align: center;
       z-index: 3;
       opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.6s ease-out forwards;
+      transform: translateY(10px);
+      animation: fadeInUp 0.8s ease-out forwards;
     }
 
     .timeline-item:nth-child(1) { animation-delay: 0.1s; }
@@ -254,7 +252,6 @@
       width: 12px;
       height: 12px;
       background: #e2e8f0;
-      border-radius: 50%;
       border: 3px solid #ffffff;
       box-shadow: 0 0 0 2px #e2e8f0;
       transition: all 0.5s ease;
@@ -382,14 +379,14 @@
 
     /* Pulse Animation */
     .status-pulse {
-      animation: statusPulse 1s ease-in-out;
+      animation: statusPulse 1.5s ease-in-out;
     }
 
     /* Animations */
     @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
       }
       to {
         opacity: 1;
@@ -460,7 +457,7 @@
         background-color: rgba(59, 130, 246, 0.1);
       }
       50% {
-        background-color: rgba(59, 130, 246, 0.3);
+        background-color: rgba(59, 130, 246, 0.2);
       }
       100% {
         background-color: rgba(59, 130, 246, 0.1);
@@ -481,7 +478,7 @@
       height: 100%;
       background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8);
       border-radius: 3px;
-      transition: width 1s ease-in-out;
+      transition: width 1.5s ease-in-out;
       position: relative;
     }
 
@@ -492,8 +489,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      animation: shimmer 2s infinite;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: shimmer 3s infinite;
     }
 
     @keyframes shimmer {
@@ -694,6 +691,19 @@
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
     let pollingInterval = null;
+    let lastRenderedOrder = null;
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
 
     function parseJwt(token) {
       try {
@@ -927,6 +937,11 @@
     }
 
     function renderOrder(order) {
+      if (lastRenderedOrder && JSON.stringify(lastRenderedOrder) === JSON.stringify(order)) {
+        console.log(`No changes for order ${order.id}, skipping render`);
+        return;
+      }
+
       const orderDetails = document.getElementById('order-details');
       if (!orderDetails) {
         console.error("Order details element not found");
@@ -973,11 +988,13 @@
 
       const progressFill = document.getElementById('progress-fill');
       if (progressFill) {
-        progressFill.style.width = `${progressPercentage}%`;
-        progressFill.classList.add('status-pulse');
-        setTimeout(() => {
-          progressFill.classList.remove('status-pulse');
-        }, 1000);
+        if (progressFill.style.width !== `${progressPercentage}%`) {
+          progressFill.style.width = `${progressPercentage}%`;
+          progressFill.classList.add('status-pulse');
+          setTimeout(() => {
+            progressFill.classList.remove('status-pulse');
+          }, 1500);
+        }
       } else {
         console.error("Progress fill element not found");
         showError("Unable to update progress bar: DOM element missing");
@@ -1013,8 +1030,11 @@
         </div>
       `).join('') || '<p class="text-gray-600">No items found.</p>';
 
+      lastRenderedOrder = order;
       console.log("Rendered order:", order.id, "with status:", order.status);
     }
+
+    const debouncedRenderOrder = debounce(renderOrder, 2000);
 
     function initializeWebSocket() {
       if (!isLoggedIn()) {
@@ -1053,7 +1073,7 @@
                 return;
               }
               if (data && orderSelect.value == data.id) {
-                renderOrder(data);
+                debouncedRenderOrder(data);
                 showSuccess(`Order #${data.id} updated: ${data.status}`);
               } else {
                 console.log(`Ignoring WebSocket message for order ${data.id}, selected order: ${orderSelect.value}`);
@@ -1091,7 +1111,7 @@
         } else {
           console.log("Polling skipped: No order selected or not logged in");
         }
-      }, 5000); // Poll every 5 seconds
+      }, 10000);
     }
 
     function restoreSelectedOrder() {
@@ -1107,7 +1127,7 @@
           orderSelect.value = selectedOrderId;
           console.log(`Restoring selected order: ${selectedOrderId}`);
           fetchOrderDetails(selectedOrderId);
-          startPolling(); // Start polling for selected order
+          startPolling();
         } else {
           console.warn(`Selected order ${selectedOrderId} not found in order list`);
           localStorage.removeItem('selectedOrderId');
@@ -1135,7 +1155,7 @@
       if (orderId) {
         localStorage.setItem('selectedOrderId', orderId);
         fetchOrderDetails(orderId);
-        startPolling(); // Start polling when an order is selected
+        startPolling();
       } else {
         localStorage.removeItem('selectedOrderId');
         const orderDetails = document.getElementById('order-details');
@@ -1147,6 +1167,7 @@
           pollingInterval = null;
         }
         console.log("Hid order details due to no order selected");
+        lastRenderedOrder = null;
       }
     });
 
