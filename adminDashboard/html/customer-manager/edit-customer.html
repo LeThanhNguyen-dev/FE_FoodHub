@@ -1,440 +1,1107 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>FoodHub Admin - Chỉnh sửa khách hàng</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta name="description">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
-
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodHub - Register</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0F172B;
+            --secondary-color: #1E293B;
+            --accent-color: #FEA116;
+            --accent-hover: #E6910E;
+            --accent-light: #FFF7E6;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --light-bg: #f7fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../css/sidebar.css">
-    <link rel="stylesheet" href="../../css/edit-staff.css">
+        * {
+            box-sizing: border-box;
+        }
 
-    <!-- Goong Map JavaScript SDK -->
-    <script src="https://maps.goong.io/maps/api/js?key=rGKoYBLI4tMjBe2tkthJ3vY1AAfTLHu6h7wVxaWF"></script>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--accent-light) 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--gray-700);
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            min-height: calc(100vh - 40px);
+        }
+
+        .brand-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .brand-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(254, 161, 22, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-text {
+            font-family: 'Pacifico', cursive;
+            font-size: 80px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .brand-content h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .brand-content p {
+            font-size: 18px;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--gray-600);
+        }
+
+        .features-list .icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .register-section {
+            background: var(--white);
+            padding: 48px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .register-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 14px;
+            letter-spacing: 0.025em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            padding-left: 50px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: var(--gray-50);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(254, 161, 22, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+            background-color: #fef2f2;
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success-color);
+            background-color: #f0fff4;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 18px;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-control:focus + .input-icon {
+            color: var(--accent-color);
+        }
+
+        .invalid-feedback,
+        .valid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            font-size: 14px;
+            padding-left: 4px;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+        }
+
+        .valid-feedback {
+            color: var(--success-color);
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--accent-color);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-color);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-register::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-register:hover::after {
+            left: 100%;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 8px 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            margin-top: 16px;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: var(--accent-light);
+            color: var(--accent-hover);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #c53030;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #c05621;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+            gap: 12px;
+        }
+
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background-color: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        .step.completed {
+            background-color: var(--accent-color);
+        }
+
+        .otp-timer {
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: var(--gray-50);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        .d-block {
+            display: block !important;
+        }
+
+        /* Autocomplete Styles */
+        .autocomplete-suggestion {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: var(--gray-50);
+        }
+
+        .autocomplete-suggestion.active {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        .autocomplete-suggestion .icon {
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+
+        #address-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                max-width: 600px;
+            }
+
+            .brand-section {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .brand-content h1 {
+                font-size: 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .register-section {
+                padding: 32px 24px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .brand-content h1 {
+                font-size: 28px;
+            }
+
+            .logo-text {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-section {
+                padding: 24px 20px;
+            }
+
+            .form-control {
+                padding: 14px 18px;
+                padding-left: 45px;
+                font-size: 16px;
+            }
+
+            .btn-register {
+                padding: 14px 20px;
+            }
+        }
+
+        /* Animation for form transitions */
+        .form-transition {
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
 </head>
 
 <body>
-<!-- Hidden inputs để ngăn autofill -->
-<div style="display: none;">
-    <input type="text" name="fake_username">
-    <input type="password" name="fake_password">
-</div>
-
-<!-- Sidebar Include -->
-<div id="sidebar-container"></div>
-
-<!-- Main Content -->
-<div class="main-content" id="mainContent">
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmUpdateModalLabel">Xác nhận cập nhật</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn lưu các thay đổi cho khách hàng này?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="confirmUpdateBtn">Xác nhận</button>
-                </div>
+    <div class="main-container">
+        <!-- Phần thương hiệu -->
+        <div class="brand-section">
+            <div class="logo">
+                <h2 class="logo-text">FoodHub</h2>
             </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Original Customer Info Card -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5><i class="fas fa-info-circle me-2"></i>Thông tin khách hàng hiện tại</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table original-info-table">
-                        <thead>
-                            <tr>
-                                <th>Tên đăng nhập</th>
-                                <th>Email</th>
-                                <th>Trạng thái</th>
-                                <th>Địa chỉ</th>
-                                <th>Số điện thoại</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="original-username"></td>
-                                <td id="original-email"></td>
-                                <td id="original-status"></td>
-                                <td id="original-address"></td>
-                                <td id="original-phone"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="brand-content">
+                <h1>FoodHub – Nhà hàng ẩm thực hiện đại & tinh tế</h1>
+                <p>Khám phá những món ngon đặc sắc, phục vụ trong không gian ấm cúng và đậm chất riêng.</p>
+                <ul class="features-list">
+                    <li>
+                        <span class="icon"><i class="bi bi-check"></i></span>
+                        Giao hàng nhanh chóng
+                    </li>
+                    <li>
+                        <span class="icon"><i class="bi bi-check"></i></span>
+                        Hỗ trợ khách hàng 24/7
+                    </li>
+                </ul>
             </div>
         </div>
 
-        <!-- Edit Customer Card -->
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin khách hàng</h5>
+        <!-- Form đăng ký -->
+        <div class="register-section">
+            <div class="progress-steps">
+                <div class="step active" id="step-1"></div>
+                <div class="step" id="step-2"></div>
             </div>
-            <div class="card-body">
-                <form id="editCustomerForm" class="row g-3" autocomplete="off">
-                    <input type="hidden" id="userId" name="id">
 
-                    <div class="col-md-6">
-                        <label for="username" class="form-label">Tên đăng nhập</label>
+            <h2 class="section-title" id="form-title">Tạo tài khoản mới</h2>
+            <p class="section-subtitle" id="form-subtitle">Vui lòng nhập đầy đủ thông tin để bắt đầu</p>
+            
+            <div id="alert-message"></div>
+
+            <form id="register-form" class="d-block form-transition" novalidate>
+                <div class="form-group">
+                    <label for="username" class="form-label">Họ và tên</label>
+                    <div class="input-wrapper">
                         <input type="text" class="form-control" id="username" name="username"
-                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
-                        <div id="username-error" class="invalid-feedback"></div>
+                            placeholder="Nhập tên đăng nhập" required minlength="5" maxlength="255">
+                        <i class="bi bi-person input-icon"></i>
                     </div>
+                    <div class="invalid-feedback">Tên đăng nhập phải từ 5 đến 255 ký tự.</div>
+                    <div class="valid-feedback">Tên đăng nhập hợp lệ!</div>
+                </div>
 
-                    <div class="col-md-6">
-                        <label for="email" class="form-label">Email</label>
+                <div class="form-group">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Nhập mật khẩu" required minlength="8" maxlength="255" autocomplete="new-password">
+                        <i class="bi bi-lock input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback">Mật khẩu phải từ 8 ký tự trở lên.</div>
+                    <div class="valid-feedback">Mật khẩu đủ mạnh!</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Địa chỉ Email</label>
+                    <div class="input-wrapper">
                         <input type="email" class="form-control" id="email" name="email"
-                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                            placeholder="Nhập địa chỉ email" required maxlength="255">
+                        <i class="bi bi-envelope input-icon"></i>
                     </div>
+                    <div class="invalid-feedback">Vui lòng nhập địa chỉ email hợp lệ.</div>
+                    <div class="valid-feedback">Email hợp lệ!</div>
+                </div>
 
-                    <div class="col-md-6">
-                        <label for="status" class="form-label">Trạng thái</label>
-                        <select class="form-select" id="status" name="status" required>
-                            <option value="ACTIVE">ACTIVE</option>
-                            <option value="INACTIVE">INACTIVE</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6 position-relative">
-                        <label for="address" class="form-label">Địa chỉ</label>
-                        <input type="text" class="form-control" id="address" name="address"
-                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        <div id="addressSuggestions" class="autocomplete-suggestions" style="display: none;"></div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="phone" class="form-label">Số điện thoại</label>
+                <div class="form-group">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <div class="input-wrapper">
                         <input type="tel" class="form-control" id="phone" name="phone"
-                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            placeholder="Nhập số điện thoại (10 chữ số)" required pattern="[0-9]{10}">
+                        <i class="bi bi-telephone input-icon"></i>
                     </div>
+                    <div class="invalid-feedback">Số điện thoại phải đủ 10 chữ số.</div>
+                    <div class="valid-feedback">Số điện thoại hợp lệ!</div>
+                </div>
 
-                    <div class="col-md-6">
-                        <label for="password" class="form-label">Mật khẩu mới (để trống nếu không thay đổi)</label>
-                        <div class="password-field">
-                            <input type="password" class="form-control" id="password" name="password"
-                                   autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
-                                   placeholder="Nhập mật khẩu mới...">
-                            <i class="fas fa-eye password-toggle" id="togglePassword" onclick="togglePasswordVisibility()"></i>
-                        </div>
-                        <small class="password-note">Mật khẩu cũ đã được mã hóa và không thể hiển thị.</small>
+                <div class="form-group">
+                    <label for="address" class="form-label">Địa chỉ</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="address" name="address" 
+                            placeholder="Nhập địa chỉ (ví dụ: Đường Láng, Hà Nội)" required maxlength="255">
+                        <i class="bi bi-geo-alt input-icon"></i>
                     </div>
+                    <div id="address-suggestions"></div>
+                    <div class="invalid-feedback">Vui lòng nhập địa chỉ hợp lệ.</div>
+                    <div class="valid-feedback">Địa chỉ hợp lệ!</div>
+                </div>
 
-                    <div class="col-12 text-end">
-                        <button type="button" class="btn btn-warning me-2" onclick="restoreForm()">Khôi phục</button>
-                        <button type="button" class="btn btn-secondary me-2" onclick="goBack()">Hủy</button>
-                        <button type="button" class="btn btn-primary" onclick="showConfirmModal()">Lưu thay đổi</button>
+                <input type="hidden" id="roleName" name="roleName" value="CUSTOMER">
+
+                <button type="submit" class="btn btn-register" id="register-btn">
+                    <span class="btn-text">Gửi mã xác thực</span>
+                </button>
+            </form>
+
+            <form id="otp-form" class="d-none form-transition" novalidate>
+                <div class="form-group">
+                    <label for="otp" class="form-label">Mã xác thực</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="otp" name="otp" 
+                            placeholder="Nhập mã xác thực gồm 6 chữ số" required minlength="6" maxlength="6"
+                            style="text-align: center; font-size: 20px; font-weight: 600; letter-spacing: 4px;">
+                        <i class="bi bi-shield-check input-icon"></i>
                     </div>
-                </form>
-            </div>
+                    <div class="invalid-feedback">Mã OTP phải gồm 6 chữ số.</div>
+                    <div class="valid-feedback">Định dạng OTP hợp lệ!</div>
+                </div>
+
+                <button type="submit" class="btn btn-register" id="verify-btn">
+                    <span class="btn-text">Xác nhận & Tạo tài khoản</span>
+                </button>
+                
+                <button type="button" class="btn btn-link" onclick="resendOtp()">
+                    <i class="bi bi-arrow-clockwise"></i> Gửi lại mã xác thực
+                </button>
+
+                <div id="otp-timer" class="otp-timer"></div>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script src="/js/fetch-api.js"></script>
-<script src="../../js/sidebar.js"></script>
-<script src="../../js/topbar.js"></script>
-<script>
-    // Lưu trữ dữ liệu ban đầu
-    let originalCustomerData = {};
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+        let otpTimer;
 
-    // Lấy tham số id từ URL
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
-
-    // Tải sidebar
-    async function loadSidebar() {
-        try {
-            const response = await fetch('../../components/sidebar.html');
-            if (!response.ok) throw new Error('Không thể tải sidebar');
-            const sidebarHtml = await response.text();
-            document.getElementById('sidebar-container').innerHTML = sidebarHtml;
-            setActiveNavLink();
-        } catch (error) {
-            console.error('Lỗi khi tải sidebar:', error);
-            showNotification('Lỗi tải sidebar!', 'error');
-            document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
-        }
-    }
-
-    // Lấy thông tin khách hàng
-    async function fetchCustomerDetails(id) {
-        try {
-            const response = await apiFetch(`/users/${id}`, { method: 'GET' });
-            if (response.result) {
-                const customer = response.result;
-                originalCustomerData = {
-                    id: customer.id,
-                    username: customer.username || '',
-                    email: customer.email || '',
-                    status: customer.status || 'ACTIVE',
-                    address: customer.address || '',
-                    phone: customer.phone || '',
-                    password: ''
-                };
-                // Populate edit form
-                document.getElementById('userId').value = customer.id;
-                document.getElementById('username').value = customer.username || '';
-                document.getElementById('email').value = customer.email || '';
-                document.getElementById('status').value = customer.status || 'ACTIVE';
-                document.getElementById('address').value = customer.address || '';
-                document.getElementById('phone').value = customer.phone || '';
-                document.getElementById('password').value = '';
-
-                // Populate original info table
-                document.getElementById('original-username').textContent = originalCustomerData.username || '-';
-                document.getElementById('original-email').textContent = originalCustomerData.email || '-';
-                document.getElementById('original-status').textContent = originalCustomerData.status || '-';
-                document.getElementById('original-address').textContent = originalCustomerData.address || '-';
-                document.getElementById('original-phone').textContent = originalCustomerData.phone || '-';
-
-                disableAutocomplete();
-            } else {
-                throw new Error('Không thể tải thông tin khách hàng!');
-            }
-        } catch (error) {
-            showNotification(error.message || 'Có lỗi xảy ra khi tải thông tin khách hàng!', 'error');
-        }
-    }
-
-    // Ngăn autofill và thêm tên ngẫu nhiên cho input
-    function disableAutocomplete() {
-        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
-        inputs.forEach(input => {
-            input.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
-            input.setAttribute('data-form-type', 'other');
-            if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
-                input.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
-            }
-        });
-    }
-
-    // Cập nhật thông tin khách hàng
-    async function updateCustomer(id, data) {
-        try {
-            if (!data.password || data.password.trim() === '') {
-                delete data.password;
-            }
-            // Cố định roleName là CUSTOMER
-            data.roleName = 'CUSTOMER';
-
-            const response = await apiFetch(`/users/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (response.code === 1000) {
-                showNotification('Cập nhật thông tin khách hàng thành công!', 'success');
-                originalCustomerData = { ...data, id };
-                document.getElementById('original-username').textContent = data.username || '-';
-                document.getElementById('original-email').textContent = data.email || '-';
-                document.getElementById('original-status').textContent = data.status || '-';
-                document.getElementById('original-address').textContent = data.address || '-';
-                document.getElementById('original-phone').textContent = data.phone || '-';
-                setTimeout(() => goBack(), 1500);
-            } else {
-                throw new Error(response.message || 'Lỗi khi cập nhật thông tin khách hàng!');
-            }
-        } catch (error) {
-            const errorMessage = error.message || 'Có lỗi xảy ra khi cập nhật!';
-            if (errorMessage.includes('exist') || errorMessage.includes('duplicate') || errorMessage.includes('1001')) {
-                document.getElementById('username').classList.add('is-invalid');
-                document.getElementById('username-error').textContent = 'Tên đăng nhập đã tồn tại';
-                showNotification('Tên đăng nhập đã tồn tại, vui lòng chọn tên khác!', 'error');
-            } else {
-                showNotification(errorMessage, 'error');
-            }
-        }
-    }
-
-    // Khôi phục thông tin gốc
-    function restoreForm() {
-        if (confirm('Bạn có chắc chắn muốn khôi phục thông tin gốc?')) {
-            document.getElementById('username').value = originalCustomerData.username;
-            document.getElementById('email').value = originalCustomerData.email;
-            document.getElementById('status').value = originalCustomerData.status;
-            document.getElementById('address').value = originalCustomerData.address;
-            document.getElementById('phone').value = originalCustomerData.phone;
-            document.getElementById('password').value = originalCustomerData.password;
-            document.getElementById('username').classList.remove('is-invalid');
-            document.getElementById('username-error').textContent = '';
-            showNotification('Đã khôi phục thông tin gốc!', 'success');
-        }
-    }
-
-    // Hiển thị thông báo
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show notification`;
-        notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 5000);
-    }
-
-    // Quay lại danh sách
-    function goBack() {
-        window.location.href = '../customer-manager/customerList.html';
-    }
-
-    // Toggle hiển thị mật khẩu
-    function togglePasswordVisibility() {
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.getElementById('togglePassword');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
-    }
-
-    // Hiển thị modal xác nhận
-    function showConfirmModal() {
-        const modal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
-        modal.show();
-    }
-
-    // Gợi ý địa chỉ với Goong Map
-    function setupAddressAutocomplete() {
-        const addressInput = document.getElementById('address');
-        const suggestionsContainer = document.getElementById('addressSuggestions');
-        let debounceTimeout;
-
-        addressInput.addEventListener('input', () => {
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(async () => {
-                const input = addressInput.value.trim();
-                if (input.length < 3) {
-                    suggestionsContainer.style.display = 'none';
-                    return;
+        // API Fetch Utility
+        async function apiFetch(url, options = {}) {
+            const response = await fetch(`${API_BASE_URL}${url}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
                 }
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return await response.json();
+        }
 
-                try {
-                    const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
-                        method: 'GET'
-                    });
-                    if (response.predictions) {
-                        suggestionsContainer.innerHTML = '';
-                        response.predictions.forEach(prediction => {
-                            const suggestion = document.createElement('div');
-                            suggestion.className = 'autocomplete-suggestion';
-                            suggestion.textContent = prediction.description;
-                            suggestion.addEventListener('click', () => {
-                                addressInput.value = prediction.description;
-                                suggestionsContainer.style.display = 'none';
-                            });
-                            suggestionsContainer.appendChild(suggestion);
+        // Address Autocomplete
+        function setupAddressAutocomplete() {
+            const addressInput = document.getElementById('address');
+            const suggestionsContainer = document.getElementById('address-suggestions');
+            let debounceTimeout;
+
+            addressInput.addEventListener('input', () => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(async () => {
+                    const input = addressInput.value.trim();
+                    if (input.length < 3 || !/^[a-zA-Z0-9\s,.-ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẳẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ]+$/.test(input)) {
+                        suggestionsContainer.style.display = 'none';
+                        if (input.length >= 3) {
+                            showNotification('warning', 'Vui lòng nhập địa chỉ hợp lệ (chỉ chữ, số, và dấu câu cơ bản).');
+                        }
+                        return;
+                    }
+
+                    try {
+                        const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
+                            method: 'GET'
                         });
-                        suggestionsContainer.style.display = response.predictions.length > 0 ? 'block' : 'none';
-                    } else {
+                        suggestionsContainer.innerHTML = '';
+                        if (response.predictions && response.predictions.length > 0) {
+                            response.predictions.forEach(prediction => {
+                                const suggestion = document.createElement('div');
+                                suggestion.className = 'autocomplete-suggestion';
+                                suggestion.innerHTML = `<i class="bi bi-geo-alt icon"></i> ${prediction.description}`;
+                                suggestion.dataset.placeId = prediction.place_id;
+                                suggestion.addEventListener('click', async () => {
+                                    let selectedAddress = prediction.description;
+                                    if (prediction.place_id) {
+                                        try {
+                                            const details = await apiFetch(`/api/goong/place/detail?place_id=${encodeURIComponent(prediction.place_id)}`);
+                                            selectedAddress = details.result?.formatted_address || selectedAddress;
+                                        } catch (error) {
+                                            console.error('Error fetching place details:', error);
+                                            showNotification('warning', 'Không thể lấy chi tiết địa chỉ. Sử dụng địa chỉ mặc định.');
+                                        }
+                                    }
+                                    addressInput.value = selectedAddress;
+                                    suggestionsContainer.style.display = 'none';
+                                    validateField(addressInput);
+                                });
+                                suggestionsContainer.appendChild(suggestion);
+                            });
+                            suggestionsContainer.style.display = 'block';
+                        } else {
+                            suggestionsContainer.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+                        showNotification('danger', 'Không thể tải gợi ý địa chỉ. Vui lòng kiểm tra kết nối hoặc nhập thủ công.');
                         suggestionsContainer.style.display = 'none';
                     }
-                } catch (error) {
-                    console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+                }, 300);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
                     suggestionsContainer.style.display = 'none';
                 }
-            }, 300);
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-                suggestionsContainer.style.display = 'none';
-            }
-        });
-    }
-
-    // Khởi tạo
-    document.addEventListener('DOMContentLoaded', () => {
-        const id = getQueryParam('id');
-        if (!id) {
-            showNotification('Không tìm thấy ID khách hàng!', 'error');
-            setTimeout(() => goBack(), 2000);
-            return;
+            });
         }
-        loadUserInfo(); 
-        loadSidebar();
-        disableAutocomplete();
-        document.querySelectorAll('input').forEach(input => {
-            if (input.type !== 'hidden') {
-                input.value = '';
-            }
-        });
 
-        fetchCustomerDetails(id);
-        setupAddressAutocomplete();
-
-        document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
-            const formData = {
-                username: document.getElementById('username').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                status: document.getElementById('status').value,
-                address: document.getElementById('address').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                password: document.getElementById('password').value.trim()
-            };
-            updateCustomer(id, formData);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
-            modal.hide();
-        });
-
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.setAttribute('autocomplete', input.type === 'password' ? 'new-password' : 'off');
-                if (input.id === 'password' || input.id === 'username' || input.id === 'email') {
-                    this.setAttribute('name', `${input.id}_${Math.random().toString(36).substring(2, 15)}`);
-                }
+        // Real-time validation
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', function() {
+                validateField(this);
+            });
+            
+            input.addEventListener('blur', function() {
+                validateField(this);
             });
         });
-    });
 
-    window.addEventListener('load', function() {
-        setTimeout(() => {
-            disableAutocomplete();
-            const passwordField = document.getElementById('password');
-            if (passwordField) {
-                document.getElementById('password').value = '';
+        function validateField(field) {
+            const formGroup = field.closest('.form-group');
+            const validFeedback = formGroup.querySelector('.valid-feedback');
+            const invalidFeedback = formGroup.querySelector('.invalid-feedback');
+            const value = field.value.trim();
+
+            // Reset class & hide feedback
+            field.classList.remove('is-valid', 'is-invalid');
+            validFeedback.style.display = 'none';
+            invalidFeedback.style.display = 'none';
+
+            // If empty, show no feedback
+            if (value === '') {
+                return;
             }
-        }, 100);
-    });
-</script>
+
+            // If valid
+            if (field.checkValidity()) {
+                field.classList.add('is-valid');
+                validFeedback.style.display = 'block';
+            } else {
+                field.classList.add('is-invalid');
+                invalidFeedback.style.display = 'block';
+            }
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = document.getElementById('register-btn');
+            
+            // Validate all fields
+            let isFormValid = true;
+            form.querySelectorAll('.form-control').forEach(field => {
+                validateField(field);
+                if (!field.checkValidity()) {
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) return;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading-spinner"></div><span class="btn-text">Sending OTP...</span>';
+
+            const formData = new FormData(form);
+            const data = {
+                username: formData.get('username'),
+                password: formData.get('password'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                roleName: formData.get('roleName')
+            };
+
+            try {
+                const response = await apiFetch('/auth/send-otp', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                showNotification('success', response.message || 'Verification code sent to your email!');
+                
+                // Update progress
+                document.getElementById('step-1').classList.add('completed');
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+                
+                // Switch forms
+                form.classList.add('d-none');
+                document.getElementById('otp-form').classList.remove('d-none');
+                document.getElementById('form-title').textContent = 'Verify Your Email';
+                document.getElementById('form-subtitle').textContent = 'Enter the 6-digit code sent to your email';
+                
+                startOtpTimer();
+                
+                // Focus on OTP input
+                setTimeout(() => {
+                    document.getElementById('otp').focus();
+                }, 300);
+                
+            } catch (error) {
+                const errorMessage =
+                    error.message.includes('USER_EXISTED') ? 'Username already exists. Please choose a different one.' :
+                    error.message.includes('EMAIL_EXISTS') ? 'Email already exists. Please use a different email.' :
+                    error.message.includes('INVALID_ROLE') ? 'Invalid role selected.' :
+                    error.message || 'Something went wrong. Please try again.';
+                showNotification('danger', errorMessage);
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="btn-text">Send OTP Code</span>';
+            }
+        });
+
+        document.getElementById('otp-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = document.getElementById('verify-btn');
+            
+            validateField(document.getElementById('otp'));
+            if (!form.checkValidity()) return;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading-spinner"></div><span class="btn-text">Verifying...</span>';
+
+            const formData = new FormData(form);
+            const data = {
+                email: document.getElementById('email').value,
+                otp: formData.get('otp')
+            };
+
+            try {
+                const response = await apiFetch('/auth/verify-otp', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                // Update progress
+                document.getElementById('step-2').classList.add('completed');
+                
+                showNotification('success', 'Account created successfully! Redirecting to login...');
+                
+                // Clear timer
+                if (otpTimer) clearInterval(otpTimer);
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
+            } catch (error) {
+                const errorMessage =
+                    error.message.includes('INVALID_OTP') ? 'Invalid verification code. Please check and try again.' :
+                    error.message.includes('OTP_EXPIRED') ? 'Verification code has expired. Please request a new one.' :
+                    error.message.includes('OTP_NOT_FOUND') ? 'Verification code not found. Please request a new one.' :
+                    error.message || 'Verification failed. Please try again.';
+                showNotification('danger', errorMessage);
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="btn-text">Verify & Create Account</span>';
+            }
+        });
+
+        async function resendOtp() {
+            const email = document.getElementById('email').value;
+            const resendBtn = event.target;
+            
+            resendBtn.disabled = true;
+            resendBtn.innerHTML = '<div class="loading-spinner"></div> Sending...';
+            
+            try {
+                const response = await apiFetch('/auth/send-otp', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email,
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value,
+                        roleName: document.getElementById('roleName').value
+                    })
+                });
+                
+                showNotification('success', 'New verification code sent to your email!');
+                startOtpTimer();
+                
+            } catch (error) {
+                showNotification('danger', 'Failed to resend verification code. Please try again.');
+            } finally {
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Resend verification code';
+            }
+        }
+
+        function startOtpTimer() {
+            if (otpTimer) clearInterval(otpTimer);
+            
+            let timeLeft = 300; // 5 minutes
+            const timerDisplay = document.getElementById('otp-timer');
+            
+            const updateTimer = () => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.innerHTML = `
+                    <i class="bi bi-clock"></i> 
+                    Code expires in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}
+                `;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    timerDisplay.innerHTML = `
+                        <i class="bi bi-exclamation-triangle text-warning"></i> 
+                        Code expired. Please request a new one.
+                    `;
+                    timerDisplay.style.borderColor = 'var(--warning-color)';
+                    timerDisplay.style.backgroundColor = '#fffbeb';
+                    return;
+                }
+                
+                timeLeft--;
+            };
+            
+            updateTimer();
+            otpTimer = setInterval(updateTimer, 1000);
+        }
+
+        function showNotification(type, message) {
+            const alertMessage = document.getElementById('alert-message');
+            const iconMap = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-info-circle-fill'
+            };
+            
+            alertMessage.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="${iconMap[type]} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = alertMessage.querySelector('.alert');
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+            
+            // Scroll to top to show notification
+            alertMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Format phone number input
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+            e.target.value = value;
+        });
+
+        // OTP input formatting
+        document.getElementById('otp').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 6) {
+                value = value.slice(0, 6);
+            }
+            e.target.value = value;
+        });
+
+        // Auto-submit OTP when 6 digits are entered
+        document.getElementById('otp').addEventListener('input', function(e) {
+            if (e.target.value.length === 6) {
+                setTimeout(() => {
+                    document.getElementById('otp-form').dispatchEvent(new Event('submit'));
+                }, 500);
+            }
+        });
+
+        // Enhanced password strength indicator
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthIndicator = document.createElement('div');
+            strengthIndicator.className = 'password-strength mt-2';
+            
+            // Remove existing indicator
+            const existing = e.target.parentNode.parentNode.querySelector('.password-strength');
+            if (existing) existing.remove();
+            
+            if (password.length > 0) {
+                let strength = 0;
+                const checks = [
+                    password.length >= 8,
+                    /[a-z]/.test(password),
+                    /[A-Z]/.test(password),
+                    /[0-9]/.test(password),
+                    /[^A-Za-z0-9]/.test(password)
+                ];
+                
+                strength = checks.filter(Boolean).length;
+                
+                const levels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+                const colors = ['#f56565', '#ed8936', '#ecc94b', '#48bb78', '#38a169'];
+                
+                strengthIndicator.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1" style="height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
+                            <div style="width: ${(strength / 5) * 100}%; height: 100%; background: ${colors[strength - 1] || colors[0]}; transition: all 0.3s ease;"></div>
+                        </div>
+                        <small style="color: ${colors[strength - 1] || colors[0]}; font-weight: 500;">
+                            ${levels[strength - 1] || levels[0]}
+                        </small>
+                    </div>
+                `;
+                
+                e.target.parentNode.parentNode.appendChild(strengthIndicator);
+            }
+        });
+
+        // Initialize autocomplete
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scroll behavior
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Add form animation on load
+            setTimeout(() => {
+                document.querySelector('.register-section').style.animation = 'fadeIn 0.6s ease';
+            }, 100);
+
+            // Setup address autocomplete
+            setupAddressAutocomplete();
+        });
+    </script>
 </body>
+
 </html>

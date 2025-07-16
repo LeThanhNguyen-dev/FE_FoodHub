@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Tracking</title>
-  <!-- Tailwind CSS qua CDN -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <!-- SockJS và STOMP -->
+  <!-- SockJS and STOMP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
   <style>
@@ -42,7 +42,6 @@
       border-radius: 8px;
       color: #ffffff;
       text-decoration: none;
-      transition: all 0.2s ease;
       font-weight: 500;
     }
 
@@ -77,7 +76,6 @@
       border-radius: 12px;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
       border: 1px solid #e2e8f0;
-      transition: all 0.3s ease;
     }
 
     .content-card:hover {
@@ -101,7 +99,6 @@
       border: 1px solid #d1d5db;
       border-radius: 8px;
       font-size: 14px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
       color: #1f2937;
     }
 
@@ -118,7 +115,6 @@
       font-weight: 500;
       font-size: 14px;
       cursor: pointer;
-      transition: all 0.2s ease;
       border: none;
       display: inline-flex;
       align-items: center;
@@ -156,7 +152,6 @@
       margin-bottom: 16px;
       font-size: 14px;
       border: 1px solid;
-      animation: slideInFromTop 0.5s ease-out;
     }
 
     .message-success {
@@ -189,7 +184,6 @@
     .section-header i {
       margin-right: 12px;
       color: #3b82f6;
-      animation: pulse 2s infinite;
     }
 
     /* Timeline */
@@ -221,9 +215,7 @@
       height: 4px;
       background: linear-gradient(to right, #3b82f6, #2563eb, #1d4ed8);
       border-radius: 2px;
-      transition: width 1.5s ease-in-out;
       z-index: 2;
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     }
 
     .timeline-item {
@@ -231,17 +223,7 @@
       position: relative;
       text-align: center;
       z-index: 3;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInUp 0.8s ease-out forwards;
     }
-
-    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
-    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
-    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
-    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
-    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
-    .timeline-item:nth-child(6) { animation-delay: 0.6s; }
 
     .timeline-item::before {
       content: '';
@@ -254,14 +236,12 @@
       background: #e2e8f0;
       border: 3px solid #ffffff;
       box-shadow: 0 0 0 2px #e2e8f0;
-      transition: all 0.5s ease;
       z-index: 4;
     }
 
     .timeline-item.active::before {
       background: #3b82f6;
-      box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
-      animation: pulseGlow 2s infinite;
+      box-shadow: 0 0 0 2px #3b82f6;
     }
 
     .timeline-item.active::after {
@@ -274,7 +254,6 @@
       font-size: 10px;
       font-weight: bold;
       z-index: 5;
-      animation: checkmarkPop 0.5s ease-out;
     }
 
     .timeline-content {
@@ -282,16 +261,12 @@
       padding: 12px;
       background: rgba(255, 255, 255, 0.8);
       border-radius: 8px;
-      backdrop-filter: blur(5px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
     }
 
     .timeline-item.active .timeline-content {
       background: rgba(59, 130, 246, 0.1);
       border-color: rgba(59, 130, 246, 0.3);
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
     .timeline-content p:first-child {
@@ -315,55 +290,15 @@
     #order-items .content-card {
       padding: 16px;
       margin-bottom: 16px;
-      opacity: 0;
-      transform: translateX(-20px);
-      animation: slideInFromLeft 0.5s ease-out forwards;
-      position: relative;
-      overflow: hidden;
     }
 
-    #order-items .content-card:nth-child(1) { animation-delay: 0.1s; }
-    #order-items .content-card:nth-child(2) { animation-delay: 0.2s; }
-    #order-items .content-card:nth-child(3) { animation-delay: 0.3s; }
-    #order-items .content-card:nth-child(4) { animation-delay: 0.4s; }
-
-    #order-items .content-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.5s;
-    }
-
-    #order-items .content-card:hover::before {
-      left: 100%;
-    }
-
-    #order-items h5 {
-      color: #1f2937;
-      font-weight: 600;
-      font-size: 16px;
-    }
-
-    #order-items p,
-    #order-items span {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    /* Order Details Animation */
+    /* Order Details */
     #order-details {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.5s ease;
+      /* Removed transition to prevent animation on show/hide */
     }
 
     #order-details:not(.hidden) {
-      opacity: 1;
-      transform: translateY(0);
+      /* No animation for visibility */
     }
 
     /* Loading Spinner */
@@ -375,93 +310,6 @@
       border-radius: 50%;
       border-top-color: #3b82f6;
       animation: spin 1s ease-in-out infinite;
-    }
-
-    /* Pulse Animation */
-    .status-pulse {
-      animation: statusPulse 1.5s ease-in-out;
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideInFromTop {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideInFromLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% {
-        box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.6);
-      }
-      50% {
-        box-shadow: 0 0 0 2px #3b82f6, 0 0 25px rgba(59, 130, 246, 0.8);
-      }
-    }
-
-    @keyframes checkmarkPop {
-      0% {
-        transform: translateX(-50%) scale(0);
-      }
-      50% {
-        transform: translateX(-50%) scale(1.2);
-      }
-      100% {
-        transform: translateX(-50%) scale(1);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.1);
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes statusPulse {
-      0% {
-        background-color: rgba(59, 130, 246, 0.1);
-      }
-      50% {
-        background-color: rgba(59, 130, 246, 0.2);
-      }
-      100% {
-        background-color: rgba(59, 130, 246, 0.1);
-      }
     }
 
     /* Progress Bar */
@@ -478,27 +326,13 @@
       height: 100%;
       background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8);
       border-radius: 3px;
-      transition: width 1.5s ease-in-out;
-      position: relative;
+      /* Removed transition to prevent smooth width change */
     }
 
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      animation: shimmer 3s infinite;
-    }
-
-    @keyframes shimmer {
-      0% {
-        transform: translateX(-100%);
-      }
-      100% {
-        transform: translateX(100%);
+    /* Animations (only keep essential ones) */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
     }
 
@@ -543,7 +377,6 @@
         top: 0;
         left: 16px;
         width: 4px;
-        height: 0;
       }
 
       .timeline-item {
@@ -967,35 +800,49 @@
         return;
       }
 
-      orderTitle.textContent = `Order #${order.id}`;
-      orderDate.textContent = new Date(order.createdAt).toLocaleDateString('en-GB', {
+      if (!lastRenderedOrder || orderTitle.textContent !== `Order #${order.id}`) {
+        orderTitle.textContent = `Order #${order.id}`;
+      }
+      const formattedDate = new Date(order.createdAt).toLocaleDateString('en-GB', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
       });
-      orderStatus.textContent = `Status: ${order.status}`;
-      orderType.textContent = `Type: ${order.orderType}`;
-      orderTotal.textContent = `Total: $${order.totalAmount.toFixed(2)}`;
-      orderPaymentStatus.textContent = order.paymentStatus ? `Payment Status: ${order.paymentStatus}` : '';
-      orderTable.textContent = order.tableId ? `Table: ${order.tableNumber || order.tableId}` : '';
-      orderTable.classList.toggle('hidden', !order.tableId);
-      orderNote.textContent = order.note ? `Note: ${order.note}` : '';
-      orderNote.classList.toggle('hidden', !order.note);
+      if (!lastRenderedOrder || orderDate.textContent !== formattedDate) {
+        orderDate.textContent = formattedDate;
+      }
+      if (!lastRenderedOrder || orderStatus.textContent !== `Status: ${order.status}`) {
+        orderStatus.textContent = `Status: ${order.status}`;
+      }
+      if (!lastRenderedOrder || orderType.textContent !== `Type: ${order.orderType}`) {
+        orderType.textContent = `Type: ${order.orderType}`;
+      }
+      if (!lastRenderedOrder || orderTotal.textContent !== `Total: $${order.totalAmount.toFixed(2)}`) {
+        orderTotal.textContent = `Total: $${order.totalAmount.toFixed(2)}`;
+      }
+      const paymentStatusText = order.paymentStatus ? `Payment Status: ${order.paymentStatus}` : '';
+      if (!lastRenderedOrder || orderPaymentStatus.textContent !== paymentStatusText) {
+        orderPaymentStatus.textContent = paymentStatusText;
+      }
+      const tableText = order.tableId ? `Table: ${order.tableNumber || order.tableId}` : '';
+      if (!lastRenderedOrder || orderTable.textContent !== tableText) {
+        orderTable.textContent = tableText;
+        orderTable.classList.toggle('hidden', !order.tableId);
+      }
+      const noteText = order.note ? `Note: ${order.note}` : '';
+      if (!lastRenderedOrder || orderNote.textContent !== noteText) {
+        orderNote.textContent = noteText;
+        orderNote.classList.toggle('hidden', !order.note);
+      }
 
       const statusOrder = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERING', 'COMPLETED'];
       const currentStatusIndex = statusOrder.indexOf(order.status);
       const progressPercentage = ((currentStatusIndex + 1) / statusOrder.length) * 100;
 
       const progressFill = document.getElementById('progress-fill');
-      if (progressFill) {
-        if (progressFill.style.width !== `${progressPercentage}%`) {
-          progressFill.style.width = `${progressPercentage}%`;
-          progressFill.classList.add('status-pulse');
-          setTimeout(() => {
-            progressFill.classList.remove('status-pulse');
-          }, 1500);
-        }
-      } else {
+      if (progressFill && progressFill.style.width !== `${progressPercentage}%`) {
+        progressFill.style.width = `${progressPercentage}%`;
+      } else if (!progressFill) {
         console.error("Progress fill element not found");
         showError("Unable to update progress bar: DOM element missing");
       }
@@ -1018,7 +865,7 @@
         console.error("Timeline after element not found");
       }
 
-      orderItems.innerHTML = order.orderItems?.map(item => `
+      const newItemsHTML = order.orderItems?.map(item => `
         <div class="content-card p-4">
           <div class="flex justify-between items-center mb-2">
             <h5 class="font-semibold text-gray-800">${item.menuItemName || 'Unknown Item'}</h5>
@@ -1030,11 +877,15 @@
         </div>
       `).join('') || '<p class="text-gray-600">No items found.</p>';
 
+      if (!lastRenderedOrder || orderItems.innerHTML !== newItemsHTML) {
+        orderItems.innerHTML = newItemsHTML;
+      }
+
       lastRenderedOrder = order;
       console.log("Rendered order:", order.id, "with status:", order.status);
     }
 
-    const debouncedRenderOrder = debounce(renderOrder, 2000);
+    const debouncedRenderOrder = debounce(renderOrder, 500);
 
     function initializeWebSocket() {
       if (!isLoggedIn()) {
