@@ -1,0 +1,167 @@
+:root {
+    --dark-green: #0F172B;
+    --gold: #FEA116;
+    --light-gold: #F7E6A3;
+    --light-gray: #f8f9fa;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--light-gray);
+}
+
+.navbar {
+    background-color: var(--dark-green);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+    font-weight: 200;
+    color: var(--gold) !important;
+}
+
+.nav-link {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    color: var(--light-gold) !important;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--gold) !important;
+}
+
+.btn-login {
+    background-color: transparent;
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    background-color: var(--gold);
+    color: var(--dark-green);
+}
+
+.user-dropdown .dropdown-toggle {
+    color: var(--light-gold) !important;
+    font-weight: 600;
+}
+
+.user-dropdown .dropdown-menu {
+    background-color: var(--dark-green);
+    border: none;
+}
+
+.user-dropdown .dropdown-item {
+    color: var(--light-gold);
+}
+
+.user-dropdown .dropdown-item:hover {
+    background-color: var(--gold);
+    color: var(--dark-green);
+}
+
+.cart-icon {
+    color: var(--light-gold);
+    font-size: 1.2rem;
+    position: relative;
+    margin-left: 1rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.cart-icon .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: var(--gold);
+    color: var(--dark-green);
+    font-size: 0.75rem;
+}
+
+.welcome-message {
+    font-size: 1.3rem;
+    color: var(--light-gold);
+    margin-top: 1rem;
+    transition: opacity 0.3s ease;
+}
+
+.footer {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--dark-green);
+    color: var(--light-gold);
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.footer a {
+    font-family: 'Pacifico', cursive;
+    color: var(--gold);
+    text-decoration: none;
+    margin: 0 1rem;
+    transition: color 0.3s;
+    font-size: 20px;
+}
+
+.footer a:hover {
+    color: var(--light-gold);
+}
+
+.footer .contact-info {
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 0.5rem;
+    font-size: 20px;
+}
+
+/* Chuyển đổi mượt mà cho navbar */
+#auth-nav-item, #user-nav-item, #cart-nav-item {
+    transition: opacity 0.3s ease;
+}
+
+/* Nút trong menu card */
+.menu-card .btn-order, .menu-card .btn-add-to-cart {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    margin: 5px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.menu-card .btn-order {
+    background-color: var(--gold);
+    color: var(--dark-green);
+    border: none;
+}
+
+.menu-card .btn-order:hover {
+    background-color: var(--light-gold);
+    color: var(--dark-green);
+    transform: translateY(-2px);
+}
+
+.menu-card .btn-add-to-cart {
+    background-color: transparent;
+    color: var(--dark-green);
+    border: 2px solid var(--dark-green);
+}
+
+.menu-card .btn-add-to-cart:hover {
+    background-color: var(--dark-green);
+    color: var(--gold);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .menu-card .btn-order, .menu-card .btn-add-to-cart {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+}

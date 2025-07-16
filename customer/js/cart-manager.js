@@ -720,7 +720,7 @@ class CartUIManager {
         let isNewOrder = true;
 
         try {
-            const response = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current`, {
+            const response = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current/customer`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -731,12 +731,15 @@ class CartUIManager {
             if (response.ok) {
                 const data = await response.json();
                 existingOrder = data.result;
-
-                // Kiểm tra status của đơn hàng hiện tại
-                const activeStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
-                if (existingOrder && activeStatuses.includes(existingOrder.status)) {
+                console.log('Existing order found:', existingOrder);
+                // Nếu order tồn tại thì vẫn kiểm tra ID trong session (bảo vệ thêm lớp frontend)
+                const sessionData = window.tokenManager.getSessionData();
+                if (sessionData.orderId && sessionData.orderId === existingOrder.id) {
                     isNewOrder = false;
-                    console.log('Found existing active order:', existingOrder.id);
+                    console.log('✅ Đang tiếp tục đơn hàng hiện tại:', existingOrder.id);
+                } else {
+                    console.log('⚠️ Token hợp lệ nhưng không phải session hiện tại, tạo đơn mới');
+                    existingOrder = null; // Hủy để buộc tạo mới
                 }
             }
         } catch (error) {

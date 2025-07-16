@@ -164,7 +164,8 @@ let currentOrderData = null;
         async function initializeFromAPI() {
             const orderId = getUrlParameter('orderId');
             const tableNumber = getUrlParameter('tableNumber');
-
+            const token = localStorage.getItem('sessionToken'); 
+            console.log('Initializing from API with orderId:', orderId, 'and tableNumber:', tableNumber, 'token:', token);
             if (!orderId) {
                 console.error('No order ID provided');
                 showError();
@@ -175,7 +176,8 @@ let currentOrderData = null;
                 const response = await fetch(`${BACKEND_BASE_URL}/orders/${orderId}`, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
@@ -221,15 +223,15 @@ let currentOrderData = null;
 
                 if (orderData.orderItems && orderData.orderItems.length > 0) {
                     orderData.orderItems.forEach(orderItem => {
-                        const menuItem = orderItem.menuItem;
+                        console.log('with orderItem:', orderItem);
                         const itemCard = document.createElement('div');
                         itemCard.className = 'item-card';
                         itemCard.innerHTML = `
                             <div class="item-image">🍽️</div>
                             <div class="item-info">
-                                <div class="item-name">${menuItem.name}</div>
+                                <div class="item-name">${orderItem.menuItemName}</div>
                                 ${orderItem.note ? `<div class="item-note">Ghi chú: ${orderItem.note}</div>` : ''}
-                                <div class="item-price">${formatCurrency(menuItem.price)}</div>
+                                <div class="item-price">${formatCurrency(orderItem.price)}</div>
                             </div>
                             <div class="item-quantity">x${orderItem.quantity}</div>
                         `;

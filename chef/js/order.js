@@ -7,6 +7,7 @@ let lastUpdateTime = null;
 let currentPage = 0;
 let totalPages = 0;
 let totalElements = 0;
+let pageSize = '20';
 // Status translations
 const statusTranslations = {
     'PENDING': 'Chờ Xử Lý',
@@ -27,22 +28,8 @@ const statusClasses = {
     'READY': 'status-ready'
 };
 
-// Calculate time ago
-function timeAgo(dateString) {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMins / 60);
 
-    if (diffMins < 60) {
-        return `${diffMins} phút trước`;
-    } else if (diffHours < 24) {
-        return `${diffHours} giờ trước`;
-    } else {
-        return `${Math.floor(diffHours / 24)} ngày trước`;
-    }
-}
+
 
 // Format currency
 function formatCurrency(amount) {
@@ -94,7 +81,7 @@ function updateOrderCard(order) {
     // Update time
     const timeElement = existingCard.querySelector('.order-time small');
     if (timeElement) {
-        timeElement.textContent = timeAgo(order.createdAt);
+        timeElement.textContent = formatDateTime(order.createdAt);
     }
 
     // Update order items status
@@ -128,87 +115,89 @@ async function loadOrders(isAutoRefresh = false) {
     try {
         isReloading = true;
 
-        // Chỉ hiển thị loading khi không có dữ liệu và không phải auto refresh
-        if (!isAutoRefresh && ordersData.length === 0) {
-            const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid) {
-                ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
-            }
+        // Kiểm tra xem ordersGrid có tồn tại không
+        const ordersGrid = document.getElementById('ordersGrid');
+        if (!ordersGrid) {
+            console.error('Orders grid element not found');
+            return;
         }
 
-        console.log('Fetching orders from API...');
+        // Get filter values - với null checks
+        const statusFilter = document.getElementById('statusFilter');
+        const tableIdFilter = document.getElementById('tableIdFilter');
+        const sortByFilter = document.getElementById('sortByFilter');
+        const sortDirectionFilter = document.getElementById('sortDirectionFilter');
 
-        const data = await apiFetch('/orders', {
-            method: 'GET',
-        });
+        const status = statusFilter ? statusFilter.value : '';
+        const tableId = tableIdFilter ? tableIdFilter.value : '';
+        const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
+        const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
+
+        // Chỉ show loading khi không có dữ liệu và không phải auto refresh
+        if (!isAutoRefresh && (!ordersData || ordersData.length === 0)) {
+            ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
+        }
+
+        // Luôn sử dụng API có pagination và sorting
+        const params = new URLSearchParams();
+
+        // Thêm filters nếu có
+        if (status) params.append('status', status);
+        if (tableId) params.append('tableId', tableId);
+
+        // Luôn thêm pagination và sorting parameters
+        params.append('page', (currentPage || 0).toString());
+        params.append('size', pageSize);
+        params.append('sortBy', sortBy);
+        params.append('sort', sortDirection);
+        if (currentWorkSchedule && currentWorkSchedule.startTime) {
+            params.append('startTime', currentWorkSchedule.startTime);
+        }
+        console.log('Fetching orders with pagination and sorting:', params.toString());
+        const data = await apiFetch(`/orders/chef/work-shift-orders?${params.toString()}`, { method: 'GET' });
 
         console.log('API Response:', data);
 
-        if (data.code === 0 && data.result && data.result.content) {
-            const newOrders = data.result.content;
+        if (data.code === 0 && data.result) {
+            // Paginated response
+            const orderPage = data.result;
+            const orders = orderPage.content || [];
 
-            // Check if data has changed
-            if (isAutoRefresh && !hasOrdersChanged(newOrders, ordersData)) {
+            // Update pagination info
+            if (typeof totalPages !== 'undefined') totalPages = orderPage.totalPages || 0;
+            if (typeof totalElements !== 'undefined') totalElements = orderPage.totalElements || 0;
+            if (typeof currentPage !== 'undefined') currentPage = orderPage.number || 0;
+
+            // Update additional components if functions exist
+            if (typeof updateSummary === 'function') updateSummary(orderPage);
+            if (typeof updatePagination === 'function') updatePagination();
+
+            // Check if data has changed for auto refresh
+            if (isAutoRefresh && typeof hasOrdersChanged === 'function' && !hasOrdersChanged(orders, ordersData)) {
                 console.log('No changes detected, skipping render');
                 return;
             }
 
-            // Store previous data
-            const previousOrders = [...ordersData];
-            ordersData = newOrders;
+            // Store orders data
+            ordersData = orders;
 
-            // Try to update existing cards first
-            let needsFullRender = false;
+            // Render orders
+            renderOrders(orders);
 
-            if (isAutoRefresh && previousOrders.length > 0) {
-                // Check if we need full render (new orders added/removed)
-                const currentIds = new Set(ordersData.map(o => o.id));
-                const previousIds = new Set(previousOrders.map(o => o.id));
+            // Update stats if function exists
+            if (typeof updateStats === 'function') updateStats();
 
-                if (currentIds.size !== previousIds.size ||
-                    ![...currentIds].every(id => previousIds.has(id))) {
-                    needsFullRender = true;
-                }
-            } else {
-                needsFullRender = true;
-            }
+            // Update last update time if exists
+            if (typeof lastUpdateTime !== 'undefined') lastUpdateTime = new Date();
 
-            if (needsFullRender) {
-                renderOrders(ordersData);
-            } else {
-                // Update existing cards
-                ordersData.forEach(order => {
-                    updateOrderCard(order);
-                });
-            }
-
-            updateStats();
-            lastUpdateTime = new Date();
-            console.log('Orders updated successfully:', ordersData.length);
+            console.log('Orders loaded successfully:', orders.length);
         } else {
             throw new Error('Invalid response format or no data');
         }
+
     } catch (error) {
         console.error('Error loading orders:', error);
-
-        // Only show error if it's not an auto refresh or if we have no data
-        if (!isAutoRefresh || ordersData.length === 0) {
-            const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid) {
-                ordersGrid.innerHTML = `
-                    <div class="text-center text-danger">
-                        <i class="fas fa-exclamation-triangle mb-2"></i>
-                        <div>Lỗi tải dữ liệu đơn hàng</div>
-                        <small>${error.message}</small>
-                        <div class="mt-2">
-                            <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">
-                                <i class="fas fa-refresh"></i> Thử lại
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
+        showErrorState(error.message);
     } finally {
         isReloading = false;
     }
@@ -223,10 +212,10 @@ function renderOrders(orders) {
         return;
     }
 
-    // Filter out cancelled orders for kitchen display
-    const activeOrders = orders.filter(order => order.status !== 'CANCELLED');
+    // Hiển thị tất cả đơn hàng bao gồm cả đơn đã hủy
+    const allOrders = orders;
 
-    if (activeOrders.length === 0) {
+    if (allOrders.length === 0) {
         ordersGrid.innerHTML = `
             <div class="text-center text-muted py-4">
                 <i class="fas fa-clipboard-list fa-3x mb-3 opacity-50"></i>
@@ -236,106 +225,137 @@ function renderOrders(orders) {
         return;
     }
 
-    const ordersHTML = activeOrders.map(order => {
-        // Show only first 3 items
-        const visibleItems = order.orderItems ? order.orderItems.slice(0, 3) : [];
-        const hasMoreItems = order.orderItems && order.orderItems.length > 3;
-        const remainingCount = hasMoreItems ? order.orderItems.length - 3 : 0;
+    const ordersHTML = allOrders.map(order => {
+        // Show all items in the order
+        const allItems = order.orderItems || [];
 
-        const itemsHTML = visibleItems.map(item => `
+        const itemsHTML = allItems.map(item => `
             <div class="item-row">
-                <div class="item-info">
+                <div class="order-item-info">
                     <span class="item-name">${item.menuItemName || 'Món ăn'}</span>
-                    <span class="item-quantity">x${item.quantity}</span>
                 </div>
-                <span class="item-status ${statusClasses[item.status] || 'status-pending'}">
-                    ${statusTranslations[item.status] || item.status}
-                </span>
+                <div class="item-quantity">
+                    <span class="quantity-number">${item.quantity}</span>
+                </div>
             </div>
         `).join('');
 
-        const moreItemsHTML = hasMoreItems ? `
-            <div class="more-items" onclick="viewOrderDetails(${order.id})">
-                <i class="fas fa-plus-circle"></i> +${remainingCount} món khác - Xem chi tiết
-            </div>
-        ` : '';
-
         // Calculate total items for display
-        const totalItems = order.orderItems ? order.orderItems.length : 0;
+        const totalItems = allItems.length;
+
+        // Determine order type display
+        function getOrderTypeDisplay(orderType, tableNumber) {
+            switch (orderType) {
+                case 'TAKEAWAY':
+                    return '<i class="fas fa-shopping-bag"></i> Mang Về';
+                case 'DELIVERY':
+                    return '<i class="fas fa-motorcycle"></i> Giao Hàng';
+                case 'DINE_IN':
+                default:
+                    return `<i class="fas fa-chair"></i> ${tableNumber || 'Bàn N/A'}`;
+            }
+        }
 
         return `
-            <div class="order-card" data-order-id="${order.id}">
+            <div class="order-card ${order.status === 'CANCELLED' ? 'cancelled-order' : ''}" data-order-id="${order.id}">
                 <div class="order-header">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="order-title-row">
                         <div class="order-number">
-                            <strong>Đơn #${order.id.toString().padStart(3, '0')}</strong>
+                            <span class="order-label">Order #${order.id.toString().padStart(3, '0')}</span>
                         </div>
-                        <div class="text-end">
-                            <div class="table-badge mb-1">
-                                <i class="fas fa-chair"></i> ${order.tableNumber || 'Bàn N/A'}
-                            </div>
-                            <div class="order-time">
-                                <i class="fas fa-clock"></i>
-                                <small>${timeAgo(order.createdAt)}</small>
-                            </div>
+                        <div class="order-time">
+                            <span>${formatDateTime(order.createdAt)}</span>
                         </div>
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="status-badge ${statusClasses[order.status]}">
+                    <div class="order-meta">
+                        <div class="item-count">
+                            <span>${totalItems} món</span>
+                        </div>
+                        <div class="customer-info">
+                            ${getOrderTypeDisplay(order.orderType, order.tableNumber)}
+                        </div>
+                    </div>
+                    
+                    <div class="status-row">
+                        <span class="status-badge status-${order.status.toLowerCase()}">
                             ${statusTranslations[order.status] || order.status}
                         </span>
                     </div>
-                    
-                    <div class="order-summary mb-2">
-                        <small class="text-muted">
-                            <i class="fas fa-utensils"></i> ${totalItems} món | 
-                            <i class="fas fa-money-bill-wave"></i> ${formatCurrency(order.totalAmount)}
-                        </small>
-                    </div>
-                    
-                    ${order.note ? `
-                        <div class="order-note mb-2">
-                            <small class="text-info">
-                                <i class="fas fa-sticky-note"></i> ${order.note}
-                            </small>
-                        </div>
-                    ` : ''}
                 </div>
                 
                 <div class="order-items">
+                    <div class="items-header">
+                        <span class="header-item">TÊN MÓN</span>
+                        <span class="header-qty">SL</span>
+                    </div>
                     ${itemsHTML}
-                    ${moreItemsHTML}
                 </div>
                 
-                <div class="order-actions mt-3">
-                    <button class="btn btn-primary btn-sm" onclick="updateOrderStatus(${order.id}, 'PREPARING')">
-                        <i class="fas fa-fire"></i> Bắt Đầu Nấu
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="updateOrderStatus(${order.id}, 'READY')">
-                        <i class="fas fa-check"></i> Hoàn Thành
-                    </button>
-                    <button class="btn btn-outline-info btn-sm" onclick="viewOrderDetails(${order.id})">
-                        <i class="fas fa-eye"></i> Chi Tiết
+                <div class="order-actions">
+                    ${order.status === 'CANCELLED' ?
+                '<div class="cancelled-notice"><i class="fas fa-ban"></i> Đơn hàng đã bị hủy</div>' :
+                `<button class="btn btn-preparing" onclick="updateOrderStatus(${order.id}, 'PREPARING')">
+                            <i class="fas fa-fire"></i> Bắt Đầu Nấu
+                        </button>
+                        <button class="btn btn-ready" onclick="updateOrderStatus(${order.id}, 'READY')">
+                            <i class="fas fa-check"></i> Hoàn Thành
+                        </button>`
+            }
+                    <button class="btn btn-details" onclick="viewOrderDetails(${order.id})">
+                        <i class="fas fa-eye"></i>
                     </button>
                 </div>
             </div>
         `;
     }).join('');
 
-    // Render trực tiếp không có hiệu ứng opacity
     ordersGrid.innerHTML = ordersHTML;
+}
+
+function calculateAverageTime() {
+    console.log("Calculating average cooking time...");
+
+    const readyOrders = ordersData.filter(order => order.status === 'READY');
+    console.log("ready orders: ", readyOrders.length);
+    if (readyOrders.length === 0) {
+        return '0p';
+    }
+
+    let totalTime = 0;
+    let validOrders = 0;
+
+    readyOrders.forEach(order => {
+        if (order.createdAt && order.updatedAt) {
+            const createdTime = new Date(order.createdAt);
+            const updatedTime = new Date(order.updatedAt);
+            const timeDiff = (updatedTime - createdTime) / (1000 * 60);
+
+            if (timeDiff >= 5 && timeDiff <= 60) {
+                totalTime += timeDiff;
+                validOrders++;
+            }
+        }
+    });
+
+    if (validOrders === 0) {
+        return '0p';
+    }
+
+    const avgMinutes = Math.round(totalTime / validOrders);
+    return `${avgMinutes}p`;
 }
 
 
 // Update statistics with smooth animations
 function updateStats() {
+    console.log("in updateStats");
     const pendingCount = ordersData.filter(order => order.status === 'PENDING').length;
     const preparingCount = ordersData.filter(order => order.status === 'PREPARING').length;
     const readyCount = ordersData.filter(order => order.status === 'READY').length;
-
+    console.log("pending: ", pendingCount);
     // Calculate average cooking time (mock calculation for now)
-    const avgTime = '15p';
+    const avgTime = calculateAverageTime();
 
     // Smooth update function
     function updateStatElement(elementId, newValue) {
@@ -383,83 +403,114 @@ async function viewOrderDetails(orderId) {
 // Display order details in a modal or detailed view
 function displayOrderDetails(orderData) {
     const {
-        id, status, orderType, createdAt, note,
+        id, status, orderType, createdAt, updatedAt, note,
         tableNumber, username, totalAmount, orderItems
     } = orderData;
 
     // Format dữ liệu
-    const formattedDate = new Date(createdAt).toLocaleString('vi-VN');
+    const formatDateTime = (dateStr) => {
+            if (!dateStr) return 'Chưa cập nhật';
+            
+            // Parse date string trực tiếp mà không để JS tự động chuyển đổi timezone
+            const date = new Date(dateStr.replace('Z', ''));
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+        };
+
+        const formattedDateCreation = formatDateTime(createdAt);
+        const formattedDateUpdate = formatDateTime(updatedAt);
     const formattedAmount = formatCurrency(totalAmount);
 
-    // Tạo HTML cho danh sách món ăn
-    const orderItemsHtml = orderItems.map(item => `
-        <div class="order-item">
-            <div class="item-info">
-                <strong>${item.menuItemName}</strong>
-                <span class="item-details">SL: ${item.quantity} × ${formatCurrency(item.price)}</span>
+    // Tạo HTML cho danh sách món ăn với ghi chú
+    const orderItemsHtml = orderItems.map(item => {
+        const itemNoteHtml = (item.note && item.note.trim() !== '') 
+            ? `<div class="item-note">Ghi chú: ${item.note}</div>` 
+            : '';
+        
+        return `
+            <div class="order-item">
+                <div class="order-item-info">
+                    <strong>${item.menuItemName}</strong>
+                    <span class="item-details">SL: ${item.quantity} × ${formatCurrency(item.price)}</span>
+                    ${itemNoteHtml}
+                </div>
+                <div class="item-status">
+                    <span class="badge ${getStatusBadgeClass(item.status)}">${getStatusText(item.status)}</span>
+                </div>
             </div>
-            <div class="item-status">
-                <span class="badge ${getStatusBadgeClass(item.status)}">${getStatusText(item.status)}</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Tạo nội dung modal với animation
     const modalHtml = `
-        <div class="modal-overlay" onclick="closeOrderDetails()" style="animation: fadeIn 0.3s ease;">
-            <div class="modal-content" onclick="event.stopPropagation()" style="animation: slideInUp 0.3s ease;">
-                <div class="modal-header">
-                    <h3>Chi tiết đơn hàng #${id}</h3>
-                    <button class="btn-close" onclick="closeOrderDetails()">×</button>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="order-summary">
-                        <div class="info-row">
-                            <span>Trạng thái:</span>
-                            <span class="badge ${getStatusBadgeClass(status)}">${getStatusText(status)}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Loại đơn:</span>
-                            <span>${getOrderTypeText(orderType)}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Thời gian:</span>
-                            <span>${formattedDate}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Bàn:</span>
-                            <span>${tableNumber || 'Mang về'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Nhân viên:</span>
-                            <span>${username}</span>
-                        </div>
-                        ${note ? `<div class="info-row"><span>Ghi chú:</span><span>${note}</span></div>` : ''}
-                    </div>
-
-                    <div class="order-items-section">
-                        <h4>Danh sách món ăn:</h4>
-                        <div class="order-items-list">
-                            ${orderItemsHtml}
-                        </div>
-                    </div>
-
-                    <div class="order-total">
-                        <strong>Tổng tiền: ${formattedAmount}</strong>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="updateOrderItemsStatus(${id})">
-                        Cập nhật trạng thái
-                    </button>
-                    <button class="btn btn-secondary" onclick="closeOrderDetails()">
-                        Đóng
-                    </button>
-                </div>
-            </div>
+        <div class="modal-overlay" onclick="closeOrderDetails()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Chi tiết đơn hàng #${id}</h3>
+          <button class="btn-close" onclick="closeOrderDetails()">×</button>
         </div>
+
+        <div class="modal-body">
+          <div class="order-summary">
+            <div class="info-row">
+              <span>Trạng thái:</span>
+              <span class="badge ${getStatusBadgeClass(status)}">${getStatusText(status)}</span>
+            </div>
+            <div class="info-row">
+              <span>Loại đơn:</span>
+              <span>${getOrderTypeText(orderType)}</span>
+            </div>
+            <div class="info-row">
+              <span>Thời gian tạo:</span>
+              <span>${formattedDateCreation}</span>
+            </div>
+            <div class="info-row">
+              <span>Thời gian cập nhật:</span>
+              <span>${formattedDateUpdate}</span>
+            </div>
+            <div class="info-row">
+              <span>Bàn:</span>
+              <span>${tableNumber || 'Mang về'}</span>
+            </div>
+            <div class="info-row">
+              <span>Khách hàng:</span>
+              <span>${username}</span>
+            </div>
+            <div class="info-row">
+              <span>Ghi chú:</span>
+              <span>${note}</span>
+            </div>
+          </div>
+
+          <div class="order-items-section">
+            <h4>Danh sách món ăn:</h4>
+            <div class="order-items-list">
+              ${orderItemsHtml}
+            </div>
+          </div>
+
+          <div class="order-total">
+            <strong>Tổng tiền: ${formattedAmount}</strong>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="updateOrderStatus(${id})">
+            Cập nhật trạng thái
+          </button>
+          <button class="btn btn-secondary" onclick="closeOrderDetails()">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
     `;
 
     // Thêm CSS inline nếu chưa có
@@ -567,15 +618,39 @@ function addModalStyles() {
             border: 1px solid #eee;
             border-radius: 4px;
             margin-bottom: 8px;
-            transition: background-color 0.2s;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
         }
         .order-item:hover {
-            background-color: #f8f9fa;
+            background-color: #f0f0f0;
+        }
+        .order-item .order-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .order-item-info strong {
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
         }
         .item-details {
             color: #666;
-            font-size: 14px;
-            display: block;
+            font-size: 13px;
+        }
+        .item-note {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 4px;
+            border-radius: 3px;
+            display: inline-block;
+            max-width: fit-content;
+        }
+        .item-status {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
         }
         .order-total {
             text-align: center;
@@ -599,10 +674,6 @@ function addModalStyles() {
             font-size: 14px;
             transition: all 0.2s;
         }
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
         .btn-secondary {
             background: #6c757d;
             color: white;
@@ -610,21 +681,6 @@ function addModalStyles() {
         .btn:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-        }
-        
-        /* Order card animations */
-        .order-card {
-            transition: all 0.3s ease;
-        }
-        
-        .order-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        /* Stat counters transition */
-        #pendingCount, #preparingCount, #readyCount, #avgTime {
-            transition: all 0.2s ease;
         }
         </style>
     `;
@@ -655,7 +711,29 @@ document.head.insertAdjacentHTML('beforeend', `
 // Update order status
 async function updateOrderStatus(orderId, newStatus) {
     try {
+        // Tạo message xác nhận dựa trên status
+        const statusMessages = {
+            'PENDING': 'chờ xử lý',
+            'CONFIRMED': 'xác nhận',
+            'PREPARING': 'đang chuẩn bị',
+            'READY': 'sẵn sàng',
+            'SERVED': 'đã phục vụ',
+            'COMPLETED': 'hoàn thành',
+            'CANCELLED': 'hủy'
+        };
+
+        const statusText = statusMessages[newStatus] || newStatus.toLowerCase();
+        const confirmMessage = `Bạn có chắc chắn muốn chuyển đơn hàng #${orderId} sang trạng thái "${statusText}"?`;
+
+        // Hiển thị alert xác nhận
+        if (!confirm(confirmMessage)) {
+            return; // User cancelled, exit function
+        }
+
         console.log(`Updating order ${orderId} to status: ${newStatus}`);
+
+        // Hiển thị notification đang xử lý
+        showNotification(`Đang cập nhật trạng thái đơn hàng #${orderId}...`, 'info');
 
         const data = await apiFetch(`/orders/status/${orderId}?status=${newStatus}`, {
             method: 'PUT',
@@ -664,17 +742,24 @@ async function updateOrderStatus(orderId, newStatus) {
 
         if (data && data.code === 0) {
             console.log('Order status updated successfully');
+
+            // Hiển thị notification thành công
+            showNotification(`Đã cập nhật đơn hàng #${orderId} sang trạng thái "${statusText}" thành công!`, 'success');
+
             // Reload orders to reflect changes
             await loadOrders(true); // Use auto-refresh mode
+
             // Close modal if open
             closeOrderDetails();
         } else {
-            throw new Error('Failed to update order status');
+            throw new Error(data?.message || 'Failed to update order status');
         }
 
     } catch (error) {
         console.error('Error updating order status:', error);
-        alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng: ' + error.message);
+
+        // Hiển thị notification lỗi
+        showNotification(`Có lỗi xảy ra khi cập nhật trạng thái đơn hàng #${orderId}: ${error.message}`, 'error');
     }
 }
 
@@ -702,7 +787,7 @@ function showOrderItemsStatusModal(orderData) {
     // Tạo HTML cho danh sách order items
     const orderItemsOptions = orderItems.map(item => `
         <div class="order-item-option" data-item-id="${item.id}">
-            <div class="item-info">
+            <div class="order-item-info">
                 <input type="checkbox" id="item_${item.id}" value="${item.id}">
                 <label for="item_${item.id}">
                     <strong>${item.menuItemName}</strong>
@@ -720,7 +805,7 @@ function showOrderItemsStatusModal(orderData) {
         { value: 'READY', text: 'Hoàn thành' }
     ];
 
-    const statusOptionsHtml = statusOptions.map(option => 
+    const statusOptionsHtml = statusOptions.map(option =>
         `<option value="${option.value}">${option.text}</option>`
     ).join('');
 
@@ -775,7 +860,7 @@ function showOrderItemsStatusModal(orderData) {
 function toggleSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAll');
     const itemCheckboxes = document.querySelectorAll('.order-item-option input[type="checkbox"]');
-    
+
     itemCheckboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
     });
@@ -784,7 +869,7 @@ function toggleSelectAll() {
 async function executeStatusUpdate() {
     const selectedItems = Array.from(document.querySelectorAll('.order-item-option input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.value);
-    
+
     const newStatus = document.getElementById('newStatus').value;
 
     if (selectedItems.length === 0) {
@@ -805,21 +890,21 @@ async function executeStatusUpdate() {
         updateBtn.disabled = true;
 
         // Gọi API để cập nhật từng item
-        const updatePromises = selectedItems.map(itemId => 
+        const updatePromises = selectedItems.map(itemId =>
             apiFetch(`/orders/items/status/${itemId}?status=${newStatus}`, {
                 method: 'PUT'
             })
         );
 
         const results = await Promise.all(updatePromises);
-        
+
         // Kiểm tra kết quả
         const failedUpdates = results.filter(result => result.code !== 0);
-        
+
         if (failedUpdates.length === 0) {
             alert(`Cập nhật trạng thái thành công cho ${selectedItems.length} món ăn!`);
             closeStatusUpdateModal();
-            
+
             // Refresh orders list và close order details modal
             await loadOrders();
             closeOrderDetails();
@@ -937,15 +1022,7 @@ function initializeFilters() {
     const filtersHTML = `
         <div class="filters-section mb-4" id="filtersSection">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">
-                        <i class="fas fa-filter"></i> Bộ lọc & Sắp xếp
-                    </h6>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleFilters()">
-                        <i class="fas fa-chevron-down" id="filterToggleIcon"></i>
-                    </button>
-                </div>
-                <div class="card-body collapse" id="filtersBody">
+                <div class="card-body">
                     <div class="row g-3">
                         <!-- Status Filter -->
                         <div class="col-md-3">
@@ -959,6 +1036,7 @@ function initializeFilters() {
                                 <option value="PREPARING">Đang Chế Biến</option>
                                 <option value="READY">Sẵn Sàng</option>
                                 <option value="COMPLETED">Hoàn Thành</option>
+                                <option value="CANCELLED">Đã Hủy</option>
                             </select>
                         </div>
 
@@ -971,25 +1049,8 @@ function initializeFilters() {
                                    placeholder="Chọn bàn" onchange="applyFilters()" min="1">
                         </div>
 
-                        <!-- Price Range -->
-                        <div class="col-md-3">
-                            <label class="form-label">
-                                <i class="fas fa-money-bill-wave"></i> Giá tối thiểu (VND)
-                            </label>
-                            <input type="number" class="form-control" id="minPriceFilter" 
-                                   placeholder="0" onchange="applyFilters()" min="0" step="1000">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">
-                                <i class="fas fa-credit-card"></i> Giá tối đa (VND)
-                            </label>
-                            <input type="number" class="form-control" id="maxPriceFilter" 
-                                   placeholder="10000000" onchange="applyFilters()" min="0" step="1000">
-                        </div>
-
                         <!-- Sort Options -->
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">
                                 <i class="fas fa-sort"></i> Sắp xếp theo
                             </label>
@@ -1001,26 +1062,13 @@ function initializeFilters() {
                             </select>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">
                                 <i class="fas fa-arrows-alt-v"></i> Thứ tự
                             </label>
                             <select class="form-select" id="sortDirectionFilter" onchange="applyFilters()">
                                 <option value="DESC">Giảm dần</option>
                                 <option value="ASC">Tăng dần</option>
-                            </select>
-                        </div>
-
-                        <!-- Page Size -->
-                        <div class="col-md-4">
-                            <label class="form-label">
-                                <i class="fas fa-list"></i> Số đơn/trang
-                            </label>
-                            <select class="form-select" id="pageSizeFilter" onchange="applyFilters()">
-                                <option value="5">5 đơn</option>
-                                <option value="10" selected>10 đơn</option>
-                                <option value="20">20 đơn</option>
-                                <option value="50">50 đơn</option>
                             </select>
                         </div>
 
@@ -1033,7 +1081,7 @@ function initializeFilters() {
                                 <button class="btn btn-outline-secondary" onclick="clearFilters()">
                                     <i class="fas fa-times"></i> Xóa bộ lọc
                                 </button>
-                                <button class="btn btn-outline-info" onclick="loadOrders()">
+                                <button class="btn btn-outline-success" onclick="loadOrders()">
                                     <i class="fas fa-sync-alt"></i> Làm mới
                                 </button>
                             </div>
@@ -1044,12 +1092,14 @@ function initializeFilters() {
         </div>
     `;
 
-    // Insert filters before orders grid
+    // Insert filters before orders grid trong dynamicContent
     const ordersGrid = document.getElementById('ordersGrid');
     if (ordersGrid && !document.getElementById('filtersSection')) {
         ordersGrid.insertAdjacentHTML('beforebegin', filtersHTML);
     }
 }
+
+// Hàm initializePagination được sửa lại
 function initializePagination() {
     const paginationHTML = `
         <!-- Pagination -->
@@ -1071,27 +1121,10 @@ function initializePagination() {
         </div>
     `;
 
-    // Insert pagination after orders grid
+    // Insert pagination after orders grid trong dynamicContent
     const ordersGrid = document.getElementById('ordersGrid');
     if (ordersGrid && !document.getElementById('paginationSection')) {
         ordersGrid.insertAdjacentHTML('afterend', paginationHTML);
-    }
-}
-
-
-// Toggle filters visibility
-function toggleFilters() {
-    const filtersBody = document.getElementById('filtersBody');
-    const toggleIcon = document.getElementById('filterToggleIcon');
-
-    if (filtersBody.classList.contains('show')) {
-        filtersBody.classList.remove('show');
-        toggleIcon.classList.remove('fa-chevron-up');
-        toggleIcon.classList.add('fa-chevron-down');
-    } else {
-        filtersBody.classList.add('show');
-        toggleIcon.classList.remove('fa-chevron-down');
-        toggleIcon.classList.add('fa-chevron-up');
     }
 }
 
@@ -1110,7 +1143,6 @@ function clearFilters() {
     const maxPriceFilter = document.getElementById('maxPriceFilter');
     const sortByFilter = document.getElementById('sortByFilter');
     const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-    const pageSizeFilter = document.getElementById('pageSizeFilter');
 
     if (statusFilter) statusFilter.value = '';
     if (tableIdFilter) tableIdFilter.value = '';
@@ -1118,7 +1150,6 @@ function clearFilters() {
     if (maxPriceFilter) maxPriceFilter.value = '';
     if (sortByFilter) sortByFilter.value = 'createdAt';
     if (sortDirectionFilter) sortDirectionFilter.value = 'DESC';
-    if (pageSizeFilter) pageSizeFilter.value = '10';
 
     // Reset pagination
     currentPage = 0;
@@ -1128,81 +1159,38 @@ function clearFilters() {
 }
 
 // Updated showOrders function
-function showOrders() {
-    const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) {
-        pageTitle.textContent = 'Quản Lý Đơn Hàng';
-    }
+async function loadOrdersContent() {
+    const dynamicContent = document.getElementById('dynamicContent');
 
-    updateActiveNav('orders');
-    initializeFilters();
-    initializePagination(); // Initialize pagination after orders grid
-    loadOrders();
-}
-
-// Load orders with current filters and pagination
-async function loadOrdersWithFilters() {
-    if (isReloading) return;
-
-    try {
-        isReloading = true;
-
-        // Build query parameters
-        const params = new URLSearchParams();
-
-        if (currentFilters.status) params.append('status', currentFilters.status);
-        if (currentFilters.tableId) params.append('tableId', currentFilters.tableId);
-        if (currentFilters.minPrice) params.append('minPrice', currentFilters.minPrice);
-        if (currentFilters.maxPrice) params.append('maxPrice', currentFilters.maxPrice);
-        params.append('page', currentFilters.page);
-        params.append('size', currentFilters.size);
-        params.append('SorderBy', currentFilters.sortBy);
-        params.append('sort', currentFilters.sort);
-
-        console.log('Fetching orders with params:', params.toString());
-
-        const data = await apiFetch(`/orders?${params.toString()}`, {
-            method: 'GET',
-        });
-
-        console.log('Filtered API Response:', data);
-
-        if (data.code === 0 && data.result) {
-            const pageData = data.result;
-            ordersData = pageData.content || [];
-
-            renderOrders(ordersData);
-            renderPagination(pageData);
-            updatePaginationInfo(pageData);
-            updateStats();
-
-            console.log('Filtered orders loaded successfully:', ordersData.length);
-        } else {
-            throw new Error('Invalid response format or no data');
-        }
-    } catch (error) {
-        console.error('Error loading filtered orders:', error);
-
-        const ordersGrid = document.getElementById('ordersGrid');
-        if (ordersGrid) {
-            ordersGrid.innerHTML = `
-                <div class="text-center text-danger">
-                    <i class="fas fa-exclamation-triangle mb-2"></i>
-                    <div>Lỗi tải dữ liệu đơn hàng</div>
-                    <small>${error.message}</small>
-                    <div class="mt-2">
-                        <button class="btn btn-outline-primary btn-sm" onclick="loadOrdersWithFilters()">
-                            <i class="fas fa-refresh"></i> Thử lại
-                        </button>
-                    </div>
+    // Tạo HTML structure cho orders (giữ nguyên class để CSS hoạt động)
+    const ordersHTML = `
+        <!-- Orders Section -->
+        <div class="orders-section">
+            <!-- Filters Section sẽ được inject ở đây -->
+            
+            <div class="orders-grid" id="ordersGrid">
+                <div class="text-center">
+                    <div class="loading"></div> Đang tải đơn hàng...
                 </div>
-            `;
-        }
-    } finally {
-        isReloading = false;
-    }
-}
+            </div>
 
+            <!-- Pagination Section sẽ được inject ở đây -->
+        </div>
+    `;
+
+    // Load HTML vào dynamicContent
+    dynamicContent.innerHTML = ordersHTML;
+
+    // Đợi một chút để DOM được render
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Initialize filters và pagination
+    initializeFilters();
+    initializePagination();
+
+    // Load orders data
+    await loadOrders();
+}
 
 // Render pagination controls
 function renderPagination(pageData) {
@@ -1293,81 +1281,7 @@ function updatePaginationInfo(pageData) {
 }
 
 // Enhanced loadOrders function to work with filters
-async function loadOrders(isAutoRefresh = false) {
-    try {
-        // Get filter values - với null checks
-        const statusFilter = document.getElementById('statusFilter');
-        const tableIdFilter = document.getElementById('tableIdFilter');
-        const minPriceFilter = document.getElementById('minPriceFilter');
-        const maxPriceFilter = document.getElementById('maxPriceFilter');
-        const sortByFilter = document.getElementById('sortByFilter');
-        const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-        const pageSizeFilter = document.getElementById('pageSizeFilter');
 
-        const status = statusFilter ? statusFilter.value : '';
-        const tableId = tableIdFilter ? tableIdFilter.value : '';
-        const minPrice = minPriceFilter ? minPriceFilter.value : '';
-        const maxPrice = maxPriceFilter ? maxPriceFilter.value : '';
-        const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
-        const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
-        const pageSize = pageSizeFilter ? pageSizeFilter.value || '10' : '10';
-
-        // Chỉ show loading khi không có dữ liệu và không phải auto refresh
-        if (!isAutoRefresh && ordersData.length === 0) {
-            const ordersGrid = document.getElementById('ordersGrid');
-            if (ordersGrid) {
-                ordersGrid.innerHTML = '<div class="text-center"><div class="loading"></div> Đang tải đơn hàng...</div>';
-            }
-        }
-
-        // Build query parameters
-        const params = new URLSearchParams();
-        if (status) params.append('status', status);
-        if (tableId) params.append('tableId', tableId);
-        if (minPrice) params.append('minPrice', minPrice);
-        if (maxPrice) params.append('maxPrice', maxPrice);
-        params.append('page', currentPage.toString());
-        params.append('size', pageSize);
-        params.append('SorderBy', sortBy); // Note: backend uses 'SorderBy'
-        params.append('sort', sortDirection);
-
-        console.log('Fetching orders with params:', params.toString());
-
-        // Fetch orders with filters
-        const data = await apiFetch(`/orders?${params.toString()}`, {
-            method: 'GET'
-        });
-
-        console.log('API Response:', data);
-
-        if (data.code === 0 && data.result) {
-            const orderPage = data.result;
-            const orders = orderPage.content || [];
-
-            // Update pagination info
-            totalPages = orderPage.totalPages;
-            totalElements = orderPage.totalElements;
-            currentPage = orderPage.number;
-
-            // Store orders data
-            ordersData = orders;
-
-            // Render orders
-            renderOrders(orders);
-            updateSummary(orderPage);
-            updatePagination();
-            updateStats();
-
-            console.log('Orders loaded successfully:', orders.length);
-        } else {
-            throw new Error('Invalid response format or no data');
-        }
-
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-        showErrorState(error.message);
-    }
-}
 
 function updateSummary(orderPage) {
     const paginationInfo = document.getElementById('paginationInfo');
@@ -1456,18 +1370,36 @@ function updatePagination() {
 function showErrorState(errorMessage) {
     const ordersGrid = document.getElementById('ordersGrid');
     if (ordersGrid) {
-        ordersGrid.innerHTML = `
-            <div class="text-center text-danger">
-                <i class="fas fa-exclamation-triangle mb-2"></i>
-                <div>Lỗi tải dữ liệu đơn hàng</div>
-                <small>${errorMessage}</small>
-                <div class="mt-2">
-                    <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">
-                        <i class="fas fa-refresh"></i> Thử lại
-                    </button>
+        // Kiểm tra nếu không có lịch làm việc
+        if (!hasWorkSchedule) {
+            ordersGrid.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">Hiện tại bạn không đang trong ca làm việc</h5>
+                        <p class="text-muted mb-4">
+                            Bạn không thể xem đơn hàng khi không có ca làm việc được phân công.
+                        </p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        } else {
+            // Hiển thị lỗi bình thường khi có lịch làm việc
+            ordersGrid.innerHTML = `
+                <div class="text-center text-danger">
+                    <i class="fas fa-exclamation-triangle mb-2"></i>
+                    <div>Lỗi tải dữ liệu đơn hàng</div>
+                    <small>${errorMessage}</small>
+                    <div class="mt-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadOrders()">
+                            <i class="fas fa-refresh"></i> Thử lại
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
     }
 }
 
@@ -1483,29 +1415,26 @@ function hasActiveFilters() {
 }
 
 // Enhanced showOrders function to initialize filters
-function showOrders() {
+async function showOrders() {
+    // Update page title
     const pageTitle = document.getElementById('pageTitle');
     if (pageTitle) {
         pageTitle.textContent = 'Quản Lý Đơn Hàng';
     }
 
+    // Show dynamic content and hide others
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('dynamicContent').style.display = 'block';
+    document.getElementById('errorMessage').style.display = 'none';
+
+    // Update active navigation
     updateActiveNav('orders');
-    initializeFilters();
-    loadOrders();
+
+    // Load orders content into dynamicContent
+    await loadOrdersContent();
 }
 
-// Enhanced showDashboard function to initialize filters
-function showDashboard() {
-    const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) {
-        pageTitle.textContent = 'Tổng Quan - Ca Làm Việc';
-    }
 
-    updateActiveNav('dashboard');
-    initializeFilters();
-    initializePagination(); // Initialize pagination after orders grid
-    loadOrders();
-}
 
 // Update active navigation
 function updateActiveNav(section) {
@@ -1571,17 +1500,31 @@ function startSmartRefresh() {
 }
 
 // Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Kitchen Dashboard initialized');
     showDashboard();
     startSmartRefresh();
 });
 
 // Stop refresh when page is hidden
-document.addEventListener('visibilitychange', function() {
+document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
         if (refreshInterval) clearInterval(refreshInterval);
     } else {
         startSmartRefresh();
     }
 });
+
+
+
+
+// NEW FUNCTION: Lấy icon cho notification
+function getNotificationIcon(type) {
+    const icons = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-circle',
+        'warning': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle'
+    };
+    return icons[type] || 'fa-info-circle';
+}

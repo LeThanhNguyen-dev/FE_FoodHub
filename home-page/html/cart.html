@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodHub - Cart</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!-- Shared CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
+    <!-- Page-specific CSS -->
+    <style>
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--dark-green);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .menu-section {
+            background: linear-gradient(180deg, #ffffff, #f1f3f5);
+            padding: 3rem 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .cart-table th,
+        .cart-table td {
+            vertical-align: middle;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .cart-table .btn-qty {
+            width: 40px;
+            font-size: 0.9rem;
+            padding: 5px;
+        }
+
+        .cart-total {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #ff0000;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px; /* Đặt modal cách mép phải 20px */
+            top: 20px; /* Đặt modal cách mép trên 20px */
+            margin: 0; /* Bỏ margin mặc định */
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e; /* Màu xanh lá cho viền */
+            background-color: #f0fdf4; /* Màu nền xanh nhạt */
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d; /* Màu xanh lá đậm hơn cho liên kết */
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        /* Đảm bảo modal không bị che khuất */
+        .modal-notification {
+            z-index: 1055; /* Đặt z-index cao hơn nếu cần */
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cart-table {
+                font-size: 0.9rem;
+            }
+
+            .cart-table .btn-qty {
+                width: 30px;
+            }
+
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px; /* Giảm khoảng cách mép phải cho màn hình nhỏ */
+                top: 10px; /* Giảm khoảng cách mép trên */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .cart-table th,
+            .cart-table td {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+
+            .cart-table .btn-qty {
+                width: 25px;
+                font-size: 0.8rem;
+            }
+
+            .cart-total {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+                <i class="fa fa-utensils"></i>
+                <span>FoodHub</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="menu.html">Thực Đơn</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">Giới Thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Liên Hệ</a>
+                    </li>
+                    <!-- Đăng nhập (hiện khi chưa login) -->
+                    <li class="nav-item" id="auth-nav-item">
+                        <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
+                    </li>
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
+                        <div class="user-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span id="username-display"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Đăng Xuất</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
+                        <a class="nav-link cart-icon" href="cart.html">
+                            <i class="bi bi-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phần Chào Mừng -->
+    <section class="hero">
+        <div class="container">
+            <h1>Giỏ Hàng</h1>
+            <p>Xem lại các món đã chọn và tiến hành thanh toán.</p>
+        </div>
+    </section>
+
+    <!-- Phần Giỏ Hàng -->
+    <section id="cart" class="menu-section py-5">
+        <div class="container">
+            <h2 class="section-title">Giỏ Hàng Của Bạn</h2>
+            <div id="cart-empty" class="error-message d-none">
+                Giỏ hàng của bạn đang trống. <a href="menu.html">Xem thực đơn</a> để thêm món ăn.
+            </div>
+            <div id="cart-content">
+                <table class="table cart-table">
+                    <thead>
+                        <tr>
+                            <th>Món</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items"></tbody>
+                </table>
+                <div class="text-end">
+                    <h4 class="cart-total">Tổng cộng: <span id="cart-total">0</span> VND</h4>
+                    <button class="btn btn-primary" id="checkout-btn" disabled>Thanh Toán</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
+            <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
+            <div>
+                <a href="#">Facebook</a>
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+            </div>
+            <p class="mt-3">© 2025 FoodHub. Bản quyền đã được bảo hộ.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Shared JS -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/notification.js"></script>
+    <!-- Page-specific JS -->
+    <script>
+        // Update cart count in navbar
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = cartCount;
+            }
+        }
+
+        // Load cart from localStorage
+        function loadCart() {
+            if (!isLoggedIn()) {
+                document.getElementById('cart-empty').classList.remove('d-none');
+                document.getElementById('cart-content').classList.add('d-none');
+                document.getElementById('cart-count').textContent = '0';
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalElement = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            let total = 0;
+
+            if (cart.length === 0) {
+                document.getElementById('cart-empty').classList.remove('d-none');
+                document.getElementById('cart-content').classList.add('d-none');
+                checkoutBtn.disabled = true;
+                updateCartCount();
+                return;
+            }
+
+            cartItemsContainer.innerHTML = '';
+            cart.forEach(item => {
+                if (!item.id || !item.name || !item.price || !item.quantity) {
+                    console.warn('Invalid cart item:', item);
+                    return;
+                }
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                cartItemsContainer.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${Number(item.price).toLocaleString('vi-VN')} VND</td>
+                        <td>
+                            <button class="btn btn-outline-secondary btn-qty" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                            <span class="mx-2">${item.quantity}</span>
+                            <button class="btn btn-outline-secondary btn-qty" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                        </td>
+                        <td>${itemTotal.toLocaleString('vi-VN')} VND</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="removeItem(${item.id})">Remove</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            cartTotalElement.textContent = total.toLocaleString('vi-VN');
+            checkoutBtn.disabled = total === 0;
+            document.getElementById('cart-empty').classList.add('d-none');
+            document.getElementById('cart-content').classList.remove('d-none');
+            updateCartCount();
+        }
+
+        // Update item quantity in cart
+        function updateQuantity(itemId, quantity) {
+            if (!isLoggedIn()) {
+                alert('Vui lòng đăng nhập để cập nhật giỏ hàng!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (quantity < 1) {
+                removeItem(itemId);
+                return;
+            }
+
+            const itemIndex = cart.findIndex(cartItem => cartItem.id === itemId);
+            if (itemIndex !== -1) {
+                cart[itemIndex].quantity = quantity;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            } else {
+                alert('Món không tồn tại trong giỏ hàng.');
+            }
+        }
+
+        // Remove item from cart
+        function removeItem(itemId) {
+            if (!isLoggedIn()) {
+                alert('Vui lòng đăng nhập để xóa món khỏi giỏ hàng!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(cartItem => cartItem.id !== itemId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI(); // From auth.js
+            loadCart();
+            fetchUserOrders().then(() => startPolling());
+            initializeWebSocket();
+
+            // Add event listener for checkout button
+            document.getElementById('checkout-btn').addEventListener('click', () => {
+                if (!isLoggedIn()) {
+                    alert('Vui lòng đăng nhập để tiếp tục thanh toán!');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                window.location.href = 'checkout.html';
+            });
+        });
+
+        // Fallback for isLoggedIn if not defined in auth.js
+        if (typeof isLoggedIn === 'undefined') {
+            function isLoggedIn() {
+                return localStorage.getItem('isLoggedIn') === 'true';
+            }
+        }
+
+        // Fallback for updateUI if not defined in auth.js
+        if (typeof updateUI === 'undefined') {
+            function updateUI() {
+                const authNavItem = document.getElementById('auth-nav-item');
+                const userNavItem = document.getElementById('user-nav-item');
+                const cartNavItem = document.getElementById('cart-nav-item');
+                const usernameDisplay = document.getElementById('username-display');
+
+                if (isLoggedIn()) {
+                    authNavItem.classList.add('d-none');
+                    userNavItem.classList.remove('d-none');
+                    cartNavItem.classList.remove('d-none');
+                    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                    if (usernameDisplay) {
+                        usernameDisplay.textContent = userInfo.name || 'Người dùng';
+                    }
+                } else {
+                    authNavItem.classList.remove('d-none');
+                    userNavItem.classList.add('d-none');
+                    cartNavItem.classList.add('d-none');
+                }
+                updateCartCount();
+            }
+        }
+    </script>
+</body>
+
+</html>

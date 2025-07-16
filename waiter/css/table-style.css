@@ -1,0 +1,663 @@
+.table-stats-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+/* Tables Grid */
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Table Card Base */
+.table-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.table-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Status-specific border colors and backgrounds */
+.table-card.table-available {
+    border-color: var(--success);
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.table-card.table-occupied {
+    border-color: var(--info);
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.table-card.table-reserved {
+    border-color: var(--warning);
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+}
+
+/* Urgent status with subtle indication */
+.table-card.table-urgent {
+    border-color: var(--danger);
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+/* Status Indicator */
+.table-status-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.table-status-indicator .fa-check-circle {
+    color: #198754;
+}
+
+.table-status-indicator .fa-users {
+    color: var(--primary);
+}
+
+.table-status-indicator .fa-clock {
+    color: var(--warning);
+}
+
+/* Table Content */
+.table-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.table-status {
+    margin-bottom: 1.5rem;
+}
+
+/* Status Badge */
+.status-badge {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid;
+    display: inline-block;
+}
+
+.status-badge.status-available {
+    background-color: #dcfce7;
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.status-badge.status-occupied {
+    background-color: #dbeafe;
+    color: var(--info);
+    border-color: var(--info);
+}
+
+.status-badge.status-reserved {
+    background-color: #fef3c7;
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+/* Urgent Badge */
+.urgent-badge {
+    background-color: #fee2e2;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+
+/* Table Info and Actions Container */
+.table-info-actions-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.table-info {
+    flex: 1;
+}
+
+.table-info small {
+    color: #6b7280;
+    font-size: 0.875rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.table-qr,
+.table-customers {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.table-actions .btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 36px;
+}
+
+.table-actions .btn:hover {
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.table-actions .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Color Variants */
+.table-actions .btn-outline-success {
+    color: #059669;
+    border-color: #059669;
+    background-color: white;
+}
+
+.table-actions .btn-outline-success:hover{
+    background-color: #059669;
+}
+
+.table-actions .btn-outline-info {
+    color: #0891b2;
+    border-color: #0891b2;
+    background-color: white;
+}
+
+.table-actions .btn-outline-info:hover{
+    background-color: #0891b2;
+}
+
+.table-actions .btn-outline-primary {
+    color: #7c3aed;
+    border-color: #7c3aed;
+    background-color: white;
+}
+
+.table-actions .btn-outline-primary:hover{
+    background-color: #7c3aed;
+}
+
+.table-actions .btn-outline-warning {
+    color: #ea580c;
+    border-color: #ea580c;
+    background-color: white;
+}
+
+.table-actions .btn-outline-warning:hover{
+    background-color: #ea580c;
+}
+
+.table-actions .btn-outline-danger {
+    color: #ef4444;
+    border-color: #ef4444;
+    background-color: white;
+}
+
+.table-actions .btn-outline-danger:hover{
+    background-color: #ef4444;
+}
+
+.table-actions .btn i {
+    font-size: 0.875rem;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Large screens - show button text */
+@media (min-width: 992px) {
+    .table-actions .btn {
+        min-width: auto;
+        gap: 0.375rem;
+    }
+}
+
+/* Tablet screens */
+@media (max-width: 768px) {
+    /* Mobile responsive for info-actions container */
+    .table-info-actions-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .table-actions {
+        justify-content: center;
+    }
+
+    /* Circular buttons on mobile */
+    .table-actions .btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        min-width: 40px;
+    }
+}
+
+/* Small mobile screens */
+@media (max-width: 576px) {
+    /* Very small screen button adjustments */
+    .table-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .table-actions .btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* ===== ACCESSIBILITY & PREFERENCES ===== */
+
+/* Touch-friendly interactions for mobile */
+@media (hover: none) and (pointer: coarse) {
+    .table-actions .btn:hover {
+        background-color: white;
+        color: currentColor;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .table-actions .btn:active {
+        background-color: currentColor;
+        color: white;
+        transform: scale(0.95);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .table-actions .btn {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion support - Remove all animations */
+@media (prefers-reduced-motion: reduce) {
+    .table-actions .btn {
+        transition: none;
+    }
+    
+    .table-actions .btn:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .table-actions .btn:active {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+/* Area Section */
+.area-section {
+    margin-bottom: 3rem;
+}
+
+.area-header {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    background: white;
+    margin-bottom: 2rem;
+}
+
+.area-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.area-count {
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.area-stats-badges {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.area-stats-badges .badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Table Overlay Effect */
+.table-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.table-card:hover .table-overlay {
+    opacity: 1;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Large screens - show button text */
+@media (min-width: 992px) {
+    .table-action-btn {
+        min-width: auto;
+        padding: 0.5rem 1rem;
+    }
+    
+    .table-action-btn .btn-text {
+        display: inline;
+    }
+}
+
+/* Medium screens */
+@media (max-width: 1200px) {
+    .table-stats-cards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+
+    .tables-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .table-stats-cards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .tables-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .area-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .area-stats-badges {
+        justify-content: center;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .stats-label {
+        font-size: 0.85rem;
+    }
+    
+    .card-body {
+        padding: 1rem 0.75rem;
+    }
+}
+
+/* Tablet screens */
+@media (max-width: 768px) {
+    /* Change to 2x2 grid on tablets */
+    .table-stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem 1rem;
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+    }
+
+    .stats-label {
+        font-size: 0.9rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+
+    .tables-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .table-card {
+        padding: 1rem;
+        border-width: 1.5px;
+        border-radius: 10px;
+    }
+
+    .table-number {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .table-status-indicator {
+        font-size: 1rem;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+
+    /* Mobile responsive for info-actions container */
+    .table-info-actions-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .table-actions {
+        justify-content: center;
+    }
+
+    /* Circular buttons on mobile */
+    .table-action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        min-width: 40px;
+    }
+
+    .table-action-btn .btn-text {
+        display: none;
+    }
+
+    .table-qr,
+    .table-customers {
+        font-size: 0.8rem;
+    }
+
+    .area-header {
+        padding: 1rem;
+        border-width: 1.5px;
+    }
+
+    .area-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .area-count {
+        font-size: 0.85rem;
+    }
+
+    .area-stats-badges .badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Small mobile screens */
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+
+    .table-stats-cards {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-header {
+        padding: 1rem;
+    }
+
+    .tables-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .table-card {
+        border-radius: 12px;
+        border-width: 1.5px;
+    }
+
+    .area-header {
+        border-radius: 12px;
+    }
+
+    /* Very small screen button adjustments */
+    .table-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .table-action-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .urgent-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+/* ===== ACCESSIBILITY & PREFERENCES ===== */
+
+/* Touch-friendly interactions for mobile */
+@media (hover: none) and (pointer: coarse) {
+    .table-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .table-card:active {
+        transform: scale(0.98);
+    }
+
+    .table-action-btn:hover {
+        transform: none;
+        box-shadow: none;
+        background: white;
+        color: currentColor;
+    }
+
+    .table-action-btn:active {
+        transform: scale(0.95);
+        background-color: currentColor;
+        color: white;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .table-card {
+        border-width: 3px;
+    }
+
+    .status-badge {
+        border-width: 2px;
+    }
+
+    .table-action-btn {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support - Remove all animations */
+@media (prefers-reduced-motion: reduce) {
+    .table-card,
+    .table-action-btn,
+    .table-overlay {
+        transition: none;
+    }
+
+    .table-action-btn:hover {
+        transform: none;
+    }
+
+    .table-action-btn:active {
+        transform: none;
+    }
+
+    .table-card:hover .table-overlay {
+        opacity: 0;
+    }
+}

@@ -9,84 +9,67 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!-- Shared CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
+    <!-- Chat JS -->
+    <script src="../js/chat.js"></script>
+    <!-- Page-specific CSS -->
     <style>
-        :root {
-            --dark-green: #02052f;
-            --gold: #D4A017;
-            --light-gold: #F7E6A3;
-            --light-gray: #f8f9fa;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--light-gray);
-        }
-
-        .navbar {
-            background-color: var(--dark-green);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gold) !important;
-        }
-
-        .nav-link {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            color: var(--light-gold) !important;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--gold) !important;
-        }
-
-        .btn-login {
-            background-color: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            padding: 8px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-login:hover {
-            background-color: var(--gold);
-            color: var(--dark-green);
-        }
-
         .hero {
-            background: linear-gradient(rgba(26, 60, 52, 0.8), rgba(26, 60, 52, 0.8)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0');
-            background-size: cover;
-            background-position: center;
-            height: 50vh;
+            background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
+            height: 60vh;
             display: flex;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            color: white;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            z-index: 1;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 2;
         }
 
         .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #F7E6A3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
         }
 
         .hero p {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            color: var(--light-gold);
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s;
+            animation-fill-mode: both;
         }
 
         .section-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Montserrat', sans-serif;
             color: var(--dark-green);
             font-size: 2.5rem;
             font-weight: 700;
@@ -101,53 +84,89 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
-        .menu-nav {
+        .menu-layout {
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
-        .menu-nav .btn {
+        .menu-sidebar {
+            flex: 0 0 250px;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .menu-sidebar h4 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--dark-green);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .search-box {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--dark-green);
+            border-radius: 25px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .category-btn {
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 1rem;
-            padding: 10px 20px;
-            margin: 0.3rem;
+            font-size: 0.9rem;
+            padding: 12px 20px;
             border: 2px solid var(--dark-green);
             border-radius: 25px;
             color: var(--dark-green);
             background-color: transparent;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-nav .btn:hover {
-            background-color: var(--dark-green);
-            color: var(--gold);
-            transform: translateY(-2px);
-        }
-
-        .menu-nav .btn.active {
-            background-color: var(--dark-green);
-            color: var(--gold);
-            box-shadow: 0 4px 10px rgba(0, 0,0.2);
-        }
-
-        .menu-nav .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+            cursor: pointer;
+            text-align: left;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
         }
 
-        .menu-nav .btn:hover::after {
-            left: 100%;
+        .category-btn:hover {
+            background-color: var(--dark-green);
+            color: var(--gold);
+            transform: translateX(5px);
+        }
+
+        .category-btn.active {
+            background-color: var(--dark-green);
+            color: var(--gold);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-main {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .menu-content {
@@ -155,136 +174,193 @@
         }
 
         .menu-content.active {
-            display: flex;
-            justify-content: center;
+            display: block;
         }
 
-        .menu-items-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding: 1rem 0;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .menu-items-container::-webkit-scroll {
-            height: 8px;
-        }
-
-        .menu-items-container::-webkit-scroll::-webkit-scroll-track {
-            background: #f1f1f1 color;
-            border-radius: 10px;
-        }
-
-        .menu-items-container::-webkit-scroll::-webkit-scroll-thumb {
-            background: var(--gold);
-            border-radius: 5px;
-        }
-
-        .menu-items-container::-webkit-scroll::-webkit-scroll-thumb:hover {
-            background: var(--dark-green);
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .menu-card {
-            background: linear-gradient(145deg, #ffffff, #f8f9faf8);
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
             border: none;
             border-radius: 15px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 250px;
-            min-width: 250px;
-            margin: 0 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in;
             display: flex;
             flex-direction: column;
-            animation: fadeIn 0.5s ease-in;
+            height: 100%;
+            min-height: 450px;
+            position: relative;
         }
 
         .menu-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .menu-card img {
-            height: 150px;
+            height: 200px;
             object-fit: cover;
             width: 100%;
             border-bottom: 3px solid var(--gold);
         }
 
+        .menu-card .view-details-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(26, 60, 52, 0.8);
+            color: var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-card:hover .view-details-btn {
+            opacity: 1;
+        }
+
         .menu-card .card-body {
-            padding: 15px;
+            padding: 1.5rem;
             text-align: center;
-            flex-grow: 1;
             display: flex;
             flex-direction: column;
+            flex-grow: 1;
             justify-content: space-between;
         }
 
         .menu-card .card-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Montserrat', sans-serif;
             color: var(--dark-green);
             font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
-        .menu-card .menu-card-text {
+        .menu-card .card-text {
             font-family: 'Montserrat', sans-serif;
             color: #555;
             font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
             flex-grow: 1;
-            margin-bottom: 0.5rem;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
         }
 
-        .menu-card .menu-card-price {
+        .menu-card .card-price {
             font-family: 'Montserrat', sans-serif;
             color: var(--gold);
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .menu-card .badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .btn-order,
+        .btn-add-to-cart {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 0 5px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-order {
+            background-color: #1a3c34;
+            color: white;
+            border: 2px solid #1a3c34;
+        }
+
+        .btn-order:hover {
+            background-color: var(--gold);
+            color: #1a3c34;
+            border-color: var(--gold);
+        }
+
+        .btn-order:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #1a3c34;
+            border-color: #1a3c34;
+            color: white;
+        }
+
+        .btn-add-to-cart {
+            background-color: transparent;
+            color: var(--dark-green);
+            border: 2px solid var(--dark-green);
+        }
+
+        .btn-add-to-cart:hover {
+            background-color: var(--dark-green);
+            color: white;
+        }
+
+        .btn-add-to-cart:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: transparent;
+            color: var(--dark-green);
+            border-color: var(--dark-green);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--dark-green);
+            background: white;
+            color: var(--dark-green);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: var(--dark-green);
+            color: white;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
             background-color: var(--gold);
             color: var(--dark-green);
+            border-color: var(--gold);
+        }
+
+        .pagination-info {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--dark-green);
             font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        .footer {
-            background-color: var(--dark-green);
-            color: var(--light-gold);
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .footer a {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--gold);
-            text-decoration: none;
-            margin: 0 1rem;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            color: var(--light-gold);
-        }
-
-        .footer .contact-info {
-            font-family: 'Montserrat', sans-serif;
-            margin-top: 1rem;
         }
 
         .loading-spinner {
@@ -301,175 +377,609 @@
             color: #ff0000;
         }
 
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--dark-green);
+        }
+
+        .no-results h4 {
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 1rem;
+        }
+
+        .no-results p {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Modal Popup Styles */
+        .modal-notification .modal-dialog {
+            max-width: 400px;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            margin: 0;
+        }
+
+        .modal-notification .modal-content {
+            border-radius: 10px;
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .modal-notification .modal-body {
+            padding: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .modal-notification .modal-body a {
+            color: #15803d;
+            text-decoration: none;
+        }
+
+        .modal-notification .modal-body a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-notification {
+            z-index: 1055;
+        }
+
+        /* Item Details Modal Styles */
+        .modal-item-details .modal-dialog {
+            max-width: 500px;
+        }
+
+        .modal-item-details .modal-content {
+            border-radius: 15px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-item-details .modal-header {
+            background-color: var(--dark-green);
+            color: var(--gold);
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-item-details .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-item-details .modal-body {
+            padding: 2rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .modal-item-details .modal-body img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .item-description {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .item-price {
+            color: var(--gold);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-item-details .modal-body .quantity-selector input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid var(--dark-green);
+            border-radius: 10px;
+            padding: 5px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .modal-item-details .modal-body .quantity-selector button {
+            background-color: var(--dark-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-item-details .modal-body .quantity-selector button:hover {
+            background-color: var(--gold);
+            color: var(--dark-green);
+        }
+
+        .modal-item-details .modal-footer {
+            border-top: none;
+            padding: 1rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Chat Window Styles */
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 380px;
+            height: 550px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            z-index: 1060;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .chat-container.show {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .chat-container.hidden {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .chat-header {
+            background: #FEA116;
+            color: var(--dark-green);
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: var(--dark-green);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f5f5f5;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #FEA116;
+            color: var(--dark-green);
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .bot ul, .bot ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .bot li {
+            margin-bottom: 6px;
+        }
+
+        .bot strong {
+            color: #FEA116;
+            font-weight: 600;
+        }
+
+        .bot code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bot pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #FEA116;
+            box-shadow: 0 0 0 2px rgba(254, 161, 22, 0.2);
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #e69114;
+        }
+
+        button.clear-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.clear-btn:hover {
+            background: #d0d0d0;
+        }
+
+        #chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #FEA116;
+            color: var(--dark-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1060;
+        }
+
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 992px) {
+            .menu-layout {
+                flex-direction: column;
             }
-            to {
-                opacity: 1;
-                transform: none;
+
+            .menu-sidebar {
+                flex: none;
+                position: static;
+                margin-bottom: 1rem;
+            }
+
+            .category-list {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .category-btn {
+                min-width: 150px;
+                text-align: center;
             }
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 0.9rem; }
+            .section-title { font-size: 2rem; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .menu-card img { height: 150px; }
+            .modal-notification .modal-dialog {
+                max-width: 90%;
+                right: 10px;
+                top: 10px;
             }
-
-            .hero p {
-                font-size: 0.9rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .menu-nav .btn {
-                font-size: 0.9rem;
-                padding: 8px 15px;
-                margin: 0.2rem;
-            }
-
-            .menu-card {
-                width: 200px;
-                min-width: 200px;
-                margin: 0 10px;
-            }
-
-            .menu-card .card-title {
-                font-size: 1.2rem;
-            }
-
-            .menu-card .menu-card-text {
-                font-size: 0.85rem;
-            }
-
-            .menu-card .menu-card-price {
-                font-size: 1rem;
-            }
-
-            .menu-card img {
-                height: 120px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .menu-nav {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .menu-nav .btn {
-                width: 80%;
-                margin-bottom: 0.5rem;
-            }
-
-            .menu-card {
-                width: 180px;
-                min-width: 180px;
-                margin: 0 8px;
+            .modal-item-details .modal-dialog { max-width: 90%; }
+            .modal-item-details .modal-body img { height: 200px; }
+            .chat-container {
+                width: 90%;
+                height: 70vh;
+                right: 10px;
+                bottom: 70px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <!-- Thanh Điều Hướng -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
-            <a class="navbar-brand" href="index.html">FoodHub</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+                <i class="fa fa-utensils"></i>
+                <span>FoodHub</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="home.html">Home</a>
+                        <a class="nav-link" href="home.html">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="menu.html">Menu</a>
+                        <a class="nav-link active" href="menu.html">Thực Đơn</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#about">About</a>
+                        <a class="nav-link" href="about.html">Giới Thiệu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#contact">Contact</a>
+                        <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-login" href="login.html">Login</a>
+                    <!-- Đăng nhập (hiện khi chưa login) -->
+                    <li class="nav-item" id="auth-nav-item">
+                        <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
+                    </li>
+                    <!-- User đã login -->
+                    <li class="nav-item" id="user-nav-item">
+                        <div class="user-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span id="username-display"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Giỏ hàng -->
+                    <li class="nav-item" id="cart-nav-item">
+                        <a class="nav-link cart-icon" href="cart.html">
+                            <i class="bi bi-cart"></i>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="menu-hero" class="hero">
+    <!-- Modal Popup cho thông báo -->
+    <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-notification">
+            <div class="modal-content">
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Item Details -->
+    <div class="modal fade modal-item-details" id="itemDetailsModal" tabindex="-1" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-item-details">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="itemDetailsModalLabel">Chi Tiết Món Ăn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="itemDetailsImage" src="" alt="Item Image" class="img-fluid">
+                    <h5 id="itemDetailsName" class="card-title"></h5>
+                    <p id="itemDetailsDescription" class="item-description"></p>
+                    <p id="itemDetailsPrice" class="item-price"></p>
+                    <div class="quantity-selector">
+                        <button onclick="try { updateQuantity(-1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">-</button>
+                        <input type="number" id="itemQuantity" value="1" min="1" max="100">
+                        <button onclick="try { updateQuantity(1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">+</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-add-to-cart" onclick="try { addItemToCart(); } catch(e) { console.error('Error adding to cart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                    <button class="btn btn-order" onclick="try { orderItemNow(); } catch(e) { console.error('Error ordering item:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
+
+    <!-- Chat Window -->
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <span>FoodHub Chat</span>
+            <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="if(event.key === 'Enter') try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }" />
+            <button onclick="try { sendMessage(); } catch(e) { console.error('Error sending message:', e); showNotification('Lỗi khi gửi tin nhắn: ' + e.message); }">Gửi</button>
+            <button class="clear-btn" onclick="try { clearChatHistory(); } catch(e) { console.error('Error clearing chat:', e); showNotification('Lỗi khi xóa chat: ' + e.message); }">Xóa</button>
+        </div>
+    </div>
+
+    <!-- Phần Chào Mừng -->
+    <section class="hero">
         <div class="container">
-            <h1>Our Menu</h1>
-            <p>Explore our delicious offerings, crafted with passion and the finest ingredients.</p>
+            <h1>Thực Đơn</h1>
+            <p>Khám phá các món ăn ngon, được chế biến từ nguyên liệu tươi ngon với sự tận tâm.</p>
         </div>
     </section>
 
-    <!-- Menu Section -->
+    <!-- Phần Thực Đơn -->
     <section id="menu" class="menu-section py-5">
         <div class="container">
-            <h2 class="section-title">Explore Our Menu</h2>
-            <div class="menu-nav text-center mb-4" id="category-nav">
-                <div class="loading-spinner">Loading categories...</div>
-            </div>
-            <div id="menu-contents">
-                <!-- Menu content divs will be dynamically inserted here -->
+            <h2 class="section-title">Khám Phá Thực Đơn</h2>
+            <div class="menu-layout">
+                <!-- Sidebar -->
+                <div class="menu-sidebar">
+                    <h4>Danh Mục</h4>
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Tìm kiếm món ăn..." onkeyup="try { handleSearch(); } catch(e) { console.error('Error searching:', e); showNotification('Lỗi khi tìm kiếm: ' + e.message); }">
+                    </div>
+                    <!-- Category List -->
+                    <div class="category-list" id="category-list">
+                        <div class="loading-spinner">Đang tải...</div>
+                    </div>
+                </div>
+                <!-- Main Content -->
+                <div class="menu-main">
+                    <div id="menu-contents">
+                        <!-- Menu items will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Chân Trang -->
     <footer id="contact" class="footer">
         <div class="container">
-            <h3 style="font-family: 'Playfair Display', serif; color: var(--gold);">FoodHub</h3>
-            <p class="contact-info">1 FPT | Phone: (123) 456-7890 | Email: info@foodhub.com</p>
+            <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
+            <p class="contact-info">1 FPT | Điện thoại: (123) 456-7890 | Email: info@foodhub.com</p>
             <div>
                 <a href="#">Facebook</a>
                 <a href="#">Instagram</a>
                 <a href="#">Twitter</a>
-                <a href="#">Reservation</a>
             </div>
-            <p class="mt-3">© 2025 FoodHub. All rights reserved.</p>
+            <p class="mt-3">© 2025 FoodHub. Bản quyền đã được bảo hộ.</p>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
+    <!-- Shared JS -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/notification.js"></script>
+    <!-- Page-specific JS -->
     <script>
-        // API base URL (adjust this to match your backend)
-        const API_BASE_URL = 'http://localhost:8080';
+        // Global variables
+        let menuItemsCache = {};
+        let allMenuItems = [];
+        let currentCategory = 'all';
+        let currentPage = 0;
+        let totalPages = 0;
+        const itemsPerPage = 8;
+        let isSearching = false;
+        let searchResults = [];
+        let selectedItem = null;
 
-        // Function to show/hide categories
-        function showCategory(categoryId) {
-            document.querySelectorAll('.menu-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            const contentElement = document.getElementById(`category-${categoryId}`);
-            if (contentElement) {
-                contentElement.classList.add('active');
-            }
-
-            document.querySelectorAll('.menu-nav .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const activeButton = document.querySelector(`.menu-nav .btn[data-category-id="${categoryId}"]`);
-            if (activeButton) {
-                activeButton.classList.add('active');
+        // Update cart badge
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cart-count').textContent = totalItems;
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+                document.getElementById('cart-count').textContent = '0';
             }
         }
 
-        // Function to fetch categories and create navigation
+        // Show category function
+        function showCategory(categoryId) {
+            try {
+                document.querySelectorAll('.menu-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                const contentElement = document.getElementById(`category-${categoryId}`);
+                if (contentElement) {
+                    contentElement.classList.add('active');
+                }
+
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                const activeButton = document.querySelector(`.category-btn[data-category-id="${categoryId}"]`);
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error in showCategory:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi hiển thị danh mục: ' + error.message);
+                }
+            }
+        }
+
+        // Fetch categories
         async function fetchCategories() {
-            const navContainer = document.getElementById('category-nav');
+            const categoryContainer = document.getElementById('category-list');
             const contentContainer = document.getElementById('menu-contents');
-            navContainer.innerHTML = '<div class="loading-spinner">Loading categories...</div>';
 
             try {
                 const response = await fetch(`${API_BASE_URL}/categories`);
@@ -477,91 +987,413 @@
                     throw new Error('Failed to fetch categories');
                 }
                 const data = await response.json();
-                const categories = data.result || data; // Handle ApiResponse wrapper if present
+                const categories = data.result || data;
+
                 if (!Array.isArray(categories)) {
                     throw new Error('Invalid category data format');
                 }
 
-                // Clear loading spinner
-                navContainer.innerHTML = '';
+                // Create category buttons
+                categoryContainer.innerHTML = '';
                 contentContainer.innerHTML = '';
 
-                // Create category buttons and content divs
-                categories.forEach((category, index) => {
-                    const safeCategoryId = `cat-${category.id}`; // Ensure safe ID for DOM
-                    // Add button
-                    navContainer.innerHTML += `
-                        <button class="btn ${index === 0 ? 'active' : ''}" data-category-id="${category.id}" onclick="fetchMenuItems(${category.id}, '${safeCategoryId}')">
+                // Add "View All" button
+                categoryContainer.innerHTML += `
+                    <button class="category-btn active" data-category-id="all" onclick="try { selectCategory('all'); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
+                        Xem Tất Cả
+                    </button>
+                `;
+
+                categories.forEach(category => {
+                    categoryContainer.innerHTML += `
+                        <button class="category-btn" data-category-id="${category.id}" onclick="try { selectCategory(${category.id}); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
                             ${category.name}
                         </button>
                     `;
-                    // Add content div
+                });
+
+                // Create content containers
+                contentContainer.innerHTML = `
+                    <div id="category-all" class="menu-content active">
+                        <div class="loading-spinner">Đang tải...</div>
+                    </div>
+                `;
+
+                categories.forEach(category => {
                     contentContainer.innerHTML += `
-                        <div id="category-${category.id}" class="menu-content ${index === 0 ? 'active' : ''}">
-                            <div class="loading-spinner">Loading...</div>
+                        <div id="category-${category.id}" class="menu-content">
+                            <div class="loading-spinner">Đang tải...</div>
                         </div>
                     `;
                 });
 
-                // Fetch items for the first category
-                if (categories.length > 0) {
-                    fetchMenuItems(categories[0].id, `cat-${categories[0].id}`);
-                }
+                // Load all items initially
+                await fetchAllMenuItems();
             } catch (error) {
                 console.error('Error fetching categories:', error);
-                navContainer.innerHTML = '<div class="error-message">Failed to load categories. Please try again later.</div>';
+                categoryContainer.innerHTML = '<div class="error-message">Không thể tải danh mục.</div>';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tải danh mục: ' + error.message);
+                }
             }
         }
 
-        // Function to fetch menu items for a category
-        async function fetchMenuItems(categoryId, safeCategoryId) {
-            showCategory(categoryId);
+        // Fetch all menu items
+        async function fetchAllMenuItems() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/menu-items?page=0&size=1000&sortBy=name&sortDirection=asc`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch menu items');
+                }
+                const data = await response.json();
+                allMenuItems = data.result.content.filter(item => item.status === 'AVAILABLE');
+
+                displayMenuItems(allMenuItems, 'all');
+            } catch (error) {
+                console.error('Error fetching all menu items:', error);
+                const container = document.getElementById('category-all');
+                if (container) {
+                    container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
+                }
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tải món ăn: ' + error.message);
+                }
+            }
+        }
+
+        // Select category
+        async function selectCategory(categoryId) {
+            try {
+                currentCategory = categoryId;
+                currentPage = 0;
+                isSearching = false;
+                document.getElementById('search-input').value = '';
+
+                showCategory(categoryId);
+
+                if (categoryId === 'all') {
+                    displayMenuItems(allMenuItems, categoryId);
+                } else {
+                    await fetchMenuItems(categoryId);
+                }
+            } catch (error) {
+                console.error('Error in selectCategory:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi chọn danh mục: ' + error.message);
+                }
+            }
+        }
+
+        // Fetch menu items by category
+        async function fetchMenuItems(categoryId) {
             const container = document.getElementById(`category-${categoryId}`);
             if (!container) return;
 
-            container.innerHTML = '<div class="loading-spinner">Loading...</div>';
+            container.innerHTML = '<div class="loading-spinner">Đang tải...</div>';
 
             try {
-                const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=10&sortBy=name&sortDirection=asc`);
+                const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=1000&sortBy=name&sortDirection=asc`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                const menuItems = data.result.content; // Access the content array from the Page object
+                const menuItems = data.result.content.filter(item => item.status === 'AVAILABLE');
 
-                if (menuItems.length === 0) {
-                    container.innerHTML = '<div class="error-message">No items found for this category.</div>';
-                    return;
-                }
-
-                // Render menu items
-                container.innerHTML = '<div class="menu-items-container">';
-                menuItems.forEach(item => {
-                    const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Price not available';
-                    const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
-                    if (item.status === 'AVAILABLE') {
-                        container.innerHTML += `
-                            <div class="menu-card">
-                                <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
-                                <div class="card-body">
-                                    <span class="badge">Available</span>
-                                    <h5 class="card-title">${item.name}</h5>
-                                    <p class="card-text">${item.description || 'No description available.'}</p>
-                                    <p class="card-price">${price}</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                container.innerHTML += '</div>';
+                menuItemsCache[categoryId] = menuItems;
+                displayMenuItems(menuItems, categoryId);
             } catch (error) {
                 console.error('Error fetching menu items:', error);
-                container.innerHTML = '<div class="error-message">Failed to load menu items. Please try again later.</div>';
+                container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tải món ăn: ' + error.message);
+                }
             }
         }
 
-        // Fetch categories on page load
-        document.addEventListener('DOMContentLoaded', fetchCategories);
+        // Display menu items with pagination
+        function displayMenuItems(items, categoryId) {
+            try {
+                const container = document.getElementById(`category-${categoryId}`);
+                if (!container) return;
+
+                if (items.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <h4>Không tìm thấy món ăn</h4>
+                            <p>Vui lòng thử tìm kiếm với từ khóa khác.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                totalPages = Math.ceil(items.length / itemsPerPage);
+                const startIndex = currentPage * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const currentItems = items.slice(startIndex, endIndex);
+
+                const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : false;
+                let html = '<div class="menu-grid">';
+
+                currentItems.forEach((item, index) => {
+                    const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
+                    const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+                    window.menuItems = window.menuItems || [];
+                    window.menuItems[index] = item;
+
+                    html += `
+                        <div class="menu-card">
+                            <div style="position: relative;">
+                                <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                                <button class="view-details-btn" onclick="try { showItemDetails(window.menuItems[${index}]); } catch(e) { console.error('Error showing item details:', e); showNotification('Lỗi khi hiển thị chi tiết món: ' + e.message); }">Xem Chi Tiết</button>
+                            </div>
+                            <div class="card-body">
+                                <span class="badge">Có sẵn</span>
+                                <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
+                                <p class="card-price">${price}</p>
+                                ${loggedIn ? `
+                                    <div>
+                                        <button class="btn btn-order" onclick="try { orderItem(window.menuItems[${index}]); } catch(e) { console.error('Error in orderItem:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt món</button>
+                                        <button class="btn btn-add-to-cart" onclick="try { addToCart(window.menuItems[${index}]); } catch(e) { console.error('Error in addToCart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                // Add pagination
+                if (totalPages > 1) {
+                    html += createPaginationHTML();
+                }
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error in displayMenuItems:', error);
+                container.innerHTML = '<div class="error-message">Lỗi hiển thị món ăn.</div>';
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi hiển thị món ăn: ' + error.message);
+                }
+            }
+        }
+
+        // Create pagination HTML
+        function createPaginationHTML() {
+            let paginationHTML = '<div class="pagination-container">';
+
+            // Previous button
+            paginationHTML += `
+                <button class="pagination-btn" onclick="try { changePage(${currentPage - 1}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }" ${currentPage === 0 ? 'disabled' : ''}>
+                    <i class="bi bi-chevron-left"></i> Trước
+                </button>
+            `;
+
+            // Page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(0, endPage - maxVisiblePages + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="try { changePage(${i}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }">
+                        ${i + 1}
+                    </button>
+                `;
+            }
+
+            // Next button
+            paginationHTML += `
+                <button class="pagination-btn" onclick="try { changePage(${currentPage + 1}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
+                    Sau <i class="bi bi-chevron-right"></i>
+                </button>
+            `;
+
+            // Page info
+            paginationHTML += `
+                <div class="pagination-info">
+                    Trang ${currentPage + 1} / ${totalPages}
+                </div>
+            `;
+
+            paginationHTML += '</div>';
+            return paginationHTML;
+        }
+
+        // Change page
+        function changePage(page) {
+            try {
+                if (page < 0 || page >= totalPages) return;
+
+                currentPage = page;
+
+                if (isSearching) {
+                    displayMenuItems(searchResults, currentCategory);
+                } else if (currentCategory === 'all') {
+                    displayMenuItems(allMenuItems, currentCategory);
+                } else {
+                    displayMenuItems(menuItemsCache[currentCategory] || [], currentCategory);
+                }
+            } catch (error) {
+                console.error('Error in changePage:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi chuyển trang: ' + error.message);
+                }
+            }
+        }
+
+        // Search functionality
+        function handleSearch() {
+            try {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+                currentPage = 0;
+
+                if (searchTerm === '') {
+                    isSearching = false;
+                    if (currentCategory === 'all') {
+                        displayMenuItems(allMenuItems, currentCategory);
+                    } else {
+                        displayMenuItems(menuItemsCache[currentCategory] || [], currentCategory);
+                    }
+                    return;
+                }
+
+                isSearching = true;
+                let itemsToSearch = [];
+
+                if (currentCategory === 'all') {
+                    itemsToSearch = allMenuItems;
+                } else {
+                    itemsToSearch = menuItemsCache[currentCategory] || [];
+                }
+
+                searchResults = itemsToSearch.filter(item =>
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    (item.description && item.description.toLowerCase().includes(searchTerm))
+                );
+
+                displayMenuItems(searchResults, currentCategory);
+            } catch (error) {
+                console.error('Error in handleSearch:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi tìm kiếm: ' + error.message);
+                }
+            }
+        }
+
+        // Show item details modal
+        function showItemDetails(item) {
+            try {
+                selectedItem = item;
+                const modal = new bootstrap.Modal(document.getElementById('itemDetailsModal'));
+                document.getElementById('itemDetailsImage').src = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+                document.getElementById('itemDetailsName').textContent = item.name;
+                document.getElementById('itemDetailsDescription').textContent = item.description || 'Chưa có mô tả.';
+                document.getElementById('itemDetailsPrice').textContent = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
+                document.getElementById('itemQuantity').value = 1;
+                modal.show();
+            } catch (error) {
+                console.error('Error in showItemDetails:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi hiển thị chi tiết món ăn: ' + error.message);
+                }
+            }
+        }
+
+        // Update quantity
+        function updateQuantity(change) {
+            try {
+                const input = document.getElementById('itemQuantity');
+                let quantity = parseInt(input.value) + change;
+                if (quantity < 1) quantity = 1;
+                if (quantity > 100) quantity = 100;
+                input.value = quantity;
+            } catch (error) {
+                console.error('Error in updateQuantity:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi cập nhật số lượng: ' + error.message);
+                }
+            }
+        }
+
+        // Add item to cart from modal
+        function addItemToCart() {
+            try {
+                if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+                    showNotification('Vui lòng đăng nhập để thêm món vào giỏ hàng.');
+                    return;
+                }
+                const quantity = parseInt(document.getElementById('itemQuantity').value);
+                if (!selectedItem) {
+                    showNotification('Không có món ăn được chọn.');
+                    return;
+                }
+                const item = { ...selectedItem, quantity };
+                if (typeof addToCart !== 'function') {
+                    throw new Error('addToCart function is not defined');
+                }
+                addToCart(item);
+                updateCartBadge();
+                bootstrap.Modal.getInstance(document.getElementById('itemDetailsModal')).hide();
+                showNotification(`${item.name} đã được thêm vào giỏ hàng!`);
+            } catch (error) {
+                console.error('Error in addItemToCart:', error);
+                showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng: ' + error.message);
+            }
+        }
+
+        // Order item now from modal
+        function orderItemNow() {
+            try {
+                if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+                    showNotification('Vui lòng đăng nhập để đặt món.');
+                    return;
+                }
+                const quantity = parseInt(document.getElementById('itemQuantity').value);
+                if (!selectedItem) {
+                    showNotification('Không có món ăn được chọn.');
+                    return;
+                }
+                const item = { ...selectedItem, quantity };
+                if (typeof orderItem !== 'function') {
+                    throw new Error('orderItem function is not defined');
+                }
+                orderItem(item);
+                localStorage.setItem('orderItem', JSON.stringify(item));
+                bootstrap.Modal.getInstance(document.getElementById('itemDetailsModal')).hide();
+                showNotification(`${item.name} đã được thêm vào đơn hàng!`);
+                window.location.href = 'checkout.html';
+            } catch (error) {
+                console.error('Error in orderItemNow:', error);
+                showNotification('Có lỗi xảy ra khi đặt món: ' + error.message);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (typeof updateUI === 'function') updateUI();
+                fetchCategories();
+                if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
+                    fetchUserOrders().then(() => startPolling());
+                }
+                if (typeof initializeWebSocket === 'function') initializeWebSocket();
+                if (typeof loadChatHistory === 'function') loadChatHistory();
+                const chatToggle = document.getElementById('chat-toggle');
+                if (chatToggle) chatToggle.style.display = 'flex';
+                updateCartBadge();
+            } catch (error) {
+                console.error('Error in DOMContentLoaded:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
+                }
+            }
+        });
     </script>
 </body>
 </html>

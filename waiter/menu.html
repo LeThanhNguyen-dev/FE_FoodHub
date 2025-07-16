@@ -20,32 +20,15 @@
                         <!-- Categories sẽ được load động -->
                     </select>
 
-                    <input type="text" id="keywordFilter" placeholder="Tìm kiếm món ăn...">
+                    <div class="search-input-container">
+                        <input type="text" id="keywordFilter" placeholder="Tìm kiếm món ăn...">
+                        <i class="fas fa-search"></i>
+                    </div>
 
-                    <select id="menuStatusFilter">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="AVAILABLE">Có sẵn</option>
-                        <option value="UNAVAILABLE">Hết hàng</option>
-                    </select>
-
-                    <select id="sortByMenuFilter">
-                        <option value="name">Tên món</option>
-                        <option value="price">Giá</option>
-                        <option value="createdAt">Ngày tạo</option>
-                    </select>
-
-                    <select id="sortDirectionMenuFilter">
-                        <option value="asc">Tăng dần</option>
-                        <option value="desc">Giảm dần</option>
-                    </select>
-
-                    <select id="pageSizeMenuFilter">
-                        <option value="10">10 món/trang</option>
-                        <option value="20">20 món/trang</option>
-                        <option value="50">50 món/trang</option>
-                    </select>
-
-                    <button onclick="applyMenuFilters()">Áp dụng</button>
+                    <button onclick="applyMenuFilters()">
+                        <i class="fas fa-search me-1"></i>
+                        Tìm kiếm
+                    </button>
                     <button onclick="resetFilters()">Đặt lại</button>
                 </div>
             </div>
@@ -61,104 +44,126 @@
                     <span id="paginationInfo">Hiển thị 0 - 0 của 0 món ăn</span>
                 </div>
                 <div class="pagination-controls">
-                    <button onclick="goToMenuPage(0)" id="firstPageBtn">Đầu</button>
-                    <button onclick="goToMenuPage(currentPage - 1)" id="prevPageBtn">Trước</button>
+                    <button onclick="goToMenuPage(currentMenuPage - 1)" id="prevPageBtn" title="Trang trước">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg>
+                    </button>
                     <span id="pageNumbers"></span>
-                    <button onclick="goToMenuPage(currentPage + 1)" id="nextPageBtn">Sau</button>
-                    <button onclick="goToMenuPage(totalPages - 1)" id="lastPageBtn">Cuối</button>
+                    <button onclick="goToMenuPage(currentMenuPage + 1)" id="nextPageBtn" title="Trang sau">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
     </template>
 
-    <!-- Template cho modal thêm vào giỏ hàng -->
-    <template id="addToCartModalTemplate">
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Thêm món vào giỏ hàng</h3>
-                    <button class="close-btn" onclick="closeModal()">×</button>
-                </div>
-                <div class="modal-body">
-                    <h4 id="modalItemName">[Tên món]</h4>
-                    <p id="modalItemPrice">Giá: [Giá]</p>
-                    <div class="quantity-selector">
-                        <label for="quantity">Số lượng:</label>
-                        <input type="number" id="quantity" min="1" value="1">
+
+    <template id="cartSidebarTemplate">
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <!-- Banner thông báo khi đang trong chế độ thêm món -->
+                <div class="add-items-banner" id="addItemsBanner" style="display: none;">
+                    <div class="banner-content">
+                        <span class="banner-icon">🍽️</span>
+                        <span class="banner-text">Order #<span id="currentOrderId"></span></span>
+                        <button class="btn btn-cancel-add-items" onclick="cancelAddItemsMode()">
+                            Hủy
+                        </button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-                    <button class="btn-add" id="addToCartBtn">Thêm vào giỏ</button>
+
+                <div class="order-type-section" id="orderTypeSection">
+                    <div class="order-type-options">
+                        <div class="order-type-option" onclick="selectOrderType('DINE_IN', this)">
+                            <div class="order-type-checkbox"></div>
+                            <span class="order-type-text">tại chỗ</span>
+                        </div>
+                        <div class="order-type-option" onclick="selectOrderType('TAKEAWAY', this)">
+                            <div class="order-type-checkbox"></div>
+                            <span class="order-type-text">Mang về</span>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Table Selection -->
+                <div class="table-selection" id="tableSelection" style="display: none;">
+                    <div class="table-dropdown">
+                        <button class="table-select-btn" onclick="toggleTableDropdown()">
+                            <span class="selected-table">Chọn bàn</span>
+                            <span class="arrow">▼</span>
+                        </button>
+                        <div class="table-dropdown-menu" id="tableDropdownMenu">
+                            <!-- Danh sách bàn sẽ được load động từ API -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clear All Section -->
+            <div class="clear-all-section">
+                <div class="clear-all-text">Danh sách món đã chọn</div>
+                <button class="clear-all-btn" onclick="clearCart()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                    Xóa tất cả
+                </button>
+            </div>
+
+            <div class="cart-body">
+                <div class="cart-items" id="cartItemsContainer">
+                    <!-- Cart items sẽ được thêm động -->
+                </div>
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="cart-footer">
+                <div class="total-section">
+                    <div class="total-label">Tổng cộng:</div>
+                    <div class="total-amount" id="totalAmount">0₫</div>
+                </div>
+                <button class="checkout-btn" onclick="handleCheckout()">
+                    <span id="checkoutBtnText">Đặt món ngay</span>
+                </button>
             </div>
         </div>
     </template>
 
-    <!-- Template cho modal giỏ hàng -->
-    <template id="cartModalTemplate">
-        <div class="modal-overlay">
-            <div class="modal-content cart-modal">
-                <div class="modal-header">
-                    <h3>Giỏ hàng</h3>
-                    <button class="close-btn" onclick="closeModal()">×</button>
+    <template id="confirmationPopupTemplate">
+        <div id="confirmationPopup" class="confirmation-popup-overlay">
+            <div class="confirmation-popup">
+                <div class="popup-header">
+                    <h3 class="popup-title"></h3>
+                    <button class="popup-close-btn" onclick="closeConfirmationPopup()">×</button>
                 </div>
-                <div class="modal-body">
-                    <div class="cart-items" id="cartItemsContainer">
-                        <!-- Cart items sẽ được thêm động -->
-                    </div>
-                    <div class="cart-summary">
-                        <div class="total-amount">
-                            <strong id="totalAmount">Tổng cộng: đ0</strong>
-                        </div>
-                    </div>
-                    <div class="order-info">
-                        <div class="order-type-selection">
-                            <label for="orderTypeSelect">Loại đơn hàng:</label>
-                            <select id="orderTypeSelect">
-                                <option value="">-- Chọn loại đơn hàng --</option>
-                                <option value="DINE_IN">Ăn tại chỗ</option>
-                                <option value="TAKEAWAY">Mang về</option>
-                                <option value="DELIVERY">Giao hàng</option>
-                            </select>
-                        </div>
-                        <div class="table-selection">
-                            <label for="tableSelect">Chọn bàn:</label>
-                            <select id="tableSelect">
-                                <option value="">-- Chọn bàn --</option>
-                                <!-- Table options sẽ được thêm động -->
-                            </select>
-                        </div>
-                        <div class="order-note">
-                            <label for="orderNote">Ghi chú đơn hàng:</label>
-                            <textarea id="orderNote" placeholder="Ghi chú cho toàn bộ đơn hàng..."></textarea>
+                <div class="popup-content">
+                    <p class="popup-message"></p>
+                    <!-- Thêm phần chọn phương thức thanh toán -->
+                    <div id="paymentMethodSection" class="payment-method-section" style="display: none;">
+                        <h4 class="payment-method-title">Chọn phương thức thanh toán:</h4>
+                        <div class="payment-methods">
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="CASH" checked>
+                                <span class="payment-method-label">💵 Tiền mặt</span>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="BANKING">
+                                <span class="payment-method-label">🏦 Chuyển khoản</span>
+                            </label>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn-cancel" onclick="closeModal()">Hủy</button>
-                    <button class="btn-clear" onclick="clearCart()">Xóa hết</button>
-                    <button class="btn-order" onclick="submitOrder()">Đặt món</button>
+                <div class="popup-actions">
+                    <button class="popup-btn cancel-btn" onclick="closeConfirmationPopup()"></button>
+                    <button class="popup-btn confirm-btn" id="confirmActionBtn"></button>
                 </div>
             </div>
-        </div>
-    </template>
-
-    <!-- Template cho cart item -->
-    <template id="cartItemTemplate">
-        <div class="cart-item">
-            <div class="item-info">
-                <h4 class="cart-item-name">[Tên món]</h4>
-                <p class="cart-item-price">Giá: [Giá]</p>
-                <p class="item-note" style="display: none;">Ghi chú: [Ghi chú]</p>
-            </div>
-            <div class="item-controls">
-                <button class="qty-btn qty-decrease">-</button>
-                <span class="quantity">[Số lượng]</span>
-                <button class="qty-btn qty-increase">+</button>
-                <button class="remove-btn">Xóa</button>
-            </div>
-            <div class="item-total">[Tổng tiền]</div>
         </div>
     </template>
 </body>
