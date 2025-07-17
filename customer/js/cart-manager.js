@@ -620,7 +620,7 @@ class CartUIManager {
             // Kiểm tra token trong TokenManager
             const sessionData = window.tokenManager.getSessionData();
             const token = sessionData.token;
-            console.log("token: ", token);
+
             if (!window.tokenManager.isTokenValid()) {
                 throw new Error('TOKEN_EXPIRED');
             }
@@ -720,7 +720,7 @@ class CartUIManager {
         let isNewOrder = true;
 
         try {
-            const response = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current`, {
+            const response = await fetch(`${BACKEND_BASE_URL}/orders/table/${tableId}/current/customer`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -731,12 +731,15 @@ class CartUIManager {
             if (response.ok) {
                 const data = await response.json();
                 existingOrder = data.result;
-
-                // Kiểm tra status của đơn hàng hiện tại
-                const activeStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
-                if (existingOrder && activeStatuses.includes(existingOrder.status)) {
+                console.log('Existing order found:', existingOrder);
+                // Nếu order tồn tại thì vẫn kiểm tra ID trong session (bảo vệ thêm lớp frontend)
+                const sessionData = window.tokenManager.getSessionData();
+                if (sessionData.orderId && sessionData.orderId === existingOrder.id) {
                     isNewOrder = false;
-                    console.log('Found existing active order:', existingOrder.id);
+                    console.log('✅ Đang tiếp tục đơn hàng hiện tại:', existingOrder.id);
+                } else {
+                    console.log('⚠️ Token hợp lệ nhưng không phải session hiện tại, tạo đơn mới');
+                    existingOrder = null; // Hủy để buộc tạo mới
                 }
             }
         } catch (error) {
@@ -770,66 +773,58 @@ class CartUIManager {
         let response;
         let requestData;
 
-        try {
-            if (isNewOrder) {
-                console.log('Creating new order...');
+        if (isNewOrder) {
+            console.log('Creating new order...');
 
-                requestData = {
-                    tableId: tableInfo.id,
-                    userId: null,
-                    orderType: 'DINE_IN',
-                    status: 'PENDING',
-                    note: '',
-                    orderItems: orderItems,
-                    ...(token && { token: token })
-                };
-                console.log("Dữ liệu gửi lên tạo order:", requestData);
-                console.log("Sending Authorization header:", `Bearer ${token}`);
+            requestData = {
+                tableId: tableInfo.id,
+                userId: null,
+                orderType: 'DINE_IN',
+                status: 'PENDING',
+                note: '',
+                orderItems: orderItems,
+                ...(token && { token: token })
+            };
+            console.log("Dữ liệu gửi lên tạo order:", requestData);
 
-                response = await fetch(`${BACKEND_BASE_URL}/orders`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        ...(token && { 'Authorization': `Bearer ${token}` })
-                    },
-                    body: JSON.stringify(requestData)
-                });
-            } else {
-                console.log('Adding items to existing order:', existingOrder.id);
+            response = await fetch(`${BACKEND_BASE_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                },
+                body: JSON.stringify(requestData)
+            });
+        } else {
+            console.log('Adding items to existing order:', existingOrder.id);
 
-                requestData = {
-                    orderItems: orderItems,
-                    ...(token && { token: token })
-                };
+            requestData = {
+                orderItems: orderItems,
+                ...(token && { token: token })
+            };
 
-                response = await fetch(`${BACKEND_BASE_URL}/orders/${existingOrder.id}/items`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        ...(token && { 'Authorization': `Bearer ${token}` })
-                    },
-                    body: JSON.stringify(requestData)
-                });
-            }
-
-            if (!response.ok) {
-                const errorData = await this.parseErrorResponse(response);
-                console.error('❌ Lỗi từ server:', errorData);
-                throw new Error(errorData.code || 'ORDER_FAILED');
-            }
-            
-            const result = await response.json();
-            console.log('✅ Order operation completed successfully:', result);
-
-            return { ...result.result, isNewOrder };
-        } catch (error) {
-            console.error('❌ Lỗi khi gọi API đặt món:', error);
-            throw error; // hoặc có thể trả về error để xử lý UI bên ngoài
+            response = await fetch(`${BACKEND_BASE_URL}/orders/${existingOrder.id}/items`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                },
+                body: JSON.stringify(requestData)
+            });
         }
-    }
 
+        if (!response.ok) {
+            const errorData = await this.parseErrorResponse(response);
+            throw new Error(errorData.code || 'ORDER_FAILED');
+        }
+
+        const result = await response.json();
+        console.log('Order operation completed successfully:', result);
+
+        return { ...result.result, isNewOrder };
+    }
 
     // Hàm parse error response
     async parseErrorResponse(response) {
@@ -1068,7 +1063,7 @@ function placeOrder(event) {
 //         category: 'Món chính'
 //     };
 //     cartManager.addItem(sampleItem, 1, 'Ít cay');
-// }
+// }x
 
 // Debug functions (có thể xóa trong production)
 function debugCart() {
@@ -1080,4 +1075,3 @@ function clearDebugCart() {
     cartManager.clearCart();
     console.log('Cart cleared');
 }
-

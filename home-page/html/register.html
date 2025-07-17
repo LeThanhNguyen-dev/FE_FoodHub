@@ -10,7 +10,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #0F172B;
@@ -445,6 +445,48 @@
             display: block !important;
         }
 
+        /* Autocomplete Styles */
+        .autocomplete-suggestion {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: var(--gray-50);
+        }
+
+        .autocomplete-suggestion.active {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        .autocomplete-suggestion .icon {
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+
+        #address-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 4px;
+            display: none;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .main-container {
@@ -524,24 +566,22 @@
         <!-- Phần thương hiệu -->
         <div class="brand-section">
             <div class="logo">
-                
                 <h2 class="logo-text">FoodHub</h2>
             </div>
             <div class="brand-content">
-    <h1>FoodHub – Nhà hàng ẩm thực hiện đại & tinh tế</h1>
-    <p>Khám phá những món ngon đặc sắc, phục vụ trong không gian ấm cúng và đậm chất riêng.</p>
-    <ul class="features-list">
-        <li>
-            <span class="icon"><i class="bi bi-check"></i></span>
-            Giao hàng nhanh chóng
-        </li>
-        <li>
-            <span class="icon"><i class="bi bi-check"></i></span>
-            Hỗ trợ khách hàng 24/7
-        </li>
-    </ul>
-</div>
-
+                <h1>FoodHub – Nhà hàng ẩm thực hiện đại & tinh tế</h1>
+                <p>Khám phá những món ngon đặc sắc, phục vụ trong không gian ấm cúng và đậm chất riêng.</p>
+                <ul class="features-list">
+                    <li>
+                        <span class="icon"><i class="bi bi-check"></i></span>
+                        Giao hàng nhanh chóng
+                    </li>
+                    <li>
+                        <span class="icon"><i class="bi bi-check"></i></span>
+                        Hỗ trợ khách hàng 24/7
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- Form đăng ký -->
@@ -556,101 +596,167 @@
             
             <div id="alert-message"></div>
 
+            <form id="register-form" class="d-block form-transition" novalidate>
+                <div class="form-group">
+                    <label for="username" class="form-label">Họ và tên</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Nhập tên đăng nhập" required minlength="5" maxlength="255">
+                        <i class="bi bi-person input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback">Tên đăng nhập phải từ 5 đến 255 ký tự.</div>
+                    <div class="valid-feedback">Tên đăng nhập hợp lệ!</div>
+                </div>
 
-<form id="register-form" class="d-block form-transition" novalidate>
-    <div class="form-group">
-        <label for="username" class="form-label">Tên đăng nhập</label>
-        <div class="input-wrapper">
-            <input type="text" class="form-control" id="username" name="username"
-                placeholder="Nhập tên đăng nhập" required minlength="5" maxlength="255">
-            <i class="bi bi-person input-icon"></i>
-        </div>
-        <div class="invalid-feedback">Tên đăng nhập phải từ 5 đến 255 ký tự.</div>
-        <div class="valid-feedback">Tên đăng nhập hợp lệ!</div>
-    </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Nhập mật khẩu" required minlength="8" maxlength="255">
+                        <i class="bi bi-lock input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback">Mật khẩu phải từ 8 ký tự trở lên.</div>
+                    <div class="valid-feedback">Mật khẩu đủ mạnh!</div>
+                </div>
 
-    <div class="form-group">
-        <label for="password" class="form-label">Mật khẩu</label>
-        <div class="input-wrapper">
-            <input type="password" class="form-control" id="password" name="password"
-                placeholder="Nhập mật khẩu" required minlength="8" maxlength="255">
-            <i class="bi bi-lock input-icon"></i>
-        </div>
-        <div class="invalid-feedback">Mật khẩu phải từ 8 ký tự trở lên.</div>
-        <div class="valid-feedback">Mật khẩu đủ mạnh!</div>
-    </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Địa chỉ Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" class="form-control" id="email" name="email"
+                            placeholder="Nhập địa chỉ email" required maxlength="255">
+                        <i class="bi bi-envelope input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback">Vui lòng nhập địa chỉ email hợp lệ.</div>
+                    <div class="valid-feedback">Email hợp lệ!</div>
+                </div>
 
-    <div class="form-group">
-        <label for="email" class="form-label">Địa chỉ Email</label>
-        <div class="input-wrapper">
-            <input type="email" class="form-control" id="email" name="email"
-                placeholder="Nhập địa chỉ email" required maxlength="255">
-            <i class="bi bi-envelope input-icon"></i>
-        </div>
-        <div class="invalid-feedback">Vui lòng nhập địa chỉ email hợp lệ.</div>
-        <div class="valid-feedback">Email hợp lệ!</div>
-    </div>
+                <div class="form-group">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <div class="input-wrapper">
+                        <input type="tel" class="form-control" id="phone" name="phone"
+                            placeholder="Nhập số điện thoại (10 chữ số)" required pattern="[0-9]{10}">
+                        <i class="bi bi-telephone input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback">Số điện thoại phải đủ 10 chữ số.</div>
+                    <div class="valid-feedback">Số điện thoại hợp lệ!</div>
+                </div>
 
-    <div class="form-group">
-        <label for="phone" class="form-label">Số điện thoại</label>
-        <div class="input-wrapper">
-            <input type="tel" class="form-control" id="phone" name="phone"
-                placeholder="Nhập số điện thoại (10 chữ số)" required pattern="[0-9]{10}">
-            <i class="bi bi-telephone input-icon"></i>
-        </div>
-        <div class="invalid-feedback">Số điện thoại phải đủ 10 chữ số.</div>
-        <div class="valid-feedback">Số điện thoại hợp lệ!</div>
-    </div>
+                <div class="form-group">
+                    <label for="address" class="form-label">Địa chỉ</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="address" name="address" 
+                            placeholder="Nhập địa chỉ (ví dụ: Đường Láng, Hà Nội)" required maxlength="255">
+                        <i class="bi bi-geo-alt input-icon"></i>
+                    </div>
+                    <div id="address-suggestions"></div>
+                    <div class="invalid-feedback">Vui lòng nhập địa chỉ hợp lệ.</div>
+                    <div class="valid-feedback">Địa chỉ hợp lệ!</div>
+                </div>
 
-    <div class="form-group">
-        <label for="address" class="form-label">Địa chỉ</label>
-        <div class="input-wrapper">
-            <input type="text" class="form-control" id="address" name="address" 
-                placeholder="Nhập địa chỉ đầy đủ" required maxlength="255">
-            <i class="bi bi-geo-alt input-icon"></i>
-        </div>
-        <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
-        <div class="valid-feedback">Địa chỉ hợp lệ!</div>
-    </div>
+                <input type="hidden" id="roleName" name="roleName" value="CUSTOMER">
 
-    <input type="hidden" id="roleName" name="roleName" value="CUSTOMER">
-
-    <button type="submit" class="btn btn-register" id="register-btn">
-        <span class="btn-text">Gửi mã xác thực</span>
-    </button>
-</form>
-
+                <button type="submit" class="btn btn-register" id="register-btn">
+                    <span class="btn-text">Gửi mã xác thực</span>
+                </button>
+            </form>
 
             <form id="otp-form" class="d-none form-transition" novalidate>
-    <div class="form-group">
-        <label for="otp" class="form-label">Mã xác thực</label>
-        <div class="input-wrapper">
-            <input type="text" class="form-control" id="otp" name="otp" 
-                placeholder="Nhập mã xác thực gồm 6 chữ số" required minlength="6" maxlength="6"
-                style="text-align: center; font-size: 20px; font-weight: 600; letter-spacing: 4px;">
-            <i class="bi bi-shield-check input-icon"></i>
+                <div class="form-group">
+                    <label for="otp" class="form-label">Mã xác thực</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="otp" name="otp" 
+                            placeholder="Nhập mã xác thực gồm 6 chữ số" required minlength="6" maxlength="6"
+                            style="text-align: center; font-size: 20px; font-weight: 600; letter-spacing: 4px;">
+                        <i class="bi bi-shield-check input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback">Mã OTP phải gồm 6 chữ số.</div>
+                    <div class="valid-feedback">Định dạng OTP hợp lệ!</div>
+                </div>
+
+                <button type="submit" class="btn btn-register" id="verify-btn">
+                    <span class="btn-text">Xác nhận & Tạo tài khoản</span>
+                </button>
+                
+                <button type="button" class="btn btn-link" onclick="resendOtp()">
+                    <i class="bi bi-arrow-clockwise"></i> Gửi lại mã xác thực
+                </button>
+
+                <div id="otp-timer" class="otp-timer"></div>
+            </form>
         </div>
-        <div class="invalid-feedback">Mã OTP phải gồm 6 chữ số.</div>
-        <div class="valid-feedback">Định dạng OTP hợp lệ!</div>
     </div>
-
-    <button type="submit" class="btn btn-register" id="verify-btn">
-        <span class="btn-text">Xác nhận & Tạo tài khoản</span>
-    </button>
-    
-    <button type="button" class="btn btn-link" onclick="resendOtp()">
-        <i class="bi bi-arrow-clockwise"></i> Gửi lại mã xác thực
-    </button>
-
-    <div id="otp-timer" class="otp-timer"></div>
-</form>
-
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_BASE_URL = 'http://localhost:8080/auth';
+        const API_BASE_URL = 'http://localhost:8080';
         let otpTimer;
+
+        // API Fetch Utility
+        async function apiFetch(url, options = {}) {
+            const response = await fetch(`${API_BASE_URL}${url}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return await response.json();
+        }
+
+        // Address Autocomplete
+        function setupAddressAutocomplete() {
+            const addressInput = document.getElementById('address');
+            const suggestionsContainer = document.getElementById('address-suggestions');
+            let debounceTimeout;
+
+            addressInput.addEventListener('input', () => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(async () => {
+                    const input = addressInput.value.trim();
+                    if (input.length < 3) {
+                        suggestionsContainer.style.display = 'none';
+                        return;
+                    }
+
+                    try {
+                        const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
+                            method: 'GET'
+                        });
+                        suggestionsContainer.innerHTML = '';
+                        if (response.predictions && response.predictions.length > 0) {
+                            response.predictions.forEach(prediction => {
+                                const suggestion = document.createElement('div');
+                                suggestion.className = 'autocomplete-suggestion';
+                                suggestion.innerHTML = `<i class="bi bi-geo-alt icon"></i> ${prediction.description}`;
+                                suggestion.addEventListener('click', () => {
+                                    addressInput.value = prediction.description;
+                                    suggestionsContainer.style.display = 'none';
+                                    validateField(addressInput);
+                                });
+                                suggestionsContainer.appendChild(suggestion);
+                            });
+                            suggestionsContainer.style.display = 'block';
+                        } else {
+                            suggestionsContainer.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
+                        showNotification('danger', 'Không thể tải gợi ý địa chỉ. Vui lòng nhập thủ công.');
+                        suggestionsContainer.style.display = 'none';
+                    }
+                }, 300);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            });
+        }
 
         // Real-time validation
         document.querySelectorAll('.form-control').forEach(input => {
@@ -663,31 +769,31 @@
             });
         });
 
-      function validateField(field) {
-    const formGroup = field.closest('.form-group');
-    const validFeedback = formGroup.querySelector('.valid-feedback');
-    const invalidFeedback = formGroup.querySelector('.invalid-feedback');
-    const value = field.value.trim();
+        function validateField(field) {
+            const formGroup = field.closest('.form-group');
+            const validFeedback = formGroup.querySelector('.valid-feedback');
+            const invalidFeedback = formGroup.querySelector('.invalid-feedback');
+            const value = field.value.trim();
 
-    // Reset class & ẩn feedback
-    field.classList.remove('is-valid', 'is-invalid');
-    validFeedback.style.display = 'none';
-    invalidFeedback.style.display = 'none';
+            // Reset class & hide feedback
+            field.classList.remove('is-valid', 'is-invalid');
+            validFeedback.style.display = 'none';
+            invalidFeedback.style.display = 'none';
 
-    // Nếu chưa nhập gì => không hiện gì cả
-    if (value === '') {
-        return;
-    }
+            // If empty, show no feedback
+            if (value === '') {
+                return;
+            }
 
-    // Nếu hợp lệ
-    if (field.checkValidity()) {
-        field.classList.add('is-valid');
-        validFeedback.style.display = 'block';
-    } else {
-        field.classList.add('is-invalid');
-        invalidFeedback.style.display = 'block';
-    }
-}
+            // If valid
+            if (field.checkValidity()) {
+                field.classList.add('is-valid');
+                validFeedback.style.display = 'block';
+            } else {
+                field.classList.add('is-invalid');
+                invalidFeedback.style.display = 'block';
+            }
+        }
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -720,16 +826,12 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE_URL}/send-otp`, {
+                const response = await apiFetch('/auth/send-otp', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.message || `HTTP error! Status: ${response.status}`);
-
-                showNotification('success', result.message || 'Verification code sent to your email!');
+                showNotification('success', response.message || 'Verification code sent to your email!');
                 
                 // Update progress
                 document.getElementById('step-1').classList.add('completed');
@@ -782,14 +884,10 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+                const response = await apiFetch('/auth/verify-otp', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.message || `HTTP error! Status: ${response.status}`);
 
                 // Update progress
                 document.getElementById('step-2').classList.add('completed');
@@ -825,9 +923,8 @@
             resendBtn.innerHTML = '<div class="loading-spinner"></div> Sending...';
             
             try {
-                const response = await fetch(`${API_BASE_URL}/send-otp`, {
+                const response = await apiFetch('/auth/send-otp', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email,
                         username: document.getElementById('username').value,
@@ -837,9 +934,6 @@
                         roleName: document.getElementById('roleName').value
                     })
                 });
-                
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.message || 'Failed to resend OTP');
                 
                 showNotification('success', 'New verification code sent to your email!');
                 startOtpTimer();
@@ -980,7 +1074,7 @@
             }
         });
 
-        // Add loading states and better UX
+        // Initialize autocomplete
         document.addEventListener('DOMContentLoaded', function() {
             // Add smooth scroll behavior
             document.documentElement.style.scrollBehavior = 'smooth';
@@ -989,6 +1083,9 @@
             setTimeout(() => {
                 document.querySelector('.register-section').style.animation = 'fadeIn 0.6s ease';
             }, 100);
+
+            // Setup address autocomplete
+            setupAddressAutocomplete();
         });
     </script>
 </body>

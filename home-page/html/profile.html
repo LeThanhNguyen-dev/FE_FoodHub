@@ -14,6 +14,8 @@
       box-sizing: border-box;
     }
 
+
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #f8fafc;
@@ -210,7 +212,7 @@
         grid-template-columns: 1fr;
         gap: 24px;
       }
-
+      
       .sidebar {
         position: fixed;
         top: 0;
@@ -225,7 +227,7 @@
         left: 0;
       }
 
-      .main Manually {
+      .main-content {
         margin-left: 0;
       }
 
@@ -256,9 +258,7 @@
     }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      to { transform: rotate(360deg); }
     }
 
     /* Input with icon */
@@ -308,8 +308,7 @@
 
 <body class="flex">
   <!-- Mobile menu button -->
-  <button
-    class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
     <i class="fas fa-bars text-gray-600"></i>
   </button>
 
@@ -369,7 +368,7 @@
             <div class="section-header">
               <h3><i class="fas fa-user"></i>Profile Information</h3>
             </div>
-
+            
             <div class="form-group">
               <label for="username" class="form-label">Username</label>
               <input type="text" id="username" class="form-input" readonly>
@@ -400,7 +399,7 @@
             <div class="section-header">
               <h3><i class="fas fa-lock"></i>Change Password</h3>
             </div>
-
+            
             <div class="form-group">
               <label for="old-password" class="form-label">Current Password</label>
               <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
@@ -449,6 +448,30 @@
       return payload && payload.exp * 1000 > Date.now();
     }
 
+    function updateSidebarByRole(scope) {
+      const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
+      // Extract the role from scope (first value starting with ROLE_)
+      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+      const isStaff = staffRoles.includes(role);
+
+      const workScheduleLink = document.getElementById('work-schedule-link');
+      const attendanceLink = document.getElementById('attendance-link'); // Thêm dòng này
+      const orderTrackLink = document.getElementById('order-track-link');
+      const orderHistoryLink = document.getElementById('order-history-link');
+
+      if (isStaff) {
+        workScheduleLink.classList.remove('hidden');
+        attendanceLink.classList.remove('hidden'); // Thêm dòng này
+        orderTrackLink.classList.add('hidden');
+        orderHistoryLink.classList.add('hidden');
+      } else if (role === 'ROLE_CUSTOMER') {
+        workScheduleLink.classList.add('hidden');
+        attendanceLink.classList.add('hidden'); // Thêm dòng này
+        orderTrackLink.classList.remove('hidden');
+        orderHistoryLink.classList.remove('hidden');
+      }
+    }
+
     function logout() {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('cart');
@@ -492,30 +515,6 @@
         console.log("role: ", payload.scope);
       } catch (error) {
         showError('Error fetching info: ' + error.message);
-      }
-    }
-
-    function updateSidebarByRole(scope) {
-      const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
-      // Extract the role from scope (first value starting with ROLE_)
-      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
-      const isStaff = staffRoles.includes(role);
-
-      const workScheduleLink = document.getElementById('work-schedule-link');
-      const attendanceLink = document.getElementById('attendance-link'); // Thêm dòng này
-      const orderTrackLink = document.getElementById('order-track-link');
-      const orderHistoryLink = document.getElementById('order-history-link');
-
-      if (isStaff) {
-        workScheduleLink.classList.remove('hidden');
-        attendanceLink.classList.remove('hidden'); // Thêm dòng này
-        orderTrackLink.classList.add('hidden');
-        orderHistoryLink.classList.add('hidden');
-      } else if (role === 'ROLE_CUSTOMER') {
-        workScheduleLink.classList.add('hidden');
-        attendanceLink.classList.add('hidden'); // Thêm dòng này
-        orderTrackLink.classList.remove('hidden');
-        orderHistoryLink.classList.remove('hidden');
       }
     }
 
@@ -687,11 +686,11 @@
     document.addEventListener('click', (e) => {
       const sidebar = document.querySelector('.sidebar');
       const menuBtn = document.querySelector('.mobile-menu-btn');
-
-      if (window.innerWidth <= 768 &&
-        !sidebar.contains(e.target) &&
-        !menuBtn.contains(e.target) &&
-        sidebar.classList.contains('open')) {
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target) && 
+          sidebar.classList.contains('open')) {
         sidebar.classList.remove('open');
       }
     });

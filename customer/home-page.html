@@ -628,9 +628,10 @@
         // Gọi thanh toán
         function callPayment() {
             const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
-            if (confirm(`Bạn có muốn gọi nhân viên đến thanh toán cho bàn ${tableNumber} không?`)) {
-                alert('Đã gửi yêu cầu thanh toán. Nhân viên sẽ đến trong giây lát.');
-            }
+            // const sessionData = JSON.parse(localStorage.getItem('qrSession'));
+            // const orderId = sessionData.orderId;
+            // console.log('Calling payment for table:', tableNumber, 'Order ID:', orderId);
+            window.location.href = `payment.html?tableNumber=${tableNumber}`;
         }
 
         // Chat functions

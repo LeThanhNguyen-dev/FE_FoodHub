@@ -145,7 +145,7 @@ function updateTransactionTable(order) {
 
 
 // Gọi hàm kiểm tra định kỳ
-setInterval(checkNewOrders, 5000);
+setInterval(checkNewOrders, 30000);
 
 // Kiểm tra ngay khi tải trang
 document.addEventListener('DOMContentLoaded', checkNewOrders);

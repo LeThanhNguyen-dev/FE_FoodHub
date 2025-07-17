@@ -346,7 +346,6 @@
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            display: flex;
             flex-direction: column;
             border: 1px solid #e0e0e0;
             z-index: 1060;
@@ -360,6 +359,7 @@
         }
 
         .chat-container.hidden {
+            display: none;
             transform: translateY(20px);
             opacity: 0;
         }
@@ -635,7 +635,7 @@
     <div id="chat-toggle" onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi mở/đóng chat: ' + e.message); }">💬</div>
 
     <!-- Chat Window -->
-    <div id="chat-container" class="chat-container">
+    <div id="chat-container" class="chat-container hidden">
         <div class="chat-header">
             <span>FoodHub Chat</span>
             <button onclick="try { toggleChat(); } catch(e) { console.error('Error toggling chat:', e); showNotification('Lỗi khi đóng chat: ' + e.message); }">✕</button>
@@ -910,9 +910,35 @@
             }
         }
 
+        // Toggle chat visibility
+        function toggleChat() {
+            try {
+                const chatContainer = document.getElementById('chat-container');
+                if (!chatContainer) {
+                    throw new Error('Chat container not found');
+                }
+                const isHidden = chatContainer.classList.contains('hidden');
+                chatContainer.classList.toggle('hidden', !isHidden);
+                chatContainer.classList.toggle('show', isHidden);
+                console.log('Chat toggled:', isHidden ? 'shown' : 'hidden');
+            } catch (error) {
+                console.error('Error in toggleChat:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Lỗi khi mở/đóng chat: ' + error.message);
+                }
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             try {
+                // Ensure chat is hidden on page load
+                const chatContainer = document.getElementById('chat-container');
+                if (chatContainer) {
+                    chatContainer.classList.add('hidden');
+                    chatContainer.classList.remove('show');
+                }
+
                 if (typeof updateUI === 'function') updateUI();
                 if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
                     fetchUserOrders().then(() => startPolling());
