@@ -31,15 +31,7 @@ async function showTables() {
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-clock me-2"></i>Bàn đặt trước</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="stats-number" id="reservedTables">0</div>
-                        <p class="text-muted mb-0">Chờ khách đến</p>
-                    </div>
-                </div>
+
 
                 <div class="card">
                     <div class="card-header">
@@ -110,12 +102,10 @@ async function showTables() {
 function updateTableStatistics(tables) {
     const available = tables.filter(t => t.status === 'AVAILABLE').length;
     const occupied = tables.filter(t => t.status === 'OCCUPIED').length;
-    const reserved = tables.filter(t => t.status === 'RESERVED').length;
     const total = tables.length;
 
     document.getElementById('availableTables').textContent = available;
     document.getElementById('occupiedTables').textContent = occupied;
-    document.getElementById('reservedTables').textContent = reserved;
     document.getElementById('totalTables').textContent = total;
 }
 

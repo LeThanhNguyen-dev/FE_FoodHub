@@ -485,33 +485,148 @@ body {
 }
 
 .shift-btn {
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border: 2px solid transparent;
+    background-clip: padding-box;
     color: var(--primary);
     padding: 14px 28px;
     border-radius: 12px;
     font-size: 1rem;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     width: 100%;
     max-width: 200px;
-    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15);
+    box-shadow: 
+        0 2px 8px rgba(234, 88, 12, 0.15),
+        0 0 0 1px rgba(234, 88, 12, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.shift-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.shift-btn:hover::before {
+    left: 100%;
 }
 
 .shift-btn:hover {
-    background: white;
+    background: linear-gradient(135deg, white 0%, rgba(254, 242, 242, 0.95) 100%);
     color: #ea580c;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 20px rgba(234, 88, 12, 0.25),
+        0 0 0 1px rgba(234, 88, 12, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: rgba(234, 88, 12, 0.2);
 }
 
 .shift-btn:active {
     transform: translateY(0);
+    box-shadow: 
+        0 2px 8px rgba(234, 88, 12, 0.2),
+        0 0 0 1px rgba(234, 88, 12, 0.15),
+        inset 0 2px 4px rgba(234, 88, 12, 0.1);
+}
+
+.shift-btn:focus {
+    outline: none;
+    box-shadow: 
+        0 4px 12px rgba(234, 88, 12, 0.25),
+        0 0 0 3px rgba(234, 88, 12, 0.1);
 }
 
 .shift-btn i {
     margin-right: 8px;
     font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.shift-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Variant cho active state */
+.shift-btn.active {
+    background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 
+        0 4px 15px rgba(234, 88, 12, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.shift-btn.active:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 18px rgba(234, 88, 12, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Variant cho disabled state */
+.shift-btn:disabled {
+    background: linear-gradient(135deg, rgba(156, 163, 175, 0.3) 0%, rgba(209, 213, 219, 0.3) 100%);
+    color: rgba(107, 114, 128, 0.6);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shift-btn:disabled:hover {
+    background: linear-gradient(135deg, rgba(156, 163, 175, 0.3) 0%, rgba(209, 213, 219, 0.3) 100%);
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shift-btn:disabled i {
+    transform: none;
+}
+
+/* Loading state */
+.shift-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.shift-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid rgba(234, 88, 12, 0.3);
+    border-top: 2px solid #ea580c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .shift-btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        max-width: 180px;
+    }
+    
+    .shift-btn i {
+        font-size: 1rem;
+    }
 }
 
 .btn-container {
@@ -2019,42 +2134,199 @@ body {
 }
 
 
-.orders-filter-section .btn {
+
+
+#dashboardOrdersSection .btn,
+.orders-filter-section .btn,
+.modal-overlay .btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     border: 2px solid;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
+#dashboardOrdersSection .btn::before,
+.orders-filter-section .btn::before
+.modal-overlay .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
 
+#dashboardOrdersSection .btn:hover::before,
+.orders-filter-section .btn:hover::before {
+    left: 100%;
+}
+
+#dashboardOrdersSection .btn i,
 .orders-filter-section .btn i {
     margin-right: 0.5rem;
 }
 
-#dashboardOrdersSection .btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 2px solid;
-    transition: all 0.2s ease;
-}
-
-#dashboardOrdersSection .btn i {
-    margin-right: 0.5rem;
-}
-
-#dashboardOrdersSection .btn-primary {
-    background: #F97316;
+#dashboardOrdersSection .btn-primary,
+.orders-filter-section .btn-primary,
+.modal-overlay .btn-primary {
+    background: linear-gradient(135deg, #F97316 0%, #FF8C00 50%, #FF6B35 100%);
     color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }
 
-#dashboardOrdersSection .btn-primary:hover {
-    background: #ff7700;
+#dashboardOrdersSection .btn-primary:hover,
+.orders-filter-section .btn-primary:hover,
+.modal-overlay .btn-primary:hover {
+    background: linear-gradient(135deg, #FF8C00 0%, #FF6B35 50%, #F97316 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+}
+
+#dashboardOrdersSection .btn-primary:active,
+.orders-filter-section .btn-primary:active,
+.modal-overlay .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
+}
+
+/* Thêm các màu gradient khác cho các loại button khác */
+#dashboardOrdersSection .btn-success,
+.orders-filter-section .btn-success,
+.modal-overlay .btn-success {
+    background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+#dashboardOrdersSection .btn-success:hover,
+.orders-filter-section .btn-success:hover,
+.modal-overlay .btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 50%, #10B981 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+#dashboardOrdersSection .btn-danger,
+.orders-filter-section .btn-danger {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #B91C1C 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+#dashboardOrdersSection .btn-danger:hover,
+.orders-filter-section .btn-danger:hover {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 50%, #EF4444 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+#dashboardOrdersSection .btn-warning,
+.orders-filter-section .btn-warning {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+#dashboardOrdersSection .btn-warning:hover,
+.orders-filter-section .btn-warning:hover {
+    background: linear-gradient(135deg, #D97706 0%, #B45309 50%, #F59E0B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+#dashboardOrdersSection .btn-info,
+.orders-filter-section .btn-info {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+#dashboardOrdersSection .btn-info:hover,
+.orders-filter-section .btn-info:hover {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #3B82F6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+#dashboardOrdersSection .btn-secondary,
+.orders-filter-section .btn-secondary,
+.modal-overlay .btn-secondary {
+    background: linear-gradient(135deg, #6B7280 0%, #4B5563 50%, #374151 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+}
+
+#dashboardOrdersSection .btn-secondary:hover,
+.orders-filter-section .btn-secondary:hover,
+.modal-overlay .btn-secondary:hover {
+    background: linear-gradient(135deg, #4B5563 0%, #374151 50%, #6B7280 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+}
+
+/* Hiệu ứng loading cho button */
+#dashboardOrdersSection .btn.loading,
+.orders-filter-section .btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+#dashboardOrdersSection .btn.loading::after,
+.orders-filter-section .btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hiệu ứng loading cho button */
+#dashboardOrdersSection .btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+#dashboardOrdersSection .btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .orders-section {

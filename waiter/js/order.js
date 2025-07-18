@@ -418,17 +418,6 @@ function createOrderActionButtons(order) {
     // Nút hoàn thành cho đơn hàng READY
     if (order.status === 'READY') {
         buttons += `
-            <button class="action-btn btn-complete" 
-                    onclick="event.stopPropagation(); completeOrder(${order.id})"
-                    title="Hoàn thành đơn hàng">
-                <i class="fas fa-check-double"></i>
-            </button>
-        `;
-    }
-
-    // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
-    if (order.status === 'COMPLETED') {
-        buttons += `
             <button class="action-btn btn-checkout" 
                     data-order='${JSON.stringify(order)}'
                     onclick="event.stopPropagation(); handleCheckoutClick(this)"
@@ -437,6 +426,18 @@ function createOrderActionButtons(order) {
             </button>
         `;
     }
+
+    // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
+    // if (order.status === 'COMPLETED') {
+    //     buttons += `
+    //         <button class="action-btn btn-checkout" 
+    //                 data-order='${JSON.stringify(order)}'
+    //                 onclick="event.stopPropagation(); handleCheckoutClick(this)"
+    //                 title="Thanh toán đơn hàng">
+    //             <i class="fas fa-money-bill"></i>
+    //         </button>
+    //     `;
+    // }
 
     // Nút hủy đơn hàng - hiển thị cho các trạng thái có thể hủy
     if (['PENDING', 'CONFIRMED'].includes(order.status)) {
@@ -480,7 +481,7 @@ async function checkoutOrder(order) {
                 paymentMethod: paymentMethod
             };
 
-            const data = await apiFetch('/payments', {
+            const data = await apiFetch('/payments/payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -542,9 +543,16 @@ function showOrderDetailsAndPaymentModal(order) {
 
         const modal = document.createElement('div');
         modal.innerHTML = `
-            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
-                <div style="background: white; border-radius: 16px; max-width: 520px; width: 100%; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);">
+            <div id="modal-backdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 20px;">
+                <div id="modal-content" style="background: white; border-radius: 16px; max-width: 520px; width: 100%; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); position: relative;">
                     
+                    <!-- Close button -->
+                    <button onclick="closeModal()" style="position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1001; color: white; font-size: 18px; font-weight: bold; transition: all 0.2s;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='scale(1.1)';" 
+                        onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';">
+                        ×
+                    </button>
+
                     <!-- Header -->
                     <div style="background: linear-gradient(135deg, #FEA116 0%, #f59e0b 100%); padding: 24px; text-align: center;">
                         <h3 style="margin: 0; color: white; font-size: 22px; font-weight: 700;">Thông tin thanh toán</h3>
@@ -562,10 +570,6 @@ function showOrderDetailsAndPaymentModal(order) {
                                 <div>
                                     <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">BÀN SỐ</div>
                                     <div style="color: #1f2937; font-weight: 600;">${order.tableNumber}</div>
-                                </div>
-                                <div style="grid-column: 1 / -1;">
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">NHÂN VIÊN</div>
-                                    <div style="color: #1f2937; font-weight: 600;">${order.username}</div>
                                 </div>
                                 ${order.note ? `
                                 <div style="grid-column: 1 / -1; margin-top: 8px;">
@@ -620,19 +624,9 @@ function showOrderDetailsAndPaymentModal(order) {
                                     onmouseover="this.style.background='#3b82f6'; this.style.color='white';" 
                                     onmouseout="this.style.background='white'; this.style.color='#3b82f6';">
                                     <span style="font-size: 18px;">💳</span>
-                                    <span>BANKING</span>
+                                    <span>Chuyển khoản</span>
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- Nút hủy -->
-                        <div style="text-align: center;">
-                            <button onclick="selectPaymentMethod(null)" 
-                                style="padding: 12px 32px; background: white; border: 2px solid #EF4444; color: #EF4444; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;"
-                                onmouseover="this.style.background='#EF4444'; this.style.color='white';" 
-                                onmouseout="this.style.background='white'; this.style.color='#EF4444';">
-                                ❌ Hủy bỏ
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -641,10 +635,33 @@ function showOrderDetailsAndPaymentModal(order) {
 
         document.body.appendChild(modal);
 
+        // Xử lý click vào backdrop để đóng modal
+        const backdrop = modal.querySelector('#modal-backdrop');
+        const modalContent = modal.querySelector('#modal-content');
+        
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) {
+                closeModal();
+            }
+        });
+
+        // Ngăn chặn sự kiện click trên modal content lan ra backdrop
+        modalContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
         window.selectPaymentMethod = (method) => {
             document.body.removeChild(modal);
             delete window.selectPaymentMethod;
+            delete window.closeModal;
             resolve(method);
+        };
+
+        window.closeModal = () => {
+            document.body.removeChild(modal);
+            delete window.selectPaymentMethod;
+            delete window.closeModal;
+            resolve(null);
         };
     });
 }

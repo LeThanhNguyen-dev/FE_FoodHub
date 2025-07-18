@@ -209,28 +209,7 @@
 }
 
 /* Buttons (dùng chung, kết hợp từ cả hai) */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
 
-
-
-.btn-success {
-    color: white;
-}
-
-
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
 
 
 

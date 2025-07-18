@@ -239,30 +239,41 @@ body.cart-open .search-input-container i {
 }
 /* Thu nhỏ button khi cart mở */
 body.cart-open .filter-section button {
-    padding: 10px 12px;
-    font-size: 13px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .filter-section button:first-of-type {
-    background: #F97316;
+    background: linear-gradient(135deg, #F97316 0%, #FF8C00 50%, #FF6B35 100%);
     color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }
 
 .filter-section button:first-of-type:hover {
-    background-color: #ff9500;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+    background: linear-gradient(135deg, #FF8C00 0%, #FF6B35 50%, #F97316 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
 .filter-section button:last-of-type {
-    background-color: #6c757d;
+    background: linear-gradient(135deg, #6B7280 0%, #4B5563 50%, #374151 100%);
     color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
 }
 
 .filter-section button:last-of-type:hover {
-    background-color: #5a6268;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    background: linear-gradient(135deg, #4B5563 0%, #374151 50%, #6B7280 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
 }
 /* Pagination Styling */
 .pagination-container {

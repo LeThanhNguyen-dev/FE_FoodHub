@@ -776,7 +776,10 @@
 
             const workScheduleLink = document.getElementById('work-schedule-link');
             const workShiftLogLink = document.getElementById('work-shift-log-link');
+            const homeLink = document.getElementById('home-link');
 
+            // Cập nhật href cho home link dựa trên role
+            homeLink.href = getHomePageByRole(scope);
             if (isStaff) {
                 workScheduleLink.classList.remove('hidden');
                 workShiftLogLink.classList.remove('hidden');
@@ -784,7 +787,24 @@
                 redirectToLogin();
             }
         }
+        function getHomePageByRole(scope) {
+            // Extract the role from scope (first value starting with ROLE_)
+            const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
 
+            switch (role) {
+                case 'ROLE_WAITER':
+                    return '../../waiter/index.html';
+                case 'ROLE_CHEF':
+                    return '../../chef/index.html';
+                case 'ROLE_CASHIER':
+                    return '../../cashier/index.html';
+                case 'ROLE_ADMIN':
+                    return '../../adminDashboard/adminDashboard.html';
+                case 'ROLE_CUSTOMER':
+                default:
+                    return 'home.html';
+            }
+        }
         async function fetchUserInfo() {
             try {
                 const token = localStorage.getItem('accessToken');

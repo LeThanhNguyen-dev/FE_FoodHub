@@ -299,7 +299,7 @@ function renderOrders(orders) {
                             <i class="fas fa-fire"></i> Bắt Đầu Nấu
                         </button>
                         <button class="btn btn-ready" onclick="updateOrderStatus(${order.id}, 'READY')">
-                            <i class="fas fa-check"></i> Hoàn Thành
+                            <i class="fas fa-check"></i> Sẵn Sàng
                         </button>`
             }
                     <button class="btn btn-details" onclick="viewOrderDetails(${order.id})">
@@ -502,7 +502,7 @@ function displayOrderDetails(orderData) {
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-primary" onclick="updateOrderStatus(${id})">
+          <button class="btn btn-primary" onclick="updateOrderItemsStatus(${id})">
             Cập nhật trạng thái
           </button>
           <button class="btn btn-secondary" onclick="closeOrderDetails()">
@@ -722,7 +722,7 @@ async function updateOrderStatus(orderId, newStatus) {
             'CANCELLED': 'hủy'
         };
 
-        const statusText = statusMessages[newStatus] || newStatus.toLowerCase();
+        const statusText = statusMessages[newStatus] || newStatus;
         const confirmMessage = `Bạn có chắc chắn muốn chuyển đơn hàng #${orderId} sang trạng thái "${statusText}"?`;
 
         // Hiển thị alert xác nhận

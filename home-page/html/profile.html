@@ -212,7 +212,7 @@
         grid-template-columns: 1fr;
         gap: 24px;
       }
-      
+
       .sidebar {
         position: fixed;
         top: 0;
@@ -258,7 +258,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Input with icon */
@@ -308,7 +310,8 @@
 
 <body class="flex">
   <!-- Mobile menu button -->
-  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+  <button
+    class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
     <i class="fas fa-bars text-gray-600"></i>
   </button>
 
@@ -368,7 +371,7 @@
             <div class="section-header">
               <h3><i class="fas fa-user"></i>Profile Information</h3>
             </div>
-            
+
             <div class="form-group">
               <label for="username" class="form-label">Username</label>
               <input type="text" id="username" class="form-input" readonly>
@@ -399,7 +402,7 @@
             <div class="section-header">
               <h3><i class="fas fa-lock"></i>Change Password</h3>
             </div>
-            
+
             <div class="form-group">
               <label for="old-password" class="form-label">Current Password</label>
               <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
@@ -448,6 +451,24 @@
       return payload && payload.exp * 1000 > Date.now();
     }
 
+    function getHomePageByRole(scope) {
+      // Extract the role from scope (first value starting with ROLE_)
+      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+
+      switch (role) {
+        case 'ROLE_WAITER':
+          return '../../waiter/index.html';
+        case 'ROLE_CHEF':
+          return '../../chef/index.html';
+        case 'ROLE_CASHIER':
+          return '../../cashier/index.html';
+        case 'ROLE_ADMIN':
+          return '../../adminDashboard/adminDashboard.html';
+        case 'ROLE_CUSTOMER':
+        default:
+          return 'home.html';
+      }
+    }
     function updateSidebarByRole(scope) {
       const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
       // Extract the role from scope (first value starting with ROLE_)
@@ -455,18 +476,22 @@
       const isStaff = staffRoles.includes(role);
 
       const workScheduleLink = document.getElementById('work-schedule-link');
-      const attendanceLink = document.getElementById('attendance-link'); // Thêm dòng này
+      const attendanceLink = document.getElementById('attendance-link');
       const orderTrackLink = document.getElementById('order-track-link');
       const orderHistoryLink = document.getElementById('order-history-link');
+      const homeLink = document.getElementById('home-link');
+
+      // Cập nhật href cho home link dựa trên role
+      homeLink.href = getHomePageByRole(scope);
 
       if (isStaff) {
         workScheduleLink.classList.remove('hidden');
-        attendanceLink.classList.remove('hidden'); // Thêm dòng này
+        attendanceLink.classList.remove('hidden');
         orderTrackLink.classList.add('hidden');
         orderHistoryLink.classList.add('hidden');
       } else if (role === 'ROLE_CUSTOMER') {
         workScheduleLink.classList.add('hidden');
-        attendanceLink.classList.add('hidden'); // Thêm dòng này
+        attendanceLink.classList.add('hidden');
         orderTrackLink.classList.remove('hidden');
         orderHistoryLink.classList.remove('hidden');
       }
@@ -510,7 +535,7 @@
         document.getElementById('address').value = user.address || '';
         document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
 
-        // Update sidebar based on user role
+        // Update sidebar based on user role (bao gồm cả việc cập nhật home link)
         updateSidebarByRole(payload.scope);
         console.log("role: ", payload.scope);
       } catch (error) {
@@ -686,11 +711,11 @@
     document.addEventListener('click', (e) => {
       const sidebar = document.querySelector('.sidebar');
       const menuBtn = document.querySelector('.mobile-menu-btn');
-      
-      if (window.innerWidth <= 768 && 
-          !sidebar.contains(e.target) && 
-          !menuBtn.contains(e.target) && 
-          sidebar.classList.contains('open')) {
+
+      if (window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
+        !menuBtn.contains(e.target) &&
+        sidebar.classList.contains('open')) {
         sidebar.classList.remove('open');
       }
     });
