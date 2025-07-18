@@ -1,3 +1,16 @@
+ async function loadSidebar() {
+            try {
+                const response = await fetch('components/sidebar.html');
+                if (!response.ok) throw new Error('Không thể tải sidebar');
+                const sidebarHtml = await response.text();
+                document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+                setActiveNavLink();
+            } catch (error) {
+                console.error('Lỗi khi tải sidebar:', error);
+                showNotification('Lỗi tải sidebar!', 'error');
+                document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+            }
+        }
 function handleLogout() {
     if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
         localStorage.removeItem('accessToken');

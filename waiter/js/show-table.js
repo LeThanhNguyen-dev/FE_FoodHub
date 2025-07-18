@@ -60,17 +60,7 @@ async function showTables() {
         `;
 
     try {
-        // Build query parameters
-        const queryParams = new URLSearchParams();
-        if (currentWorkSchedule.area && currentWorkSchedule.area.trim()) {
-            queryParams.append('area', currentWorkSchedule.area.trim());
-        } else {
-            throw new Error('Không tìm thấy thông tin khu vực của nhân viên.');
-        }
-
-        const queryString = queryParams.toString();
-        const url = queryString ? `/tables?${queryString}` : '/tables';
-
+        const url = `/tables/waiter/${currentUserInfo.id}`;
         // Fetch tables using fetch API
         const data = await apiFetch(url, {
             method: 'GET'
@@ -89,12 +79,22 @@ async function showTables() {
 
     } catch (error) {
         console.error('Error fetching tables:', error);
-        document.getElementById('tablesContainer').innerHTML = `
+        if (error.code == 1041 || error.code == 1048) {
+            document.getElementById('tablesContainer').innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h6 class="text-muted">Hiện tại bạn đang không trong ca làm</h6>
+                <p class="text-muted small">Đơn hàng sẽ hiển thị khi bạn có ca làm việc</p>
+            </div>
+        `;
+        } else {
+            document.getElementById('tablesContainer').innerHTML = `
             <div class="alert alert-danger" role="alert" style="border-radius: 20px; border: none; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2);">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>Lỗi!</strong> Không thể tải danh sách bàn: ${error.message}
             </div>
         `;
+        }
     }
 
     // Update navigation active state
@@ -323,7 +323,7 @@ async function assignTable(tableId) {
 async function viewTableOrders(tableId) {
     try {
         // Gọi API để lấy đơn hàng hiện tại của bàn
-        const data = await apiFetch(`/orders/table/${tableId}/current`,{
+        const data = await apiFetch(`/orders/table/${tableId}/current`, {
             method: 'GET'
         });
 
@@ -360,7 +360,7 @@ fadeOutStyle.textContent = `
 document.head.appendChild(fadeOutStyle);
 
 // Đóng modal khi nhấn ESC
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
         closeOrderModal();
     }

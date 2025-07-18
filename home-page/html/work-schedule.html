@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Schedule</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #FEA116;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background-color: #0F172B;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      color: #ffffff;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .sidebar-link:hover {
+      background-color: #FEA116;
+      color: #334155;
+    }
+
+    .sidebar-link.active {
+      background-color: #FEA116;
+      color: white;
+    }
+
+    .sidebar-link.active:hover {
+      background-color: #FEA116;
+    }
+
+    .sidebar-link i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      background: white;
+      min-height: 100vh;
+    }
+
+    .content-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .section-header h2 {
+      color: #374151;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+      font-size: 20px;
+    }
+
+    /* Calendar Header */
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .week-selector {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .week-selector span {
+      font-size: 16px;
+      font-weight: 500;
+      color: #374151;
+      padding: 8px 16px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+
+    .btn-outline:hover {
+      background-color: #f3f4f6;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    /* Legend */
+    /* .legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    } */
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #374151;
+      padding: 6px 12px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    /* Calendar - Fixed Height Table Layout */
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .calendar-table th {
+      background: #f9fafb;
+      color: #374151;
+      font-weight: 600;
+      padding: 16px 12px;
+      text-align: left;
+      border-bottom: 2px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .calendar-table td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+      height: 80px;
+      min-height: 80px;
+    }
+
+    .calendar-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .calendar-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .day-cell {
+      width: 120px;
+      min-width: 120px;
+      position: relative;
+    }
+
+    .day-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .day-name {
+      font-weight: 600;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .day-date {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .today-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    .shifts-cell {
+      width: auto;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .shifts-horizontal {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+    }
+
+    .shift-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      gap: 4px;
+    }
+
+    .shift-badge.morning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+    }
+
+    .shift-badge.afternoon {
+      background: #d1fae5;
+      color: #065f46;
+      border: 2px solid #10b981;
+    }
+
+    .shift-badge.evening {
+      background: #e0e7ff;
+      color: #5b21b6;
+      border: 2px solid #8b5cf6;
+    }
+
+    .shift-time {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .empty-shifts {
+      color: #9ca3af;
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    /* Messages */
+    .message {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
+    }
+
+    .message-success {
+      background: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .message-error {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    /* Loading states */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #e5e7eb;
+      border-radius: 50%;
+      border-top-color: #3b82f6;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .content-card {
+        margin: 16px;
+      }
+
+      .calendar-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .week-selector {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .week-selector span {
+        min-width: 100%;
+      }
+
+      .legend {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      /* Mobile table layout */
+      .calendar-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .calendar-table thead {
+        display: none;
+      }
+
+      .calendar-table tbody {
+        display: block;
+      }
+
+      .calendar-table tr {
+        display: block;
+        margin-bottom: 16px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .calendar-table td {
+        display: block;
+        padding: 12px 16px;
+        border-bottom: 1px solid #f3f4f6;
+        height: auto;
+        min-height: auto;
+      }
+
+      .calendar-table td:last-child {
+        border-bottom: none;
+      }
+
+      .day-cell {
+        width: 100%;
+        min-width: 100%;
+        background: #f9fafb;
+        border-radius: 4px 4px 0 0;
+      }
+
+      .day-cell::before {
+        content: 'Ngày: ';
+        font-weight: 600;
+        color: #6b7280;
+      }
+
+      .shifts-cell {
+        width: 100%;
+        min-width: 100%;
+        padding-top: 8px;
+      }
+
+      .shifts-cell::before {
+        content: 'Ca làm: ';
+        font-weight: 600;
+        color: #6b7280;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .shifts-horizontal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .shift-badge {
+        font-size: 14px;
+        padding: 6px 12px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="flex">
+  <!-- Mobile menu button -->
+  <button
+    class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-80 flex flex-col justify-between">
+    <div>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold">Dashboard User</h2>
+        <p id="username-greeting" class="text-sm mt-1">Welcome back!</p>
+      </div>
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link">
+          <i class="fas fa-user"></i> Edit Profile
+        </a>
+        <a href="work-schedule.html" id="work-schedule-link" class="sidebar-link active">
+          <i class="fas fa-calendar-alt"></i> Lịch Làm Việc
+        </a>
+        <a href="work-shift-log.html" id="work-shift-log-link" class="sidebar-link hidden">
+          <i class="fas fa-clock"></i> Lịch Sử Chấm Công
+        </a>
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Back to Home
+        </a>
+      </nav>
+    </div>
+    <div class="p-6">
+      <button id="logout-button" class="w-full btn btn-danger">
+        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content flex-1 p-6 overflow-auto">
+    <div class="max-w-6xl mx-auto">
+      <!-- Work Schedule Section -->
+      <div class="content-card p-6 relative">
+        <div class="section-header">
+          <h2><i class="fas fa-calendar-alt"></i>Lịch Làm Việc</h2>
+        </div>
+
+        <!-- Messages -->
+        <div id="error-message" class="hidden message message-error"></div>
+        <div id="success-message" class="hidden message message-success"></div>
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+          <div class="week-selector">
+            <button id="prev-week" class="btn btn-outline">
+              <i class="fas fa-chevron-left mr-2"></i>Tuần Trước
+            </button>
+            <span id="current-week" class="text-lg font-semibold px-4">Loading...</span>
+            <button id="next-week" class="btn btn-outline">
+              Tuần Sau<i class="fas fa-chevron-right ml-2"></i>
+            </button>
+          </div>
+          <button id="today-btn" class="btn btn-primary">
+            <i class="fas fa-calendar-day mr-2"></i>Hôm Nay
+          </button>
+        </div>
+
+        <!-- Calendar Container -->
+        <div id="calendar-container" class="relative">
+          <div class="loading-overlay" id="loading-overlay">
+            <div class="loading"></div>
+
+          </div>
+
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th class="day-cell">Ngày</th>
+                <th class="shifts-cell">Ca Làm Việc</th>
+              </tr>
+            </thead>
+            <tbody id="calendar-body">
+              <!-- Calendar rows will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentWeekStart = new Date();
+    let shifts = [];
+
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error("Invalid token:", e);
+        return null;
+      }
+    }
+
+    function isLoggedIn() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return false;
+      const payload = parseJwt(token);
+      return payload && payload.exp * 1000 > Date.now();
+    }
+
+    function logout() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('cart');
+      window.location.href = 'login.html';
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.textContent = message;
+      errorDiv.classList.remove('hidden');
+      document.getElementById('success-message').classList.add('hidden');
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success-message');
+      successDiv.textContent = message;
+      successDiv.classList.remove('hidden');
+      document.getElementById('error-message').classList.add('hidden');
+    }
+
+    function hideMessages() {
+      document.getElementById('error-message').classList.add('hidden');
+      document.getElementById('success-message').classList.add('hidden');
+    }
+
+    function getWeekStart(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(d.setDate(diff));
+    }
+
+    function getWeekEnd(weekStart) {
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      return weekEnd;
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
+
+    function formatTime(isoString) {
+      const timePart = isoString.split('T')[1].split(':');
+      return `${timePart[0]}:${timePart[1]}`; // HH:mm
+    }
+
+    function getShiftColor(shift) {
+      const shiftLower = shift.toLowerCase();
+      switch (shiftLower) {
+        case 'morning':
+          return 'morning';
+        case 'afternoon':
+          return 'afternoon';
+        case 'evening':
+          return 'evening';
+        default:
+          return '';
+      }
+    }
+
+    function getShiftDisplayName(shift) {
+      const shiftLower = shift.toLowerCase();
+      switch (shiftLower) {
+        case 'morning':
+          return 'Sáng';
+        case 'afternoon':
+          return 'Chiều';
+        case 'evening':
+          return 'Tối';
+        case 'night':
+          return 'Đêm';
+        default:
+          return shift;
+      }
+    }
+
+    function updateWeekDisplay() {
+      const weekEnd = getWeekEnd(currentWeekStart);
+      const weekText = `${formatDate(currentWeekStart)} - ${formatDate(weekEnd)}`;
+      document.getElementById('current-week').textContent = weekText;
+    }
+
+    function renderCalendar() {
+      const calendarBody = document.getElementById('calendar-body');
+      calendarBody.innerHTML = '';
+
+      const days = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+      const weekEnd = getWeekEnd(currentWeekStart);
+      const today = new Date();
+
+      // Filter shifts for current week
+      const weekShifts = shifts.filter(shift => {
+        const shiftDate = new Date(shift.date);
+        return shiftDate >= currentWeekStart && shiftDate <= weekEnd;
+      });
+
+      for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(currentWeekStart);
+        currentDate.setDate(currentWeekStart.getDate() + i);
+
+        const row = document.createElement('tr');
+
+        // Day cell
+        const dayCell = document.createElement('td');
+        dayCell.className = 'day-cell';
+
+        const dayInfo = document.createElement('div');
+        dayInfo.className = 'day-info';
+
+        const dayName = document.createElement('div');
+        dayName.className = 'day-name';
+        dayName.textContent = days[i];
+
+        const dayDate = document.createElement('div');
+        dayDate.className = 'day-date';
+        dayDate.textContent = `${currentDate.getDate()}/${currentDate.getMonth() + 1}`;
+
+        dayInfo.appendChild(dayName);
+        dayInfo.appendChild(dayDate);
+        dayCell.appendChild(dayInfo);
+
+        // Add today indicator
+        if (currentDate.toDateString() === today.toDateString()) {
+          const todayIndicator = document.createElement('div');
+          todayIndicator.className = 'today-indicator';
+          dayCell.appendChild(todayIndicator);
+        }
+
+        // Shifts cell
+        const shiftsCell = document.createElement('td');
+        shiftsCell.className = 'shifts-cell';
+
+        const shiftsContainer = document.createElement('div');
+        shiftsContainer.className = 'shifts-horizontal';
+
+        // Add shifts for this day
+        const dayShifts = weekShifts.filter(shift => {
+          const shiftDate = new Date(shift.date);
+          return shiftDate.toDateString() === currentDate.toDateString();
+        });
+
+        if (dayShifts.length > 0) {
+          dayShifts.forEach(shift => {
+            const shiftBadge = document.createElement('div');
+            shiftBadge.className = `shift-badge ${getShiftColor(shift.shift)}`;
+
+            const shiftName = document.createElement('span');
+            shiftName.textContent = getShiftDisplayName(shift.shift);
+
+            const shiftTime = document.createElement('span');
+            shiftTime.className = 'shift-time';
+            shiftTime.textContent = `${formatTime(shift.startTime)} - ${formatTime(shift.endTime)}`;
+
+            shiftBadge.appendChild(shiftName);
+            shiftBadge.appendChild(document.createElement('br'));
+            shiftBadge.appendChild(shiftTime);
+
+            shiftsContainer.appendChild(shiftBadge);
+          });
+        } else {
+          const emptyShifts = document.createElement('div');
+          emptyShifts.className = 'empty-shifts';
+          emptyShifts.textContent = 'Không có ca làm';
+          shiftsContainer.appendChild(emptyShifts);
+        }
+
+        shiftsCell.appendChild(shiftsContainer);
+
+        row.appendChild(dayCell);
+        row.appendChild(shiftsCell);
+        calendarBody.appendChild(row);
+      }
+    }
+
+
+    async function fetchWorkSchedule() {
+      const loadingOverlay = document.getElementById('loading-overlay');
+
+      try {
+        const data = await apiFetch(`/shifts/my-work-schedule`, {
+          method: 'GET'
+        });
+        shifts = data.result || [];
+
+        hideMessages();
+        renderCalendar();
+
+      } catch (error) {
+        console.error('Error fetching work schedule:', error);
+        showError('Lỗi khi tải lịch làm việc: ' + error.message);
+      } finally {
+        loadingOverlay.style.display = 'none';
+      }
+    }
+
+    async function fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id;
+
+        const data = await apiFetch(`/users/${userId}`, {
+          method: 'GET'
+        });
+        const user = data.result;
+        document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
+
+        // Update sidebar based on user role
+        updateSidebarByRole(payload.scope);
+
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    }
+
+    function updateSidebarByRole(scope) {
+      const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
+      // Extract the role from scope (first value starting with ROLE_)
+      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+      const isStaff = staffRoles.includes(role);
+
+      const workScheduleLink = document.getElementById('work-schedule-link');
+      const attendanceLink = document.getElementById('work-shift-log-link');
+
+      if (isStaff) {
+        workScheduleLink.classList.remove('hidden');
+        attendanceLink.classList.remove('hidden'); 
+      } else {
+        redirectToLogin();
+      }
+    }
+
+    function initializeWeek() {
+      const today = new Date();
+      currentWeekStart = getWeekStart(today);
+      updateWeekDisplay();
+    }
+
+    function previousWeek() {
+      currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+      updateWeekDisplay();
+      renderCalendar();
+    }
+
+    function nextWeek() {
+      currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+      updateWeekDisplay();
+      renderCalendar();
+    }
+
+    function goToToday() {
+      const today = new Date();
+      currentWeekStart = getWeekStart(today);
+      updateWeekDisplay();
+      renderCalendar();
+    }
+
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    function initializePage() {
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập để xem lịch làm việc!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      initializeWeek();
+      fetchUserInfo();
+      fetchWorkSchedule();
+    }
+
+    // Event Listeners
+    document.getElementById('prev-week').addEventListener('click', previousWeek);
+    document.getElementById('next-week').addEventListener('click', nextWeek);
+    document.getElementById('today-btn').addEventListener('click', goToToday);
+    document.getElementById('logout-button').addEventListener('click', logout);
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+
+      if (window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
+        !menuBtn.contains(e.target) &&
+        sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+  <script src="../../js/fetch-api.js"></script>
+</body>
+
+</html>

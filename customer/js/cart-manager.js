@@ -1063,7 +1063,7 @@ function placeOrder(event) {
 //         category: 'Món chính'
 //     };
 //     cartManager.addItem(sampleItem, 1, 'Ít cay');
-// }
+// }x
 
 // Debug functions (có thể xóa trong production)
 function debugCart() {
@@ -1075,4 +1075,3 @@ function clearDebugCart() {
     cartManager.clearCart();
     console.log('Cart cleared');
 }
-

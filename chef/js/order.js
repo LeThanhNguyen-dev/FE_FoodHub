@@ -154,7 +154,7 @@ async function loadOrders(isAutoRefresh = false) {
             params.append('startTime', currentWorkSchedule.startTime);
         }
         console.log('Fetching orders with pagination and sorting:', params.toString());
-        const data = await apiFetch(`/orders/chef/work-shift-orders?${params.toString()}`, { method: 'GET' });
+        const data = await apiFetch(`/orders/chef/work-shift-orders/${currentUserInfo.id}?${params.toString()}`, { method: 'GET' });
 
         console.log('API Response:', data);
 
@@ -563,7 +563,7 @@ function addModalStyles() {
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 9999;
         }
         .modal-content {
             background: white;

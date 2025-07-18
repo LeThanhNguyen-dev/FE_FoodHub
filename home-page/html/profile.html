@@ -323,6 +323,12 @@
         <a href="profile.html" id="profile-link" class="sidebar-link active">
           <i class="fas fa-user"></i> Edit Profile
         </a>
+        <a href="work-schedule.html" id="work-schedule-link" class="sidebar-link hidden">
+          <i class="fas fa-calendar-alt"></i> Lịch Làm Việc
+        </a>
+        <a href="work-shift-log.html" id="attendance-link" class="sidebar-link hidden">
+          <i class="fas fa-clock"></i> Nhật Ký Chấm Công
+        </a>
         <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
           <i class="fas fa-truck"></i> Order Tracking
         </a>
@@ -439,7 +445,31 @@
       const token = localStorage.getItem('accessToken');
       if (!token) return false;
       const payload = parseJwt(token);
-      return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
+      return payload && payload.exp * 1000 > Date.now();
+    }
+
+    function updateSidebarByRole(scope) {
+      const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
+      // Extract the role from scope (first value starting with ROLE_)
+      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+      const isStaff = staffRoles.includes(role);
+
+      const workScheduleLink = document.getElementById('work-schedule-link');
+      const attendanceLink = document.getElementById('attendance-link'); // Thêm dòng này
+      const orderTrackLink = document.getElementById('order-track-link');
+      const orderHistoryLink = document.getElementById('order-history-link');
+
+      if (isStaff) {
+        workScheduleLink.classList.remove('hidden');
+        attendanceLink.classList.remove('hidden'); // Thêm dòng này
+        orderTrackLink.classList.add('hidden');
+        orderHistoryLink.classList.add('hidden');
+      } else if (role === 'ROLE_CUSTOMER') {
+        workScheduleLink.classList.add('hidden');
+        attendanceLink.classList.add('hidden'); // Thêm dòng này
+        orderTrackLink.classList.remove('hidden');
+        orderHistoryLink.classList.remove('hidden');
+      }
     }
 
     function logout() {
@@ -479,6 +509,10 @@
         document.getElementById('phone').value = user.phone || '';
         document.getElementById('address').value = user.address || '';
         document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
+
+        // Update sidebar based on user role
+        updateSidebarByRole(payload.scope);
+        console.log("role: ", payload.scope);
       } catch (error) {
         showError('Error fetching info: ' + error.message);
       }

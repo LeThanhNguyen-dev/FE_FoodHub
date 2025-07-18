@@ -46,7 +46,7 @@
                 <div class="card-body">
                     <form id="filterForm" class="row g-3">
                         <div class="col-md-3">
-                            <label for="periodSelect" class="form-label fw-bold">Thời gian</label>
+                            <label for="statusFilter" class="form-label fw-bold">Thời gian</label>
                             <select id="period" class="form-select">
                                 <option value="today">Hôm nay</option>
                                 <option value="week">Tuần này</option>
@@ -224,6 +224,10 @@
         function hideLoading() {
             document.getElementById('loadingSpinner').style.display = 'none';
         }
+        function hideQueryParams() {
+    const cleanUrl = window.location.pathname; // Lấy đường dẫn không chứa query parameters
+    history.pushState({}, '', cleanUrl); // Thay đổi URL hiển thị
+}
 
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -407,7 +411,7 @@
                         <td data-status-column>${formatPaymentStatus(payment.status)}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-outline-primary btn-sm" onclick="showPaymentDetail('${payment.transactionId}')" title="View Details">
+                                <button class="btn btn-outline-primary btn-sm" onclick="showPaymentDetail('${payment.id}')" title="View Details">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -477,9 +481,9 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        async function showPaymentDetail(transactionId) {
+        async function showPaymentDetail(paymentId) {
             try {
-                const data = await apiFetch(`/payments/${transactionId}`);
+                const data = await apiFetch(`/payments/${paymentId}`);
                 const payment = data.result;
                 document.getElementById('paymentDetailModalLabel').textContent = `Chi tiết giao dịch ${payment.payment.transactionId}`;
                 document.getElementById('paymentDetails').innerHTML = `
@@ -531,24 +535,31 @@
             fetchPayments();
         }
 
-        function initPeriodFromQueryParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const period = urlParams.get('period') || 'month';
-            const startDate = urlParams.get('startDate');
-            const endDate = urlParams.get('endDate');
+       function initPeriodFromQueryParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const period = urlParams.get('period') || 'month';
+    const startDate = urlParams.get('startDate');
+    const endDate = urlParams.get('endDate');
+    const status = urlParams.get('status');
 
-            const periodSelect = document.getElementById('period');
+    const periodSelect = document.getElementById('period');
+    const statusFilter = document.getElementById('statusFilter');
 
-            if (period === 'specific' && startDate && endDate) {
-                periodSelect.value = 'specific';
-                document.getElementById('customDate').style.display = 'block';
-                document.getElementById('startDate').value = startDate.split('T')[0];
-                document.getElementById('endDate').value = endDate.split('T')[0];
-            } else {
-                periodSelect.value = period;
-                document.getElementById('customDate').style.display = period === 'specific' ? 'block' : 'none';
-            }
-        }
+    if (period === 'specific' && startDate && endDate) {
+        periodSelect.value = 'specific';
+        document.getElementById('customDate').style.display = 'block';
+        document.getElementById('startDate').value = startDate.split('T')[0];
+        document.getElementById('endDate').value = endDate.split('T')[0];
+    } else {
+        periodSelect.value = period;
+        document.getElementById('customDate').style.display = period === 'specific' ? 'block' : 'none';
+    }
+
+    if (status) {
+        statusFilter.value = status;
+    }
+    hideQueryParams();
+}
 
         async function updateData() {
             await fetchPayments();

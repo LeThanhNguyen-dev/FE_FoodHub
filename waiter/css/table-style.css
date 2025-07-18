@@ -546,12 +546,15 @@
         font-size: 0.7rem;
         padding: 0.25rem 0.5rem;
     }
+    #tablesContainer.orders-section{
+        margin: 8px !important;
+    }
 }
 
 /* Small mobile screens */
 @media (max-width: 576px) {
     .container-fluid {
-        padding: 0.5rem;
+        padding: 0.5rem !important;
     }
 
     .table-stats-cards {

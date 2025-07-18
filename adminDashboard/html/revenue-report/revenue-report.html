@@ -43,14 +43,14 @@
         <!-- Dashboard Content -->
         <div class="dashboard">
             <div class="stats-grid">
-                <div class="stat-card revenue">
-                    <div class="stat-header">
-                        <div class="stat-label">Tổng Doanh Thu</div>
-                    </div>
-                    <div class="stat-value" id="totalRevenue">
-                        <span class="loading-spinner"></span>Đang tải...
-                    </div>
-                </div>
+                <div class="stat-card revenue" onclick="navigateToTransactions()">
+    <div class="stat-header">
+        <div class="stat-label">Tổng Doanh Thu</div>
+    </div>
+    <div class="stat-value" id="totalRevenue">
+        <span class="loading-spinner"></span>Đang tải...
+    </div>
+</div>
                 <div class="stat-card orders" onclick="navigateToOrders()">
                     <div class="stat-header">
                         <div class="stat-label">Đơn hàng</div>
@@ -224,15 +224,50 @@
 
         function navigateToOrders() {
             const period = document.getElementById('periodSelect').value;
-            let url = 'order.html?period=' + encodeURIComponent(period);
+            let url = 'order.html?status=COMPLETED&period=' + encodeURIComponent(period);
             if (period === 'specific') {
                 const specificDate = document.getElementById('specificDateInput').value;
                 if (specificDate) {
-                    url = `order.html?period=custom&startDate=${encodeURIComponent(specificDate)}&endDate=${encodeURIComponent(specificDate)}`;
+                    url = `order.html?status=COMPLETED&period=custom&startDate=${encodeURIComponent(specificDate)}&endDate=${encodeURIComponent(specificDate)}`;
                 }
             }
             window.location.href = url;
         }
+        function navigateToTransactions() {
+    const period = document.getElementById('periodSelect').value;
+    let url = 'transaction.html?status=PAID&period=' + encodeURIComponent(period);
+    if (period === 'specific') {
+        const specificDate = document.getElementById('specificDateInput').value;
+        if (specificDate) {
+            url = `transaction.html?status=PAID&period=specific&startDate=${encodeURIComponent(specificDate)}&endDate=${encodeURIComponent(specificDate)}`;
+        }
+    }
+    window.location.href = url;
+}
+function saveFilterState() {
+    const period = document.getElementById('periodSelect').value;
+    sessionStorage.setItem('filter_period', period);
+    if (period === 'specific') {
+        const specificDate = document.getElementById('specificDateInput').value;
+        sessionStorage.setItem('filter_specificDate', specificDate);
+    } else {
+        sessionStorage.removeItem('filter_specificDate');
+    }
+}
+function restoreFilterState() {
+    const period = sessionStorage.getItem('filter_period') || 'month';
+    const specificDate = sessionStorage.getItem('filter_specificDate');
+    
+    const periodSelect = document.getElementById('periodSelect');
+    periodSelect.value = period;
+    
+    if (period === 'specific' && specificDate) {
+        document.getElementById('specificDate').style.display = 'flex';
+        document.getElementById('specificDateInput').value = specificDate;
+    } else {
+        document.getElementById('specificDate').style.display = 'none';
+    }
+}
 
         function getChartConfig(chartId, data) {
             const period = document.getElementById('periodSelect').value;
@@ -603,22 +638,22 @@
         }
 
         async function updateData() {
-            const period = document.getElementById('periodSelect').value;
-            const categoryId = document.getElementById('categoryFilter').value;
-            let queryParams = `period=${period}`;
-            let dishQueryParams = `period=${period}`;
-            if (period === 'specific') {
-                const specificDate = document.getElementById('specificDateInput').value;
-                if (!specificDate) {
-                    showError('Vui lòng chọn một ngày cụ thể.');
-                    return;
-                }
-                queryParams += `&specificDate=${specificDate}`;
-                dishQueryParams += `&specificDate=${specificDate}`;
-            }
-            if (categoryId) {
-                dishQueryParams += `&categoryId=${categoryId}`;
-            }
+           const period = document.getElementById('periodSelect').value;
+    const categoryId = document.getElementById('categoryFilter').value;
+    let queryParams = `period=${period}`;
+    let dishQueryParams = `period=${period}`;
+    if (period === 'specific') {
+        const specificDate = document.getElementById('specificDateInput').value;
+        if (!specificDate) {
+            showError('Vui lòng chọn một ngày cụ thể.');
+            return;
+        }
+        queryParams += `&specificDate=${specificDate}`;
+        dishQueryParams += `&specificDate=${specificDate}`;
+    }
+    if (categoryId) {
+        dishQueryParams += `&categoryId=${categoryId}`;
+    }
 
             try {
                 document.getElementById('totalRevenue').innerHTML = '<span class="loading-spinner"></span>Đang tải...';
@@ -653,19 +688,25 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadTopbar();
-            loadSidebar();
-            updateData();
-            document.getElementById('periodSelect').addEventListener('change', function() {
-                document.getElementById('specificDate').style.display = this.value === 'specific' ? 'flex' : 'none';
-                if (this.value !== 'specific') updateData();
-            });
-            document.getElementById('specificDateInput').addEventListener('change', function() {
-                if (document.getElementById('periodSelect').value === 'specific') updateData();
-            });
-            document.getElementById('categoryFilter').addEventListener('change', updateData);
-        });
+      document.addEventListener('DOMContentLoaded', function() {
+    loadTopbar();
+    loadSidebar();
+    restoreFilterState(); // Khôi phục trạng thái bộ lọc
+    updateData(); // Làm mới dữ liệu dựa trên bộ lọc
+    document.getElementById('periodSelect').addEventListener('change', function() {
+        document.getElementById('specificDate').style.display = this.value === 'specific' ? 'flex' : 'none';
+        saveFilterState(); // Lưu trạng thái khi thay đổi
+        if (this.value !== 'specific') updateData();
+    });
+    document.getElementById('specificDateInput').addEventListener('change', function() {
+        saveFilterState(); // Lưu trạng thái khi thay đổi
+        if (document.getElementById('periodSelect').value === 'specific') updateData();
+    });
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        saveFilterState(); // Lưu trạng thái khi thay đổi
+        updateData();
+    });
+});
 
         setInterval(updateData, 5 * 60 * 1000);
     </script>
