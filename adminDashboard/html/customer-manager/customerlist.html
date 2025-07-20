@@ -95,7 +95,7 @@
                                     <th>Email</th>
                                     <th>Số điện thoại</th>
                                     <th style="width: 130px;">Trạng thái</th>
-                                    <th style="width: 150px;">Thao tác</th>
+                                    <th style="width: 200px;">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody id="customerTableBody">
@@ -119,7 +119,61 @@
             </nav>
         </div>
     </div>
+<div class="modal fade" id="orderHistoryModal" tabindex="-1" aria-labelledby="orderHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderHistoryModalLabel">
+                    <i class="fas fa-history me-2"></i>Lịch sử đặt hàng
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loading Spinner -->
+                <div id="orderLoadingSpinner" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Đang tải lịch sử đặt hàng...</p>
+                </div>
 
+                <!-- Order History Content -->
+                <div id="orderHistoryContent">
+                    <!-- Customer Info -->
+                    <div class="customer-info mb-4" id="customerInfo" style="display: none;">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted mb-2">Thông tin khách hàng</h6>
+                                        <p class="mb-1"><strong>Tên:</strong> <span id="customerName"></span></p>
+                                        <p class="mb-0"><strong>Email:</strong> <span id="customerEmail"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted mb-2">Thống kê</h6>
+                                        <p class="mb-1"><strong>Tổng đơn hàng:</strong> <span id="totalOrders"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orders List -->
+                    <div id="ordersList">
+                        <!-- Orders will be loaded here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyOrderState" class="empty-state" style="display: none;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h5>Chưa có đơn hàng nào</h5>
+                        <p class="text-muted">Khách hàng này chưa có đơn hàng nào</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
@@ -231,72 +285,82 @@
         }
 
         function renderCustomerTable(items) {
-            const tbody = document.getElementById('customerTableBody');
+    const tbody = document.getElementById('customerTableBody');
 
-            if (!items || items.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
-                tbody.innerHTML = '';
-                return;
-            }
+    if (!items || items.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        tbody.innerHTML = '';
+        return;
+    }
 
-            document.getElementById('emptyState').style.display = 'none';
-            tbody.innerHTML = '';
+    document.getElementById('emptyState').style.display = 'none';
+    tbody.innerHTML = '';
 
-            items.forEach(item => {
-                const isActive = item.status === 'ACTIVE' || !item.status;
-                const statusClass = isActive ? 'status-active' : 'status-inactive';
-                const statusText = isActive ? 'Hoạt động' : 'Không hoạt động';
-                const actionButton = item.id ? (
-                    isActive ?
-                    `<button class="btn btn-outline-danger btn-sm" onclick="deactivateCustomer(${item.id})" title="Vô hiệu hóa">
-                         <i class="fas fa-trash"></i>
-                       </button>` :
-                    `<button class="btn btn-outline-success btn-sm" onclick="restoreCustomer(${item.id})" title="Kích hoạt">
-                         <i class="fas fa-undo"></i>
-                       </button>`
-                ) : (
-                    isActive ?
-                    `<button class="btn btn-outline-danger btn-sm" disabled title="Vô hiệu hóa">
-                         <i class="fas fa-trash"></i>
-                       </button>` :
-                    `<button class="btn btn-outline-success btn-sm" disabled title="Kích hoạt">
-                         <i class="fas fa-undo"></i>
-                       </button>`
-                );
+    items.forEach(item => {
+        const isActive = item.status === 'ACTIVE' || !item.status;
+        const statusClass = isActive ? 'status-active' : 'status-inactive';
+        const statusText = isActive ? 'Hoạt động' : 'Không hoạt động';
+        
+        const actionButton = item.id ? (
+            isActive ?
+            `<button class="btn btn-outline-danger btn-sm" onclick="deactivateCustomer(${item.id})" title="Vô hiệu hóa">
+                 <i class="fas fa-trash"></i>
+               </button>` :
+            `<button class="btn btn-outline-success btn-sm" onclick="restoreCustomer(${item.id})" title="Kích hoạt">
+                 <i class="fas fa-undo"></i>
+               </button>`
+        ) : (
+            isActive ?
+            `<button class="btn btn-outline-danger btn-sm" disabled title="Vô hiệu hóa">
+                 <i class="fas fa-trash"></i>
+               </button>` :
+            `<button class="btn btn-outline-success btn-sm" disabled title="Kích hoạt">
+                 <i class="fas fa-undo"></i>
+               </button>`
+        );
 
-                const editButton = item.id ?
-                    `<button class="btn btn-outline-primary btn-sm me-1" onclick="editCustomer(${item.id})" title="Chỉnh sửa">
-                     <i class="fas fa-edit"></i>
-                   </button>` :
-                    `<button class="btn btn-outline-primary btn-sm me-1" disabled title="Chỉnh sửa">
-                     <i class="fas fa-edit"></i>
-                   </button>`;
+        const editButton = item.id ?
+            `<button class="btn btn-outline-primary btn-sm me-1" onclick="editCustomer(${item.id})" title="Chỉnh sửa">
+             <i class="fas fa-edit"></i>
+           </button>` :
+            `<button class="btn btn-outline-primary btn-sm me-1" disabled title="Chỉnh sửa">
+             <i class="fas fa-edit"></i>
+           </button>`;
 
-                const row = `
-                    <tr>
-                        <td>
-                            <div class="fw-bold">${item.username || 'N/A'}</div>
-                        </td>
-                        <td>
-                            <div class="text-muted">${item.email || 'N/A'}</div>
-                        </td>
-                        <td>
-                            <div>${item.phone || 'Chưa có'}</div>
-                        </td>
-                        <td>
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                ${editButton}
-                                ${actionButton}
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                tbody.insertAdjacentHTML('beforeend', row);
-            });
-        }
+        const viewHistoryButton = item.id ?
+            `<button class="btn btn-outline-info btn-sm me-1" onclick="viewOrderHistory(${item.id}, '${item.username}', '${item.email}')" title="Xem lịch sử đặt hàng">
+             <i class="fas fa-eye"></i>
+           </button>` :
+            `<button class="btn btn-outline-info btn-sm me-1" disabled title="Xem lịch sử đặt hàng">
+             <i class="fas fa-eye"></i>
+           </button>`;
+
+        const row = `
+            <tr>
+                <td>
+                    <div class="fw-bold">${item.username || 'N/A'}</div>
+                </td>
+                <td>
+                    <div class="text-muted">${item.email || 'N/A'}</div>
+                </td>
+                <td>
+                    <div>${item.phone || 'Chưa có'}</div>
+                </td>
+                <td>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        ${viewHistoryButton}
+                        ${editButton}
+                        ${actionButton}
+                    </div>
+                </td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+    });
+}
 
         function renderPagination(totalPages, currentPageIndex) {
             const pagination = document.getElementById('pagination');
@@ -423,7 +487,197 @@
                 timeout = setTimeout(later, wait);
             };
         }
+async function viewOrderHistory(userId, username, email) {
+    if (!userId) {
+        showNotification('Không tìm thấy ID khách hàng!', 'error');
+        return;
+    }
 
+    // Hiển thị modal
+    const modal = new bootstrap.Modal(document.getElementById('orderHistoryModal'));
+    modal.show();
+
+    // Cập nhật thông tin khách hàng
+    document.getElementById('customerName').textContent = username || 'N/A';
+    document.getElementById('customerEmail').textContent = email || 'N/A';
+
+    // Load lịch sử đặt hàng
+    await loadOrderHistory(userId);
+}
+
+// Function để load lịch sử đặt hàng từ API
+async function loadOrderHistory(userId) {
+    const loadingSpinner = document.getElementById('orderLoadingSpinner');
+    const ordersList = document.getElementById('ordersList');
+    const emptyOrderState = document.getElementById('emptyOrderState');
+    const customerInfo = document.getElementById('customerInfo');
+
+    // Hiển thị loading
+    loadingSpinner.style.display = 'block';
+    ordersList.innerHTML = '';
+    emptyOrderState.style.display = 'none';
+    customerInfo.style.display = 'none';
+
+    try {
+        const response = await apiFetch(`/orders/user/${userId}`, { method: 'GET' });
+        
+        if (response && response.code === 0) {
+            const orders = response.result.content || [];
+            
+            if (orders.length > 0) {
+                renderOrderHistory(orders);
+                updateCustomerStats(orders);
+                customerInfo.style.display = 'block';
+            } else {
+                emptyOrderState.style.display = 'block';
+            }
+        } else {
+            throw new Error(response?.message || 'Lỗi khi tải lịch sử đặt hàng');
+        }
+    } catch (error) {
+        showNotification(error.message || 'Có lỗi xảy ra khi tải lịch sử đặt hàng!', 'error');
+        emptyOrderState.style.display = 'block';
+    } finally {
+        loadingSpinner.style.display = 'none';
+    }
+}
+
+// Function để render danh sách đơn hàng
+function renderOrderHistory(orders) {
+    const ordersList = document.getElementById('ordersList');
+    
+    ordersList.innerHTML = orders.map(order => {
+        const createdDate = new Date(order.createdAt).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const statusClass = getOrderStatusClass(order.status);
+        const orderTypeText = getOrderTypeText(order.orderType);
+
+        return `
+            <div class="card mb-3 order-card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-0">
+                                <i class="fas fa-receipt me-2"></i>
+                                Đơn hàng #${order.id}
+                            </h6>
+                            <small class="text-muted">${createdDate}</small>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                             <span class="badge ${statusClass} me-2">${getOrderStatusText(order.status)}</span>
+                            <span class="badge bg-secondary">${orderTypeText}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="mb-2">Món ăn đã đặt:</h6>
+                            <ul class="list-unstyled mb-0">
+                                ${order.orderItems.map(item => `
+                                    <li class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <strong>${item.menuItemName}</strong>
+                                            <span class="text-muted"> x${item.quantity}</span>
+                                           <span class="badge ${getOrderStatusClass(item.status)} ms-2">${getOrderStatusText(item.status) || 'N/A'}</span>
+                                            <div class="text-muted small">Đơn giá: ${formatCurrency(item.price)}</div>
+                                        </div>
+                                        <span class="fw-bold">Tổng: ${formatCurrency(item.price * item.quantity)}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="order-summary">
+                                ${order.tableNumber ? `<p class="mb-1"><strong>Bàn:</strong> ${order.tableNumber}</p>` : ''}
+                                <p class="mb-1"><strong>Thanh toán:</strong> ${getPaymentMethodText(order.payment?.paymentMethod)}</p>
+                                <p class="mb-1"><strong>Trạng thái TT:</strong> 
+                                    <span class="badge ${getPaymentStatusClass(order.payment?.status)}">${order.payment?.status || 'N/A'}</span>
+                                </p>
+                                <hr>
+                                <h5 class="mb-0 text-primary">
+                                    <strong>Tổng: ${formatCurrency(order.totalAmount)}</strong>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+function getOrderStatusText(status) {
+    switch(status) {
+        case 'PENDING': return 'Đang chờ';
+        case 'CONFIRMED': return 'Đã xác nhận';
+        case 'PREPARING': return 'Đang chuẩn bị';
+        case 'COMPLETED': return 'Hoàn thành';
+        case 'READY': return 'Sẵn sàng';
+        case 'CANCELLED': return 'Đã hủy';
+        default: return status || 'N/A';
+    }
+}
+
+// Function để cập nhật thống kê khách hàng
+function updateCustomerStats(orders) {
+    const totalOrders = orders.length;
+    document.getElementById('totalOrders').textContent = totalOrders;
+}
+
+// Helper functions
+function getOrderStatusClass(status) {
+    switch(status) {
+        case 'COMPLETED': 
+        case 'READY': return 'bg-success';
+        case 'PENDING': 
+        case 'CONFIRMED': 
+        case 'PREPARING': return 'bg-warning';
+        case 'CANCELLED': return 'bg-danger';
+        default: return 'bg-secondary';
+    }
+}
+
+function getPaymentStatusClass(status) {
+    switch(status) {
+        case 'PAID': return 'bg-success';
+        case 'PENDING': 
+        case 'UNPAID': return 'bg-warning';
+        case 'CANCELLED': 
+        case 'FAILED': 
+        case 'REFUNDED': return 'bg-danger';
+        default: return 'bg-secondary';
+    }
+}
+
+function getOrderTypeText(orderType) {
+    switch(orderType) {
+        case 'DINE_IN': return 'Tại chỗ';
+        case 'TAKEAWAY': return 'Mang về';
+        case 'DELIVERY': return 'Giao hàng';
+        default: return orderType || 'N/A';
+    }
+}
+
+function getPaymentMethodText(paymentMethod) {
+    switch(paymentMethod) {
+        case 'CASH': return 'Tiền mặt';
+        case 'BANKING': return 'Banking';
+        default: return paymentMethod || 'N/A';
+    }
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount || 0);
+}
         // Hàm xử lý khi filter/sort thay đổi
         function handleFilterChange() {
             currentPage = 0; // Reset về trang đầu khi lọc

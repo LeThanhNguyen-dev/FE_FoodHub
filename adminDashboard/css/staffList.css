@@ -272,6 +272,68 @@
         width: 160px; /* Đặt width cố định cho cột trạng thái */
         min-width: 160px;
     }
+    .order-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary {
+    background: var(--light);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.modal-xl {
+    max-width: 90%;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    flex: 1;
+    min-width: 40px;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .modal-xl {
+        max-width: 95%;
+    }
+}
+
+/* Badge styles for order status */
+.badge.bg-success {
+    background-color: var(--success) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--secondary) !important;
+}
 
     /* =================================================================== */
     /* Responsive - Đảm bảo hoạt động tốt trên mobile                     */

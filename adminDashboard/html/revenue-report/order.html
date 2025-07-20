@@ -143,8 +143,9 @@
                                     <th onclick="sortTable('totalAmount')" style="cursor: pointer;">
                                         Tổng tiền <span id="sort-totalAmount" class="sort-arrow"></span>
                                     </th>
-                                    <th>Loại đơn</th>
                                     <th>Thanh toán</th>
+                                    <th>Trạng thái</th>
+                                    
                                     <th style="width: 150px;">Thao tác</th>
                                 </tr>
                             </thead>
@@ -196,6 +197,7 @@
                                     <th>Số lượng</th>
                                     <th>Đơn giá</th>
                                     <th>Thành tiền</th>
+                                    <th>Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody id="itemsTableBody"></tbody>
@@ -315,6 +317,20 @@
                 default: return status;
             }
         }
+        function getStatusClass(status) {
+    if (!status || status.trim() === '') {
+        return 'status-unknown';
+    }
+    switch (status.toUpperCase()) {
+        case 'PENDING': return 'status-pending';
+        case 'CONFIRMED': return 'status-confirmed';
+        case 'PREPARING': return 'status-preparing';
+        case 'READY': return 'status-ready';
+        case 'COMPLETED': return 'status-completed';
+        case 'CANCELLED': return 'status-cancelled';
+        default: return 'status-unknown';
+    }
+}
 
         function getQueryParams() {
             const period = document.getElementById('period').value;
@@ -476,8 +492,8 @@ function renderOrderTable(orders, totalElements = 0) {
                 <td><div>${formatDate(order.createdAt)}</div></td>
                 <td><div>${order.username || 'Khách lẻ'}</div></td>
                 <td><div class="fw-bold text-success">${formatCurrency(order.totalAmount)}</div></td>
-                <td><div>${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</div></td>
                 <td><div>${paymentMethodText}</div></td>
+                <td><div><span class="status-badge ${getStatusClass(order.status)}">${formatStatus(order.status)}</span></div></td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn btn-outline-primary btn-sm" onclick="showOrderDetail(${order.id})" title="Xem chi tiết">
@@ -699,13 +715,13 @@ function renderOrderTable(orders, totalElements = 0) {
                         <p><strong>Mã:</strong> ${order.id}</p>
                         <p><strong>Ngày đặt:</strong> ${formatDate(order.createdAt)}</p>
                         <p><strong>Khách hàng:</strong> ${order.username || 'Khách lẻ'}</p>
+                        <p><strong>Phương thức thanh toán:</strong> ${paymentMethodText}</p>
                     </div>
                     <div class="col-md-6">
                         <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
                         <p><strong>Loại đơn:</strong> ${order.orderType === 'DINE_IN' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Giao hàng'}</p>
                         <p><strong>Bàn:</strong> ${order.tableNumber || 'N/A'}</p>
-                        <p><strong>Phương thức thanh toán:</strong> ${paymentMethodText}</p>
-                        <p><strong>Trạng thái:</strong> ${statusText}</p>
+                        <p><strong>Trạng thái đơn hàng:</strong> ${statusText}</p>
                     </div>
                 `;
                 
@@ -715,6 +731,7 @@ function renderOrderTable(orders, totalElements = 0) {
                         <td>${item.quantity}</td>
                         <td>${formatCurrency(item.price)}</td>
                         <td>${formatCurrency(item.quantity * item.price)}</td>
+                        <td>${formatStatus(item.status)}</td>
                     </tr>
                 `).join('');
                 
