@@ -1,318 +1,370 @@
-  <!DOCTYPE html>
-  <html lang="vi">
-  <head>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cashier Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link href= "css/style.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+   
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <h3><i class="brand-icon fas fa-utensils"></i><span class="brand-text">FoodHub</span></h3>
+            <div class="subtitle">Cashier System</div>
+        </div>
 
-  </head>
+        
+        <nav class="sidebar-nav">
 
-  <body>
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    
-    <div class="brand">
-    <h3><i class="brand-icon fas fa-utensils"></i><span class="brand-text">FoodHub</span></h3>
-    <div class="subtitle">Cashier System</div>
-</div>
-    <nav class="sidebar-nav">
-
-
-      
-      <div class="nav-item">
-        <button class="nav-link" onclick="showSection('transactions')" id="sidebarTransactions">
-          <i class="fas fa-list-alt"></i><span>Giao Dịch</span>
+<div class="nav-item">
+        <button class="nav-link" onclick="showSection('dashboard')" id="sidebarDashboard">
+            <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
         </button>
-      </div>
+    </div>
 
-      <div class="nav-item">
-        <button class="nav-link" onclick="showSection('revenue')" id="sidebarRevenue">
-          <i class="fas fa-chart-line"></i><span>Doanh thu</span>
-        </button>
-      </div>
-
-
-
- <div class="nav-item">
-                <button class="nav-link" onclick="showSection('schedule')" id="sidebarSchedule">
-                    <i class="fas fa-calendar-alt"></i><span>Lịch Làm</span>
+            <div class="nav-item">
+                <button class="nav-link" onclick="showSection('transactions')" id="sidebarTransactions">
+                    <i class="fas fa-list-alt"></i><span>Giao Dịch</span>
                 </button>
             </div>
-      
-
+            <div class="nav-item">
+                <button class="nav-link" onclick="showSection('revenue')" id="sidebarRevenue">
+                    <i class="fas fa-chart-line"></i><span>Doanh thu</span>
+                </button>
+            </div>
             
-
-      <div class="nav-item">
-        <button class="nav-link" onclick="logout()" id="sidebarLogout">
-            <i class="fas fa-sign-out-alt"></i><span>Đăng Xuất</span>
-        </button>
-    </div>
-     
-    </nav>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content" id="mainContent">
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <button class="toggle-sidebar" onclick="toggleSidebar()">
-          <i class="fas fa-bars"></i>
-        </button>
-        <h1>Cashier Dashboard</h1>
-      </div>
-      <div class="user-info">
-      <span id="cashier-name">👤 Cashier: Loading...</span>
-        <span>|</span>
-        <span id="current-time"></span>
-      </div>
-    </div>
-
-    <!-- Messages -->
-    <div id="message" class="success"></div>
-      <div id="error" class="error"></div>
-
-  <!-- Notification Bar -->
-  <div id="successNotification" class="notification" style="display: none;">
-  </div>
-
-  <div id="deleteSuccessNotification" class="notification" style="display: none;">
-    </div>
-
-  <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
-
-
-    <!-- Transactions Section -->
-    <div class="section" id="transactionsSection">
-    <div class="form-container">
-        <div class="form-header">
-            <h1>Giao Dịch Hôm Nay</h1>
-            <p>Hiển thị giao dịch của ngày hôm nay: <span id="currentDate"></span></p>
-        </div>
-    </div>
-
-    <!-- Filter and Search Row -->
-    <div class="filter-search-row">
-        <!-- Filter Section -->
-        <div class="filter-container" id="filterContainer">
-            <div class="filter-buttons-row">
-                <button class="filter-btn" id="statusFilterBtn" onclick="showFilterMenu('status')">Lọc Theo Trạng Thái</button>
-                <button class="filter-btn" id="priceFilterBtn" onclick="showPriceFilter()">Lọc Theo Giá</button>
-                <button class="filter-btn" id="sortPriceBtn" onclick="showFilterMenu('sortPrice')">Sắp xếp Theo Giá</button>
-                <button class="filter-btn" id="methodFilterBtn" onclick="showFilterMenu('method')">Lọc Theo Phương Thức</button>
+            
+            <div class="nav-item">
+                <button class="nav-link" onclick="logout()" id="sidebarLogout">
+                    <i class="fas fa-sign-out-alt"></i><span>Đăng Xuất</span>
+                </button>
             </div>
-            <div class="filter-menu" id="statusFilterMenu" style="display: none;">
-                <div class="filter-item" onclick="applyFilter('status', 'all')">Tất cả</div>
-                <div class="filter-item" onclick="applyFilter('status', 'PENDING')">Đang chờ</div>
-                <div class="filter-item" onclick="applyFilter('status', 'CANCELLED')">Đã hủy</div>
-                <div class="filter-item" onclick="applyFilter('status', 'PAID')">Đã thanh toán</div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="toggle-sidebar" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Cashier Dashboard</h1>
             </div>
-            <div class="filter-menu" id="priceFilterMenu" style="display: none; width: 250px; padding: 10px;">
-                <div class="price-range">
-                    <label for="priceRange">Mức giá: <span id="priceRangeValue">0 - 1.200.000</span> VNĐ</label>
-                    <input type="range" id="priceRange" min="0" max="1200000" step="10000" value="0" oninput="updatePriceRange()">
-                    <input type="range" id="priceRangeMax" min="0" max="1200000" step="10000" value="1200000" oninput="updatePriceRange()">
-                    <div id="priceRangeDisplay">0 - 1.200.000 VNĐ</div>
-                    <button class="apply-btn" onclick="applyPriceFilter()">Áp dụng</button>
+              
+            <div class="user-info">
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn" onclick="toggleUserDropdown()">
+                        <i class="fas fa-user-circle user-icon"></i>
+                        <span id="cashier-name"></span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="../home-page/html/profile.html#profile">
+                            <i class="fas fa-user"></i>Hồ sơ
+                        </a>
+                        <a class="dropdown-item" href="../home-page/html/work-schedule.html">
+                            <i class="fas fa-clock"></i>Lịch làm việc
+                        </a>
+                     
+                        <hr class="dropdown-divider">
+                        <a class="dropdown-item logout-item" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>Đăng xuất
+                        </a>
+                    </div>
                 </div>
-                <div class="price-options">
-                    <div class="filter-item" onclick="applyPriceFilter(null)">Lọc Tất cả</div>
-                    <div class="filter-item" onclick="applyPriceFilter('0-5000000')">Dưới 5 triệu</div>
-                    <div class="filter-item" onclick="applyPriceFilter('0-7000000')">Dưới 7 triệu</div>
-                    <div class="filter-item" onclick="applyPriceFilter('1000000-2000000')">1 đến 2 triệu</div>
-                    <div class="filter-item" onclick="applyPriceFilter('1000000-3000000')">1 đến 3 triệu</div>
-                    <div class="filter-item" onclick="applyPriceFilter('0-1000000')">Dưới 1 triệu</div>
-                    <div class="filter-item" onclick="applyPriceFilter('0-200000')">Từ 0-200k</div>
-                    <div class="filter-item" onclick="applyPriceFilter('200000-500000')">Từ 200-500k</div>
-                    <div class="filter-item" onclick="applyPriceFilter('500000-1000000')">Từ 500-1000k</div>
-                    <div class="filter-item" onclick="applyPriceFilter('7000000-12000000')">Trên 7 triệu</div>
+               
+ <span class="separator">|</span>
+                
+                <span class="current-time" id="current-time">15:30:45</span>
+
+            </div>
+        </div>
+
+<!-- Dashboard Section -->
+<!-- Dashboard Section -->
+<div class="section" id="dashboardSection" style="display: none;">
+   
+    
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="info-item" id="shiftTime">
+                        <i class="fas fa-clock"></i>
+                        <span>Ca làm: Đang tải...</span>
+                    </div>
+                    <div class="info-item" id="shiftDate">
+                        <i class="fas fa-calendar"></i>
+                        <span>Ngày: Đang tải...</span>
+                    </div>
+                    <div class="info-item" id="shiftArea">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Khu vực: Đang tải...</span>
+                    </div>
+                    <div>
+                        <p class="mb-0" id="shiftType">
+                            <i class="fas fa-sun me-2"></i><span>Loại ca: Đang tải...</span>
+                        </p>
+                    </div>
                 </div>
-                <button class="close-btn" onclick="hidePriceFilter()">Thu gọn</button>
-            </div>
-            <div class="filter-menu" id="sortPriceFilterMenu" style="display: none;">
-                <div class="filter-item" onclick="applySortFilter('price', null)">Tất cả</div>
-                <div class="filter-item" onclick="applySortFilter('price', 'asc')">Giá tăng dần</div>
-                <div class="filter-item" onclick="applySortFilter('price', 'desc')">Giá giảm dần</div>
-            </div>
-            <div class="filter-menu" id="methodFilterMenu" style="display: none;">
-                <div class="filter-item" onclick="applyFilter('method', null)">Tất cả</div>
-                <div class="filter-item" onclick="applyFilter('method', 'VNPAY')">VNPAY</div>
-                <div class="filter-item" onclick="applyFilter('method', 'CASH')">CASH</div>
-            </div>
-        </div>
-
-        <!-- Search Section -->
-        <div class="search-container" id="searchContainer">
-            <div class="input-wrapper">
-                <input type="text" id="searchTransactionInput" class="form-input" 
-                       placeholder="Nhập Order ID, Transaction ID..." autocomplete="off">
-                <div id="suggestionBox" class="suggestion-box" style="display: none;"></div>
-            </div>
-            <div class="search-buttons">
-                <button type="button" id="searchTransactionBtn" class="submit-btn">Tìm Kiếm</button>
-                <button type="button" id="reloadSearchBtn" class="submit-btn reload-btn">Tải Lại</button>
+                <div class="col-md-4 text-center">
+                    <div class="btn-container">
+                        <button class="btn shift-btn" id="shiftButton">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Vào ca</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="transactionsResult">
-        <table id="transactionsTable">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Amount</th>
-                    <th>Payment Method</th>
-                    <th>Status</th>
-                    <th>Transaction ID</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="transactionsBody"></tbody>
-        </table>
-        <div id="transactionCount" style="margin-top: 10px;"></div>
-    </div>
-
-    <!-- Invoice Section -->
-    <div id="invoice" class="invoice" style="display: none;">
-        <div class="invoice-header">
-            <h3>HÓA ĐƠN THANH TOÁN</h3>
-            <div class="invoice-subtitle">FoodHub Restaurant</div>
+    <!-- Summary Cards with Icons and Better Structure -->
+    <div class="summary-container">
+        <div class="summary-card" id="totalOrders">
+            
         </div>
         
-        <div class="invoice-main">
-            <div class="invoice-info">
-                <p><strong>🆔 Số HĐ:</strong> <span id="invoiceId"></span></p>
-                <p><strong>📅 Ngày:</strong> <span id="paymentDate"></span></p>
-                <p><strong>🍽️ Bàn:</strong> <span id="tableNumber"></span></p>
-                <p><strong>👤 Khách:</strong> <span id="customerName"></span></p>
-                <p><strong>📧 Email:</strong> <span id="displayCustomerEmail"></span></p>
-                <p><strong>🔗 Mã GD:</strong> <span id="transactionId"></span></p>
+        <div class="summary-card" id="totalRevenue">
+           
+        </div>
+        
+       
+    </div>
+</div>
+
+<!-- Notification Bar -->
+<!-- Notification Bar -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+        
+<div id="errorMessage" style="display: none; color: red; margin-top: 10px;">
+    <span id="errorText"></span>
+</div>
+        
+        <!-- Transactions Section -->
+        <div class="section" id="transactionsSection">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Giao Dịch Hôm Nay</h1>
+                    <p>Hiển thị giao dịch của ngày hôm nay: <span id="currentDate"></span></p>
+                </div>
             </div>
-            <div class="invoice-table-wrapper">
-                <table id="invoiceTable">
+            <!-- Filter and Search Row -->
+            <div class="filter-search-row">
+                <!-- Filter Section -->
+                <!-- Filter Section -->
+<div class="filter-container" id="filterContainer">
+    <div class="filter-buttons-row">
+        <button class="filter-btn" id="statusFilterBtn" onclick="showFilterMenu('status')">Lọc Theo Trạng Thái</button>
+        <button class="filter-btn" id="priceFilterBtn" onclick="showPriceFilter()">Lọc Theo Giá</button>
+        <button class="filter-btn" id="sortPriceBtn" onclick="showFilterMenu('sortPrice')">Sắp xếp Theo Giá</button>
+    </div>
+    <div class="filter-menu" id="statusFilterMenu" style="display: none;">
+        <div class="filter-item" onclick="applyFilter('status', 'all')">Tất cả</div>
+        <div class="filter-item" onclick="applyFilter('status', 'UNPAID')">Chưa thanh toán</div>
+        <div class="filter-item" onclick="applyFilter('status', 'CANCELLED')">Đã hủy</div>
+        <div class="filter-item" onclick="applyFilter('status', 'PAID')">Đã thanh toán</div>
+    </div>
+    <div class="filter-menu" id="priceFilterMenu" style="display: none; width: 250px; padding: 10px;">
+        <div class="price-range">
+            <label for="priceRange">Mức giá: <span id="priceRangeValue">0 - 1.200.000</span> VNĐ</label>
+            <input type="range" id="priceRange" min="0" max="1200000" step="10000" value="0" oninput="updatePriceRange()">
+            <input type="range" id="priceRangeMax" min="0" max="1200000" step="10000" value="1200000" oninput="updatePriceRange()">
+            <div id="priceRangeDisplay">0 - 1.200.000 VNĐ</div>
+            <button class="apply-btn" onclick="applyPriceFilter()">Áp dụng</button>
+        </div>
+        <div class="price-options">
+            <div class="filter-item" onclick="applyPriceFilter(null)">Lọc Tất cả</div>
+            <div class="filter-item" onclick="applyPriceFilter('0-5000000')">Dưới 5 triệu</div>
+            <div class="filter-item" onclick="applyPriceFilter('0-7000000')">Dưới 7 triệu</div>
+            <div class="filter-item" onclick="applyPriceFilter('1000000-2000000')">1 đến 2 triệu</div>
+            <div class="filter-item" onclick="applyPriceFilter('1000000-3000000')">1 đến 3 triệu</div>
+            <div class="filter-item" onclick="applyPriceFilter('0-1000000')">Dưới 1 triệu</div>
+            <div class="filter-item" onclick="applyPriceFilter('0-200000')">Từ 0-200k</div>
+            <div class="filter-item" onclick="applyPriceFilter('200000-500000')">Từ 200-500k</div>
+            <div class="filter-item" onclick="applyPriceFilter('500000-1000000')">Từ 500-1000k</div>
+            <div class="filter-item" onclick="applyPriceFilter('7000000-12000000')">Trên 7 triệu</div>
+        </div>
+        <button class="close-btn" onclick="hidePriceFilter()">Thu gọn</button>
+    </div>
+    <div class="filter-menu" id="sortPriceFilterMenu" style="display: none;">
+        <div class="filter-item" onclick="applySortFilter('sortPrice', 'asc')">Tăng dần</div>
+        <div class="filter-item" onclick="applySortFilter('sortPrice', 'desc')">Giảm dần</div>
+        <div class="filter-item" onclick="applySortFilter('sortPrice', null)">Mặc định</div>
+    </div>
+   
+</div>
+                <!-- Search Section -->
+                <div class="search-container" id="searchContainer">
+                    <div class="input-wrapper">
+                        <input type="text" id="searchTransactionInput" class="form-input" 
+                               placeholder="Nhập Order ID, Transaction ID..." autocomplete="off">
+                        <div id="suggestionBox" class="suggestion-box" style="display: none;"></div>
+                    </div>
+                    <div class="search-buttons">
+                        <button type="button" id="searchTransactionBtn" class="submit-btn">Tìm Kiếm</button>
+                        <button type="button" id="reloadSearchBtn" class="submit-btn reload-btn">Tải Lại</button>
+                    </div>
+                </div>
+            </div>
+            <div id="transactionsResult">
+                <table id="transactionsTable">
                     <thead>
                         <tr>
-                            <th>🍽️ Tên món</th>
-                            <th>📊 S.L</th>
-                            <th>💰 Đơn giá</th>
-                            <th>💵 Tổng</th>
+                            <th>Order ID</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Transaction ID</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="invoiceItems"></tbody>
+                    <tbody id="transactionsBody"></tbody>
                 </table>
+                <div id="transactionCount" style="margin-top: 10px;"></div>
             </div>
-            <div class="invoice-summary">
-                <div class="invoice-total">
-                    <span>💰 TỔNG CỘNG:</span>
-                    <span id="totalAmount"></span>
+            <!-- Invoice Section -->
+            <div id="invoice" class="invoice" style="display: none;">
+                <div class="invoice-header">
+                    <h3>HÓA ĐƠN THANH TOÁN</h3>
+                    <div class="invoice-subtitle">FoodHub Restaurant</div>
                 </div>
-                <div class="invoice-details">
-                    <div class="invoice-detail-item">
-                        <strong>💳 Phương thức:</strong>
-                        <span class="payment-badge" id="paymentMethodDisplay"></span>
+                <div class="invoice-main">
+                    <div class="invoice-info">
+                        <p><strong>🆔 Số HĐ:</strong> <span id="invoiceId"></span></p>
+                        <p><strong>📅 Ngày:</strong> <span id="paymentDate"></span></p>
+                        <p><strong>🍽️ Bàn:</strong> <span id="tableNumber"></span></p>
+                        <p><strong>👤 Khách:</strong> <span id="customerName"></span></p>
+                        <p><strong>📧 Email:</strong> <span id="displayCustomerEmail"></span></p>
+                        <p><strong>🔗 Mã GD:</strong> <span id="transactionId"></span></p>
                     </div>
-                    <div class="invoice-detail-item">
-                        <strong>📊 Trạng thái:</strong>
-                        <span class="status-badge status-success" id="status"></span>
+                    <div class="invoice-table-wrapper">
+                        <table id="invoiceTable">
+                            <thead>
+                                <tr>
+                                    <th>🍽️ Tên món</th>
+                                    <th>📊 S.L</th>
+                                    <th>💰 Đơn giá</th>
+                                    <th>💵 Tổng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceItems"></tbody>
+                        </table>
+                    </div>
+                    <div class="invoice-summary">
+                        <div class="invoice-total">
+                            <span>💰 TỔNG CỘNG:</span>
+                            <span id="totalAmount"></span>
+                        </div>
+                        <div class="invoice-details">
+                            <div class="invoice-detail-item">
+                                <strong>💳 Phương thức:</strong>
+                                <span class="payment-badge" id="paymentMethodDisplay"></span>
+                            </div>
+                            <div class="invoice-detail-item">
+                                <strong>📊 Trạng thái:</strong>
+                                <span class="status-badge status-success" id="status"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="invoice-footer">
+                    <strong>🍴 FoodHub Restaurant</strong><br>
+                    Chuyên món lẩu và nướng<br>
+                    📞 Hotline: 1900-1234 | 🌐 www.foodhub.vn<br>
+                    <em>Cảm ơn quý khách!</em>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Section -->
+        <div class="section" id="revenueSection">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Doanh Thu</h1>
+                    <p>Hiển thị doanh thu của ngày hôm nay: <span id="revenueCurrentDate"></span></p>
+                </div>
+            </div>
+            <div id="revenueResult">
+                <div class="chart-container">
+                    <canvas id="dailyRevenueChart"></canvas>
+                </div>
+                <div class="revenue-stats-container">
+                    <div class="revenue-stats-row">
+                        <!-- Hàng 1: 3 thẻ -->
+                    </div>
+                    <div class="revenue-stats-row">
+                        <!-- Hàng 2: 3 thẻ -->
                     </div>
                 </div>
             </div>
         </div>
-        <div class="invoice-footer">
-            <strong>🍴 FoodHub Restaurant</strong><br>
-            Chuyên món lẩu và nướng<br>
-            📞 Hotline: 1900-1234 | 🌐 www.foodhub.vn<br>
-            <em>Cảm ơn quý khách!</em>
+
+        <!-- Schedule Section -->
+        <div class="section" id="scheduleSection">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Lịch Ca Làm Việc</h1>
+                    <p>Quản lý ca làm việc nhà hàng</p>
+                </div>
+                <div class="filter-search-row">
+                    <div class="filter-container">
+                        <button class="filter-btn" id="prevWeekBtn" onclick="changeWeek(-1)">Tuần trước</button>
+                        <span id="scheduleWeekRange"></span>
+                        <button class="filter-btn" id="nextWeekBtn" onclick="changeWeek(1)">Tuần sau</button>
+                    </div>
+                </div>
+            </div>
+            <div id="scheduleResult">
+                <table id="scheduleTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Thứ Hai</th>
+                            <th>Thứ Ba</th>
+                            <th>Thứ Tư</th>
+                            <th>Thứ Năm</th>
+                            <th>Thứ Sáu</th>
+                            <th>Thứ Bảy</th>
+                            <th>Chủ Nhật</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
+                        <tr>
+                            <td>Ngày</td>
+                            <td id="monDate"></td>
+                            <td id="tueDate"></td>
+                            <td id="wedDate"></td>
+                            <td id="thuDate"></td>
+                            <td id="friDate"></td>
+                            <td id="satDate"></td>
+                            <td id="sunDate"></td>
+                        </tr>
+                        <tr>
+                            <td>Ca làm việc</td>
+                            <td id="monShift"></td>
+                            <td id="tueShift"></td>
+                            <td id="wedShift"></td>
+                            <td id="thuShift"></td>
+                            <td id="friShift"></td>
+                            <td id="satShift"></td>
+                            <td id="sunShift"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="scheduleMessage" style="margin-top: 10px;"></div>
+            </div>
         </div>
     </div>
-</div>
-
-  <!-- Revenue Section -->
- <!-- Revenue Section -->
-<div class="section" id="revenueSection">
-  <div class="form-container">
-    <div class="form-header">
-      <h1>Doanh Thu</h1>
-      <p>Hiển thị doanh thu của ngày hôm nay: <span id="revenueCurrentDate"></span></p>
-    </div>
-  </div>
-  <div id="revenueResult">
-    <div class="chart-container">
-      <canvas id="dailyRevenueChart"></canvas>
-    </div>
-    <div class="revenue-stats-container">
-      <div class="revenue-stats-row">
-        <!-- Hàng 1: 3 thẻ -->
-      </div>
-      <div class="revenue-stats-row">
-        <!-- Hàng 2: 3 thẻ -->
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Schedule Section -->
-<div class="section" id="scheduleSection">
-  <div class="form-container">
-    <div class="form-header">
-      <h1>Lịch Ca Làm Việc</h1>
-      <p>Quản lý ca làm việc nhà hàng</p>
-    </div>
-    <div class="filter-search-row">
-      <div class="filter-container">
-        <button class="filter-btn" id="prevWeekBtn" onclick="changeWeek(-1)">Tuần trước</button>
-        <span id="scheduleWeekRange"></span>
-        <button class="filter-btn" id="nextWeekBtn" onclick="changeWeek(1)">Tuần sau</button>
-      </div>
-    </div>
-  </div>
-  <div id="scheduleResult">
-    <table id="scheduleTable">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Thứ Hai</th>
-          <th>Thứ Ba</th>
-          <th>Thứ Tư</th>
-          <th>Thứ Năm</th>
-          <th>Thứ Sáu</th>
-          <th>Thứ Bảy</th>
-          <th>Chủ Nhật</th>
-        </tr>
-      </thead>
-      <tbody id="scheduleBody">
-        <tr>
-          <td>Ngày</td>
-          <td id="monDate"></td>
-          <td id="tueDate"></td>
-          <td id="wedDate"></td>
-          <td id="thuDate"></td>
-          <td id="friDate"></td>
-          <td id="satDate"></td>
-          <td id="sunDate"></td>
-        </tr>
-        <tr>
-          <td>Ca làm việc</td>
-          <td id="monShift"></td>
-          <td id="tueShift"></td>
-          <td id="wedShift"></td>
-          <td id="thuShift"></td>
-          <td id="friShift"></td>
-          <td id="satShift"></td>
-          <td id="sunShift"></td>
-        </tr>
-      </tbody>
-    </table>
-    <div id="scheduleMessage" style="margin-top: 10px;"></div>
-  </div>
-</div>
-
-</div>
-
 
 <!-- biểu đồ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -327,186 +379,457 @@
 <script src="js/transaction.js"></script>
 <script src="js/util.js"></script>
 <script src="js/workSchedule.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
 
-  <script>
-    
-      const API_BASE_URL = 'http://localhost:8080';
+<script>
+    const API_BASE_URL = 'http://localhost:8080';
 
-//=================================================================================
+    let currentWorkSchedule = null;
+    let currentShiftLog = null;
+    let hasWorkSchedule = false;
 
-
-
-async function clearData() {
-    try {
-        console.log('Calling clearData API...');
-        const response = await fetch(`${API_BASE_URL}/auth/admin/clear-data`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${getToken()}` }
-        });
-        const data = await response.json();
-        console.log('Clear data response:', data);
-        if (data.result === 'clearToken') {
-            console.log('Removing token from localStorage...');
-            localStorage.removeItem('accessToken');
-            console.log('Reloading page...');
-            window.location.reload();
-        } else {
-            console.error('No clearToken action in response');
-        }
-    } catch (err) {
-        console.error('Error clearing data:', err.message);
+    // Toggle User Dropdown
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('active');
     }
-}
 
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM fully loaded');
-        const token = getToken();
-        const cashierNameElement = document.getElementById('cashier-name');
-
-        if (token && cashierNameElement) {
-            const payload = parseJwt(token);
-            if (payload && (payload.sub || payload.email)) {
-                cashierNameElement.innerText = `👤 Cashier: ${payload.sub || payload.email}`;
-                console.log('Email set to:', payload.sub || payload.email);
-            } else {
-                cashierNameElement.innerText = '👤 Cashier: Unknown';
-                console.error('No email found in token payload or invalid token');
-            }
-        } else {
-            if (!token) console.error('No token found in localStorage');
-            if (!cashierNameElement) console.error('Element with id "cashier-name" not found');
-            if (cashierNameElement) cashierNameElement.innerText = '👤 Cashier: Unknown';
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('userDropdown');
+        if (!dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
         }
-
-        document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
-
-        const searchInput = document.getElementById('searchTransactionInput');
-        const searchButton = document.getElementById('searchTransactionBtn');
-        const reloadSearchBtn = document.getElementById('reloadSearchBtn');
-
-        if (searchInput && searchButton && reloadSearchBtn) {
-            console.log('Elements found, attaching events');
-            const debouncedSearch = debounce(async () => {
-                await fetchSuggestions();
-                await searchTransactions();
-            }, 300);
-
-            searchInput.addEventListener('input', debouncedSearch);
-            searchInput.addEventListener('keypress', async (event) => {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    await searchTransactions(event);
-                }
-            });
-            searchButton.addEventListener('click', async (event) => {
-                event.preventDefault();
-                await searchTransactions(event);
-            });
-            reloadSearchBtn.addEventListener('click', async () => await reloadSearch());
-        } else {
-            console.error('Error: One or more elements not found');
-        }
-
-        document.addEventListener('click', function(e) {
-            const suggestionBox = document.getElementById('suggestionBox');
-            const inputWrapper = document.querySelector('.search-container .input-wrapper');
-            if (suggestionBox && inputWrapper && !inputWrapper.contains(e.target)) {
-                suggestionBox.style.display = 'none';
-            }
-        });
     });
 
-    function showSection(sectionId) {
-        console.log('Showing section at:', new Date().toLocaleTimeString(), sectionId);
-        const sections = document.querySelectorAll('.section');
-        sections.forEach(section => section.classList.remove('active'));
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => link.classList.remove('active'));
-        const sidebarLink = document.getElementById(`sidebar${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
-        if (sidebarLink) sidebarLink.classList.add('active');
-        const sectionElement = document.getElementById(`${sectionId}Section`);
-        if (sectionElement) {
-            sectionElement.classList.add('active');
-            if (sectionId === 'transactions') {
-                if (typeof attachTransactionEvents === 'function') attachTransactionEvents();
-                if (typeof refreshTransactions === 'function') refreshTransactions();
-            } else if (sectionId === 'revenue') {
-                if (typeof refreshRevenue === 'function') refreshRevenue();
-            } else if (sectionId === 'schedule') {
-                if (typeof initializeSchedule === 'function') initializeSchedule();
+    async function clearData() {
+        try {
+            console.log('Calling clearData API...');
+            const response = await fetch(`${API_BASE_URL}/auth/admin/clear-data`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${getToken()}` }
+            });
+            const data = await response.json();
+            console.log('Clear data response:', data);
+            if (data.result === 'clearToken') {
+                console.log('Removing token from localStorage...');
+                localStorage.removeItem('accessToken');
+                console.log('Reloading page...');
+                window.location.reload();
+            } else {
+                console.error('No clearToken action in response');
             }
-        } else {
-            console.error('Section', sectionId, 'not found at:', new Date().toLocaleTimeString());
+        } catch (err) {
+            console.error('Error clearing data:', err.message);
         }
     }
 
 
 
 
-//==================================================================================//==================================================================================
-     
-  
 
-      // Chuyển đổi trạng thái sidebar
-      function toggleSidebar() {
-          const sidebar = document.getElementById('sidebar');
-          const mainContent = document.getElementById('mainContent');
-          sidebar.classList.toggle('collapsed');
-          mainContent.classList.toggle('expanded');
-      }
-
-//==================================================================================//==================================================================================
-    
-
-
-
-
-     async function logout() {
-  const confirmLogout = confirm('Bạn có chắc muốn đăng xuất không?');
-  if (!confirmLogout) {
-    return; // Ở lại cashier.html nếu nhấn Cancel
-  }
-
-  const token = getToken();
-  const loginUrl = '../../home-page/html/login.html';
-
-  // Xóa accessToken trước để đảm bảo logout an toàn
-  localStorage.removeItem('accessToken');
-
-  try {
-    if (token) {
-      console.log('Sending logout request with token:', token);
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ token })
-      });
-      if (!response.ok) {
-        throw new Error(`Lỗi khi gọi API logout: ${response.status} ${response.statusText}`);
-      }
-      console.log('Logout API called successfully:', await response.text());
-    } else {
-      console.warn('No token found, skipping API call');
+    //=============================================================
+    // Load work schedule
+  // Load work schedule (xóa thông báo tự động)
+async function loadWorkSchedule() {
+    try {
+        console.log('Loading work schedule...');
+        const data = await apiFetch('/shifts/my-work-schedule/today', { method: 'GET' });
+        console.log('API response for work schedule:', data);
+        if (data.code === 1000 && data.result) {
+            currentWorkSchedule = data.result;
+            hasWorkSchedule = true;
+            console.log('Work schedule loaded:', currentWorkSchedule);
+            displayWorkSchedule(data.result);
+            await checkWorkShiftLog();
+        } else {
+            hasWorkSchedule = false;
+            currentWorkSchedule = null;
+            console.log('No work schedule available:', data.message);
+            displayNoWorkSchedule();
+            disableAllShiftButtons();
+        }
+        updateShiftButtonState();
+        updateSidebarState();
+    } catch (error) {
+        console.error('Error loading work schedule:', error);
+        hasWorkSchedule = false;
+        currentWorkSchedule = null;
+        displayNoWorkSchedule();
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) {
+            errorMessage.style.display = 'block';
+            document.getElementById('errorText').textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu.';
+        } else {
+            console.error('Error message element not found!');
+        }
+        showNotification('Đã xảy ra lỗi khi tải dữ liệu ca làm việc.', 'error');
     }
-    // Thay thế lịch sử để xóa cashier.html
-    window.history.replaceState({ redirect: 'login' }, '', loginUrl);
-    window.location.href = loginUrl;
-  } catch (err) {
-    console.error('Lỗi khi đăng xuất:', err);
-    // Thay thế lịch sử ngay cả khi API thất bại
-    window.history.replaceState({ redirect: 'login' }, '', loginUrl);
-    window.location.href = loginUrl;
-  }
+}
+    // Check work shift log
+    async function checkWorkShiftLog() {
+        if (!currentWorkSchedule || !currentWorkSchedule.id) {
+            console.log('No work schedule available');
+            disableAllShiftButtons();
+            return;
+        }
+        try {
+            const data = await apiFetch(`/shifts/work-shift-log/work-schedule/${currentWorkSchedule.id}`, { method: 'GET' });
+            if (data.code === 1000 && data.result) {
+                currentShiftLog = data.result;
+                updateShiftButtonState();
+                updateShiftStatusDisplay(currentShiftLog);
+            } else {
+                console.error('Error checking work shift log:', data.message);
+                disableAllShiftButtons();
+                currentShiftLog = null;
+            }
+        } catch (error) {
+            console.error('Error checking work shift log:', error);
+            disableAllShiftButtons();
+            currentShiftLog = null;
+        }
+    }
+// Check-in shift (thêm thông báo khi không có ca)
+async function checkInShift() {
+    if (!currentWorkSchedule || !currentWorkSchedule.id) {
+        console.error('currentWorkSchedule is invalid:', currentWorkSchedule);
+        showNotification('Không có ca làm việc để check-in. Vui lòng liên hệ quản lý.', 'no-schedule');
+        return;
+    }
+    if (!confirm('Bạn có chắc chắn muốn vào ca làm việc?')) {
+        return;
+    }
+    try {
+        const requestBody = { shiftId: currentWorkSchedule.id };
+        console.log('Attempting check-in with shiftId:', currentWorkSchedule.id);
+        const data = await apiFetch('/shifts/check-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody),
+        });
+        console.log('Check-in API response:', data);
+        if (data.code === 1000 && data.result) {
+            console.log('Calling showCheckinNotification');
+            showCheckinNotification();
+            await checkWorkShiftLog();
+            updateSidebarState();
+            showSection('dashboard');
+        } else {
+            console.error('Check-in failed:', data.message);
+            showNotification(`❌ Check-in thất bại: ${data.message || 'Lỗi không xác định'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error during check-in:', error);
+        showNotification(`❌ ${error.message || 'Lỗi khi kết nối đến máy chủ.'}`, 'error');
+    }
+}
+// Check-out shift (thêm thông báo khi không có ca)
+async function checkOutShift() {
+    if (!currentWorkSchedule || !currentWorkSchedule.id) {
+        console.error('currentWorkSchedule is invalid:', currentWorkSchedule);
+        showNotification('Không có ca làm việc để check-out. Vui lòng liên hệ quản lý.', 'no-schedule');
+        return;
+    }
+    if (!confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) {
+        return;
+    }
+    try {
+        const requestBody = { shiftId: currentWorkSchedule.id };
+        console.log('Attempting check-out with shiftId:', currentWorkSchedule.id);
+        const data = await apiFetch('/shifts/check-out', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody),
+        });
+        console.log('Check-out API response:', data);
+        if (data.code === 1000 && data.result) {
+            console.log('Calling showCheckoutNotification');
+            showCheckoutNotification();
+            await checkWorkShiftLog();
+            updateSidebarState();
+            showSection('dashboard');
+        } else {
+            console.error('Check-out failed:', data.message);
+            showNotification(`❌ Check-out thất bại: ${data.message || 'Lỗi không xác định'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error during check-out:', error);
+        showNotification(`❌ ${error.message || 'Lỗi khi kết nối đến máy chủ.'}`, 'error');
+    }
+}
+// Hiển thị thông tin ca làm việc
+   function displayWorkSchedule(schedule) {
+    const shiftDate = document.getElementById('shiftDate');
+    const shiftTime = document.getElementById('shiftTime');
+    const shiftArea = document.getElementById('shiftArea');
+    const shiftType = document.getElementById('shiftType');
+    const errorMessage = document.getElementById('errorMessage');
+
+    function adjustToLocalTime(utcTime) {
+        const date = new Date(utcTime);
+        date.setHours(date.getHours() - 7); // Trừ 7 giờ để về múi giờ +07
+        return date;
+    }
+
+    if (shiftDate) shiftDate.innerHTML = `<i class="fas fa-calendar"></i>Ngày: ${new Date(schedule.date).toLocaleDateString('vi-VN')}`;
+    if (shiftTime) {
+        const startTimeLocal = adjustToLocalTime(schedule.startTime);
+        const endTimeLocal = adjustToLocalTime(schedule.endTime);
+        shiftTime.innerHTML = `<i class="fas fa-clock"></i>Ca làm: ${startTimeLocal.toLocaleTimeString('vi-VN')} - ${endTimeLocal.toLocaleTimeString('vi-VN')}`;
+    }
+    if (shiftArea) shiftArea.innerHTML = `<i class="fas fa-map-marker-alt"></i>Khu vực: ${schedule.area}`;
+    if (shiftType) shiftType.innerHTML = `<i class="fas fa-sun me-2"></i>Loại ca: ${schedule.shift || 'Chưa xác định'}`;
+    if (errorMessage) errorMessage.style.display = 'none';
 }
 
+   // Hiển thị khi không có ca làm việc
+function displayNoWorkSchedule() {
+    const shiftDate = document.getElementById('shiftDate');
+    const shiftTime = document.getElementById('shiftTime');
+    const shiftArea = document.getElementById('shiftArea');
+    const shiftType = document.getElementById('shiftType');
 
-  </script>
+    if (shiftDate) shiftDate.innerHTML = `<i class="fas fa-calendar"></i>Ngày: Không có ca`;
+    if (shiftTime) shiftTime.innerHTML = `<i class="fas fa-clock"></i>Ca làm: Không có ca`;
+    if (shiftArea) shiftArea.innerHTML = `<i class="fas fa-map-marker-alt"></i>Khu vực: Không có`;
+    if (shiftType) shiftType.innerHTML = `<i class="fas fa-sun me-2"></i>Trạng thái: Không có`;
+}
+    function updateShiftButtonState() {
+        const shiftButton = document.getElementById('shiftButton');
+        if (!shiftButton) return;
 
+        if (!currentWorkSchedule || !currentWorkSchedule.id) {
+            disableAllShiftButtons();
+            return;
+        }
+
+        if (currentShiftLog && currentShiftLog.checkInTime) {
+            if (currentShiftLog.checkOutTime) {
+                disableAllShiftButtons();
+            } else {
+                shiftButton.innerHTML = `<i class="fas fa-sign-out-alt"></i><span>Kết thúc ca</span>`;
+                shiftButton.onclick = checkOutShift;
+                shiftButton.disabled = false;
+            }
+        } else {
+            shiftButton.innerHTML = `<i class="fas fa-sign-in-alt"></i><span>Vào ca</span>`;
+            shiftButton.onclick = checkInShift;
+            shiftButton.disabled = false;
+        }
+    }
+
+    function disableAllShiftButtons() {
+        const shiftButton = document.getElementById('shiftButton');
+        if (shiftButton) {
+            shiftButton.disabled = true;
+            shiftButton.innerHTML = `<i class="fas fa-sign-in-alt"></i><span>Đã hoàn thành</span>`;
+        }
+    }
+
+    // Cập nhật trạng thái ca làm việc
+function updateShiftStatusDisplay(shiftLog) {
+    const shiftTypeElement = document.getElementById('shiftType');
+    if (shiftLog && shiftLog.checkInTime) {
+        function adjustToLocalTime(utcTime) {
+            const date = new Date(utcTime);
+            date.setHours(date.getHours() - 7); // Trừ 7 giờ để về múi giờ +07
+            return date;
+        }
+
+        const checkInTime = adjustToLocalTime(shiftLog.checkInTime).toLocaleTimeString('vi-VN');
+        const checkOutTime = shiftLog.checkOutTime ? adjustToLocalTime(shiftLog.checkOutTime).toLocaleTimeString('vi-VN') : null;
+        let statusText = '';
+        let statusIcon = '';
+        if (checkOutTime) {
+            statusText = `Đã hoàn thành ca (${checkInTime} - ${checkOutTime}) (Trạng thái: ${shiftLog.status || 'COMPLETED'})`;
+            statusIcon = 'fa-check-circle';
+        } else {
+            statusText = `Đã check-in lúc ${checkInTime} (Trạng thái: ${shiftLog.status || 'ONGOING'})`;
+            statusIcon = 'fa-clock';
+        }
+        if (shiftTypeElement) shiftTypeElement.innerHTML = `<i class="fas ${statusIcon} me-2"></i>Trạng thái: ${statusText}`;
+    }
+}
+
+function updateSidebarState() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    if (!currentShiftLog || !currentShiftLog.checkInTime) {
+        // Chưa check-in, vô hiệu hóa tất cả các nút trừ nút Dashboard
+        navLinks.forEach(link => {
+            const onclick = link.getAttribute('onclick');
+            if (onclick) {
+                const match = onclick.match(/showSection\('(.+)'\)/);
+                const sectionId = match ? match[1] : null;
+                if (sectionId && sectionId !== 'dashboard') {
+                    link.disabled = true;
+                    link.classList.add('disabled');
+                } else {
+                    link.disabled = false;
+                    link.classList.remove('disabled');
+                }
+            }
+        });
+    } else {
+        // Đã check-in, kích hoạt tất cả các nút
+        navLinks.forEach(link => {
+            link.disabled = false;
+            link.classList.remove('disabled');
+        });
+    }
+}
+
+// Show section (chỉ hiển thị thông báo khi cần)
+function showSection(sectionId) {
+    console.log('Showing section at:', new Date().toLocaleTimeString(), sectionId);
+
+    // Kiểm tra trạng thái check-in hoặc không có lịch làm việc
+    if (!hasWorkSchedule && sectionId !== 'dashboard') {
+        const now = Date.now();
+        if (now - lastNotificationTime >= NOTIFICATION_COOLDOWN) {
+            showNoScheduleNotification();
+            lastNotificationTime = now;
+        }
+        showSection('dashboard');
+        return;
+    }
+
+    if (checkAndNotifyIfNotCheckedIn(sectionId !== 'dashboard') && sectionId !== 'dashboard') {
+        console.log('No check-in, staying on Dashboard');
+        showSection('dashboard');
+        return;
+    }
+
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => section.classList.remove('active'));
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    const sidebarLink = document.getElementById(`sidebar${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
+    if (sidebarLink) sidebarLink.classList.add('active');
+    const sectionElement = document.getElementById(`${sectionId}Section`);
+    if (sectionElement) {
+        sectionElement.classList.add('active');
+        if (sectionId === 'dashboard') {
+            loadWorkSchedule().then(() => {
+                updateSidebarState();
+                refreshRevenue().then(() => calculateDailySummary()).catch(error => console.error('Failed to refresh revenue:', error));
+            }).catch(error => console.error('Failed to load work schedule:', error));
+        } else if (sectionId === 'transactions') {
+            if (typeof attachTransactionEvents === 'function') attachTransactionEvents();
+            if (typeof refreshTransactions === 'function') refreshTransactions();
+        } else if (sectionId === 'revenue') {
+            if (typeof refreshRevenue === 'function') refreshRevenue();
+        } else if (sectionId === 'schedule') {
+            if (typeof initializeSchedule === 'function') initializeSchedule();
+        }
+    } else {
+        console.error('Section', sectionId, 'not found at:', new Date().toLocaleTimeString());
+    }
+}
+    // Toggle sidebar
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+
+    // Logout
+    async function logout() {
+        const confirmLogout = confirm('Bạn có chắc muốn đăng xuất không?');
+        if (!confirmLogout) return;
+
+        const token = getToken();
+        const loginUrl = '../../home-page/html/login.html';
+
+        localStorage.removeItem('accessToken');
+
+        try {
+            if (token) {
+                console.log('Sending logout request with token:', token);
+                const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+                if (!response.ok) throw new Error(`Lỗi khi gọi API logout: ${response.status} ${response.statusText}`);
+                console.log('Logout API called successfully:', await response.text());
+            } else {
+                console.warn('No token found, skipping API call');
+            }
+            window.history.replaceState({ redirect: 'login' }, '', loginUrl);
+            window.location.href = loginUrl;
+        } catch (err) {
+            console.error('Lỗi khi đăng xuất:', err);
+            window.history.replaceState({ redirect: 'login' }, '', loginUrl);
+            window.location.href = loginUrl;
+        }
+    }
+
+  // Sửa sự kiện tìm kiếm trong DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    const token = getToken();
+    const cashierNameElement = document.getElementById('cashier-name');
+
+    if (token && cashierNameElement) {
+        const payload = parseJwt(token);
+        if (payload && (payload.sub || payload.email)) {
+            cashierNameElement.innerText = `${payload.sub || payload.email}`;
+            console.log('Email set to:', payload.sub || payload.email);
+        } else {
+            cashierNameElement.innerText = '👤 Cashier: Unknown';
+            console.error('No email found in token payload or invalid token');
+        }
+    } else {
+        if (!token) console.error('No token found in localStorage');
+        if (!cashierNameElement) console.error('Element with id "cashier-name" not found');
+        if (cashierNameElement) cashierNameElement.innerText = '👤 Cashier: Unknown';
+    }
+
+    document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
+
+    const searchInput = document.getElementById('searchTransactionInput');
+    const searchButton = document.getElementById('searchTransactionBtn');
+    const reloadSearchBtn = document.getElementById('reloadSearchBtn');
+
+    if (searchInput && searchButton && reloadSearchBtn) {
+        console.log('Elements found, attaching events');
+        const debouncedSearch = debounce(async () => {  
+            if (checkAndNotifyIfNotCheckedIn(true)) return;
+            await fetchSuggestions();
+            await searchTransactions();
+        }, 300);
+
+        searchInput.addEventListener('input', debouncedSearch);
+        searchInput.addEventListener('keypress', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (checkAndNotifyIfNotCheckedIn(true)) return;
+                await searchTransactions(event);
+            }
+        });
+        searchButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+            if (checkAndNotifyIfNotCheckedIn(true)) return;
+            await searchTransactions(event);
+        });
+        reloadSearchBtn.addEventListener('click', async () => {
+            if (checkAndNotifyIfNotCheckedIn(true)) return;
+            await reloadSearch();
+        });
+    } else {
+        console.error('Error: One or more elements not found');
+    }
+
+    loadWorkSchedule().then(() => {
+        showSection('dashboard');
+    }).catch(error => console.error('Failed to load work schedule in DOMContentLoaded:', error));
+});
+</script>
   </body>
   </html>

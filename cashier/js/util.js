@@ -153,7 +153,7 @@ function initializeDashboard() {
     console.log('Initializing dashboard at:', new Date().toLocaleTimeString());
     const payload = parseJwt(getToken());
     if (payload && payload.sub) {
-        document.getElementById('cashier-name').innerText = `👤 Cashier: ${payload.sub || payload.email || 'Unknown'}`;
+        document.getElementById('cashier-name').innerText = `${payload.sub || payload.email || 'Unknown'}`;
     } else {
         console.warn('No payload/sub at:', new Date().toLocaleTimeString(), 'Using default');
         document.getElementById('cashier-name').innerText = `👤 Cashier: Unknown`;
