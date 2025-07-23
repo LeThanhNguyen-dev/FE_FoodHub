@@ -1762,6 +1762,7 @@ async function calculateDailySummary() {
         }
     }
 }
+// thay đổi để push
 
 
 document.addEventListener('DOMContentLoaded', async () => {

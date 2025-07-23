@@ -159,3 +159,4 @@ function initializeDashboard() {
         document.getElementById('cashier-name').innerText = `👤 Cashier: Unknown`;
     }
 }
+// thay đổi để push
