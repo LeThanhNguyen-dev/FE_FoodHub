@@ -20,6 +20,7 @@
     <script src="../js/chat.js"></script>
     <!-- Page-specific CSS -->
     <style>
+        /* Existing styles remain unchanged */
         .hero {
             background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
             height: 60vh;
@@ -492,6 +493,7 @@
             border-radius: 10px;
             padding: 5px;
             font-family: 'Montserrat', sans-serif;
+            pointer-events: none; /* Prevent direct input */
         }
 
         .modal-item-details .modal-body .quantity-selector button {
@@ -499,8 +501,8 @@
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 5px 10px;
-            font-size: 1rem;
+            padding: 5px 15px;
+            font-size: 1.2rem;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -761,7 +763,7 @@
     </style>
 </head>
 <body>
-    <!-- Thanh Điều Hướng -->
+    <!-- Navigation Bar -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
@@ -785,11 +787,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Liên Hệ</a>
                     </li>
-                    <!-- Đăng nhập (hiện khi chưa login) -->
+                    <!-- Login (shown when not logged in) -->
                     <li class="nav-item" id="auth-nav-item">
                         <a class="nav-link btn-login" href="login.html">Đăng Nhập</a>
                     </li>
-                    <!-- User đã login -->
+                    <!-- Logged-in User -->
                     <li class="nav-item" id="user-nav-item">
                         <div class="user-dropdown dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
@@ -802,7 +804,7 @@
                             </ul>
                         </div>
                     </li>
-                    <!-- Giỏ hàng -->
+                    <!-- Cart -->
                     <li class="nav-item" id="cart-nav-item">
                         <a class="nav-link cart-icon" href="cart.html">
                             <i class="bi bi-cart"></i>
@@ -814,18 +816,18 @@
         </div>
     </nav>
 
-    <!-- Modal Popup cho thông báo -->
+    <!-- Notification Modal -->
     <div class="modal fade modal-notification" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-notification">
             <div class="modal-content">
                 <div class="modal-body" id="notificationModalBody">
-                    <!-- Nội dung thông báo sẽ được chèn vào đây -->
+                    <!-- Notification content will be inserted here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal for Item Details -->
+    <!-- Item Details Modal -->
     <div class="modal fade modal-item-details" id="itemDetailsModal" tabindex="-1" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-item-details">
             <div class="modal-content">
@@ -840,7 +842,7 @@
                     <p id="itemDetailsPrice" class="item-price"></p>
                     <div class="quantity-selector">
                         <button onclick="try { updateQuantity(-1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">-</button>
-                        <input type="number" id="itemQuantity" value="1" min="1" max="100">
+                        <input type="number" id="itemQuantity" value="1" min="1" max="100" readonly>
                         <button onclick="try { updateQuantity(1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">+</button>
                     </div>
                 </div>
@@ -869,7 +871,7 @@
         </div>
     </div>
 
-    <!-- Phần Chào Mừng -->
+    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <h1>Thực Đơn</h1>
@@ -877,7 +879,7 @@
         </div>
     </section>
 
-    <!-- Phần Thực Đơn -->
+    <!-- Menu Section -->
     <section id="menu" class="menu-section py-5">
         <div class="container">
             <h2 class="section-title">Khám Phá Thực Đơn</h2>
@@ -904,7 +906,7 @@
         </div>
     </section>
 
-    <!-- Chân Trang -->
+    <!-- Footer -->
     <footer id="contact" class="footer">
         <div class="container">
             <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
@@ -936,15 +938,97 @@
         let searchResults = [];
         let selectedItem = null;
 
+        // Parse JWT token
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Token không hợp lệ:", e);
+                return null;
+            }
+        }
+
+        // Check login status (ROLE_CUSTOMER)
+        function isLoggedIn() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) return false;
+            const payload = parseJwt(token);
+            return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
+        }
+
         // Update cart badge
         function updateCartBadge() {
             try {
                 const cart = JSON.parse(localStorage.getItem('cart') || '[]');
                 const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-                document.getElementById('cart-count').textContent = totalItems;
+                const cartCountEl = document.getElementById('cart-count');
+                if (cartCountEl) cartCountEl.textContent = totalItems;
             } catch (error) {
                 console.error('Error updating cart badge:', error);
-                document.getElementById('cart-count').textContent = '0';
+                const cartCountEl = document.getElementById('cart-count');
+                if (cartCountEl) cartCountEl.textContent = '0';
+                showNotification('Lỗi khi cập nhật số lượng giỏ hàng: ' + error.message);
+            }
+        }
+
+        // Add item to cart
+        function addToCart(item, quantity = 1) {
+            try {
+                if (!isLoggedIn()) {
+                    showNotification('Vui lòng đăng nhập để thêm món vào giỏ hàng!');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const existingItem = cart.find(i => i.id === item.id);
+                if (existingItem) {
+                    existingItem.quantity = (existingItem.quantity || 1) + quantity;
+                } else {
+                    cart.push({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: quantity,
+                        imageUrl: item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'
+                    });
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartBadge();
+                showNotification(`Đã thêm ${quantity} ${item.name} vào giỏ hàng!`);
+            } catch (error) {
+                console.error('Error in addToCart:', error);
+                showNotification('Lỗi khi thêm vào giỏ hàng: ' + error.message);
+            }
+        }
+
+        // Order item
+        function orderItem(item, quantity = 1) {
+            try {
+                if (!isLoggedIn()) {
+                    showNotification('Vui lòng đăng nhập để đặt món!');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                localStorage.removeItem('cart');
+                const cartItem = {
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: quantity,
+                    imageUrl: item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'
+                };
+                localStorage.setItem('cart', JSON.stringify([cartItem]));
+                updateCartBadge();
+                showNotification(`Đã thêm ${quantity} ${item.name} vào đơn hàng!`);
+                window.location.href = 'checkout.html';
+            } catch (error) {
+                console.error('Error in orderItem:', error);
+                showNotification('Lỗi khi đặt món: ' + error.message);
             }
         }
 
@@ -952,46 +1036,32 @@
         function toggleChat() {
             try {
                 const chatContainer = document.getElementById('chat-container');
-                if (!chatContainer) {
-                    throw new Error('Chat container not found');
-                }
+                if (!chatContainer) throw new Error('Chat container not found');
                 const isHidden = chatContainer.classList.contains('hidden');
                 chatContainer.classList.toggle('hidden', !isHidden);
                 chatContainer.classList.toggle('show', isHidden);
-                console.log('Chat toggled:', isHidden ? 'shown' : 'hidden');
             } catch (error) {
                 console.error('Error in toggleChat:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi mở/đóng chat: ' + error.message);
-                }
+                showNotification('Lỗi khi mở/đóng chat: ' + error.message);
             }
         }
 
-        // Show category function
+        // Show category
         function showCategory(categoryId) {
             try {
                 document.querySelectorAll('.menu-content').forEach(content => {
                     content.classList.remove('active');
                 });
-
                 const contentElement = document.getElementById(`category-${categoryId}`);
-                if (contentElement) {
-                    contentElement.classList.add('active');
-                }
-
+                if (contentElement) contentElement.classList.add('active');
                 document.querySelectorAll('.category-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
-
                 const activeButton = document.querySelector(`.category-btn[data-category-id="${categoryId}"]`);
-                if (activeButton) {
-                    activeButton.classList.add('active');
-                }
+                if (activeButton) activeButton.classList.add('active');
             } catch (error) {
                 console.error('Error in showCategory:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi hiển thị danh mục: ' + error.message);
-                }
+                showNotification('Lỗi khi hiển thị danh mục: ' + error.message);
             }
         }
 
@@ -999,30 +1069,19 @@
         async function fetchCategories() {
             const categoryContainer = document.getElementById('category-list');
             const contentContainer = document.getElementById('menu-contents');
-
             try {
                 const response = await fetch(`${API_BASE_URL}/categories`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch categories');
-                }
+                if (!response.ok) throw new Error('Failed to fetch categories');
                 const data = await response.json();
                 const categories = data.result || data;
-
-                if (!Array.isArray(categories)) {
-                    throw new Error('Invalid category data format');
-                }
-
-                // Create category buttons
+                if (!Array.isArray(categories)) throw new Error('Invalid category data format');
                 categoryContainer.innerHTML = '';
                 contentContainer.innerHTML = '';
-
-                // Add "View All" button
                 categoryContainer.innerHTML += `
                     <button class="category-btn active" data-category-id="all" onclick="try { selectCategory('all'); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
                         Xem Tất Cả
                     </button>
                 `;
-
                 categories.forEach(category => {
                     categoryContainer.innerHTML += `
                         <button class="category-btn" data-category-id="${category.id}" onclick="try { selectCategory(${category.id}); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
@@ -1030,14 +1089,11 @@
                         </button>
                     `;
                 });
-
-                // Create content containers
                 contentContainer.innerHTML = `
                     <div id="category-all" class="menu-content active">
                         <div class="loading-spinner">Đang tải...</div>
                     </div>
                 `;
-
                 categories.forEach(category => {
                     contentContainer.innerHTML += `
                         <div id="category-${category.id}" class="menu-content">
@@ -1045,15 +1101,11 @@
                         </div>
                     `;
                 });
-
-                // Load all items initially
                 await fetchAllMenuItems();
             } catch (error) {
                 console.error('Error fetching categories:', error);
                 categoryContainer.innerHTML = '<div class="error-message">Không thể tải danh mục.</div>';
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi tải danh mục: ' + error.message);
-                }
+                showNotification('Lỗi khi tải danh mục: ' + error.message);
             }
         }
 
@@ -1061,22 +1113,15 @@
         async function fetchAllMenuItems() {
             try {
                 const response = await fetch(`${API_BASE_URL}/menu-items?page=0&size=1000&sortBy=name&sortDirection=asc`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch menu items');
-                }
+                if (!response.ok) throw new Error('Failed to fetch menu items');
                 const data = await response.json();
                 allMenuItems = data.result.content.filter(item => item.status === 'AVAILABLE');
-
                 displayMenuItems(allMenuItems, 'all');
             } catch (error) {
                 console.error('Error fetching all menu items:', error);
                 const container = document.getElementById('category-all');
-                if (container) {
-                    container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
-                }
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi tải món ăn: ' + error.message);
-                }
+                if (container) container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
+                showNotification('Lỗi khi tải món ăn: ' + error.message);
             }
         }
 
@@ -1087,9 +1132,7 @@
                 currentPage = 0;
                 isSearching = false;
                 document.getElementById('search-input').value = '';
-
                 showCategory(categoryId);
-
                 if (categoryId === 'all') {
                     displayMenuItems(allMenuItems, categoryId);
                 } else {
@@ -1097,9 +1140,7 @@
                 }
             } catch (error) {
                 console.error('Error in selectCategory:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi chọn danh mục: ' + error.message);
-                }
+                showNotification('Lỗi khi chọn danh mục: ' + error.message);
             }
         }
 
@@ -1107,25 +1148,18 @@
         async function fetchMenuItems(categoryId) {
             const container = document.getElementById(`category-${categoryId}`);
             if (!container) return;
-
             container.innerHTML = '<div class="loading-spinner">Đang tải...</div>';
-
             try {
                 const response = await fetch(`${API_BASE_URL}/menu-items?categoryId=${categoryId}&page=0&size=1000&sortBy=name&sortDirection=asc`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 const menuItems = data.result.content.filter(item => item.status === 'AVAILABLE');
-
                 menuItemsCache[categoryId] = menuItems;
                 displayMenuItems(menuItems, categoryId);
             } catch (error) {
                 console.error('Error fetching menu items:', error);
                 container.innerHTML = '<div class="error-message">Không thể tải món ăn.</div>';
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi tải món ăn: ' + error.message);
-                }
+                showNotification('Lỗi khi tải món ăn: ' + error.message);
             }
         }
 
@@ -1134,7 +1168,6 @@
             try {
                 const container = document.getElementById(`category-${categoryId}`);
                 if (!container) return;
-
                 if (items.length === 0) {
                     container.innerHTML = `
                         <div class="no-results">
@@ -1144,21 +1177,17 @@
                     `;
                     return;
                 }
-
                 totalPages = Math.ceil(items.length / itemsPerPage);
                 const startIndex = currentPage * itemsPerPage;
                 const endIndex = startIndex + itemsPerPage;
                 const currentItems = items.slice(startIndex, endIndex);
-
-                const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : false;
+                const loggedIn = isLoggedIn();
                 let html = '<div class="menu-grid">';
-
                 currentItems.forEach((item, index) => {
                     const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
                     const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
                     window.menuItems = window.menuItems || [];
                     window.menuItems[index] = item;
-
                     html += `
                         <div class="menu-card">
                             <div style="position: relative;">
@@ -1180,44 +1209,32 @@
                         </div>
                     `;
                 });
-
                 html += '</div>';
-
-                // Add pagination
                 if (totalPages > 1) {
                     html += createPaginationHTML();
                 }
-
                 container.innerHTML = html;
             } catch (error) {
                 console.error('Error in displayMenuItems:', error);
                 container.innerHTML = '<div class="error-message">Lỗi hiển thị món ăn.</div>';
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi hiển thị món ăn: ' + error.message);
-                }
+                showNotification('Lỗi khi hiển thị món ăn: ' + error.message);
             }
         }
 
         // Create pagination HTML
         function createPaginationHTML() {
             let paginationHTML = '<div class="pagination-container">';
-
-            // Previous button
             paginationHTML += `
                 <button class="pagination-btn" onclick="try { changePage(${currentPage - 1}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }" ${currentPage === 0 ? 'disabled' : ''}>
                     <i class="bi bi-chevron-left"></i> Trước
                 </button>
             `;
-
-            // Page numbers
             const maxVisiblePages = 5;
             let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-
             if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(0, endPage - maxVisiblePages + 1);
             }
-
             for (let i = startPage; i <= endPage; i++) {
                 paginationHTML += `
                     <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="try { changePage(${i}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }">
@@ -1225,21 +1242,16 @@
                     </button>
                 `;
             }
-
-            // Next button
             paginationHTML += `
                 <button class="pagination-btn" onclick="try { changePage(${currentPage + 1}); } catch(e) { console.error('Error changing page:', e); showNotification('Lỗi khi chuyển trang: ' + e.message); }" ${currentPage === totalPages - 1 ? 'disabled' : ''}>
                     Sau <i class="bi bi-chevron-right"></i>
                 </button>
             `;
-
-            // Page info
             paginationHTML += `
                 <div class="pagination-info">
                     Trang ${currentPage + 1} / ${totalPages}
                 </div>
             `;
-
             paginationHTML += '</div>';
             return paginationHTML;
         }
@@ -1248,9 +1260,7 @@
         function changePage(page) {
             try {
                 if (page < 0 || page >= totalPages) return;
-
                 currentPage = page;
-
                 if (isSearching) {
                     displayMenuItems(searchResults, currentCategory);
                 } else if (currentCategory === 'all') {
@@ -1260,9 +1270,7 @@
                 }
             } catch (error) {
                 console.error('Error in changePage:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi chuyển trang: ' + error.message);
-                }
+                showNotification('Lỗi khi chuyển trang: ' + error.message);
             }
         }
 
@@ -1271,7 +1279,6 @@
             try {
                 const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
                 currentPage = 0;
-
                 if (searchTerm === '') {
                     isSearching = false;
                     if (currentCategory === 'all') {
@@ -1281,27 +1288,16 @@
                     }
                     return;
                 }
-
                 isSearching = true;
-                let itemsToSearch = [];
-
-                if (currentCategory === 'all') {
-                    itemsToSearch = allMenuItems;
-                } else {
-                    itemsToSearch = menuItemsCache[currentCategory] || [];
-                }
-
+                let itemsToSearch = currentCategory === 'all' ? allMenuItems : menuItemsCache[currentCategory] || [];
                 searchResults = itemsToSearch.filter(item =>
                     item.name.toLowerCase().includes(searchTerm) ||
                     (item.description && item.description.toLowerCase().includes(searchTerm))
                 );
-
                 displayMenuItems(searchResults, currentCategory);
             } catch (error) {
                 console.error('Error in handleSearch:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi tìm kiếm: ' + error.message);
-                }
+                showNotification('Lỗi khi tìm kiếm: ' + error.message);
             }
         }
 
@@ -1318,9 +1314,7 @@
                 modal.show();
             } catch (error) {
                 console.error('Error in showItemDetails:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi hiển thị chi tiết món ăn: ' + error.message);
-                }
+                showNotification('Lỗi khi hiển thị chi tiết món ăn: ' + error.message);
             }
         }
 
@@ -1334,17 +1328,16 @@
                 input.value = quantity;
             } catch (error) {
                 console.error('Error in updateQuantity:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi cập nhật số lượng: ' + error.message);
-                }
+                showNotification('Lỗi khi cập nhật số lượng: ' + error.message);
             }
         }
 
         // Add item to cart from modal
         function addItemToCart() {
             try {
-                if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+                if (!isLoggedIn()) {
                     showNotification('Vui lòng đăng nhập để thêm món vào giỏ hàng.');
+                    window.location.href = 'login.html';
                     return;
                 }
                 const quantity = parseInt(document.getElementById('itemQuantity').value);
@@ -1352,25 +1345,20 @@
                     showNotification('Không có món ăn được chọn.');
                     return;
                 }
-                const item = { ...selectedItem, quantity };
-                if (typeof addToCart !== 'function') {
-                    throw new Error('addToCart function is not defined');
-                }
-                addToCart(item);
-                updateCartBadge();
+                addToCart(selectedItem, quantity);
                 bootstrap.Modal.getInstance(document.getElementById('itemDetailsModal')).hide();
-                showNotification(`${item.name} đã được thêm vào giỏ hàng!`);
             } catch (error) {
                 console.error('Error in addItemToCart:', error);
-                showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng: ' + error.message);
+                showNotification('Lỗi khi thêm vào giỏ hàng: ' + error.message);
             }
         }
 
         // Order item now from modal
         function orderItemNow() {
             try {
-                if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+                if (!isLoggedIn()) {
                     showNotification('Vui lòng đăng nhập để đặt món.');
+                    window.location.href = 'login.html';
                     return;
                 }
                 const quantity = parseInt(document.getElementById('itemQuantity').value);
@@ -1378,32 +1366,69 @@
                     showNotification('Không có món ăn được chọn.');
                     return;
                 }
-                const item = { ...selectedItem, quantity };
-                if (typeof orderItem !== 'function') {
-                    throw new Error('orderItem function is not defined');
-                }
-                orderItem(item);
-                localStorage.setItem('orderItem', JSON.stringify(item));
+                orderItem(selectedItem, quantity);
                 bootstrap.Modal.getInstance(document.getElementById('itemDetailsModal')).hide();
-                showNotification(`${item.name} đã được thêm vào đơn hàng!`);
-                window.location.href = 'checkout.html';
             } catch (error) {
                 console.error('Error in orderItemNow:', error);
-                showNotification('Có lỗi xảy ra khi đặt món: ' + error.message);
+                showNotification('Lỗi khi đặt món: ' + error.message);
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const payload = token ? parseJwt(token) : null;
+                const authNavItem = document.getElementById('auth-nav-item');
+                const userNavItem = document.getElementById('user-nav-item');
+                const cartNavItem = document.getElementById('cart-nav-item');
+                const usernameDisplay = document.getElementById('username-display');
+                const navbar = document.getElementById('navbar');
+                if (authNavItem) authNavItem.style.display = 'none';
+                if (userNavItem) userNavItem.style.display = 'none';
+                if (cartNavItem) cartNavItem.style.display = 'none';
+                const isCustomer = payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
+                if (isCustomer) {
+                    const displayName = payload.username || 'Khách hàng';
+                    if (userNavItem) userNavItem.style.display = 'block';
+                    if (cartNavItem) cartNavItem.style.display = 'block';
+                    if (usernameDisplay) usernameDisplay.textContent = displayName;
+                    updateCartBadge();
+                } else {
+                    if (authNavItem) authNavItem.style.display = 'block';
+                }
+                if (navbar) {
+                    navbar.classList.remove('invisible', 'opacity-0');
+                    navbar.classList.add('opacity-100', 'visible');
+                }
+            } catch (error) {
+                console.error('Error in updateUI:', error);
+                showNotification('Lỗi khi cập nhật giao diện: ' + error.message);
+            }
+        }
+
+        // Logout
+        function logout() {
+            try {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('cart');
+                updateCartBadge();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error in logout:', error);
+                showNotification('Lỗi khi đăng xuất: ' + error.message);
             }
         }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                // Ensure chat is hidden on page load
                 const chatContainer = document.getElementById('chat-container');
                 if (chatContainer) {
                     chatContainer.classList.add('hidden');
                     chatContainer.classList.remove('show');
                 }
-
-                if (typeof updateUI === 'function') updateUI();
+                updateUI();
                 fetchCategories();
                 if (typeof fetchUserOrders === 'function' && typeof startPolling === 'function') {
                     fetchUserOrders().then(() => startPolling());
@@ -1415,9 +1440,7 @@
                 updateCartBadge();
             } catch (error) {
                 console.error('Error in DOMContentLoaded:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Lỗi khi khởi tạo trang: ' + error.message);
-                }
+                showNotification('Lỗi khi khởi tạo trang: ' + error.message);
             }
         });
     </script>

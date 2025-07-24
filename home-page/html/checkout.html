@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FoodHub - Checkout</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="../css/styles.css" rel="stylesheet" />
@@ -19,7 +16,6 @@
             line-height: 1.6;
         }
 
-        /* Hero Section Enhancement */
         .hero {
             background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
             height: 60vh;
@@ -63,14 +59,12 @@
                 opacity: 0;
                 transform: translateY(-30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        /* Main Content Container */
         .checkout-container {
             padding: 4rem 0;
             min-height: 70vh;
@@ -98,12 +92,6 @@
             height: 3px;
             background: var(--gradient-gold);
             border-radius: 2px;
-        }
-
-        /* Form Styling */
-        .checkout-form-container {
-            max-width: 900px;
-            margin: 0 auto;
         }
 
         .form-section {
@@ -158,13 +146,12 @@
         }
 
         .form-control:focus {
-            color: #FEA116; /* Màu cam khi focus */
-            box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25); /* Bóng đổ cam nhạt */
+            color: #FEA116;
+            box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
             background: var(--warm-white);
             transform: translateY(-1px);
         }
 
-        /* Payment Method Card */
         .payment-card {
             background: linear-gradient(135deg, var(--soft-cream) 0%, var(--warm-white) 100%);
             border: 2px solid var(--border-light);
@@ -204,7 +191,6 @@
             font-style: italic;
         }
 
-        /* Order Summary */
         .order-summary {
             background: var(--gradient-primary);
             color: white;
@@ -263,7 +249,6 @@
             text-align: right;
         }
 
-        /* Submit Button */
         .btn-checkout {
             background: var(--gradient-gold);
             border: none;
@@ -299,7 +284,6 @@
             transform: translateY(-1px);
         }
 
-        /* Form Grid Enhancement */
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -311,7 +295,6 @@
             grid-column: 1 / -1;
         }
 
-        /* Input Icons */
         .input-group-custom {
             position: relative;
             margin-bottom: 1.5rem;
@@ -319,7 +302,7 @@
 
         .input-group-custom.address-group {
             position: relative;
-            z-index: 1000; /* Đảm bảo input địa chỉ và gợi ý nằm trên các phần tử khác */
+            z-index: 1000;
         }
 
         .input-icon {
@@ -341,24 +324,22 @@
         }
 
         .form-control:focus + .input-icon {
-            color: #FEA116; /* Icon chuyển sang màu cam khi focus */
+            color: #FEA116;
         }
 
-        /* Autocomplete Styles - Enhanced */
         .autocomplete-suggestions {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background: #FFFFFF; /* Màu trắng thuần */
+            background: #FFFFFF;
             border: 2px solid var(--border-light);
             border-radius: 16px;
             box-shadow: 0 6px 20px rgba(45, 95, 78, 0.15);
-            z-index: 1001; /* Đảm bảo danh sách gợi ý ở trên cùng */
+            z-index: 1001;
             max-height: 240px;
             overflow-y: auto;
             margin-top: 8px;
-            /* Xóa margin-bottom để cho phép đè hoàn toàn lên nội dung bên dưới */
             display: none;
             animation: slideIn 0.3s ease-out;
             padding: 0.5rem 0;
@@ -434,82 +415,27 @@
             background: var(--light-green);
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .section-title {
-                font-size: 2.2rem;
-            }
-
-            .form-section {
-                padding: 2rem 1.5rem;
-                margin: 0 1rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .btn-checkout {
-                width: 100%;
-                padding: 1.2rem;
-            }
-
-            .checkout-container {
-                padding: 2rem 0;
-            }
-
-            .total-amount {
-                font-size: 1.8rem;
-            }
-
-            .order-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .order-item-quantity,
-            .order-item-price {
-                width: auto;
-                text-align: left;
-            }
-
-            .autocomplete-suggestions {
-                max-height: 200px;
-                margin-top: 6px;
-                /* Xóa margin-bottom để cho phép đè hoàn toàn trên màn hình nhỏ */
-            }
+            .hero h1 { font-size: 2.5rem; }
+            .section-title { font-size: 2.2rem; }
+            .form-section { padding: 2rem 1.5rem; margin: 0 1rem; }
+            .form-row { grid-template-columns: 1fr; gap: 1rem; }
+            .btn-checkout { width: 100%; padding: 1.2rem; }
+            .checkout-container { padding: 2rem 0; }
+            .total-amount { font-size: 1.8rem; }
+            .order-item { flex-direction: column; align-items: flex-start; }
+            .order-item-quantity, .order-item-price { width: auto; text-align: left; }
+            .autocomplete-suggestions { max-height: 200px; margin-top: 6px; }
         }
 
         @media (max-width: 576px) {
-            .hero {
-                height: 35vh;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
-            }
-
-            .form-section {
-                margin: 0 0.5rem;
-                padding: 1.5rem 1rem;
-            }
-
-            .autocomplete-suggestion {
-                font-size: 0.9rem;
-                padding: 10px 12px;
-            }
+            .hero { height: 35vh; }
+            .hero h1 { font-size: 2rem; }
+            .section-title { font-size: 1.8rem; }
+            .form-section { margin: 0 0.5rem; padding: 1.5rem 1rem; }
+            .autocomplete-suggestion { font-size: 0.9rem; padding: 10px 12px; }
         }
 
-        /* Loading Animation */
         .loading-spinner {
             display: none;
             width: 20px;
@@ -522,41 +448,22 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Success Animation */
         .form-success {
             animation: successPulse 0.6s ease-out;
         }
 
         @keyframes successPulse {
-            0% {
-                transform: scale(1);
-                box-shadow: var(--shadow-soft);
-            }
-
-            50% {
-                transform: scale(1.02);
-                box-shadow: 0 12px 35px rgba(45, 95, 78, 0.15);
-            }
-
-            100% {
-                transform: scale(1);
-                box-shadow: var(--shadow-soft);
-            }
+            0% { transform: scale(1); box-shadow: var(--shadow-soft); }
+            50% { transform: scale(1.02); box-shadow: 0 12px 35px rgba(45, 95, 78, 0.15); }
+            100% { transform: scale(1); box-shadow: var(--shadow-soft); }
         }
     </style>
 </head>
-
 <body>
-    <!-- Navbar giữ nguyên -->
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top invisible opacity-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
@@ -615,7 +522,6 @@
     <section class="checkout-container">
         <div class="container">
             <h2 class="section-title">Thông Tin Đặt Hàng</h2>
-
             <div class="checkout-form-container">
                 <div class="form-section">
                     <form id="checkout-form">
@@ -631,7 +537,6 @@
                                 <input type="email" class="form-control with-icon" id="email" required>
                             </div>
                         </div>
-
                         <div class="form-row">
                             <div class="input-group-custom">
                                 <i class="fas fa-phone input-icon"></i>
@@ -640,7 +545,6 @@
                             </div>
                             <div></div>
                         </div>
-
                         <div class="form-group-full">
                             <div class="input-group-custom address-group">
                                 <i class="bi bi-geo-alt input-icon"></i>
@@ -651,7 +555,6 @@
                                 <div id="address-suggestions" class="autocomplete-suggestions"></div>
                             </div>
                         </div>
-
                         <div class="form-group-full">
                             <label class="form-label">Phương Thức Thanh Toán</label>
                             <div class="payment-card">
@@ -667,7 +570,6 @@
                                 </p>
                             </div>
                         </div>
-
                         <div class="order-summary">
                             <div class="summary-title">
                                 <i class="fas fa-receipt me-2"></i>
@@ -679,7 +581,6 @@
                                 <span class="total-amount" id="total-amount">0 VND</span>
                             </div>
                         </div>
-
                         <div class="text-center mt-4">
                             <button type="submit" class="btn-checkout">
                                 <div class="loading-spinner"></div>
@@ -693,7 +594,6 @@
         </div>
     </section>
 
-    <!-- Footer giữ nguyên -->
     <footer class="footer">
         <div class="container">
             <h3 style="font-family: 'Pacifico', cursive; color: var(--gold);">FoodHub</h3>
@@ -706,7 +606,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/auth.js"></script>
     <script>
-        // Hàm parseJwt từ auth.js (giả sử có sẵn)
+
         function parseJwt(token) {
             try {
                 const base64Url = token.split('.')[1];
@@ -721,7 +621,6 @@
             }
         }
 
-        // Hàm hiển thị chi tiết đơn hàng
         function displayOrderItems() {
             try {
                 const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -760,7 +659,6 @@
             }
         }
 
-        // Hàm lấy thông tin người dùng
         async function fetchUserInfo() {
             try {
                 const usernameInput = document.getElementById('username');
@@ -774,7 +672,6 @@
                 }
 
                 const token = localStorage.getItem('accessToken');
-                console.log('Access Token:', token);
                 if (!token) {
                     console.warn('Không tìm thấy access token. Chuyển hướng đến trang đăng nhập.');
                     window.location.href = 'login.html';
@@ -782,7 +679,6 @@
                 }
 
                 const payload = parseJwt(token);
-                console.log('JWT Payload:', payload);
                 if (!payload || !payload.id) {
                     throw new Error('Token không hợp lệ hoặc không tìm thấy ID người dùng');
                 }
@@ -795,7 +691,6 @@
                 }
 
                 const userId = payload.id;
-                console.log('Đang lấy thông tin người dùng cho ID:', userId);
                 const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
                     method: 'GET',
                     headers: {
@@ -804,29 +699,23 @@
                     }
                 });
 
-                console.log('Trạng thái API Response:', response.status);
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}, Thông báo: ${errorText}`);
                 }
 
                 const data = await response.json();
-                console.log('Dữ liệu API Response:', data);
                 if (!data.result) {
                     throw new Error('Không có dữ liệu người dùng trong trường "result"');
                 }
 
                 const user = data.result;
-                console.log('Dữ liệu người dùng:', user);
-
-                // Điền thông tin vào form với hiệu ứng
                 usernameInput.value = user.username || '';
                 emailInput.value = user.email || '';
                 phoneInput.value = user.phone || '';
                 addressInput.value = user.address || '';
                 usernameDisplay.textContent = user.username || payload.sub || 'Người dùng';
 
-                // Thêm hiệu ứng success
                 document.querySelector('.form-section').classList.add('form-success');
                 setTimeout(() => {
                     document.querySelector('.form-section').classList.remove('form-success');
@@ -837,7 +726,6 @@
             }
         }
 
-        // Hàm thiết lập autocomplete cho địa chỉ
         function setupAddressAutocomplete() {
             const addressInput = document.getElementById('address');
             const suggestionsContainer = document.getElementById('address-suggestions');
@@ -911,7 +799,6 @@
             });
         }
 
-        // Xử lý submit form với loading
         async function handleFormSubmission(e) {
             e.preventDefault();
 
@@ -926,14 +813,12 @@
                 return;
             }
 
-            // Validate địa chỉ
             const addressPattern = /^[a-zA-Z0-9\s,.-ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẳẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ]+$/;
             if (!addressPattern.test(address)) {
                 alert('Vui lòng nhập địa chỉ hợp lệ (chỉ chữ, số, và dấu câu cơ bản).');
                 return;
             }
 
-            // Hiển thị loading
             const submitBtn = document.querySelector('.btn-checkout');
             const spinner = document.querySelector('.loading-spinner');
             const btnText = submitBtn.innerHTML;
@@ -958,7 +843,6 @@
                     throw new Error('Giỏ hàng trống. Vui lòng thêm món ăn trước khi đặt hàng.');
                 }
 
-                // Map cart items to orderItems
                 const orderItems = cart.map(item => ({
                     menuItemId: item.id,
                     quantity: item.quantity
@@ -993,24 +877,30 @@
                 const data = await response.json();
                 const orderResponse = data.result;
 
-                // Xóa giỏ hàng sau khi đặt hàng thành công
-                localStorage.removeItem('cart');
+                // Store order details in localStorage to track pending order
+                localStorage.setItem('pendingOrder', JSON.stringify({
+                    orderId: orderResponse.orderId,
+                    cart: cart,
+                    paymentUrl: orderResponse.payment?.paymentUrl,
+                    createdAt: Date.now()
+                }));
 
-                // Gọi updateCartCount nếu tồn tại (từ auth.js)
-                if (typeof updateCartCount === 'function') {
-                    updateCartCount();
-                }
-
-                // Redirect trực tiếp không cần alert
+                // Redirect to payment gateway for BANKING
                 if (paymentMethod === 'BANKING' && orderResponse.payment?.paymentUrl) {
                     window.location.href = orderResponse.payment.paymentUrl;
                 } else {
+                    // For non-BANKING methods, clear cart and pending order immediately
+                    localStorage.removeItem('cart');
+                    localStorage.removeItem('pendingOrder');
+                    if (typeof updateCartCount === 'function') {
+                        updateCartCount();
+                    }
                     window.location.href = 'order-confirmation.html';
                 }
             } catch (error) {
                 console.error('Lỗi khi gửi đơn hàng:', error.message);
                 alert(`Lỗi: ${error.message}`);
-                // Giữ nguyên giỏ hàng nếu có lỗi
+                // Cart remains intact
             } finally {
                 spinner.style.display = 'none';
                 submitBtn.disabled = false;
@@ -1018,25 +908,78 @@
             }
         }
 
-        // Khởi tạo trang
+        async function cancelOrder() {
+            try {
+                const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+                if (pendingOrder && pendingOrder.orderId) {
+                    // Notify server to cancel the order
+                    const token = localStorage.getItem('accessToken');
+                    if (token) {
+                        await fetch(`${API_BASE_URL}/orders/${pendingOrder.orderId}/cancel`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }).catch(error => {
+                            console.warn('Failed to cancel order on server:', error);
+                        });
+                    }
+                }
+
+                // Clear cart and pending order
+                localStorage.removeItem('cart');
+                localStorage.removeItem('pendingOrder');
+                if (typeof updateCartCount === 'function') {
+                    updateCartCount();
+                }
+                alert('Đã hủy thanh toán thành công.');
+                window.location.href = 'cart.html';
+            } catch (error) {
+                console.error('Lỗi khi hủy thanh toán:', error);
+                alert('Lỗi khi hủy thanh toán: ' + error.message);
+            }
+        }
+
+        function checkPendingOrder() {
+            try {
+                const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+                if (pendingOrder && pendingOrder.orderId) {
+                    // Check if pending order is stale (e.g., older than 24 hours)
+                    const now = Date.now();
+                    const orderAge = now - pendingOrder.createdAt;
+                    const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+                    if (orderAge > maxAge) {
+                        localStorage.removeItem('pendingOrder');
+                        console.log('Cleared stale pending order');
+                        return;
+                    }
+
+                    alert('Bạn có một đơn hàng đang chờ thanh toán. Vui lòng hoàn tất hoặc hủy đơn hàng trên trang thanh toán.');
+                    if (pendingOrder.paymentUrl) {
+                        window.location.href = pendingOrder.paymentUrl;
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi khi kiểm tra đơn hàng đang chờ:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM đã tải, đang khởi tạo trang');
-
             if (typeof updateUI === 'function') {
                 updateUI();
             } else {
                 console.warn('Hàm updateUI không được định nghĩa');
             }
-
             fetchUserInfo();
             displayOrderItems();
             setupAddressAutocomplete();
-
             if (typeof updateCartCount === 'function') {
                 updateCartCount();
             }
+            checkPendingOrder();
 
-            // Gắn sự kiện submit form
             const checkoutForm = document.getElementById('checkout-form');
             if (checkoutForm) {
                 checkoutForm.addEventListener('submit', handleFormSubmission);
@@ -1044,23 +987,56 @@
                 console.error('Không tìm thấy form thanh toán');
             }
 
-            // Thêm hiệu ứng focus cho inputs
             const inputs = document.querySelectorAll('.form-control');
             inputs.forEach(input => {
                 input.addEventListener('focus', function () {
                     this.parentElement.style.transform = 'translateY(-2px)';
                     const icon = this.parentElement.querySelector('.input-icon');
-                    if (icon) icon.style.color = '#FEA116'; // Icon chuyển sang màu cam khi focus
+                    if (icon) icon.style.color = '#FEA116';
                 });
-
                 input.addEventListener('blur', function () {
                     this.parentElement.style.transform = 'translateY(0)';
                     const icon = this.parentElement.querySelector('.input-icon');
                     if (icon) icon.style.color = '#ccc';
                 });
             });
+
+            // Handle PayOS callback
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentStatus = urlParams.get('status');
+            const orderId = urlParams.get('orderId');
+
+            if (paymentStatus === 'PAID' && orderId) {
+                // Verify payment status with server
+                fetch(`${API_BASE_URL}/orders/${orderId}/verify-payment`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result && data.result.status === 'PAID') {
+                        localStorage.removeItem('cart');
+                        localStorage.removeItem('pendingOrder');
+                        if (typeof updateCartCount === 'function') {
+                            updateCartCount();
+                        }
+                        alert('Thanh toán thành công!');
+                        window.location.href = 'order-confirmation.html';
+                    } else {
+                        alert('Xác minh thanh toán thất bại. Vui lòng thử lại.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi xác minh thanh toán:', error);
+                    alert('Lỗi khi xác minh thanh toán: ' + error.message);
+                });
+            } else if (paymentStatus === 'CANCELLED') {
+                cancelOrder();
+            }
         });
     </script>
 </body>
-
 </html>
