@@ -20,7 +20,7 @@
     <script src="../js/chat.js"></script>
     <!-- Page-specific CSS -->
     <style>
-        /* Existing styles remain unchanged */
+        /* Existing styles remain mostly unchanged, with button-specific updates */
         .hero {
             background: linear-gradient(135deg, rgba(26, 60, 52, 0.9), rgba(10, 25, 20, 0.7)), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0') no-repeat center center/cover;
             height: 60vh;
@@ -272,21 +272,45 @@
             margin-bottom: 1rem;
         }
 
+        .menu-card .button-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 2px;
+            margin-top: 0.5rem;
+            justify-content: space-between;
+        }
+
+        .menu-card .action-buttons {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
         .btn-order,
-        .btn-add-to-cart {
+        .btn-add-to-cart,
+        .btn-favorite {
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin: 0 5px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            border-radius: 25px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            line-height: 1;
         }
 
         .btn-order {
             background-color: #1a3c34;
             color: white;
             border: 2px solid #1a3c34;
+            padding: 0 20px;
+            flex: 0 0 100px; /* Fixed width for order button */
+            order: 1; /* Left */
         }
 
         .btn-order:hover {
@@ -307,6 +331,9 @@
             background-color: transparent;
             color: var(--dark-green);
             border: 2px solid var(--dark-green);
+            padding: 0 20px;
+            flex: 0 0 100px; /* Fixed width for add-to-cart button */
+            order: 2; /* Center */
         }
 
         .btn-add-to-cart:hover {
@@ -320,6 +347,33 @@
             background-color: transparent;
             color: var(--dark-green);
             border-color: var(--dark-green);
+        }
+
+        .btn-favorite {
+            background-color: transparent;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            order: 3; /* Right */
+        }
+
+        .btn-favorite:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-favorite.active {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .btn-favorite i {
+            font-size: 1.3rem;
         }
 
         .pagination-container {
@@ -393,7 +447,7 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        /* Modal Popup Styles */
+        /* Modal Notification Styles */
         .modal-notification .modal-dialog {
             max-width: 400px;
             position: fixed;
@@ -516,8 +570,33 @@
             border-top: none;
             padding: 1rem 2rem 2rem;
             display: flex;
-            gap: 1rem;
-            justify-content: center;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .modal-item-details .modal-footer .action-buttons {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .modal-item-details .modal-footer .btn {
+            min-width: 100px;
+            height: 38px;
+            font-size: 0.9rem;
+            border-radius: 25px;
+        }
+
+        .modal-item-details .modal-footer .btn-favorite {
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+            flex-shrink: 0;
         }
 
         /* Chat Window Styles */
@@ -716,7 +795,6 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         @media (max-width: 992px) {
             .menu-layout {
                 flex-direction: column;
@@ -746,6 +824,19 @@
             .section-title { font-size: 2rem; }
             .menu-grid { grid-template-columns: 1fr; }
             .menu-card img { height: 150px; }
+            .menu-card .action-buttons {
+                gap: 8px;
+            }
+            .btn-order, .btn-add-to-cart {
+                min-width: 80px;
+                font-size: 0.85rem;
+                padding: 0 10px;
+            }
+            .btn-favorite {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
             .modal-notification .modal-dialog {
                 max-width: 90%;
                 right: 10px;
@@ -753,6 +844,10 @@
             }
             .modal-item-details .modal-dialog { max-width: 90%; }
             .modal-item-details .modal-body img { height: 200px; }
+            .modal-item-details .modal-footer .btn {
+                min-width: 80px;
+                font-size: 0.85rem;
+            }
             .chat-container {
                 width: 90%;
                 height: 70vh;
@@ -845,10 +940,18 @@
                         <input type="number" id="itemQuantity" value="1" min="1" max="100" readonly>
                         <button onclick="try { updateQuantity(1); } catch(e) { console.error('Error updating quantity:', e); showNotification('Lỗi khi cập nhật số lượng: ' + e.message); }">+</button>
                     </div>
+                    <button class="btn btn-favorite" id="favoriteModalBtn" data-item-id="" onclick="try { toggleFavorite(selectedItem); } catch(e) { console.error('Error toggling favorite:', e); showNotification('Lỗi khi thêm/xóa yêu thích: ' + e.message); }">
+                        <i class="bi bi-heart"></i>
+                    </button>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-add-to-cart" onclick="try { addItemToCart(); } catch(e) { console.error('Error adding to cart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
-                    <button class="btn btn-order" onclick="try { orderItemNow(); } catch(e) { console.error('Error ordering item:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt ngay</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-order" onclick="try { orderItemNow(); } catch(e) { console.error('Error ordering item:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt ngay</button>
+                        <button class="btn btn-add-to-cart" onclick="try { addItemToCart(); } catch(e) { console.error('Error adding to cart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                    </div>
+                    <button class="btn btn-favorite" id="favoriteModalBtn2" data-item-id="" onclick="try { toggleFavorite(selectedItem); } catch(e) { console.error('Error toggling favorite:', e); showNotification('Lỗi khi thêm/xóa yêu thích: ' + e.message); }">
+                        <i class="bi bi-heart"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1032,6 +1135,86 @@
             }
         }
 
+        // Toggle favorite
+        function toggleFavorite(item) {
+            try {
+                if (!isLoggedIn()) {
+                    showNotification('Vui lòng đăng nhập để thêm món vào yêu thích!');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                const existingIndex = favorites.findIndex(fav => fav.id === item.id);
+                if (existingIndex >= 0) {
+                    favorites.splice(existingIndex, 1);
+                    showNotification(`Đã xóa ${item.name} khỏi danh sách yêu thích!`);
+                } else {
+                    favorites.push({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        description: item.description,
+                        imageUrl: item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image',
+                        status: item.status
+                    });
+                    showNotification(`Đã thêm ${item.name} vào danh sách yêu thích!`);
+                }
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                updateFavoriteButtons(item.id);
+                if (currentCategory === 'favorites') {
+                    displayFavoriteItems();
+                }
+            } catch (error) {
+                console.error('Error in toggleFavorite:', error);
+                showNotification('Lỗi khi thêm/xóa yêu thích: ' + error.message);
+            }
+        }
+
+        // Check if item is in favorites
+        function isFavorite(itemId) {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            return favorites.some(fav => fav.id === itemId);
+        }
+
+        // Update favorite buttons
+        function updateFavoriteButtons(itemId) {
+            try {
+                const buttons = document.querySelectorAll(`.btn-favorite[data-item-id="${itemId}"]`);
+                const modalButton = document.getElementById('favoriteModalBtn');
+                const modalButton2 = document.getElementById('favoriteModalBtn2');
+                const isFav = isFavorite(itemId);
+                buttons.forEach(btn => {
+                    btn.classList.toggle('active', isFav);
+                    const icon = btn.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('bi-heart', !isFav);
+                        icon.classList.toggle('bi-heart-fill', isFav);
+                    }
+                });
+                if (modalButton) {
+                    modalButton.classList.toggle('active', isFav);
+                    const modalIcon = modalButton.querySelector('i');
+                    if (modalIcon) {
+                        modalIcon.classList.toggle('bi-heart', !isFav);
+                        modalIcon.classList.toggle('bi-heart-fill', isFav);
+                    }
+                    modalButton.setAttribute('data-item-id', itemId);
+                }
+                if (modalButton2) {
+                    modalButton2.classList.toggle('active', isFav);
+                    const modalIcon2 = modalButton2.querySelector('i');
+                    if (modalIcon2) {
+                        modalIcon2.classList.toggle('bi-heart', !isFav);
+                        modalIcon2.classList.toggle('bi-heart-fill', isFav);
+                    }
+                    modalButton2.setAttribute('data-item-id', itemId);
+                }
+            } catch (error) {
+                console.error('Error in updateFavoriteButtons:', error);
+                showNotification('Lỗi khi cập nhật nút yêu thích: ' + error.message);
+            }
+        }
+
         // Toggle chat visibility
         function toggleChat() {
             try {
@@ -1081,6 +1264,9 @@
                     <button class="category-btn active" data-category-id="all" onclick="try { selectCategory('all'); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
                         Xem Tất Cả
                     </button>
+                    <button class="category-btn" data-category-id="favorites" onclick="try { selectCategory('favorites'); } catch(e) { console.error('Error selecting category:', e); showNotification('Lỗi khi chọn danh mục: ' + e.message); }">
+                        Món Yêu Thích
+                    </button>
                 `;
                 categories.forEach(category => {
                     categoryContainer.innerHTML += `
@@ -1091,6 +1277,9 @@
                 });
                 contentContainer.innerHTML = `
                     <div id="category-all" class="menu-content active">
+                        <div class="loading-spinner">Đang tải...</div>
+                    </div>
+                    <div id="category-favorites" class="menu-content">
                         <div class="loading-spinner">Đang tải...</div>
                     </div>
                 `;
@@ -1117,6 +1306,7 @@
                 const data = await response.json();
                 allMenuItems = data.result.content.filter(item => item.status === 'AVAILABLE');
                 displayMenuItems(allMenuItems, 'all');
+                displayFavoriteItems();
             } catch (error) {
                 console.error('Error fetching all menu items:', error);
                 const container = document.getElementById('category-all');
@@ -1135,6 +1325,8 @@
                 showCategory(categoryId);
                 if (categoryId === 'all') {
                     displayMenuItems(allMenuItems, categoryId);
+                } else if (categoryId === 'favorites') {
+                    displayFavoriteItems();
                 } else {
                     await fetchMenuItems(categoryId);
                 }
@@ -1186,6 +1378,7 @@
                 currentItems.forEach((item, index) => {
                     const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
                     const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+                    const isFav = isFavorite(item.id);
                     window.menuItems = window.menuItems || [];
                     window.menuItems[index] = item;
                     html += `
@@ -1200,9 +1393,14 @@
                                 <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
                                 <p class="card-price">${price}</p>
                                 ${loggedIn ? `
-                                    <div>
-                                        <button class="btn btn-order" onclick="try { orderItem(window.menuItems[${index}]); } catch(e) { console.error('Error in orderItem:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt món</button>
-                                        <button class="btn btn-add-to-cart" onclick="try { addToCart(window.menuItems[${index}]); } catch(e) { console.error('Error in addToCart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                                    <div class="button-group">
+                                        <div class="action-buttons">
+                                            <button class="btn btn-order" onclick="try { orderItem(window.menuItems[${index}]); } catch(e) { console.error('Error in orderItem:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt món</button>
+                                            <button class="btn btn-add-to-cart" onclick="try { addToCart(window.menuItems[${index}]); } catch(e) { console.error('Error in addToCart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                                        </div>
+                                        <button class="btn btn-favorite ${isFav ? 'active' : ''}" data-item-id="${item.id}" onclick="try { toggleFavorite(window.menuItems[${index}]); } catch(e) { console.error('Error toggling favorite:', e); showNotification('Lỗi khi thêm/xóa yêu thích: ' + e.message); }">
+                                            <i class="bi ${isFav ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                                        </button>
                                     </div>
                                 ` : ''}
                             </div>
@@ -1218,6 +1416,71 @@
                 console.error('Error in displayMenuItems:', error);
                 container.innerHTML = '<div class="error-message">Lỗi hiển thị món ăn.</div>';
                 showNotification('Lỗi khi hiển thị món ăn: ' + error.message);
+            }
+        }
+
+        // Display favorite items
+        function displayFavoriteItems() {
+            try {
+                const container = document.getElementById('category-favorites');
+                if (!container) return;
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]').filter(item => item.status === 'AVAILABLE');
+                if (favorites.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <h4>Không có món yêu thích</h4>
+                            <p>Hãy thêm món ăn yêu thích của bạn!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                totalPages = Math.ceil(favorites.length / itemsPerPage);
+                const startIndex = currentPage * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const currentItems = favorites.slice(startIndex, endIndex);
+                const loggedIn = isLoggedIn();
+                let html = '<div class="menu-grid">';
+                currentItems.forEach((item, index) => {
+                    const price = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
+                    const imageUrl = item.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+                    const isFav = isFavorite(item.id);
+                    window.menuItems = window.menuItems || [];
+                    window.menuItems[index] = item;
+                    html += `
+                        <div class="menu-card">
+                            <div style="position: relative;">
+                                <img src="${imageUrl}" alt="${item.name}" class="card-img-top">
+                                <button class="view-details-btn" onclick="try { showItemDetails(window.menuItems[${index}]); } catch(e) { console.error('Error showing item details:', e); showNotification('Lỗi khi hiển thị chi tiết món: ' + e.message); }">Xem Chi Tiết</button>
+                            </div>
+                            <div class="card-body">
+                                <span class="badge">Có sẵn</span>
+                                <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">${item.description || 'Chưa có mô tả.'}</p>
+                                <p class="card-price">${price}</p>
+                                ${loggedIn ? `
+                                    <div class="button-group">
+                                        <div class="action-buttons">
+                                            <button class="btn btn-order" onclick="try { orderItem(window.menuItems[${index}]); } catch(e) { console.error('Error in orderItem:', e); showNotification('Lỗi khi đặt món: ' + e.message); }">Đặt món</button>
+                                            <button class="btn btn-add-to-cart" onclick="try { addToCart(window.menuItems[${index}]); } catch(e) { console.error('Error in addToCart:', e); showNotification('Lỗi khi thêm vào giỏ: ' + e.message); }">Thêm vào giỏ</button>
+                                        </div>
+                                        <button class="btn btn-favorite ${isFav ? 'active' : ''}" data-item-id="${item.id}" onclick="try { toggleFavorite(window.menuItems[${index}]); } catch(e) { console.error('Error toggling favorite:', e); showNotification('Lỗi khi thêm/xóa yêu thích: ' + e.message); }">
+                                            <i class="bi ${isFav ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                if (totalPages > 1) {
+                    html += createPaginationHTML();
+                }
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error in displayFavoriteItems:', error);
+                container.innerHTML = '<div class="error-message">Lỗi hiển thị món yêu thích.</div>';
+                showNotification('Lỗi khi hiển thị món yêu thích: ' + error.message);
             }
         }
 
@@ -1265,6 +1528,8 @@
                     displayMenuItems(searchResults, currentCategory);
                 } else if (currentCategory === 'all') {
                     displayMenuItems(allMenuItems, currentCategory);
+                } else if (currentCategory === 'favorites') {
+                    displayFavoriteItems();
                 } else {
                     displayMenuItems(menuItemsCache[currentCategory] || [], currentCategory);
                 }
@@ -1283,18 +1548,26 @@
                     isSearching = false;
                     if (currentCategory === 'all') {
                         displayMenuItems(allMenuItems, currentCategory);
+                    } else if (currentCategory === 'favorites') {
+                        displayFavoriteItems();
                     } else {
                         displayMenuItems(menuItemsCache[currentCategory] || [], currentCategory);
                     }
                     return;
                 }
                 isSearching = true;
-                let itemsToSearch = currentCategory === 'all' ? allMenuItems : menuItemsCache[currentCategory] || [];
+                let itemsToSearch = currentCategory === 'all' ? allMenuItems : 
+                                   currentCategory === 'favorites' ? JSON.parse(localStorage.getItem('favorites') || '[]') : 
+                                   menuItemsCache[currentCategory] || [];
                 searchResults = itemsToSearch.filter(item =>
                     item.name.toLowerCase().includes(searchTerm) ||
                     (item.description && item.description.toLowerCase().includes(searchTerm))
                 );
-                displayMenuItems(searchResults, currentCategory);
+                if (currentCategory === 'favorites') {
+                    displayFavoriteItems();
+                } else {
+                    displayMenuItems(searchResults, currentCategory);
+                }
             } catch (error) {
                 console.error('Error in handleSearch:', error);
                 showNotification('Lỗi khi tìm kiếm: ' + error.message);
@@ -1311,6 +1584,7 @@
                 document.getElementById('itemDetailsDescription').textContent = item.description || 'Chưa có mô tả.';
                 document.getElementById('itemDetailsPrice').textContent = item.price ? `₫${item.price.toLocaleString('vi-VN')}` : 'Giá liên hệ';
                 document.getElementById('itemQuantity').value = 1;
+                updateFavoriteButtons(item.id);
                 modal.show();
             } catch (error) {
                 console.error('Error in showItemDetails:', error);
@@ -1412,6 +1686,7 @@
             try {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('cart');
+                localStorage.removeItem('favorites');
                 updateCartBadge();
                 window.location.href = 'login.html';
             } catch (error) {
