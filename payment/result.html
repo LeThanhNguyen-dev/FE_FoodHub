@@ -61,6 +61,18 @@
             const countdownElement = document.getElementById('countdown');
             const countdownTimer = document.getElementById('countdown-timer');
 
+            // Function to determine redirect URL for countdown (role-based)
+            function getRedirectUrl(status, role) {
+                if (role == 'ROLE_CUSTOMER') {
+                    return '../home-page/html/checkout.html'; // Redirect for QR code payment (non-customer)
+                }else if(role == "ROLE_CASHIER"){
+                    return '../../cashier/index.html'
+                }else if(role == "ROLE_WAITER"){
+                    return '../../waiter/index.html';
+                }
+                return '../home-page/html/checkout.html'; // Always redirect to checkout.html for customer
+            }
+
             if (orderId) {
                 try {
                     loadingElement.classList.remove('hidden');
@@ -84,12 +96,18 @@
                     const response = await apiFetch(`/payments/status/${orderId}`);
                     console.log('API /payments/status response:', response);
 
+                    // Assuming role is returned in the API response or stored in sessionStorage
+                    const userRole = response.result.role || sessionStorage.getItem('userRole') || 'customer'; // Fallback to 'customer'
+
                     messageElement.classList.remove('hidden');
                     loadingElement.classList.add('hidden');
                     countdownElement.classList.remove('hidden');
 
                     if (response.result.status === 'PAID') {
                         sessionStorage.setItem('paymentStatus', 'PAID');
+                        // Clear cart and pending order on successful payment
+                        localStorage.removeItem('cart');
+                        localStorage.removeItem('pendingOrder');
                         messageElement.innerHTML = `
                             <div class="flex items-center gap-4 p-4 bg-green-100 rounded-lg">
                                 <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke="#10B981" stroke-width="3">
@@ -103,7 +121,7 @@
                                 </div>
                             </div>`;
                         buttonContainer.innerHTML = `
-                            <a href="../home-page/html/checkout.html" class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">Quay lại trang chính</a>`;
+                            <a href="${getRedirectUrl('PAID', userRole)}" class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">Quay lại trang chính</a>`;
                     } else if (response.result.status === 'CANCELLED' || response.result.status === 'FAILED') {
                         messageElement.innerHTML = `
                             <div class="flex items-center gap-4 p-4 bg-red-100 rounded-lg">
@@ -117,10 +135,7 @@
                                 </div>
                             </div>`;
                         buttonContainer.innerHTML = `
-                            <div_NOWRAP_class="space-y-3">
-                                <a href="../home-page/html/checkout.html" class="inline-block bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">Thử lại</a>
-                                <a href="../home-page/html/support.html" class="inline-block bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors">Liên hệ hỗ trợ</a>
-                            </div>`;
+                            <a href="../home-page/html/checkout.html" class="inline-block bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">Thử lại</a>`;
                     } else {
                         messageElement.innerHTML = `
                             <div class="flex items-center gap-4 p-4 bg-yellow-100 rounded-lg">
@@ -134,7 +149,7 @@
                                 </div>
                             </div>`;
                         buttonContainer.innerHTML = `
-                            <a href="../home-page/html/support.html" class="inline-block bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors">Liên hệ hỗ trợ</a>`;
+                            <a href="${getRedirectUrl('UNKNOWN', userRole)}" class="inline-block bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors">Quay lại</a>`;
                     }
 
                     let countdown = 5;
@@ -143,7 +158,7 @@
                         countdownTimer.textContent = countdown;
                         if (countdown <= 0) {
                             clearInterval(interval);
-                            window.location.href = response.result.status === 'PAID' ? '../home-page/html/checkout.html' : '../home-page/html/error.html';
+                            window.location.href = getRedirectUrl(response.result.status, userRole);
                         }
                     }, 1000);
                 } catch (error) {
@@ -152,8 +167,14 @@
                     loadingElement.classList.add('hidden');
                     countdownElement.classList.remove('hidden');
 
+                    // Assuming role is stored in sessionStorage or default to 'customer'
+                    const userRole = sessionStorage.getItem('userRole') || 'customer';
+
                     if (status === 'PAID') {
                         sessionStorage.setItem('paymentStatus', 'PAID');
+                        // Clear cart and pending order on successful payment
+                        localStorage.removeItem('cart');
+                        localStorage.removeItem('pendingOrder');
                         messageElement.innerHTML = `
                             <div class="flex items-center gap-4 p-4 bg-green-100 rounded-lg">
                                 <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke="#10B981" stroke-width="3">
@@ -167,7 +188,7 @@
                                 </div>
                             </div>`;
                         buttonContainer.innerHTML = `
-                            <a href="../home-page/html/checkout.html" class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">Quay lại trang chính</a>`;
+                            <a href="${getRedirectUrl('PAID', userRole)}" class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">Quay lại trang chính</a>`;
                     } else {
                         messageElement.innerHTML = `
                             <div class="flex items-center gap-4 p-4 bg-red-100 rounded-lg">
@@ -181,10 +202,7 @@
                                 </div>
                             </div>`;
                         buttonContainer.innerHTML = `
-                            <div class="space-y-3">
-                                <a href="../home-page/html/checkout.html" class="inline-block bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">Thử lại</a>
-                                <a href="../home-page/html/support.html" class="inline-block bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors">Liên hệ hỗ trợ</a>
-                            </div>`;
+                            <a href="../home-page/html/checkout.html" class="inline-block bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">Thử lại</a>`;
                     }
 
                     let countdown = 5;
@@ -193,7 +211,7 @@
                         countdownTimer.textContent = countdown;
                         if (countdown <= 0) {
                             clearInterval(interval);
-                            window.location.href = '../home-page/html/checkout.html';
+                            window.location.href = getRedirectUrl('FAILED', userRole);
                         }
                     }, 1000);
                 } finally {
@@ -215,7 +233,10 @@
                         </div>
                     </div>`;
                 buttonContainer.innerHTML = `
-                    <a href="../home-page/html/support.html" class="inline-block bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors">Liên hệ hỗ trợ</a>`;
+                    <a href="../home-page/html/checkout.html" class="inline-block bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">Quay lại</a>`;
+
+                // Assuming role is stored in sessionStorage or default to 'customer'
+                const userRole = sessionStorage.getItem('userRole') || 'customer';
 
                 let countdown = 5;
                 const interval = setInterval(() => {
@@ -223,7 +244,7 @@
                     countdownTimer.textContent = countdown;
                     if (countdown <= 0) {
                         clearInterval(interval);
-                        window.location.href = '../home-page/html/checkout.html';
+                        window.location.href = getRedirectUrl('FAILED', userRole);
                     }
                 }, 1000);
             }
