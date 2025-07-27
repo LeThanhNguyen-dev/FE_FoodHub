@@ -1897,15 +1897,171 @@ body {
     font-size: 1rem;
 }
 
-#dashboardOrdersSection .btn {
+#dashboardOrdersSection .btn,
+.filters-section .btn,
+.modal-overlay .btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    border: 2px solid;
-    transition: all 0.2s ease;
+    border: none;
+    transition: all 0.3s ease;
 }
+
+#dashboardOrdersSection .btn i,
+.filters-section .btn i {
+    margin-right: 0.5rem;
+}
+
+/* Primary Button - Orange */
+#dashboardOrdersSection .btn-primary,
+.filters-section .btn-primary,
+.modal-overlay .btn-primary {
+    background: linear-gradient(135deg, #F97316, #FF8C00);
+    color: white;
+    box-shadow: 0 3px 10px rgba(249, 115, 22, 0.3);
+}
+
+#dashboardOrdersSection .btn-primary:hover,
+.filters-section .btn-primary:hover,
+.modal-overlay .btn-primary:hover {
+    background: linear-gradient(135deg, #FF8C00, #F97316);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+}
+
+/* Success Button - Green */
+#dashboardOrdersSection .btn-success,
+.filters-section .btn-success,
+.modal-overlay .btn-success {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+}
+
+#dashboardOrdersSection .btn-success:hover,
+.filters-section .btn-success:hover,
+.modal-overlay .btn-success:hover {
+    background: linear-gradient(135deg, #059669, #10B981);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+}
+
+/* Danger Button - Red */
+#dashboardOrdersSection .btn-danger,
+.filters-section .btn-danger {
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    color: white;
+    box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
+}
+
+#dashboardOrdersSection .btn-danger:hover,
+.filters-section .btn-danger:hover {
+    background: linear-gradient(135deg, #DC2626, #EF4444);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* Warning Button - Yellow */
+#dashboardOrdersSection .btn-warning,
+.filters-section .btn-warning {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+}
+
+#dashboardOrdersSection .btn-warning:hover,
+.filters-section .btn-warning:hover {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+}
+
+/* Info Button - Blue */
+#dashboardOrdersSection .btn-info,
+.filters-section .btn-info {
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    color: white;
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+}
+
+#dashboardOrdersSection .btn-info:hover,
+.filters-section .btn-info:hover {
+    background: linear-gradient(135deg, #2563EB, #3B82F6);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Secondary Button - Gray */
+#dashboardOrdersSection .btn-secondary,
+.filters-section .btn-secondary,
+.modal-overlay .btn-secondary {
+    background: linear-gradient(135deg, #6B7280, #4B5563);
+    color: white;
+    box-shadow: 0 3px 10px rgba(107, 114, 128, 0.3);
+}
+
+#dashboardOrdersSection .btn-secondary:hover,
+.filters-section .btn-secondary:hover,
+.modal-overlay .btn-secondary:hover {
+    background: linear-gradient(135deg, #4B5563, #6B7280);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(107, 114, 128, 0.4);
+}
+
+/* Hiệu ứng loading cho button */
+#dashboardOrdersSection .btn.loading,
+.filters-section .btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+#dashboardOrdersSection .btn.loading::after,
+.filters-section .btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hiệu ứng loading cho button */
+#dashboardOrdersSection .btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+#dashboardOrdersSection .btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 
 
 .dropdown-menu {

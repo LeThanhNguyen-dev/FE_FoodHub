@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -46,7 +45,7 @@
                 <div class="card-body">
                     <form id="filterForm" class="row g-3">
                         <div class="col-md-3">
-                            <label for="statusFilter" class="form-label fw-bold">Thời gian</label>
+                            <label for="period" class="form-label fw-bold">Thời gian</label>
                             <select id="period" class="form-select">
                                 <option value="today">Hôm nay</option>
                                 <option value="week">Tuần này</option>
@@ -66,7 +65,7 @@
                         <div class="col-md-3">
                             <label for="statusFilter" class="form-label fw-bold">Trạng thái</label>
                             <select id="statusFilter" class="form-select">
-                                <option value="">All Statuses</option>
+                                <option value="">Tất cả trạng thái</option>
                                 <option value="PAID">PAID</option>
                                 <option value="PENDING">PENDING</option>
                                 <option value="UNPAID">UNPAID</option>
@@ -76,9 +75,9 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="paymentMethodFilter" class="form-label fw-bold">Thanh toán</label>
+                            <label for="paymentMethodFilter" class="form-label fw-bold">Phương thức thanh toán</label>
                             <select id="paymentMethodFilter" class="form-select">
-                                <option value="">All Methods</option>
+                                <option value="">Tất cả phương thức</option>
                                 <option value="CASH">CASH</option>
                                 <option value="BANKING">BANKING</option>
                                 <option value="VNPAY">VNPAY</option>
@@ -122,17 +121,17 @@
                                 <tr>
                                     <th style="width: 60px;">STT</th>
                                     <th onclick="sortTable('transactionId')" style="cursor: pointer;">
-                                        Transaction ID <span id="sort-transactionId" class="sort-arrow"></span>
+                                        Mã giao dịch <span id="sort-transactionId" class="sort-arrow"></span>
                                     </th>
                                     <th onclick="sortTable('createdAt')" style="cursor: pointer;">
-                                        Transaction Date <span id="sort-createdAt" class="sort-arrow"></span>
+                                        Ngày giao dịch <span id="sort-createdAt" class="sort-arrow"></span>
                                     </th>
                                     <th onclick="sortTable('amount')" style="cursor: pointer;">
-                                        Amount <span id="sort-amount" class="sort-arrow"></span>
+                                        Số tiền <span id="sort-amount" class="sort-arrow"></span>
                                     </th>
-                                    <th>Payment Method</th>
-                                    <th data-status-column>Status</th>
-                                    <th style="width: 150px;">Actions</th>
+                                    <th>Phương thức thanh toán</th>
+                                    <th data-status-column>Trạng thái</th>
+                                    <th style="width: 150px;">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody id="paymentTableBody">
@@ -169,10 +168,11 @@
                         <table class="table table-bordered mt-3">
                             <thead>
                                 <tr>
-                                    <th>Item Name</th>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Total</th>
+                                    <th>Tên món ăn</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá/1 đơn vị</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody id="itemsTableBody"></tbody>
@@ -193,7 +193,7 @@
     <!-- Custom JS -->
     <script src="/js/fetch-api.js"></script>
     <script src="../../js/sidebar.js"></script>
-     <script src="../../js/topbar.js"></script>
+    <script src="../../js/topbar.js"></script>
     <script>
         let currentPage = 0;
         const pageSize = 10;
@@ -204,14 +204,14 @@
         async function loadSidebar() {
             try {
                 const response = await fetch('../../components/sidebar.html');
-                if (!response.ok) throw new Error('Không thể tải sidebar');
+                if (!response.ok) throw new Error('Không thể tải thanh điều hướng');
                 const sidebarHtml = await response.text();
                 document.getElementById('sidebar-container').innerHTML = sidebarHtml;
                 setActiveNavLink();
             } catch (error) {
-                console.error('Lỗi khi tải sidebar:', error);
-                showNotification('Lỗi tải sidebar!', 'error');
-                document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải sidebar!</p>';
+                console.error('Lỗi khi tải thanh điều hướng:', error);
+                showNotification('Lỗi tải thanh điều hướng!', 'error');
+                document.getElementById('sidebar-container').innerHTML = '<p>Lỗi khi tải thanh điều hướng!</p>';
             }
         }
 
@@ -224,10 +224,11 @@
         function hideLoading() {
             document.getElementById('loadingSpinner').style.display = 'none';
         }
+
         function hideQueryParams() {
-    const cleanUrl = window.location.pathname; // Lấy đường dẫn không chứa query parameters
-    history.pushState({}, '', cleanUrl); // Thay đổi URL hiển thị
-}
+            const cleanUrl = window.location.pathname; // Lấy đường dẫn không chứa query parameters
+            history.pushState({}, '', cleanUrl); // Thay đổi URL hiển thị
+        }
 
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -246,12 +247,13 @@
                 style: 'currency',
                 currency: 'VND',
                 minimumFractionDigits: 0
-            }).format(amount);
+            }).format(amount || 0);
         }
 
         function formatDate(dateStr) {
+            if (!dateStr) return 'Không xác định';
             const date = new Date(dateStr.replace('Z', '+07:00'));
-            if (isNaN(date)) return 'N/A';
+            if (isNaN(date)) return 'Không xác định';
             return date.toLocaleString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
@@ -263,12 +265,11 @@
         }
 
         function formatPaymentMethod(method) {
-            if (!method || method.trim() === '') return 'UNKNOWN';
-            return method.toUpperCase();
+            return method && method.trim() !== '' ? method.toUpperCase() : 'Không xác định';
         }
 
         function formatPaymentStatus(status) {
-            if (!status || status.trim() === '') return '<span class="status-badge status-unknown">UNKNOWN</span>';
+            if (!status || status.trim() === '') return '<span class="status-badge status-unknown">Không xác định</span>';
             return `<span class="status-badge status-${status.toLowerCase()}">${status.toUpperCase()}</span>`;
         }
 
@@ -315,7 +316,7 @@
             const maxPrice = document.getElementById('maxPrice').value;
             if (maxPrice) params += `&maxPrice=${encodeURIComponent(maxPrice)}`;
 
-            console.log('Final query params:', params);
+            console.log('Tham số truy vấn:', params);
             return params;
         }
 
@@ -328,7 +329,7 @@
                 const response = await apiFetch(`/payments/list?${allPaymentsParams}`);
 
                 if (response.code === 0 && response.result.content) {
-                    return response.result.content.reduce((total, payment) => total + payment.amount, 0);
+                    return response.result.content.reduce((total, payment) => total + (payment.amount || 0), 0);
                 }
                 return 0;
             } catch (error) {
@@ -404,14 +405,14 @@
                 return `
                     <tr>
                         <td><div class="text-center fw-bold">${stt}</div></td>
-                        <td><div class="fw-bold">${payment.transactionId}</div></td>
+                        <td><div class="fw-bold">${payment.transactionId || 'Không xác định'}</div></td>
                         <td><div>${formatDate(payment.createdAt)}</div></td>
                         <td><div class="fw-bold text-success">${formatCurrency(payment.amount)}</div></td>
                         <td><div>${formatPaymentMethod(payment.paymentMethod)}</div></td>
                         <td data-status-column>${formatPaymentStatus(payment.status)}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-outline-primary btn-sm" onclick="showPaymentDetail('${payment.id}')" title="View Details">
+                                <button class="btn btn-outline-primary btn-sm" onclick="showPaymentDetail('${payment.id || 'Không xác định'}')" title="Xem chi tiết">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -485,33 +486,34 @@
             try {
                 const data = await apiFetch(`/payments/${paymentId}`);
                 const payment = data.result;
-                document.getElementById('paymentDetailModalLabel').textContent = `Chi tiết giao dịch ${payment.payment.transactionId}`;
+                document.getElementById('paymentDetailModalLabel').textContent = `Chi tiết giao dịch ${payment.payment.transactionId || 'Không xác định'}`;
                 document.getElementById('paymentDetails').innerHTML = `
                     <div class="col-md-6">
-                        <p><strong>Transaction ID:</strong> ${payment.payment.transactionId}</p>
-                        <p><strong>Transaction Date:</strong> ${formatDate(payment.payment.createdAt)}</p>
-                        <p><strong>Customer:</strong> ${payment.username || 'Guest'}</p>
+                        <p><strong>Mã giao dịch:</strong> ${payment.payment.transactionId || 'Không xác định'}</p>
+                        <p><strong>Ngày giao dịch:</strong> ${formatDate(payment.payment.createdAt)}</p>
+                        <p><strong>Tên khách hàng:</strong> ${payment.username || 'Khách lẻ'}</p>
+                        <p><strong>Phương thức thanh toán:</strong> ${formatPaymentMethod(payment.payment.paymentMethod)}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Amount:</strong> ${formatCurrency(payment.payment.amount)}</p>
-                        <p><strong>Order Type:</strong> ${payment.orderType === 'DINE_IN' ? 'DINE_IN' : payment.orderType === 'TAKEAWAY' ? 'TAKEAWAY' : 'DELIVERY'}</p>
-                        <p><strong>Table:</strong> ${payment.tableNumber || 'N/A'}</p>
-                        <p><strong>Payment Method:</strong> ${formatPaymentMethod(payment.payment.paymentMethod)}</p>
-                        <p><strong>Status:</strong> ${formatPaymentStatus(payment.payment.status)}</p>
+                        <p><strong>Tổng tiền:</strong> ${formatCurrency(payment.payment.amount)}</p>
+                        <p><strong>Loại đơn hàng:</strong> ${payment.orderType === 'DINE_IN' ? 'Ăn tại quán' : payment.orderType === 'TAKEAWAY' ? 'Mang đi' : payment.orderType === 'DELIVERY' ? 'Giao hàng' : 'Không xác định'}</p>
+                        <p><strong>Bàn:</strong> ${payment.tableNumber || 'Không có'}</p>
+                        <p><strong>Trạng thái thanh toán:</strong> ${formatPaymentStatus(payment.payment.status)}</p>
                     </div>
                 `;
                 document.getElementById('itemsTableBody').innerHTML = payment.orderItems.map(item => `
                     <tr>
-                        <td>${item.menuItemName}</td>
-                        <td>${item.quantity}</td>
+                        <td>${item.menuItemName || 'Không xác định'}</td>
+                        <td>${item.quantity || 0}</td>
                         <td>${formatCurrency(item.price)}</td>
-                        <td>${formatCurrency(item.quantity * item.price)}</td>
+                        <td>${item.status === 'CANCELLED' ? formatCurrency(0) : formatCurrency(item.quantity * item.price)}</td>
+                        <td>${item.status || 'Không xác định'}</td>
                     </tr>
                 `).join('');
-                document.getElementById('paymentNote').innerHTML = payment.note ? `<strong>Note:</strong> ${payment.note}` : '';
+                document.getElementById('paymentNote').innerHTML = payment.note ? `<strong>Ghi chú:</strong> ${payment.note}` : '';
                 new bootstrap.Modal(document.getElementById('paymentDetailModal')).show();
             } catch (error) {
-                showNotification(`Không thể tải chi tiết giao dịch: ${error.message}`, 'error');
+                showNotification(`Không thể tải chi tiết giao dịch: ${error.message || 'Lỗi không xác định'}`, 'error');
             }
         }
 
@@ -535,31 +537,31 @@
             fetchPayments();
         }
 
-       function initPeriodFromQueryParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const period = urlParams.get('period') || 'month';
-    const startDate = urlParams.get('startDate');
-    const endDate = urlParams.get('endDate');
-    const status = urlParams.get('status');
+        function initPeriodFromQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const period = urlParams.get('period') || 'month';
+            const startDate = urlParams.get('startDate');
+            const endDate = urlParams.get('endDate');
+            const status = urlParams.get('status');
 
-    const periodSelect = document.getElementById('period');
-    const statusFilter = document.getElementById('statusFilter');
+            const periodSelect = document.getElementById('period');
+            const statusFilter = document.getElementById('statusFilter');
 
-    if (period === 'specific' && startDate && endDate) {
-        periodSelect.value = 'specific';
-        document.getElementById('customDate').style.display = 'block';
-        document.getElementById('startDate').value = startDate.split('T')[0];
-        document.getElementById('endDate').value = endDate.split('T')[0];
-    } else {
-        periodSelect.value = period;
-        document.getElementById('customDate').style.display = period === 'specific' ? 'block' : 'none';
-    }
+            if (period === 'specific' && startDate && endDate) {
+                periodSelect.value = 'specific';
+                document.getElementById('customDate').style.display = 'block';
+                document.getElementById('startDate').value = startDate.split('T')[0];
+                document.getElementById('endDate').value = endDate.split('T')[0];
+            } else {
+                periodSelect.value = period;
+                document.getElementById('customDate').style.display = period === 'specific' ? 'block' : 'none';
+            }
 
-    if (status) {
-        statusFilter.value = status;
-    }
-    hideQueryParams();
-}
+            if (status) {
+                statusFilter.value = status;
+            }
+            hideQueryParams();
+        }
 
         async function updateData() {
             await fetchPayments();

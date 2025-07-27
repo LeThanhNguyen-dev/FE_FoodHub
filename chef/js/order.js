@@ -127,10 +127,10 @@ async function loadOrders(isAutoRefresh = false) {
         const tableIdFilter = document.getElementById('tableIdFilter');
         const sortByFilter = document.getElementById('sortByFilter');
         const sortDirectionFilter = document.getElementById('sortDirectionFilter');
-
+        console.log('sort by filter: ', sortByFilter.value);
         const status = statusFilter ? statusFilter.value : '';
         const tableId = tableIdFilter ? tableIdFilter.value : '';
-        const sortBy = sortByFilter ? sortByFilter.value || 'createdAt' : 'createdAt';
+        const sortBy = sortByFilter ? sortByFilter.value || 'updatedOrCreatedAt' : 'updatedOrCreatedAt';
         const sortDirection = sortDirectionFilter ? sortDirectionFilter.value || 'DESC' : 'DESC';
 
         // Chỉ show loading khi không có dữ liệu và không phải auto refresh
@@ -148,8 +148,9 @@ async function loadOrders(isAutoRefresh = false) {
         // Luôn thêm pagination và sorting parameters
         params.append('page', (currentPage || 0).toString());
         params.append('size', pageSize);
-        params.append('sortBy', sortBy);
+        params.append('orderBy', sortBy);
         params.append('sort', sortDirection);
+        console.log('sort by: ', sortBy);
         if (currentWorkSchedule && currentWorkSchedule.startTime) {
             params.append('startTime', currentWorkSchedule.startTime);
         }
@@ -409,31 +410,31 @@ function displayOrderDetails(orderData) {
 
     // Format dữ liệu
     const formatDateTime = (dateStr) => {
-            if (!dateStr) return 'Chưa cập nhật';
-            
-            // Parse date string trực tiếp mà không để JS tự động chuyển đổi timezone
-            const date = new Date(dateStr.replace('Z', ''));
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            
-            return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
-        };
+        if (!dateStr) return 'Chưa cập nhật';
 
-        const formattedDateCreation = formatDateTime(createdAt);
-        const formattedDateUpdate = formatDateTime(updatedAt);
+        // Parse date string trực tiếp mà không để JS tự động chuyển đổi timezone
+        const date = new Date(dateStr.replace('Z', ''));
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+    };
+
+    const formattedDateCreation = formatDateTime(createdAt);
+    const formattedDateUpdate = formatDateTime(updatedAt);
     const formattedAmount = formatCurrency(totalAmount);
 
     // Tạo HTML cho danh sách món ăn với ghi chú
     const orderItemsHtml = orderItems.map(item => {
-        const itemNoteHtml = (item.note && item.note.trim() !== '') 
-            ? `<div class="item-note">Ghi chú: ${item.note}</div>` 
+        const itemNoteHtml = (item.note && item.note.trim() !== '')
+            ? `<div class="item-note">Ghi chú: ${item.note}</div>`
             : '';
-        
+
         return `
             <div class="order-item">
                 <div class="order-item-info">
@@ -665,23 +666,53 @@ function addModalStyles() {
             border-radius: 4px;
             font-size: 12px;
             font-weight: bold;
-        }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .btn-secondary {
-            background: #6c757d;
             color: white;
+            border: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+
+        /* Warning Badge - Yellow/Orange */
+        .badge.bg-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
         }
+
+        /* Primary Badge - Orange */
+        .badge.bg-primary {
+            background: linear-gradient(135deg, #ea580c, #f97316);
+        }
+
+        /* Success Badge - Green */
+        .badge.bg-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        /* Danger Badge - Red */
+        .badge.bg-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* Info Badge - Blue */
+        .badge.bg-info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        /* Secondary Badge - Gray */
+        .badge.bg-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        /* Dark Badge - Dark Gray/Black */
+        .badge.bg-dark {
+            background: linear-gradient(135deg, #374151, #1f2937);
+        }
+
+        /* Light Badge - Light Gray (with dark text) */
+        .badge.bg-light {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #374151;
+            text-shadow: none;
+        }
+
         </style>
     `;
     document.head.insertAdjacentHTML('beforeend', styles);
@@ -1013,7 +1044,7 @@ let currentFilters = {
     maxPrice: '',
     page: 0,
     size: 10,
-    sortBy: 'createdAt',
+    sortBy: 'updatedOrCreatedAt',
     sort: 'DESC'
 };
 
@@ -1055,11 +1086,13 @@ function initializeFilters() {
                                 <i class="fas fa-sort"></i> Sắp xếp theo
                             </label>
                             <select class="form-select" id="sortByFilter" onchange="applyFilters()">
+                                <option value="updatedOrCreatedAt" selected>Mặc định</option>
                                 <option value="createdAt">Thời gian tạo</option>
                                 <option value="totalAmount">Tổng tiền</option>
                                 <option value="tableNumber">Số bàn</option>
                                 <option value="status">Trạng thái</option>
                             </select>
+
                         </div>
 
                         <div class="col-md-3">
@@ -1148,7 +1181,7 @@ function clearFilters() {
     if (tableIdFilter) tableIdFilter.value = '';
     if (minPriceFilter) minPriceFilter.value = '';
     if (maxPriceFilter) maxPriceFilter.value = '';
-    if (sortByFilter) sortByFilter.value = 'createdAt';
+    if (sortByFilter) sortByFilter.value = 'updatedOrCreatedAt';
     if (sortDirectionFilter) sortDirectionFilter.value = 'DESC';
 
     // Reset pagination
@@ -1409,7 +1442,7 @@ function hasActiveFilters() {
         currentFilters.tableId !== '' ||
         currentFilters.minPrice !== '' ||
         currentFilters.maxPrice !== '' ||
-        currentFilters.sortBy !== 'createdAt' ||
+        currentFilters.sortBy !== 'updatedOrCreatedAt' ||
         currentFilters.sort !== 'DESC' ||
         currentFilters.size !== 10;
 }

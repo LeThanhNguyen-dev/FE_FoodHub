@@ -263,12 +263,12 @@ function displayShiftReport(orderData) {
 
         /* Header Styles */
         .report-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #FFB84D 100%);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 24px;
-            color: var(--white);
-            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%);
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .header-content {
@@ -652,7 +652,9 @@ function calculateShiftStats(orders) {
 
     orders.forEach(order => {
         // Calculate total revenue
-        stats.totalRevenue += parseFloat(order.totalAmount || 0);
+        if (order.status == 'COMPLETED') {
+            stats.totalRevenue += parseFloat(order.totalAmount || 0);
+        }
 
         // Count unique tables
         if (order.tableNumber) {
@@ -660,7 +662,7 @@ function calculateShiftStats(orders) {
         }
 
         // Count status distribution
-        const status = order.status || 'UNKNOWN';
+        const status = order.status;
         stats.statusCounts[status] = (stats.statusCounts[status] || 0) + 1;
 
         // Count top items

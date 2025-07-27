@@ -11,7 +11,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* Tăng z-index để đảm bảo modal luôn ở trên cùng */
+    z-index: 9999;
+    /* Tăng z-index để đảm bảo modal luôn ở trên cùng */
 }
 
 /* Modal Content */
@@ -28,7 +29,8 @@
 
 /* Modal Content for Status Update (độc đáo) */
 .modal-content.status-update-modal {
-    max-width: 700px; /* Tăng kích thước cho modal cập nhật trạng thái */
+    max-width: 700px;
+    /* Tăng kích thước cho modal cập nhật trạng thái */
 }
 
 /* Modal Header */
@@ -38,7 +40,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--dark); /* Text màu mặc định trên nền trắng */
+    color: var(--dark);
+    /* Text màu mặc định trên nền trắng */
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
@@ -66,7 +69,8 @@
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.8); /* Màu xám phù hợp với header không nền */
+    color: rgba(0, 0, 0, 0.8);
+    /* Màu xám phù hợp với header không nền */
     transition: all 0.3s ease;
 }
 
@@ -121,13 +125,12 @@
 
 /* Order Total (dùng cho displayOrderDetails) */
 .order-total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding: 16px 0;
-  border-top: 2px solid 
-#f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 16px 0;
+    border-top: 2px solid #f0f0f0;
 }
 
 /* Badge (dùng chung cho cả hai) */
@@ -135,7 +138,52 @@
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: bold;
+    color: white;
+    border: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Warning Badge - Yellow/Orange */
+.badge.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+/* Primary Badge - Orange */
+.badge.bg-primary {
+    background: linear-gradient(135deg, #ea580c, #f97316);
+}
+
+/* Success Badge - Green */
+.badge.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Danger Badge - Red */
+.badge.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Info Badge - Blue */
+.badge.bg-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+/* Secondary Badge - Gray */
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+/* Dark Badge - Dark Gray/Black */
+.badge.bg-dark {
+    background: linear-gradient(135deg, #374151, #1f2937);
+}
+
+/* Light Badge - Light Gray (with dark text) */
+.badge.bg-light {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    color: #374151;
+    text-shadow: none;
 }
 
 /* Order Items Selection (độc đáo cho statusUpdateModal) */
@@ -209,10 +257,3 @@
 }
 
 /* Buttons (dùng chung, kết hợp từ cả hai) */
-
-
-
-
-
-
-

@@ -132,19 +132,20 @@ async function loadOrders(pageSize = 20) {
         const sortDirectionOrderFilter = document.getElementById('sortDirectionOrderFilter');
 
         const status = orderStatusFilter ? orderStatusFilter.value : '';
-        const tableNumber = tableNumberFilter ? tableNumberFilter.value : ''; // Đã là tableNumber
-        const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'createdAt' : 'createdAt';
+        const tableNumber = tableNumberFilter ? tableNumberFilter.value : '';
+        const sortBy = sortByOrderFilter ? sortByOrderFilter.value || 'updatedOrCreatedAt' : 'updatedOrCreatedAt';
         const sortDirection = sortDirectionOrderFilter ? sortDirectionOrderFilter.value || 'DESC' : 'DESC';
 
         // Build query parameters
         const params = new URLSearchParams();
         if (status) params.append('status', status);
-        if (tableNumber) params.append('tableNumber', tableNumber); // Gửi tableNumber
+        if (tableNumber) params.append('tableNumber', tableNumber);
         params.append('page', currentOrderPage.toString());
         params.append('size', pageSize);
         params.append('orderBy', sortBy);
         params.append('sort', sortDirection);
-
+        console.log('params: ', params.toString());
+        
         // Fetch orders with filters
         const data = await apiFetch(`/orders/waiter/work-shift-orders/${currentUserInfo.id}?${params.toString()}`, {
             method: 'GET'
@@ -161,14 +162,11 @@ async function loadOrders(pageSize = 20) {
         // Render orders
         renderOrders(orders);
         updateSummary(orderPage);
-        updatePagination();
+        updateOrderPagination();
 
     } catch (error) {
         console.error('Error fetching orders:', error);
-
         showErrorState(error.code, error.message);
-
-
     }
 }
 
@@ -296,7 +294,7 @@ function clearFilters() {
     const filterElements = [
         { id: 'orderStatusFilter', value: '' },
         { id: 'tableNumberFilter', value: '' },
-        { id: 'sortByOrderFilter', value: 'createdAt' },
+        { id: 'sortByOrderFilter', value: 'updatedOrCreatedAt' },
         { id: 'sortDirectionOrderFilter', value: 'DESC' }
     ];
 
@@ -466,7 +464,6 @@ function handleCheckoutClick(buttonElement) {
 
 
 async function checkoutOrder(order) {
-    console.log('checkoutOrder called with:', order);
     try {
         const paymentMethod = await showOrderDetailsAndPaymentModal(order);
 
@@ -527,113 +524,116 @@ function showOrderDetailsAndPaymentModal(order) {
     return new Promise((resolve) => {
         // Tạo HTML cho danh sách món ăn
         const orderItemsHtml = order.orderItems.map(item => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f8ff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px;">
                 <div style="flex: 1;">
-                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">${item.menuItemName}</div>
-                    <div style="color: #6b7280; font-size: 13px;">
-                        <span style="margin-right: 12px;">SL: ${item.quantity}</span>
-                        <span>Đơn giá: ${item.price.toLocaleString('vi-VN')} VND</span>
-                    </div>
+                    <div style="font-weight: 500; color: #333; margin-bottom: 2px;">${item.menuItemName}</div>
+                    <div style="color: #666; font-size: 14px;">x${item.quantity}</div>
                 </div>
-                <div style="font-weight: 700; color: #FEA116; font-size: 15px;">
-                    ${(item.quantity * item.price).toLocaleString('vi-VN')} VND
+                <div style="font-weight: 600; color: #333; font-size: 14px;">
+                    ${item.price.toLocaleString('vi-VN')}đ
                 </div>
             </div>
         `).join('');
 
         const modal = document.createElement('div');
         modal.innerHTML = `
-            <div id="modal-backdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 20px;">
-                <div id="modal-content" style="background: white; border-radius: 16px; max-width: 520px; width: 100%; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); position: relative;">
+            <div id="modal-backdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 20px;">
+                <div id="modal-content" style="background: white; border-radius: 12px; max-width: 480px; width: 100%; max-height: 90vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative;">
                     
-                    <!-- Close button -->
-                    <button onclick="closeModal()" style="position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1001; color: white; font-size: 18px; font-weight: bold; transition: all 0.2s;"
-                        onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='scale(1.1)';" 
-                        onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';">
-                        ×
-                    </button>
-
                     <!-- Header -->
-                    <div style="background: linear-gradient(135deg, #FEA116 0%, #f59e0b 100%); padding: 24px; text-align: center;">
-                        <h3 style="margin: 0; color: white; font-size: 22px; font-weight: 700;">Thông tin thanh toán</h3>
-                        <div style="width: 40px; height: 3px; background: rgba(255,255,255,0.3); margin: 8px auto 0; border-radius: 2px;"></div>
+                    <div style="padding: 20px 24px; border-bottom: 1px solid #f0f0f0; position: relative;">
+                        <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Xác nhận đặt món</h3>
+                        <button onclick="closeModal()" style="position: absolute; top: 20px; right: 24px; width: 24px; height: 24px; background: none; border: none; cursor: pointer; font-size: 20px; color: #999; padding: 0; display: flex; align-items: center; justify-content: center;"
+                            onmouseover="this.style.color='#333';" 
+                            onmouseout="this.style.color='#999';">
+                            ×
+                        </button>
                     </div>
                     
-                    <div style="padding: 24px; overflow-y: auto; max-height: calc(90vh - 120px);">
-                        <!-- Thông tin đơn hàng -->
-                        <div style="background: #F1F8FF; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <div>
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">MÃ ĐƠN HÀNG</div>
-                                    <div style="color: #1f2937; font-weight: 600;">#${order.id}</div>
-                                </div>
-                                <div>
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">BÀN SỐ</div>
-                                    <div style="color: #1f2937; font-weight: 600;">${order.tableNumber}</div>
-                                </div>
-                                ${order.note ? `
-                                <div style="grid-column: 1 / -1; margin-top: 8px;">
-                                    <div style="color: #6b7280; font-size: 13px; font-weight: 500; margin-bottom: 4px;">GHI CHÚ</div>
-                                    <div style="color: #6b7280; font-style: italic; background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #FEA116;">${order.note}</div>
-                                </div>
-                                ` : ''}
-                            </div>
+                    <div style="padding: 24px; overflow-y: auto; max-height: calc(90vh - 200px);">
+                        <!-- Confirmation text -->
+                        <div style="margin-bottom: 24px; color: #666; font-size: 14px;">
+                            Bạn có chắc chắn muốn đặt món với loại đơn hàng: <strong style="color: #333;">Mang về?</strong>
                         </div>
 
-                        <!-- Danh sách món ăn -->
+                        <!-- Order details title -->
+                        <div style="margin-bottom: 16px;">
+                            <h4 style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">Chi tiết đơn hàng:</h4>
+                        </div>
+
+                        <!-- Order items -->
                         <div style="margin-bottom: 24px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                <div style="width: 24px; height: 24px; background: #FEA116; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                    <span style="color: white; font-size: 12px; font-weight: bold;">📋</span>
-                                </div>
-                                <h4 style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 600;">Chi tiết đơn hàng</h4>
-                            </div>
-                            <div style="background: white; border: 1px solid #f1f8ff; border-radius: 12px; max-height: 200px; overflow-y: auto;">
-                                <div style="padding: 16px;">
-                                    ${orderItemsHtml}
-                                </div>
+                            ${orderItemsHtml}
+                        </div>
+
+                        <!-- Total -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-top: 1px solid #f0f0f0; margin-bottom: 24px;">
+                            <div style="font-weight: 600; color: #333; font-size: 16px;">Tổng cộng:</div>
+                            <div style="font-weight: 700; color: #e74c3c; font-size: 18px;">
+                                ${order.totalAmount.toLocaleString('vi-VN')}đ
                             </div>
                         </div>
 
-                        <!-- Tổng tiền -->
-                        <div style="background: linear-gradient(135deg, #FEA116 0%, #f59e0b 100%); border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
-                            <div style="color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; margin-bottom: 4px;">TỔNG THANH TOÁN</div>
-                            <div style="color: white; font-size: 24px; font-weight: 800;">
-                                ${order.totalAmount.toLocaleString('vi-VN')} VND
-                            </div>
-                        </div>
-
-                        <!-- Chọn phương thức thanh toán -->
+                        <!-- Payment method selection -->
                         <div style="margin-bottom: 24px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                <div style="width: 24px; height: 24px; background: #FEA116; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                    <span style="color: white; font-size: 12px; font-weight: bold;">💳</span>
-                                </div>
-                                <h4 style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 600;">Phương thức thanh toán</h4>
+                            <h4 style="margin: 0 0 16px 0; color: #333; font-size: 16px; font-weight: 600;">Chọn phương thức thanh toán:</h4>
+                            
+                            <div style="margin-bottom: 12px;">
+                                <label style="display: flex; align-items: center; padding: 12px 16px; border: 2px solid #FEA116; border-radius: 8px; cursor: pointer; background: #fff8f0;">
+                                    <input type="radio" name="paymentMethod" value="CASH" checked style="margin-right: 12px; accent-color: #FEA116;">
+                                    <span style="font-size: 16px; margin-right: 8px;">💵</span>
+                                    <span style="color: #333; font-weight: 500;">Tiền mặt</span>
+                                </label>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <button onclick="selectPaymentMethod('CASH')" 
-                                    style="padding: 16px; background: white; border: 2px solid #FEA116; border-radius: 12px; cursor: pointer; font-weight: 600; color: #FEA116; display: flex; align-items: center; justify-content: center; gap: 8px;"
-                                    onmouseover="this.style.background='#FEA116'; this.style.color='white';" 
-                                    onmouseout="this.style.background='white'; this.style.color='#FEA116';">
-                                    <span style="font-size: 18px;">💵</span>
-                                    <span>Tiền mặt</span>
-                                </button>
-                                <button onclick="selectPaymentMethod('BANKING')" 
-                                    style="padding: 16px; background: white; border: 2px solid #3b82f6; border-radius: 12px; cursor: pointer; font-weight: 600; color: #3b82f6; display: flex; align-items: center; justify-content: center; gap: 8px;"
-                                    onmouseover="this.style.background='#3b82f6'; this.style.color='white';" 
-                                    onmouseout="this.style.background='white'; this.style.color='#3b82f6';">
-                                    <span style="font-size: 18px;">💳</span>
-                                    <span>Chuyển khoản</span>
-                                </button>
+                            
+                            <div>
+                                <label style="display: flex; align-items: center; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; background: white;">
+                                    <input type="radio" name="paymentMethod" value="BANKING" style="margin-right: 12px; accent-color: #FEA116;">
+                                    <span style="font-size: 16px; margin-right: 8px;">🏛️</span>
+                                    <span style="color: #333; font-weight: 500;">Chuyển khoản</span>
+                                </label>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Footer buttons -->
+                    <div style="padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; gap: 12px; justify-content: flex-end;">
+                        <button onclick="closeModal()" 
+                            style="padding: 10px 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; font-weight: 500; color: #6c757d;"
+                            onmouseover="this.style.background='#e9ecef';" 
+                            onmouseout="this.style.background='#f8f9fa';">
+                            Hủy
+                        </button>
+                        <button onclick="confirmOrder()" 
+                            style="padding: 10px 20px; background: #FEA116; border: 1px solid #FEA116; border-radius: 6px; cursor: pointer; font-weight: 500; color: white;"
+                            onmouseover="this.style.background='#e8910f';" 
+                            onmouseout="this.style.background='#FEA116';">
+                            Đặt món
+                        </button>
                     </div>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
+
+        // Add event listeners for radio buttons
+        const radioButtons = modal.querySelectorAll('input[name="paymentMethod"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remove active styling from all labels
+                radioButtons.forEach(r => {
+                    const label = r.closest('label');
+                    if (r.value === 'CASH') {
+                        label.style.border = '2px solid ' + (r.checked ? '#FEA116' : '#e0e0e0');
+                        label.style.background = r.checked ? '#fff8f0' : 'white';
+                    } else {
+                        label.style.border = '2px solid ' + (r.checked ? '#FEA116' : '#e0e0e0');
+                        label.style.background = r.checked ? '#fff8f0' : 'white';
+                    }
+                });
+            });
+        });
 
         // Xử lý click vào backdrop để đóng modal
         const backdrop = modal.querySelector('#modal-backdrop');
@@ -650,16 +650,19 @@ function showOrderDetailsAndPaymentModal(order) {
             e.stopPropagation();
         });
 
-        window.selectPaymentMethod = (method) => {
+        window.confirmOrder = () => {
+            const selectedPayment = modal.querySelector('input[name="paymentMethod"]:checked');
+            const paymentMethod = selectedPayment ? selectedPayment.value : 'CASH';
+            
             document.body.removeChild(modal);
-            delete window.selectPaymentMethod;
+            delete window.confirmOrder;
             delete window.closeModal;
-            resolve(method);
+            resolve(paymentMethod);
         };
 
         window.closeModal = () => {
             document.body.removeChild(modal);
-            delete window.selectPaymentMethod;
+            delete window.confirmOrder;
             delete window.closeModal;
             resolve(null);
         };
@@ -858,12 +861,15 @@ function updateSummary(orderPage) {
 }
 
 // Update pagination controls with smart pagination
-function updatePagination() {
+function updateOrderPagination() {
+    // Update pagination info text
+    updateOrderPaginationInfo();
+    
     // Generate pagination buttons
-    generatePaginationButtons();
+    generateOrderPaginationButtons();
 
     // Show/hide quick jump feature for large page counts
-    const jumpContainer = document.getElementById('paginationJump');
+    const jumpContainer = document.getElementById('orderPaginationJump');
     const jumpInput = document.getElementById('jumpToOrderPage');
 
     if (jumpContainer && jumpInput && totalOrderPages > 10) {
@@ -875,9 +881,21 @@ function updatePagination() {
     }
 }
 
+// Update pagination info text
+function updateOrderPaginationInfo() {
+    const paginationInfo = document.querySelector('.order-pagination-info');
+    if (!paginationInfo) return;
+
+    const itemsPerPage = 20; // or get from pageSize parameter
+    const startItem = currentOrderPage * itemsPerPage + 1;
+    const endItem = Math.min((currentOrderPage + 1) * itemsPerPage, totalOrderElements);
+    
+    paginationInfo.textContent = `Hiển thị ${startItem} - ${endItem} của ${totalOrderElements} đơn hàng`;
+}
+
 // Generate smart pagination buttons (max 10 visible pages)
-function generatePaginationButtons() {
-    const paginationList = document.getElementById('paginationList');
+function generateOrderPaginationButtons() {
+    const paginationList = document.getElementById('orderPaginationList');
     if (!paginationList) return;
 
     paginationList.innerHTML = '';
@@ -914,20 +932,20 @@ function generatePaginationButtons() {
     }
 
     // Previous button
-    const prevBtn = createPaginationButton('‹', currentOrderPage - 1, currentOrderPage <= 0, 'Trang trước');
+    const prevBtn = createOrderPaginationButton('‹', currentOrderPage - 1, currentOrderPage <= 0, 'Trang trước');
     paginationList.appendChild(prevBtn);
 
     // First page + ellipsis (if needed)
     if (startPage > 1) {
-        paginationList.appendChild(createPaginationButton('1', 0));
+        paginationList.appendChild(createOrderPaginationButton('1', 0));
         if (startPage > 2) {
-            paginationList.appendChild(createPaginationEllipsis('start'));
+            paginationList.appendChild(createOrderPaginationEllipsis('start'));
         }
     }
 
     // Page number buttons
     for (let i = startPage; i <= endPage; i++) {
-        const pageBtn = createPaginationButton(
+        const pageBtn = createOrderPaginationButton(
             i.toString(),
             i - 1, // Convert to 0-based for backend
             false,
@@ -940,18 +958,18 @@ function generatePaginationButtons() {
     // Last page + ellipsis (if needed)
     if (endPage < totalOrderPages) {
         if (endPage < totalOrderPages - 1) {
-            paginationList.appendChild(createPaginationEllipsis('end'));
+            paginationList.appendChild(createOrderPaginationEllipsis('end'));
         }
-        paginationList.appendChild(createPaginationButton(totalOrderPages.toString(), totalOrderPages - 1));
+        paginationList.appendChild(createOrderPaginationButton(totalOrderPages.toString(), totalOrderPages - 1));
     }
 
     // Next button
-    const nextBtn = createPaginationButton('›', currentOrderPage + 1, currentOrderPage >= totalOrderPages - 1, 'Trang sau');
+    const nextBtn = createOrderPaginationButton('›', currentOrderPage + 1, currentOrderPage >= totalOrderPages - 1, 'Trang sau');
     paginationList.appendChild(nextBtn);
 }
 
 // Create pagination button element
-function createPaginationButton(text, pageIndex, disabled = false, title = '', active = false) {
+function createOrderPaginationButton(text, pageIndex, disabled = false, title = '', active = false) {
     const li = document.createElement('li');
     li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`;
 
@@ -970,7 +988,7 @@ function createPaginationButton(text, pageIndex, disabled = false, title = '', a
 }
 
 // Create ellipsis element for pagination
-function createPaginationEllipsis(position) {
+function createOrderPaginationEllipsis(position) {
     const li = document.createElement('li');
     li.className = 'page-item disabled';
 
@@ -1009,7 +1027,6 @@ function jumpToOrderPage() {
         }, 2000);
     }
 }
-
 
 // Refresh orders
 async function refreshOrders() {

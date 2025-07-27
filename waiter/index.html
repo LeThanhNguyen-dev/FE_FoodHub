@@ -26,6 +26,7 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="css/table-style.css" rel="stylesheet">
     <link href="css/chat-style.css" rel="stylesheet">
+    <link href="css/menu-style.css" rel="stylesheet">
 
 
 </head>
@@ -222,7 +223,7 @@
                         <div class="card-icon sales-icon">
                             <i class="fas fa-money-bill-wave"></i>
                         </div>
-                        <div class="stats-number sales-number">0K₫</div>
+                        <div class="stats-number sales-number">0₫</div>
                         <p class="stats-label">Từ 0 đơn hàng</p>
                     </div>
                 </div>
@@ -758,6 +759,7 @@
         }
 
         function showDashboard() {
+            hideCartSidebar();
             document.getElementById('pageTitle').textContent = 'Dashboard';
 
             // Show dashboard content and hide others
@@ -1199,10 +1201,13 @@
 
                     // Calculate revenue from all orders except cancelled ones
                     ordersData.forEach(order => {
-                        const status = order.status ? order.status.toUpperCase() : '';
+                        const status = order.status ? order.status: '';
+                        console.log("order status: ", status);
                         // Count all orders that are not cancelled
-                        if (status !== 'CANCELLED') {
+                        if (status === 'COMPLETED') {
+                            
                             completedOrdersCount++;
+                            console.log("count: ",completedOrdersCount);
                             // Add order total to revenue
                             if (order.totalAmount) {
                                 totalRevenue += order.totalAmount;
@@ -1219,15 +1224,14 @@
 
                     // Update the Daily Sales Card display
                     const revenueCard = document.querySelector('.card:nth-child(3) .stats-number');
-                    const revenueDescription = document.querySelector('.card:nth-child(3) .text-muted');
+                    const revenueDescription = document.querySelector('.card:nth-child(3) .stats-label');
 
                     if (revenueCard) {
-                        // Format revenue as Vietnamese currency
                         const formattedRevenue = formatCurrency(totalRevenue);
                         revenueCard.textContent = formattedRevenue;
                     }
 
-                    if (revenueDescription) {
+                    if (revenueDescription) {   
                         revenueDescription.textContent = `Từ ${completedOrdersCount} đơn hàng`;
                     }
 
@@ -1691,14 +1695,6 @@
                 // Update status display
                 document.getElementById('shiftType').innerHTML =
                     `<i class="fas ${statusIcon} me-2"></i>Trạng thái: ${statusText}`;
-
-                // Show status badge if late
-                if (shiftLog.status === 'LATE') {
-                    const statusBadge = document.createElement('span');
-                    statusBadge.className = 'badge bg-warning ms-2';
-                    statusBadge.textContent = 'Đi muộn';
-                    document.getElementById('shiftType').appendChild(statusBadge);
-                }
             }
         }
 

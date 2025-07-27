@@ -381,7 +381,7 @@ function applyMenuFilters() {
 function resetFilters() {
     // Reset all filter elements
     const filterElements = [
-        'categoryFilter', 'keywordFilter', 
+        'categoryFilter', 'keywordFilter',
         'pageSizeMenuFilter'
     ];
 
@@ -1305,17 +1305,21 @@ async function submitOrder() {
         const note = orderNoteInput ? orderNoteInput.value.trim() : '';
 
         // Chuẩn bị dữ liệu đơn hàng
+        const orderStatus = "CONFIRMED";
+
         const orderData = {
             note: note || null,
             orderType: selectedOrderType,
-            status: "PENDING",
+            status: orderStatus,
             orderItems: cart.map(item => ({
                 menuItemId: item.menuItemId,
                 quantity: item.quantity,
-                status: "PENDING",
+                status: orderStatus,
                 note: item.note || null
             }))
         };
+
+
 
         // Nếu là đơn ăn tại chỗ, thêm tableId
         if (selectedOrderType === 'DINE_IN' && selectedTable) {
@@ -1327,7 +1331,7 @@ async function submitOrder() {
             // Lấy payment method ngay tại thời điểm này, trước khi gửi API
             const paymentMethod = getSelectedPaymentMethod();
             console.log('Payment method before API call:', paymentMethod); // Debug log
-            
+
             orderData.payment = {
                 paymentMethod: paymentMethod
             };
@@ -1360,7 +1364,7 @@ async function submitOrder() {
                 successMessage += ` - ${orderTypeText} - Bàn ${selectedTable.tableNumber}`;
             } else {
                 successMessage += ` - ${orderTypeText}`;
-                
+
                 // Thêm thông tin phương thức thanh toán vào thông báo
                 if (selectedOrderType === 'TAKEAWAY' || selectedOrderType === 'DELIVERY') {
                     const paymentMethodText = orderData.payment?.paymentMethod === 'BANKING' ? 'Chuyển khoản' : 'Tiền mặt';
@@ -1517,7 +1521,7 @@ async function showConfirmationPopup(title, message, confirmText, cancelText, on
     try {
         // Reset payment method về default
         selectedPaymentMethod = 'CASH';
-        
+
         // Xóa popup cũ nếu có
         const existingPopup = document.getElementById('confirmationPopup');
         if (existingPopup) {
@@ -1569,7 +1573,7 @@ async function showConfirmationPopup(title, message, confirmText, cancelText, on
         if (popup) {
             const paymentRadios = popup.querySelectorAll('input[name="paymentMethod"]');
             paymentRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
+                radio.addEventListener('change', function () {
                     selectedPaymentMethod = this.value;
                     console.log('Payment method changed to:', selectedPaymentMethod);
                 });

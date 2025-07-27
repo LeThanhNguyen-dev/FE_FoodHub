@@ -154,11 +154,11 @@
             Đơn hàng gần đây
           </h5>
           <div class="d-flex gap-2">
-            <button class="btn btn-outline-success" onclick="refreshDashboardOrders()">
+            <button class="btn btn-primary" onclick="refreshDashboardOrders()">
               <i class="fas fa-sync-alt me-1"></i>
               Làm mới
             </button>
-            <button class="btn btn-primary" onclick="showOrders()">
+            <button class="btn btn-info" onclick="showOrders()">
               <i class="fas fa-eye me-1"></i>
               Xem tất cả
             </button>
@@ -1372,14 +1372,6 @@
         // Update status display
         document.getElementById('shiftType').innerHTML =
           `<i class="fas ${statusIcon} me-2"></i>Trạng thái: ${statusText}`;
-
-        // Show status badge if late
-        if (shiftLog.status === 'LATE') {
-          const statusBadge = document.createElement('span');
-          statusBadge.className = 'badge bg-warning ms-2';
-          statusBadge.textContent = 'Đi muộn';
-          document.getElementById('shiftType').appendChild(statusBadge);
-        }
       }
     }
 

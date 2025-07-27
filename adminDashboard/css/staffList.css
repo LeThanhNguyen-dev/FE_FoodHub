@@ -1,8 +1,5 @@
-    /**
-    * Bảng màu được làm dịu lại để trông chuyên nghiệp hơn.
-    * Màu --dark được điều chỉnh để không quá tương phản.
-    * Màu --light được giữ nguyên cho nền.
-    */
+
+
     :root {
         --primary: #FEA116; /* Giữ màu nhấn chính */
         --light: #F8F9FA;   /* Màu nền sáng hơn một chút */
@@ -22,9 +19,7 @@
         color: #495057; /* Màu chữ mặc định */
     }
 
-    /* =================================================================== */
-    /* Sidebar & Layout - KHÔNG THAY ĐỔI THEO YÊU CẦU                  */
-    /* =================================================================== */
+  
     .main-content {
         margin-left: 280px;
         transition: all 0.3s ease-in-out;
@@ -54,9 +49,7 @@
         cursor: pointer;
     }
 
-    /* =================================================================== */
-    /* Components - Thiết kế lại cho hiện đại và chuyên nghiệp hơn        */
-    /* =================================================================== */
+
 
     .card {
         background-color: #FFFFFF;
@@ -202,9 +195,7 @@
         background-color: #fff;
     }
 
-    /* =================================================================== */
-    /* Other Components - Giữ nguyên hoặc tinh chỉnh nhẹ                   */
-    /* =================================================================== */
+  
 
     .action-buttons .btn {
         margin: 0 2px;
@@ -272,10 +263,70 @@
         width: 160px; /* Đặt width cố định cho cột trạng thái */
         min-width: 160px;
     }
+    .order-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-    /* =================================================================== */
-    /* Responsive - Đảm bảo hoạt động tốt trên mobile                     */
-    /* =================================================================== */
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary {
+    background: var(--light);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.modal-xl {
+    max-width: 90%;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    flex: 1;
+    min-width: 40px;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .modal-xl {
+        max-width: 95%;
+    }
+}
+
+/* Badge styles for order status */
+.badge.bg-success {
+    background-color: var(--success) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--secondary) !important;
+}
+
+
     @media (max-width: 768px) {
         .main-content {
             margin-left: 0;
