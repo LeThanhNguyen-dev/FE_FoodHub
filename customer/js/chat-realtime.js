@@ -6,24 +6,28 @@ class ChatManager {
         this.connected = false;
         this.messageHistory = [];
         this.unreadCount = 0;
-        
+
         this.init();
     }
 
     init() {
+        console.log('🔧 ChatManager init');
+
         this.connectWebSocket();
         this.setupEventListeners();
         this.loadChatHistory();
     }
 
     connectWebSocket() {
+        console.log('🔌 Connecting WebSocket...');
+
         const socket = new SockJS(`${BACKEND_BASE_URL}/ws`);
         this.stompClient = Stomp.over(socket);
-        
+
         // Disable debug logging
         this.stompClient.debug = null;
-        
-        this.stompClient.connect({}, 
+
+        this.stompClient.connect({},
             (frame) => {
                 console.log('Connected to WebSocket: ' + frame);
                 this.connected = true;
@@ -48,9 +52,10 @@ class ChatManager {
 
     subscribeToMessages() {
         if (this.stompClient && this.connected) {
-            // Subscribe to messages for this table
+            console.log('🔄 Subscribing to topic:', `/topic/chat/customer/table/${this.tableNumber}`);
             this.stompClient.subscribe(`/topic/chat/customer/table/${this.tableNumber}`, (message) => {
                 const messageData = JSON.parse(message.body);
+                console.log('🟡 Received message on WebSocket:', messageData); // Thêm dòng này
                 this.handleIncomingMessage(messageData);
             });
         }
@@ -81,28 +86,28 @@ class ChatManager {
     }
 
     async loadChatHistory() {
-    try {
-        const token = localStorage.getItem("sessionToken"); // Lấy JWT token từ localStorage
+        try {
+            const token = localStorage.getItem("sessionToken"); // Lấy JWT token từ localStorage
 
-        const response = await fetch(`${BACKEND_BASE_URL}/chat/messages/table/${this.tableNumber}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
+            const response = await fetch(`${BACKEND_BASE_URL}/chat/messages/table/${this.tableNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const messages = await response.json();
+                this.messageHistory = messages;
+                this.renderMessages();
+            } else if (response.status === 401) {
+                console.warn('❌ Unauthorized - Token có thể đã hết hạn hoặc không hợp lệ');
+            } else {
+                console.warn(`⚠️ Lỗi khác khi tải tin nhắn: ${response.status}`);
             }
-        });
-
-        if (response.ok) {
-            const messages = await response.json();
-            this.messageHistory = messages;
-            this.renderMessages();
-        } else if (response.status === 401) {
-            console.warn('❌ Unauthorized - Token có thể đã hết hạn hoặc không hợp lệ');
-        } else {
-            console.warn(`⚠️ Lỗi khác khi tải tin nhắn: ${response.status}`);
+        } catch (error) {
+            console.error('Error loading chat history:', error);
         }
-    } catch (error) {
-        console.error('Error loading chat history:', error);
     }
-}
 
 
     sendMessage(message) {
@@ -118,7 +123,7 @@ class ChatManager {
 
         try {
             this.stompClient.send(`/app/chat/table/${this.tableNumber}`, {}, JSON.stringify(messageData));
-            
+
             // Add message to local history immediately for better UX
             const localMessage = {
                 message: message,
@@ -126,10 +131,10 @@ class ChatManager {
                 timestamp: new Date().toISOString(),
                 tableNumber: this.tableNumber
             };
-            
+
             this.addMessageToHistory(localMessage);
             this.renderMessages();
-            
+
         } catch (error) {
             console.error('Error sending message:', error);
             this.showError('Không thể gửi tin nhắn. Vui lòng thử lại.');
@@ -141,13 +146,16 @@ class ChatManager {
         if (messageData.sender === 'WAITER') {
             this.addMessageToHistory(messageData);
             this.renderMessages();
-            
+
             // Show notification if chat is closed
             const chatPopup = document.getElementById('chatPopup');
             if (chatPopup.style.display !== 'flex') {
                 this.showNotification();
             }
-            
+
+            console.log('raw timestamp from server:', messageData.timestamp);
+            console.log('parsed date:', new Date(messageData.timestamp));
+
         }
     }
 
@@ -185,9 +193,9 @@ class ChatManager {
     createMessageElement(message) {
         const messageDiv = document.createElement('div');
         const isCustomer = message.sender === 'CUSTOMER';
-        
+
         messageDiv.className = `message ${isCustomer ? 'sent' : 'received'}`;
-        
+
         const timestamp = new Date(message.timestamp);
         const timeString = timestamp.toLocaleTimeString('vi-VN', {
             hour: '2-digit',
@@ -215,7 +223,7 @@ class ChatManager {
         const notification = document.getElementById('chatNotification');
         notification.textContent = this.unreadCount;
         notification.style.display = 'flex';
-        
+
         // Play notification sound (optional)
         this.playNotificationSound();
     }
@@ -232,16 +240,16 @@ class ChatManager {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.value = 800;
             oscillator.type = 'sine';
-            
+
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
+
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
         } catch (error) {
@@ -259,15 +267,15 @@ class ChatManager {
             z-index: 9999;
             min-width: 300px;
         `;
-        
+
         errorDiv.innerHTML = `
             <i class="fas fa-exclamation-circle me-2"></i>
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
+
         document.body.appendChild(errorDiv);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             if (errorDiv.parentNode) {
@@ -311,7 +319,7 @@ class ChatAutoReconnect {
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
         this.reconnectDelay = 5000; // 5 seconds
-        
+
         this.startHeartbeat();
     }
 
@@ -331,7 +339,7 @@ class ChatAutoReconnect {
 
         this.reconnectAttempts++;
         console.log(`Attempting reconnection ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
-        
+
         setTimeout(() => {
             this.chatManager.connectWebSocket();
         }, this.reconnectDelay * this.reconnectAttempts);
@@ -348,7 +356,7 @@ class ChatUtils {
         const date = new Date(timestamp);
         const now = new Date();
         const diffInHours = (now - date) / (1000 * 60 * 60);
-        
+
         if (diffInHours < 1) {
             return 'Vừa xong';
         } else if (diffInHours < 24) {
@@ -362,7 +370,7 @@ class ChatUtils {
         if (!message || typeof message !== 'string') {
             return false;
         }
-        
+
         const trimmed = message.trim();
         return trimmed.length > 0 && trimmed.length <= 1000;
     }
@@ -387,7 +395,7 @@ class ChatStorage {
                 id: Date.now(),
                 synced: false
             });
-            
+
             localStorage.setItem(this.storageKey, JSON.stringify(messages));
         } catch (error) {
             console.error('Error saving message to storage:', error);
@@ -437,7 +445,7 @@ class EnhancedChatManager extends ChatManager {
         this.storage = new ChatStorage(tableNumber);
         this.autoReconnect = new ChatAutoReconnect(this);
         this.isOnline = navigator.onLine;
-        
+
         this.setupOfflineHandlers();
     }
 
@@ -456,7 +464,7 @@ class EnhancedChatManager extends ChatManager {
 
     sendMessage(message) {
         const validatedMessage = ChatUtils.sanitizeMessage(message);
-        
+
         if (!ChatUtils.validateMessage(validatedMessage)) {
             this.showError('Tin nhắn không hợp lệ');
             return;
@@ -472,18 +480,18 @@ class EnhancedChatManager extends ChatManager {
                 timestamp: new Date().toISOString(),
                 tableNumber: this.tableNumber
             };
-            
+
             this.storage.saveMessage(offlineMessage);
             this.addMessageToHistory(offlineMessage);
             this.renderMessages();
-            
+
             this.showError('Tin nhắn đã được lưu. Sẽ gửi khi có kết nối.');
         }
     }
 
     async syncOfflineMessages() {
         const unsynced = this.storage.getUnsynced();
-        
+
         for (const message of unsynced) {
             try {
                 await this.sendStoredMessage(message);
@@ -520,9 +528,10 @@ window.ChatUtils = ChatUtils;
 window.ChatStorage = ChatStorage;
 
 // Initialize chat manager when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
-    if (tableNumber) {
+
+    if (tableNumber && !window.chatManager) {
         window.chatManager = new EnhancedChatManager(tableNumber);
     }
 });

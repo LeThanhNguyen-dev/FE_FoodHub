@@ -12,9 +12,6 @@ class TokenManager {
             finishSession: '/qr/finish-session'
         };
 
-        // Bắt đầu monitoring token
-        this.startTokenMonitoring();
-        this.setupEventListeners();
     }
 
     // Lấy session data từ localStorage
@@ -145,55 +142,6 @@ class TokenManager {
         } catch (error) {
             console.error('Lỗi khi finish session:', error);
             return { success: false, error: error.message };
-        }
-    }
-
-    // Bắt đầu theo dõi token
-  startTokenMonitoring() {
-    this.tokenCheckInterval = setInterval(async () => {
-        const sessionData = this.getSessionData();
-
-        if (!sessionData?.token || !sessionData?.expiryTime) {
-            return;
-        }
-
-        const nowMs = Date.now();
-        const expiryMs = new Date(sessionData.expiryTime).getTime();
-
-        if (expiryMs <= nowMs) {
-            console.warn('Token đã hết hạn');
-            this.clearExpiredSession();
-            window.dispatchEvent(new CustomEvent('sessionExpired', {
-                detail: { reason: 'expired' }
-            }));
-            return;
-        }
-
-        // Mỗi 10 phút mới gọi validate server 1 lần
-        const lastValidation = localStorage.getItem('lastTokenValidation');
-        const lastValidationMs = lastValidation ? parseInt(lastValidation) : 0;
-
-        if ((nowMs - lastValidationMs) > 10 * 60 * 1000) { // 10 phút
-            const isValidServer = await this.validateTokenWithServer(sessionData.token);
-
-            if (!isValidServer) {
-                console.warn('Token không hợp lệ trên server');
-                this.clearExpiredSession();
-                window.dispatchEvent(new CustomEvent('sessionExpired', {
-                    detail: { reason: 'server_invalid' }
-                }));
-            } else {
-                localStorage.setItem('lastTokenValidation', nowMs.toString());
-            }
-        }
-    }, 2 * 60 * 1000); // mỗi 2 phút
-}
-
-
-    // Dừng theo dõi token
-    stopTokenMonitoring() {
-        if (this.tokenCheckInterval) {
-            clearInterval(this.tokenCheckInterval);
         }
     }
 

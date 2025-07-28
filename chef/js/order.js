@@ -279,7 +279,7 @@ function renderOrders(orders) {
                     </div>
                     
                     <div class="status-row">
-                        <span class="status-badge status-${order.status.toLowerCase()}">
+                        <span class="status-badge status-${order.status}">
                             ${statusTranslations[order.status] || order.status}
                         </span>
                     </div>

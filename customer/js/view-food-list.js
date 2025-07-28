@@ -189,11 +189,11 @@ function renderMenuItems() {
             const showQuantityControls = cartQuantity > 0;
 
             return `
-    <div class="menu-item ${item.status !== 'AVAILABLE' ? 'unavailable' : ''}" data-item-id="${item.id}">
-        <div class="d-flex" onclick="viewItemDetail(${item.id})">
-            ${item.image && !item.image.startsWith('data:') ?
-                    `<img src="${item.image}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'placeholder-image\\'>${DEFAULT_EMOJI}</div>'">` :
-                    `<div class="placeholder-image">${DEFAULT_EMOJI}</div>`
+        <div class="menu-item ${item.status !== 'AVAILABLE' ? 'unavailable' : ''}" data-item-id="${item.id}">
+            <div class="d-flex align-items-center" onclick="viewItemDetail(${item.id})">
+            ${item.image
+                    ? `<img src="${item.image}" alt="${item.name}">`
+                    : `<div class="placeholder-image">${DEFAULT_EMOJI}</div>`
                 }
             <div class="flex-fill p-3">
                 <div class="d-flex justify-content-between align-items-start mb-2">

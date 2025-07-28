@@ -101,7 +101,14 @@ body {
     width: 96px;
     height: 96px;
     object-fit: cover;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
 }
+
+
 
 .price-text {
     color: var(--primary-color);
