@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FoodHub - Đăng nhập</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     :root {
@@ -52,7 +54,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
+      background-image:
         radial-gradient(circle at 20% 80%, rgba(254, 161, 22, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(247, 230, 163, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(15, 23, 43, 0.1) 0%, transparent 50%);
@@ -61,8 +63,15 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(180deg); }
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-20px) rotate(180deg);
+      }
     }
 
     .login-container {
@@ -77,7 +86,7 @@
       backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
       border-radius: 20px;
-      box-shadow: 
+      box-shadow:
         0 8px 32px var(--shadow-heavy),
         0 0 0 1px rgba(255, 255, 255, 0.1);
       overflow: hidden;
@@ -98,8 +107,15 @@
     }
 
     @keyframes shimmer {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
     }
 
     .intro-section {
@@ -130,8 +146,17 @@
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.1; }
-      50% { transform: scale(1.1); opacity: 0.2; }
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.1;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.2;
+      }
     }
 
     .brand-logo {
@@ -237,8 +262,15 @@
     }
 
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .alert-error {
@@ -300,7 +332,7 @@
       transition: color 0.3s ease;
     }
 
-    .form-group input:focus + .input-icon {
+    .form-group input:focus+.input-icon {
       color: var(--primary-gold);
     }
 
@@ -419,8 +451,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .divider {
@@ -548,6 +585,7 @@
     }
 
     @media (max-width: 480px) {
+
       .intro-section,
       .login-section {
         padding: 1.5rem;
@@ -586,8 +624,9 @@
           <div class="brand-name">FoodHub</div>
         </div>
         <h2>Chào mừng trở lại!</h2>
-        <p>Khám phá thế giới ẩm thực tuyệt vời với những món ăn được chế biến từ nguyên liệu tươi ngon nhất. Hãy đăng nhập để trải nghiệm dịch vụ đẳng cấp của chúng tôi.</p>
-        
+        <p>Khám phá thế giới ẩm thực tuyệt vời với những món ăn được chế biến từ nguyên liệu tươi ngon nhất. Hãy đăng
+          nhập để trải nghiệm dịch vụ đẳng cấp của chúng tôi.</p>
+
         <ul class="features-list">
           <li><i class="fas fa-check"></i> Thực đơn đa dạng, phong phú</li>
           <li><i class="fas fa-check"></i> Đặt hàng nhanh chóng, tiện lợi</li>
@@ -595,7 +634,7 @@
           <li><i class="fas fa-check"></i> Hỗ trợ 24/7</li>
         </ul>
       </div>
-      
+
       <div class="login-section">
         <div class="login-header">
           <h2>Đăng nhập</h2>
@@ -675,7 +714,7 @@
       alertEl.className = `alert alert-${type}`;
       alertEl.textContent = message;
       alertEl.style.display = 'block';
-      
+
       // Auto hide after 5 seconds
       setTimeout(() => {
         hideAlert();
@@ -691,7 +730,7 @@
     function togglePassword() {
       const passwordInput = document.getElementById('password');
       const toggleIcon = document.getElementById('passwordToggleIcon');
-      
+
       if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         toggleIcon.className = 'fas fa-eye-slash';
@@ -737,21 +776,36 @@
 
     // Redirect based on user role
     function redirectBasedOnRole(payload) {
-      const scopes = payload?.scope?.split(" ");
-      if (scopes.includes("ROLE_ADMIN")) {
-        window.location.href = '../../adminDashboard/adminDashboard.html';
-      } else if (scopes.includes("ROLE_WAITER")) {
-        window.location.href = '../../waiter/index.html';
-      } else if (scopes.includes("ROLE_CHEF")) {
-        window.location.href = '../../chef/index.html';
-      } else if (scopes.includes("ROLE_CASHIER")) {
-        window.location.href = '../../cashier/index.html';
-      } else if (scopes.includes("ROLE_CUSTOMER")) {
-        window.location.href = 'home.html';
-      } else {
-        window.location.href = 'adminDashboard/adminDashboard.html';
+      const scopes = payload?.scope?.split(" ") || [];
+
+      // Tìm role từ scopes (giả sử role bắt đầu bằng "ROLE_")
+      const role = scopes.find(scope => scope.startsWith("ROLE_"));
+      if (role) {
+        sessionStorage.setItem("userRole", role);
+      }
+
+      switch (role) {
+        case "ROLE_ADMIN":
+          window.location.href = '../../adminDashboard/adminDashboard.html';
+          break;
+        case "ROLE_WAITER":
+          window.location.href = '../../waiter/index.html';
+          break;
+        case "ROLE_CHEF":
+          window.location.href = '../../chef/index.html';
+          break;
+        case "ROLE_CASHIER":
+          window.location.href = '../../cashier/index.html';
+          break;
+        case "ROLE_CUSTOMER":
+          window.location.href = 'home.html';
+          break;
+        default:
+          window.location.href = 'adminDashboard/adminDashboard.html';
+          break;
       }
     }
+
 
     // Input validation
     function validateEmail(email) {
@@ -764,7 +818,7 @@
     }
 
     // Real-time input validation
-    document.getElementById('username').addEventListener('input', function(e) {
+    document.getElementById('username').addEventListener('input', function (e) {
       const input = e.target;
       if (input.value && validateEmail(input.value)) {
         input.classList.add('valid');
@@ -777,7 +831,7 @@
       }
     });
 
-    document.getElementById('password').addEventListener('input', function(e) {
+    document.getElementById('password').addEventListener('input', function (e) {
       const input = e.target;
       if (input.value && validatePassword(input.value)) {
         input.classList.add('valid');
@@ -793,11 +847,11 @@
     // Form submission
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      
+
       const loginBtn = document.getElementById('loginBtn');
       const loginBtnText = document.getElementById('loginBtnText');
       const loadingSpinner = document.getElementById('loadingSpinner');
-      
+
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
 
@@ -827,7 +881,7 @@
 
         const token = data.result.token;
         localStorage.setItem('accessToken', token);
-        
+
         // Save remember me preference
         if (document.getElementById('rememberMe').checked) {
           localStorage.setItem('rememberMe', 'true');
@@ -838,7 +892,7 @@
         }
 
         showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
-        
+
         // Redirect after short delay
         setTimeout(() => {
           const payload = parseJwt(token);
@@ -867,7 +921,7 @@
     });
 
     // Handle enter key in password field
-    document.getElementById('password').addEventListener('keypress', function(e) {
+    document.getElementById('password').addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
         document.getElementById('loginForm').dispatchEvent(new Event('submit'));
       }

@@ -34,13 +34,14 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar d-flex flex-column" id="sidebar">
-        <div class="brand">
+        <a href="index.html" class="brand" style="text-decoration: none; color: inherit;">
             <h3>
                 <i class="fa fa-utensils"></i>
                 <span class="brand-text">FoodHub</span>
             </h3>
             <small>Waiter Panel</small>
-        </div>
+        </a>
+
 
         <nav class="sidebar-nav flex-fill">
             <ul class="nav flex-column">
@@ -1201,13 +1202,13 @@
 
                     // Calculate revenue from all orders except cancelled ones
                     ordersData.forEach(order => {
-                        const status = order.status ? order.status: '';
+                        const status = order.status ? order.status : '';
                         console.log("order status: ", status);
                         // Count all orders that are not cancelled
                         if (status === 'COMPLETED') {
-                            
+
                             completedOrdersCount++;
-                            console.log("count: ",completedOrdersCount);
+                            console.log("count: ", completedOrdersCount);
                             // Add order total to revenue
                             if (order.totalAmount) {
                                 totalRevenue += order.totalAmount;
@@ -1231,7 +1232,7 @@
                         revenueCard.textContent = formattedRevenue;
                     }
 
-                    if (revenueDescription) {   
+                    if (revenueDescription) {
                         revenueDescription.textContent = `Từ ${completedOrdersCount} đơn hàng`;
                     }
 

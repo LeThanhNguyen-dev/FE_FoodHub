@@ -10,7 +10,7 @@
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="css/order-style.css" rel="stylesheet">
-  
+
 </head>
 
 <body>
@@ -438,6 +438,48 @@
     </div>
   </template>
 
+<template id="cancelOrderModal">
+    <div id="cancelOrderModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Hủy đơn hàng</h3>
+                <span class="close" onclick="closeCancelModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p><strong>Vui lòng chọn lý do hủy đơn hàng:</strong></p>
+                
+                <!-- Lý do gợi ý -->
+                <div class="reason-suggestions">
+                    <button type="button" class="reason-btn" onclick="selectReason('Khách hàng yêu cầu hủy')">
+                        Khách hàng yêu cầu hủy
+                    </button>
+                    <button type="button" class="reason-btn" onclick="selectReason('Hết hàng')">
+                        Hết hàng
+                    </button>
+                    <button type="button" class="reason-btn" onclick="selectReason('Thông tin đơn hàng không chính xác')">
+                        Thông tin đơn hàng không chính xác
+                    </button>
+                    <button type="button" class="reason-btn" onclick="selectReason('Không liên lạc được với khách hàng')">
+                        Không liên lạc được với khách hàng
+                    </button>
+                    <button type="button" class="reason-btn" onclick="selectReason('Lỗi hệ thống')">
+                        Lỗi hệ thống
+                    </button>
+                </div>
+
+                <!-- Textarea nhập lý do tùy chỉnh -->
+                <div class="custom-reason">
+                    <label for="cancelReason">Hoặc nhập lý do khác:</label>
+                    <textarea id="cancelReason" placeholder="Nhập lý do hủy đơn hàng..." rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">Hủy bỏ</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancelOrder()">Xác nhận hủy</button>
+            </div>
+        </div>
+    </div>
+</template>
   <!-- Bootstrap JS -->
 </body>
 

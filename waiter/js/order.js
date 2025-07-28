@@ -145,7 +145,7 @@ async function loadOrders(pageSize = 20) {
         params.append('orderBy', sortBy);
         params.append('sort', sortDirection);
         console.log('params: ', params.toString());
-        
+
         // Fetch orders with filters
         const data = await apiFetch(`/orders/waiter/work-shift-orders/${currentUserInfo.id}?${params.toString()}`, {
             method: 'GET'
@@ -440,12 +440,12 @@ function createOrderActionButtons(order) {
     // Nút hủy đơn hàng - hiển thị cho các trạng thái có thể hủy
     if (['PENDING', 'CONFIRMED'].includes(order.status)) {
         buttons += `
-            <button class="action-btn btn-cancel" 
-                    onclick="event.stopPropagation(); cancelOrder(${order.id})"
-                    title="Hủy đơn hàng">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
+        <button class="action-btn btn-cancel" 
+                onclick="event.stopPropagation(); openCancelModal(${order.id})"
+                title="Hủy đơn hàng">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
     }
 
     return buttons;
@@ -542,7 +542,7 @@ function showOrderDetailsAndPaymentModal(order) {
                     
                     <!-- Header -->
                     <div style="padding: 20px 24px; border-bottom: 1px solid #f0f0f0; position: relative;">
-                        <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Xác nhận đặt món</h3>
+                        <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Xác nhận thanh toán</h3>
                         <button onclick="closeModal()" style="position: absolute; top: 20px; right: 24px; width: 24px; height: 24px; background: none; border: none; cursor: pointer; font-size: 20px; color: #999; padding: 0; display: flex; align-items: center; justify-content: center;"
                             onmouseover="this.style.color='#333';" 
                             onmouseout="this.style.color='#999';">
@@ -553,7 +553,7 @@ function showOrderDetailsAndPaymentModal(order) {
                     <div style="padding: 24px; overflow-y: auto; max-height: calc(90vh - 200px);">
                         <!-- Confirmation text -->
                         <div style="margin-bottom: 24px; color: #666; font-size: 14px;">
-                            Bạn có chắc chắn muốn đặt món với loại đơn hàng: <strong style="color: #333;">Mang về?</strong>
+                            Bạn có chắc chắn muốn thanh toán đơn hàng: <strong style="color: #333;">#${order.id}</strong>
                         </div>
 
                         <!-- Order details title -->
@@ -608,7 +608,7 @@ function showOrderDetailsAndPaymentModal(order) {
                             style="padding: 10px 20px; background: #FEA116; border: 1px solid #FEA116; border-radius: 6px; cursor: pointer; font-weight: 500; color: white;"
                             onmouseover="this.style.background='#e8910f';" 
                             onmouseout="this.style.background='#FEA116';">
-                            Đặt món
+                            Thanh toán
                         </button>
                     </div>
                 </div>
@@ -620,7 +620,7 @@ function showOrderDetailsAndPaymentModal(order) {
         // Add event listeners for radio buttons
         const radioButtons = modal.querySelectorAll('input[name="paymentMethod"]');
         radioButtons.forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 // Remove active styling from all labels
                 radioButtons.forEach(r => {
                     const label = r.closest('label');
@@ -638,7 +638,7 @@ function showOrderDetailsAndPaymentModal(order) {
         // Xử lý click vào backdrop để đóng modal
         const backdrop = modal.querySelector('#modal-backdrop');
         const modalContent = modal.querySelector('#modal-content');
-        
+
         backdrop.addEventListener('click', (e) => {
             if (e.target === backdrop) {
                 closeModal();
@@ -653,7 +653,7 @@ function showOrderDetailsAndPaymentModal(order) {
         window.confirmOrder = () => {
             const selectedPayment = modal.querySelector('input[name="paymentMethod"]:checked');
             const paymentMethod = selectedPayment ? selectedPayment.value : 'CASH';
-            
+
             document.body.removeChild(modal);
             delete window.confirmOrder;
             delete window.closeModal;
@@ -669,47 +669,167 @@ function showOrderDetailsAndPaymentModal(order) {
     });
 }
 
-async function cancelOrder(orderId) {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?\nLưu ý: Đơn hàng sau khi hủy không thể khôi phục!')) {
+async function openCancelModal(orderId) {
+    currentOrderId = orderId;
+    
+    try {
+        // Nếu modal chưa tồn tại, load từ template
+        let modal = document.getElementById('cancelOrderModal');
+        
+        if (!modal) {
+            const response = await fetch('/waiter/order.html');
+            if (!response.ok) {
+                throw new Error('Không thể tải order.html');
+            }
+            const htmlContent = await response.text();
+
+            // Parse HTML để lấy templates
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+
+            // Lấy template cancelOrderModal
+            const modalTemplate = doc.getElementById('cancelOrderModal');
+            if (modalTemplate && modalTemplate.tagName === 'TEMPLATE') {
+                // Nếu là template tag
+                const modalContent = modalTemplate.content.cloneNode(true);
+                document.body.appendChild(modalContent);
+            } else if (modalTemplate) {
+                // Nếu là div thường
+                const clonedModal = modalTemplate.cloneNode(true);
+                document.body.appendChild(clonedModal);
+            } else {
+                throw new Error('Không tìm thấy template cancelOrderModal');
+            }
+
+            // Nạp CSS modal động từ thư mục css
+            if (!document.querySelector('link[href="css/modal-style.css"]')) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'css/modal-style.css';
+                document.head.appendChild(link);
+            }
+            
+            modal = document.getElementById('cancelOrderModal');
+        }
+        
+        if (!modal) {
+            throw new Error('Không thể tạo modal');
+        }
+
+        // Reset form
+        const cancelReasonTextarea = modal.querySelector('#cancelReason');
+        if (cancelReasonTextarea) {
+            cancelReasonTextarea.value = '';
+        }
+
+        // Bỏ chọn tất cả các nút lý do
+        const reasonButtons = modal.querySelectorAll('.reason-btn');
+        reasonButtons.forEach(btn => {
+            btn.classList.remove('selected');
+        });
+
+        // Hiển thị modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Ngăn scroll trang chính
+        
+    } catch (error) {
+        console.error('Error opening cancel modal:', error);
+        showNotification('Có lỗi khi mở modal hủy đơn hàng: ' + error.message, 'error');
+    }
+}
+
+
+// Đóng modal
+function closeCancelModal() {
+    const modal = document.getElementById('cancelOrderModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    currentOrderId = null;
+}
+
+// Chọn lý do gợi ý
+function selectReason(reason) {
+    // Bỏ chọn tất cả các nút khác
+    const reasonButtons = document.querySelectorAll('.reason-btn');
+    reasonButtons.forEach(btn => {
+        btn.classList.remove('selected');
+    });
+
+    // Chọn nút hiện tại
+    event.target.classList.add('selected');
+
+    // Điền vào textarea
+    const cancelReasonTextarea = document.getElementById('cancelReason');
+    if (cancelReasonTextarea) {
+        cancelReasonTextarea.value = reason;
+    }
+}
+
+// Xác nhận hủy đơn hàng
+async function confirmCancelOrder() {
+    const cancelReasonTextarea = document.getElementById('cancelReason');
+    const reason = cancelReasonTextarea ? cancelReasonTextarea.value.trim() : '';
+
+    if (!reason) {
+        showNotification('Vui lòng nhập lý do hủy đơn hàng!', 'warning');
+        return;
+    }
+
+    if (!confirm(`Bạn có chắc chắn muốn hủy đơn hàng này?\nLý do: ${reason}\n\nLưu ý: Đơn hàng sau khi hủy không thể khôi phục!`)) {
         return;
     }
 
     try {
-        // Hiển thị loading state
-        const cancelBtn = document.querySelector(`[onclick*="cancelOrder(${orderId})"]`);
-        if (cancelBtn) {
-            const originalHTML = cancelBtn.innerHTML;
-            cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            cancelBtn.disabled = true;
+        // Disable nút xác nhận và hiển thị loading
+        const confirmBtn = document.querySelector('#cancelOrderModal .btn-danger');
+        if (confirmBtn) {
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            confirmBtn.disabled = true;
 
-            // Restore button sau khi hoàn thành
-            setTimeout(() => {
-                if (cancelBtn) {
-                    cancelBtn.innerHTML = originalHTML;
-                    cancelBtn.disabled = false;
+            // Restore function
+            const restoreButton = () => {
+                if (confirmBtn) {
+                    confirmBtn.innerHTML = originalText;
+                    confirmBtn.disabled = false;
                 }
-            }, 3000);
-        }
+            };
 
-        const response = await apiFetch(`/orders/status/${orderId}?status=CANCELLED`, {
-            method: 'PUT'
-        });
+            const response = await apiFetch(`/orders/status/${currentOrderId}?status=CANCELLED&note=${reason}`, {
+                method: 'PUT',  
+            });
 
-        if (response && response.code === 0) {
-            // Hiển thị thông báo thành công
-            showNotification('Đơn hàng đã được hủy thành công!', 'success');
+            if (response && response.code === 0) {
+                // Hiển thị thông báo thành công
+                showNotification('Đơn hàng đã được hủy thành công!', 'success');
 
-            // Refresh danh sách đơn hàng
-            await loadOrders();
-        } else {
-            throw new Error(response?.message || 'Không thể hủy đơn hàng');
+                // Đóng modal
+                closeCancelModal();
+
+                // Refresh danh sách đơn hàng
+                await loadOrders();
+            } else {
+                restoreButton();
+                throw new Error(response?.message || 'Không thể hủy đơn hàng');
+            }
         }
 
     } catch (error) {
         console.error('Error cancelling order:', error);
         showNotification('Có lỗi xảy ra khi hủy đơn hàng: ' + error.message, 'error');
+
+        // Restore nút xác nhận
+        const confirmBtn = document.querySelector('#cancelOrderModal .btn-danger');
+        if (confirmBtn) {
+            confirmBtn.innerHTML = 'Xác nhận hủy';
+            confirmBtn.disabled = false;
+        }
     }
 }
+
+
 
 
 // NEW FUNCTION: Xác nhận đơn hàng
@@ -864,7 +984,7 @@ function updateSummary(orderPage) {
 function updateOrderPagination() {
     // Update pagination info text
     updateOrderPaginationInfo();
-    
+
     // Generate pagination buttons
     generateOrderPaginationButtons();
 
@@ -889,7 +1009,7 @@ function updateOrderPaginationInfo() {
     const itemsPerPage = 20; // or get from pageSize parameter
     const startItem = currentOrderPage * itemsPerPage + 1;
     const endItem = Math.min((currentOrderPage + 1) * itemsPerPage, totalOrderElements);
-    
+
     paginationInfo.textContent = `Hiển thị ${startItem} - ${endItem} của ${totalOrderElements} đơn hàng`;
 }
 
@@ -1720,6 +1840,23 @@ document.addEventListener('DOMContentLoaded', function () {
         showDashboard();
         startSmartRefresh();
     }
+
+    document.addEventListener('click', function (event) {
+        const modal = document.getElementById('cancelOrderModal');
+        if (modal && event.target === modal) {
+            closeCancelModal();
+        }
+    });
+
+    // Đóng modal khi nhấn ESC
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('cancelOrderModal');
+            if (modal && modal.style.display === 'flex') {
+                closeCancelModal();
+            }
+        }
+    });
 });
 
 // Stop refresh when page is hidden

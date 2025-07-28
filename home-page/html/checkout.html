@@ -158,8 +158,10 @@
         }
 
         .form-control:focus {
-            color: #FEA116; /* Màu cam khi focus */
-            box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25); /* Bóng đổ cam nhạt */
+            color: #FEA116;
+            /* Màu cam khi focus */
+            box-shadow: 0 0 0 0.2rem rgba(254, 161, 22, 0.25);
+            /* Bóng đổ cam nhạt */
             background: var(--warm-white);
             transform: translateY(-1px);
         }
@@ -319,7 +321,8 @@
 
         .input-group-custom.address-group {
             position: relative;
-            z-index: 1000; /* Đảm bảo input địa chỉ và gợi ý nằm trên các phần tử khác */
+            z-index: 1000;
+            /* Đảm bảo input địa chỉ và gợi ý nằm trên các phần tử khác */
         }
 
         .input-icon {
@@ -340,8 +343,9 @@
             align-items: center;
         }
 
-        .form-control:focus + .input-icon {
-            color: #FEA116; /* Icon chuyển sang màu cam khi focus */
+        .form-control:focus+.input-icon {
+            color: #FEA116;
+            /* Icon chuyển sang màu cam khi focus */
         }
 
         /* Autocomplete Styles - Enhanced */
@@ -350,11 +354,13 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: #FFFFFF; /* Màu trắng thuần */
+            background: #FFFFFF;
+            /* Màu trắng thuần */
             border: 2px solid var(--border-light);
             border-radius: 16px;
             box-shadow: 0 6px 20px rgba(45, 95, 78, 0.15);
-            z-index: 1001; /* Đảm bảo danh sách gợi ý ở trên cùng */
+            z-index: 1001;
+            /* Đảm bảo danh sách gợi ý ở trên cùng */
             max-height: 240px;
             overflow-y: auto;
             margin-top: 8px;
@@ -369,6 +375,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -591,7 +598,9 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
                                 <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); alert('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
+                                <li><a class="dropdown-item" href="#"
+                                        onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); alert('Lỗi khi đăng xuất: ' + e.message); }">Đăng
+                                        Xuất</a></li>
                             </ul>
                         </div>
                     </li>
@@ -647,7 +656,8 @@
                                 <label for="address" class="form-label">Địa Chỉ Giao Hàng</label>
                                 <input type="text" class="form-control with-icon" id="address" required
                                     placeholder="Nhập địa chỉ (ví dụ: 27 Lưu Quý Kỳ)"
-                                    pattern="[a-zA-Z0-9\s,.-ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẳẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ]+">
+                                    pattern="^[\p{L}0-9\s,.-]+$"
+>
                                 <div id="address-suggestions" class="autocomplete-suggestions"></div>
                             </div>
                         </div>
@@ -656,7 +666,8 @@
                             <label class="form-label">Phương Thức Thanh Toán</label>
                             <div class="payment-card">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="payment-method" id="online-payment" value="BANKING" checked>
+                                    <input class="form-check-input" type="radio" name="payment-method"
+                                        id="online-payment" value="BANKING" checked>
                                     <label class="form-check-label" for="online-payment">
                                         <i class="fas fa-credit-card me-2"></i>
                                         Thanh toán Online (PayOS)
@@ -711,7 +722,7 @@
             try {
                 const base64Url = token.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
                 return JSON.parse(jsonPayload);
@@ -927,11 +938,11 @@
             }
 
             // Validate địa chỉ
-            const addressPattern = /^[a-zA-Z0-9\s,.-ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẳẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ]+$/;
-            if (!addressPattern.test(address)) {
-                alert('Vui lòng nhập địa chỉ hợp lệ (chỉ chữ, số, và dấu câu cơ bản).');
-                return;
-            }
+            const addressPattern = /^[a-zA-Z0-9\s,.\-\/#()À-Ỹà-ỹ]+$/u;
+if (!addressPattern.test(address)) {
+    alert('Vui lòng nhập địa chỉ hợp lệ (chỉ chứa chữ, số và một số ký tự đặc biệt như , . - / # ()).');
+    return;
+}
 
             // Hiển thị loading
             const submitBtn = document.querySelector('.btn-checkout');

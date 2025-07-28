@@ -16,13 +16,13 @@
   <!-- Sidebar -->
   <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
   <div class="sidebar d-flex flex-column" id="sidebar">
-    <div class="brand">
+    <a href="index.html" class="brand" style="text-decoration: none; color: inherit;">
       <h3>
         <i class="fa fa-utensils"></i>
         <span class="brand-text">FoodHub</span>
       </h3>
-      <small>Kitchen Panel </small>
-    </div>
+      <small>Kitchen Panel</small>
+    </a>
 
     <nav class="sidebar-nav flex-fill">
       <ul class="nav flex-column">
@@ -96,7 +96,8 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+            <li><a class="dropdown-item" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng
+                xuất</a></li>
           </ul>
         </div>
       </div>
@@ -247,7 +248,7 @@
       document.addEventListener('click', enableAudio);
       document.addEventListener('keydown', enableAudio);
       document.addEventListener('touchstart', enableAudio);
-      
+
       // Load existing functions
       if (typeof updateNotificationCount === 'function') {
         updateNotificationCount();

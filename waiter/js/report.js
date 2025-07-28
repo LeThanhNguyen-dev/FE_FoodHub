@@ -29,12 +29,16 @@ async function loadShiftReport() {
 
     try {
 
-        const data = await apiFetch(`/orders/waiter/work-shift-orders/${currentUserInfo.id}?&size=100`, {
+        const orderData = await apiFetch(`/orders/waiter/work-shift-orders/${currentUserInfo.id}?&size=100`, {
             method: 'GET',
         });
 
-        if (data.code === 0 && data.result) {
-            displayShiftReport(data.result);
+        const tableData = await apiFetch(`/tables/waiter/${currentUserInfo.id}`, {
+            method: 'GET',
+        });
+
+        if ((orderData.code === 0 && orderData.result) && (tableData.code === 0 && tableData.result)) {
+            displayShiftReport(orderData.result, tableData.result);
         } else {
             throw new Error(data.message || 'Không thể tải báo cáo ca làm việc');
         }
@@ -60,14 +64,15 @@ async function loadShiftReport() {
             </div>
         `;
         }
-
     }
 }
 
 // Function to display shift report
-function displayShiftReport(orderData) {
+function displayShiftReport(orderData, tableData) {
+    console.log("table data: ",tableData.content );
+    const tables = tableData || [];
     const orders = orderData.content || [];
-    const stats = calculateShiftStats(orders);
+    const stats = calculateShiftStats(orders, tables);
     const scheduleDate = new Date(currentWorkSchedule.date);
     const formattedDate = scheduleDate.toLocaleDateString('vi-VN', {
         year: 'numeric',
@@ -144,8 +149,8 @@ function displayShiftReport(orderData) {
                         <i class="fas fa-chair"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">${stats.totalTables}</div>
-                        <div class="stat-label">Số bàn phục vụ</div>
+                        <div class="stat-number">${stats.totalActiveTables}</div>
+                        <div class="stat-label">Số bàn đang phục vụ</div>
                     </div>
                 </div>
                 
@@ -640,11 +645,11 @@ function displayShiftReport(orderData) {
 
 
 // Function to calculate shift statistics
-function calculateShiftStats(orders) {
+function calculateShiftStats(orders, tables) {
     const stats = {
         totalOrders: orders.length,
         totalRevenue: 0,
-        totalTables: new Set(),
+        totalActiveTables: 0,
         statusCounts: {},
         topItems: {},
         avgOrderValue: 0
@@ -654,11 +659,6 @@ function calculateShiftStats(orders) {
         // Calculate total revenue
         if (order.status == 'COMPLETED') {
             stats.totalRevenue += parseFloat(order.totalAmount || 0);
-        }
-
-        // Count unique tables
-        if (order.tableNumber) {
-            stats.totalTables.add(order.tableNumber);
         }
 
         // Count status distribution
@@ -676,8 +676,14 @@ function calculateShiftStats(orders) {
             });
         }
     });
-
-    stats.totalTables = stats.totalTables.size;
+    console.log("tables input: ", tables);
+    tables.forEach(table =>{
+        console.log("status: ", table.status);
+        if(table.status == 'OCCUPIED'){
+            stats.totalActiveTables++;
+        }
+    });
+    console.log("total table: ", stats.totalActiveTables);
     stats.avgOrderValue = stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0;
 
     return stats;
