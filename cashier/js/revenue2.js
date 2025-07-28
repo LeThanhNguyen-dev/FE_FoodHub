@@ -4,7 +4,28 @@
 
 // Làm mới thống kê doanh thu cái này là của DUY ĐẸP trai
 // Làm mới thống kê doanh thu
-
+// Thêm hàm createOrder để insert đơn và làm mới
+async function createOrder(orderData) {
+    try {
+        const response = await apiFetch(`${API_BASE_URL}/payments/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        console.log('Insert order response:', response);
+        if (response.result) {
+            console.log('Order inserted successfully, refreshing revenue...');
+            await refreshAllCharts(); // Làm mới sau khi insert
+            return response.result;
+        } else {
+            showError('error', `❌ ${response.message || 'Không thể tạo đơn hàng.'}`);
+            return null;
+        }
+    } catch (error) {
+        showError('error', `❌ ${error.message || 'Lỗi khi tạo đơn hàng.'}`);
+        return null;
+    }
+}
 // Làm mới thống kê doanh thu với thiết kế hiện đại
 // Biến global để lưu trữ stats hiện tại
 let currentRevenueStats = null;
@@ -176,7 +197,6 @@ async function showChartPopup(stats = null) {
 
   // Tiêu đề với gradient text
   const title = document.createElement('h2');
- 
 
   // Canvas cho biểu đồ popup
   const canvas = document.createElement('canvas');
@@ -200,41 +220,35 @@ async function showChartPopup(stats = null) {
     modalContent.style.transform = 'scale(1) translateY(0)';
   }, 50);
 
-  // Tạo biểu đồ popup với gradient colors
+  // Tạo biểu đồ popup với gradient colors, loại bỏ Tổng và VNPAY
   const ctx = canvas.getContext('2d');
   
-  // Tạo gradients cho từng cột
   const gradients = [
-    createGradient(ctx, '#FF8C42', '#FF6B35', 400), // Total
-    createGradient(ctx, '#FF7043', '#FF5722', 400), // CASH
-    createGradient(ctx, '#FFB74D', '#FFA726', 400), // VNPAY
-    createGradient(ctx, '#FF9800', '#F57C00', 400), // Pending
-    createGradient(ctx, '#FFCC80', '#FFB74D', 400), // Paid
-    createGradient(ctx, '#BF360C', '#D84315', 400)  // Cancelled
+    createGradient(ctx, '#FF7043', '#FF5722', 400), // Tiền mặt
+    createGradient(ctx, '#FF9800', '#F57C00', 400), // Chưa thanh toán
+    createGradient(ctx, '#FFCC80', '#FFB74D', 400), // Đã thanh toán
+    createGradient(ctx, '#BF360C', '#D84315', 400)  // Đã hủy
   ];
 
   const popupChart = new Chart(ctx, {
     type: 'bar',
     data: {
-labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', 'Đã hủy'],
+      labels: ['Tiền mặt', 'Chưa thanh toán', 'Đã thanh toán', 'Đã hủy'],
       datasets: [{
         label: 'Doanh thu (VNĐ)',
         data: [
-          Number(currentStats.totalRevenue) || 0,
           Number(currentStats.cashRevenue) || 0,
-          Number(currentStats.vnpayRevenue) || 0,
           Number(currentStats.pendingRevenue) || 0,
           Number(currentStats.paidRevenue) || 0,
           Number(currentStats.cancelledRevenue) || 0
         ],
         backgroundColor: gradients,
-        borderColor: MODERN_ORANGE_COLORS.borders,
+        borderColor: MODERN_ORANGE_COLORS.borders.slice(1, 5), // Lấy từ CASH đến CANCELLED
         borderWidth: 3,
         borderRadius: 12,
         borderSkipped: false,
         barPercentage: 0.8,
         categoryPercentage: 0.9,
-        // Thêm shadow effect
         shadowOffsetX: 3,
         shadowOffsetY: 6,
         shadowBlur: 10,
@@ -319,7 +333,6 @@ labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', '
         }
       },
       layout: { padding: 25 },
-      // Animation mượt mà
       animation: {
         duration: 1500,
         easing: 'easeOutQuart',
@@ -327,7 +340,6 @@ labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', '
           if (!this.chart || !this.chart.ctx || this.chart.destroyed) {
             return;
           }
-          
           const ctx = this.chart.ctx;
           ctx.save();
           ctx.font = 'bold 13px Inter, -apple-system, sans-serif';
@@ -349,7 +361,6 @@ labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', '
               });
             }
           });
-          
           ctx.restore();
         }
       }
@@ -392,209 +403,125 @@ labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', '
   });
 }
 
+
+
+
+
+
+
 async function refreshRevenue() {
-  try {
-    const data = await apiFetch(`${API_BASE_URL}/payments/todays-revenue-stats`);
+    try {
+        const data = await apiFetch(`${API_BASE_URL}/payments/todays-revenue-stats`);
+        console.log('API response for refreshRevenue:', data);
+        if (data.result) {
+            const stats = data.result;
+            updateGlobalStats(stats);
 
-    if (data.result) {
-      const stats = data.result;
-      
-      // Cập nhật số liệu toàn cục
-      updateGlobalStats(stats);
+            const row1Stats = [
+                { title: 'Doanh thu Tiền mặt', value: stats.cashRevenue, color: '#FF5722' }
+            ].map(stat => `
+                <div class="stat-card" style="border-left: 4px solid ${stat.color}; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.1);">
+                    <h4 style="color: ${stat.color};">${stat.title}</h4>
+                    <div class="value" style="background: linear-gradient(135deg, ${stat.color}, #FF8A65); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${(Number(stat.value) || 0).toLocaleString()}₫</div>
+                </div>
+            `).join('');
 
-      // Cập nhật thống kê với thiết kế hiện đại
-      const row1Stats = [
-        { title: 'Doanh thu Tổng', value: stats.totalRevenue, color: '#FF6B35' },
-        { title: 'Doanh thu Tiền mặt', value: stats.cashRevenue, color: '#FF5722' },
-        { title: 'Doanh thu VNPAY', value: stats.vnpayRevenue, color: '#FFA726' }
-      ].map(stat => `
-        <div class="stat-card" style="border-left: 4px solid ${stat.color}; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.1);">
-          <h4 style="color: ${stat.color};">${stat.title}</h4>
-          <div class="value" style="background: linear-gradient(135deg, ${stat.color}, #FF8A65); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${(Number(stat.value) || 0).toLocaleString()}₫</div>
-        </div>
-      `).join('');
+            const row2Stats = [
+                { title: 'Chưa thanh toán', value: stats.pendingRevenue, color: '#F57C00' },
+                { title: 'Đã thanh toán', value: stats.paidRevenue, color: '#FFB74D' },
+                { title: 'Đã hủy', value: stats.cancelledRevenue, color: '#D84315' }
+            ].map(stat => `
+                <div class="stat-card" style="border-left: 4px solid ${stat.color}; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.1);">
+                    <h4 style="color: ${stat.color};">${stat.title}</h4>
+                    <div class="value" style="background: linear-gradient(135deg, ${stat.color}, #FF8A65); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${(Number(stat.value) || 0).toLocaleString()}₫</div>
+                </div>
+            `).join('');
 
-      const row2Stats = [
-        { title: 'Đang chờ', value: stats.pendingRevenue, color: '#F57C00' },
-        { title: 'Đã thanh toán', value: stats.paidRevenue, color: '#FFB74D' },
-        { title: 'Đã hủy', value: stats.cancelledRevenue, color: '#D84315' }
-      ].map(stat => `
-        <div class="stat-card" style="border-left: 4px solid ${stat.color}; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.1);">
-          <h4 style="color: ${stat.color};">${stat.title}</h4>
-          <div class="value" style="background: linear-gradient(135deg, ${stat.color}, #FF8A65); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${(Number(stat.value) || 0).toLocaleString()}₫</div>
-        </div>
-      `).join('');
+            const statsContainer = document.querySelector('#revenueResult .revenue-stats-container');
+            statsContainer.innerHTML = `
+                <div class="revenue-stats-row">${row1Stats}</div>
+                <div class="revenue-stats-row">${row2Stats}</div>
+            `;
 
-      const statsContainer = document.querySelector('#revenueResult .revenue-stats-container');
-      statsContainer.innerHTML = `
-        <div class="revenue-stats-row">${row1Stats}</div>
-        <div class="revenue-stats-row">${row2Stats}</div>
-      `;
+            document.getElementById('revenueCurrentDate').textContent = new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
 
-      document.getElementById('revenueCurrentDate').textContent = new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+            const ctx = document.getElementById('dailyRevenueChart').getContext('2d');
+            if (window.revenueChart && window.revenueChart.canvas) {
+                window.revenueChart.destroy();
+                window.revenueChart = null;
+            }
 
-      // Tạo biểu đồ chính với màu sắc hiện đại
-      const ctx = document.getElementById('dailyRevenueChart').getContext('2d');
-      if (window.revenueChart) window.revenueChart.destroy();
+            const mainGradients = [
+                createGradient(ctx, '#FF7043', '#FF5722', 300),
+                createGradient(ctx, '#FF9800', '#F57C00', 300),
+                createGradient(ctx, '#FFCC80', '#FFB74D', 300),
+                createGradient(ctx, '#BF360C', '#D84315', 300)
+            ];
 
-      // Tạo gradient cho biểu đồ chính
-      const mainGradients = [
-        createGradient(ctx, '#FF8C42', '#FF6B35', 300),
-        createGradient(ctx, '#FF7043', '#FF5722', 300),
-        createGradient(ctx, '#FFB74D', '#FFA726', 300),
-        createGradient(ctx, '#FF9800', '#F57C00', 300),
-        createGradient(ctx, '#FFCC80', '#FFB74D', 300),
-        createGradient(ctx, '#BF360C', '#D84315', 300)
-      ];
-
-      window.revenueChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Tổng', 'Tiền mặt', 'VNPAY', 'Đang chờ', 'Đã thanh toán', 'Đã hủy'],
-          datasets: [{
-            label: 'Doanh thu (VNĐ)',
-            data: [
-              Number(stats.totalRevenue) || 0,
-              Number(stats.cashRevenue) || 0,
-              Number(stats.vnpayRevenue) || 0,
-              Number(stats.pendingRevenue) || 0,
-              Number(stats.paidRevenue) || 0,
-              Number(stats.cancelledRevenue) || 0
-            ],
-            backgroundColor: mainGradients,
-            borderColor: MODERN_ORANGE_COLORS.borders,
-            borderWidth: 2,
-            borderRadius: 10,
-            borderSkipped: false,
-            barPercentage: 0.75,
-            categoryPercentage: 0.85
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: { 
-                display: true, 
-                text: 'Doanh thu (VNĐ)', 
-                color: '#BF360C', 
-                font: { size: 16, weight: 'bold' } 
-              },
-              ticks: { 
-                color: '#FF5722', 
-                font: { size: 12, weight: '600' },
-                callback: function(value) {
-                  return value.toLocaleString() + '₫';
+            window.revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Tiền mặt', 'Chưa thanh toán', 'Đã thanh toán', 'Đã hủy'],
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: [
+                            Number(stats.cashRevenue) || 0,
+                            Number(stats.pendingRevenue) || 0,
+                            Number(stats.paidRevenue) || 0,
+                            Number(stats.cancelledRevenue) || 0
+                        ],
+                        backgroundColor: mainGradients,
+                        borderColor: MODERN_ORANGE_COLORS.borders.slice(1, 5),
+                        borderWidth: 2,
+                        borderRadius: 10,
+                        borderSkipped: false,
+                        barPercentage: 0.75,
+                        categoryPercentage: 0.85
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Doanh thu (VNĐ)', color: '#BF360C', font: { size: 16, weight: 'bold' } }, ticks: { color: '#FF5722', font: { size: 12, weight: '600' }, callback: function(value) { return value.toLocaleString() + '₫'; } }, grid: { color: 'rgba(255, 152, 0, 0.15)', borderColor: '#FF8A65' } }, x: { ticks: { color: '#BF360C', font: { size: 12, weight: '600' } }, grid: { display: false } } },
+                    plugins: { legend: { position: 'top', labels: { color: '#BF360C', font: { size: 13, weight: 'bold' }, usePointStyle: true, pointStyle: 'rectRounded' } }, title: { display: true, text: 'Phân tích Doanh thu Ngày ' + new Date().toLocaleDateString('vi-VN'), color: '#BF360C', font: { size: 18, weight: 'bold' }, padding: { top: 15, bottom: 20 } }, tooltip: { backgroundColor: 'rgba(255, 255, 255, 0.95)', titleColor: '#BF360C', bodyColor: '#FF5722', borderColor: '#FF8A65', borderWidth: 2, cornerRadius: 8, callbacks: { label: function(context) { return '' + context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '₫'; } } } },
+                    layout: { padding: 20 },
+                    animation: { duration: 1000, easing: 'easeOutQuart', onComplete: function() { if (!this.chart || !this.chart.ctx || this.chart.destroyed) return; const ctx = this.chart.ctx; ctx.save(); ctx.font = 'bold 13px Inter, -apple-system, sans-serif'; ctx.fillStyle = '#BF360C'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.shadowColor = 'rgba(255, 255, 255, 0.8)'; ctx.shadowBlur = 2; ctx.shadowOffsetY = 1; this.data.datasets.forEach((dataset, i) => { const meta = this.getDatasetMeta(i); if (meta && meta.data) { meta.data.forEach((bar, index) => { const data = dataset.data[index]; if (data > 0 && bar && bar.x !== undefined && bar.y !== undefined) { ctx.fillText(data.toLocaleString() + '₫', bar.x, bar.y - 8); } }); } }); ctx.restore(); } },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const chart = window.revenueChart;
+                            const element = elements[0];
+                            const index = element.index;
+                            const label = chart.data.labels[index];
+                            const value = chart.data.datasets[0].data[index];
+                            showRevenuePopup(label, value);
+                        }
+                    }
                 }
-              },
-              grid: { 
-                color: 'rgba(255, 152, 0, 0.15)', 
-                borderColor: '#FF8A65' 
-              }
-            },
-            x: { 
-              ticks: { 
-                color: '#BF360C', 
-                font: { size: 12, weight: '600' } 
-              }, 
-              grid: { display: false } 
+            });
+
+            const chartContainer = document.getElementById('dailyRevenueChart').parentElement;
+            if (chartContainer) {
+                chartContainer.style.cssText += `cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 12px; overflow: hidden;`;
+                chartContainer.title = '🖱️ Nhấp để xem biểu đồ chi tiết toàn màn hình';
+                chartContainer.onmouseenter = () => { chartContainer.style.transform = 'translateY(-2px)'; chartContainer.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.15)'; };
+                chartContainer.onmouseleave = () => { chartContainer.style.transform = 'translateY(0)'; chartContainer.style.boxShadow = 'none'; };
+                chartContainer.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); if (!isModalOpen) showChartPopup(); });
             }
-          },
-          plugins: {
-            legend: { 
-              position: 'top', 
-              labels: { 
-                color: '#BF360C', 
-                font: { size: 13, weight: 'bold' },
-                usePointStyle: true,
-                pointStyle: 'rectRounded'
-              } 
-            },
-            title: {
-              display: true,
-              text: 'Phân tích Doanh thu Ngày ' + new Date().toLocaleDateString('vi-VN'),
-              color: '#BF360C',
-              font: { size: 18, weight: 'bold' },
-              padding: { top: 15, bottom: 20 }
-            },
-            tooltip: {
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              titleColor: '#BF360C',
-              bodyColor: '#FF5722',
-              borderColor: '#FF8A65',
-              borderWidth: 2,
-              cornerRadius: 8,
-              callbacks: {
-                label: function(context) {
-                  return '' + context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '₫';
-                }
-              }
-            }
-          },
-          layout: { padding: 20 },
-          animation: {
-            duration: 1000,
-            easing: 'easeOutQuart'
-          },
-          onClick: (event, elements) => {
-            if (elements.length > 0) {
-              const chart = window.revenueChart;
-              const element = elements[0];
-              const datasetIndex = element.datasetIndex;
-              const index = element.index;
-              const label = chart.data.labels[index];
-              const value = chart.data.datasets[datasetIndex].data[index];
-              showRevenuePopup(label, value);
-            }
-          }
+
+            document.getElementById("message").textContent = "🎉 Thống kê doanh thu đã được tải với thiết kế hiện đại!";
+        } else {
+            showError("error", `❌ ${data.message || "Không thể tải doanh thu."}`);
         }
-      });
-
-      // Thêm hiệu ứng hover cho container
-      const chartContainer = document.getElementById('dailyRevenueChart').parentElement;
-      if (chartContainer) {
-        chartContainer.style.cssText += `
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          border-radius: 12px;
-          overflow: hidden;
-        `;
-        chartContainer.title = '🖱️ Nhấp để xem biểu đồ chi tiết toàn màn hình';
-        
-        chartContainer.onmouseenter = () => {
-          chartContainer.style.transform = 'translateY(-2px)';
-          chartContainer.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.15)';
-        };
-        
-        chartContainer.onmouseleave = () => {
-          chartContainer.style.transform = 'translateY(0)';
-          chartContainer.style.boxShadow = 'none';
-        };
-        
-        // Sự kiện click để mở popup - không truyền stats cũ
-        chartContainer.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!isModalOpen) {
-            showChartPopup(); // Không truyền stats để luôn lấy dữ liệu mới
-          }
-        });
-      }
-
-      document.getElementById("message").textContent = "🎉 Thống kê doanh thu đã được tải với thiết kế hiện đại!";
-    } else {
-      showError("error", `❌ ${data.message || "Không thể tải doanh thu."}`);
+    } catch (error) {
+        showError("error", `❌ ${error.message || "Lỗi kết nối hệ thống, vui lòng thử lại sau."}`);
     }
-  } catch (error) {
-    showError("error", `❌ ${error.message || "Lỗi kết nối hệ thống, vui lòng thử lại sau."}`);
-  }
 }
+
+// Gọi createOrder để test
+const orderData = { orderId: 66, paymentMethod: 'CASH' };
+createOrder(orderData);
+
 
 // CSS cho stat cards hiện đại
 const modernCSS = `
@@ -643,27 +570,27 @@ if (!document.getElementById('modernChartCSS')) {
 
 
 // Hàm để refresh cả biểu đồ chính và popup (nếu đang mở)
+
+// Sửa refreshAllCharts để làm mới cả popup
 async function refreshAllCharts() {
-  // Refresh biểu đồ chính
-  await refreshRevenue();
-  
-  // Nếu popup đang mở, refresh popup chart
-  if (isModalOpen) {
-    const modal = document.getElementById('chartModal');
-    if (modal) {
-      // Đóng popup hiện tại và mở lại với data mới
-      modal.style.opacity = '0';
-      setTimeout(async () => {
-        if (modal && modal.parentNode) {
-          modal.parentNode.removeChild(modal);
+    console.log('🔄 Refreshing all charts...');
+    await refreshRevenue(); // Làm mới stat cards và biểu đồ chính
+    if (isModalOpen) {
+        const modal = document.getElementById('chartModal');
+        if (modal) {
+            modal.style.opacity = '0';
+            setTimeout(async () => {
+                if (modal && modal.parentNode) {
+                    modal.parentNode.removeChild(modal);
+                }
+                isModalOpen = false;
+                await showChartPopup(); // Làm mới popup với dữ liệu mới
+            }, 200);
         }
-        isModalOpen = false;
-        // Mở lại popup với data mới
-        await showChartPopup();
-      }, 200);
     }
-  }
+    console.log('✅ All charts refreshed!');
 }
+
 
 // Gọi hàm khi section revenue được hiển thị
 document.addEventListener('DOMContentLoaded', () => {
@@ -675,12 +602,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Hàm để call sau khi thanh toán thành công
 window.onPaymentSuccess = async function() {
-  console.log('🔄 Refreshing charts after payment...');
   await refreshAllCharts();
-  console.log('✅ Charts refreshed successfully!');
+  showSection('dashboard');
 };
 
 
+// thay đổi để push
 
 //==================================================================================
       // Xử lý submit form để làm mới doanh thu

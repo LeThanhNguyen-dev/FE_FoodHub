@@ -14,8 +14,8 @@ const itemsPerPage = 10;
       let filters = {
           status: 'all',
           priceRange: null,
-          method: 'all',
-          sort: null
+          sort: null,
+          orderBy: 'createdAt' // Mặc định sắp xếp theo createdAt
       };
 
       
@@ -26,28 +26,23 @@ let currentButton = null;
 let isProcessing = false; // Flag để ngăn spam click
 //==================================================================================//==================================================================================
 
-
-// Hàm kiểm tra đơn hàng mới
 async function checkNewOrders() {
     try {
-        const response = await apiFetch(`${API_BASE_URL}/payments/check-new-orders`);
-        const newOrders = response.result || [];
+        const response = await apiFetch(`${API_BASE_URL}/payments/list?status=UNPAID&period=today&page=0&size=10`);
+        const newOrders = response.result?.content || [];
 
         if (newOrders.length > 0) {
             newOrders.forEach(order => {
-                if (!paymentList.some(p => p.orderId === order.orderId)) { // Tránh lặp
+                if (!paymentList.some(p => p.orderId === order.orderId)) {
                     showNotificationAndUpdate(`Đơn mới: ${order.orderId} - ${order.amount ? order.amount.toLocaleString('vi-VN') + ' VND' : 'N/A'}`, order);
                     paymentList.push(order);
-                    // Cập nhật bảng transactions ngay lập tức
                     updateTransactionTable(order);
-                    
-                    // Reload trang sau khi phát hiện đơn mới
 
-                    // Reload cả giao dịch và doanh thu
                     setTimeout(async () => {
-                        await reloadSearch(); // Reload giao dịch
-                        await refreshRevenue(); // Reload doanh thu
-                    }, 1000); // Đợi 1 giây để thông báo hiển thị trước khi reload
+                        await reloadSearch();
+                        await refreshRevenue();
+                        calculateDailySummary(); // Đảm bảo gọi lại sau khi thêm đơn
+                    }, 1000);
                 }
             });
         }
@@ -56,20 +51,15 @@ async function checkNewOrders() {
     }
 }
 
-
-
-// Hàm cập nhật bảng giao dịch với đơn mới
 function updateTransactionTable(order) {
     const tbody = document.getElementById('transactionsBody');
     if (!tbody) return;
 
-    // Kiểm tra xem đơn đã tồn tại trong bảng chưa
     const existingRow = Array.from(tbody.getElementsByTagName('tr')).find(row =>
         row.cells[0].textContent === order.orderId.toString()
     );
-    if (existingRow) return; // Bỏ qua nếu đã có
+    if (existingRow) return;
 
-    // Tạo hàng mới cho bảng
     const row = document.createElement('tr');
     row.className = 'transaction-row';
     let actionButtons = document.createElement('td');
@@ -81,7 +71,7 @@ function updateTransactionTable(order) {
     detailBtn.setAttribute('onclick', `showOrderDetails(${order.orderId}, this)`);
 
     let processBtn = null, cancelBtn = null;
-    if (order.status === 'PENDING') {
+    if (order.status === 'UNPAID') { // Chỉ hỗ trợ UNPAID
         processBtn = document.createElement('button');
         processBtn.className = 'action-btn process-btn';
         processBtn.textContent = 'Process';
@@ -97,7 +87,6 @@ function updateTransactionTable(order) {
     if (processBtn) actionButtons.appendChild(processBtn);
     if (cancelBtn) actionButtons.appendChild(cancelBtn);
 
-    // Thêm tooltip cho từng nút
     const buttons = [detailBtn, processBtn, cancelBtn].filter(btn => btn);
     buttons.forEach(button => {
         const tooltip = document.createElement('span');
@@ -121,28 +110,25 @@ function updateTransactionTable(order) {
         <td>${order.orderId || 'N/A'}</td>
         <td>${(order.amount || 0).toLocaleString('vi-VN')}₫</td>
         <td>${order.paymentMethod || 'N/A'}</td>
-        <td><span style="color: ${order.status === 'PAID' ? '#2ed573' : order.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${order.status || 'N/A'}</span></td>
+        <td><span style="color: ${order.status === 'PAID' ? '#2ed573' : order.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${order.status === 'UNPAID' ? 'Chưa thanh toán' : order.status === 'PAID' ? 'Đã thanh toán' : order.status === 'CANCELLED' ? 'Đã hủy' : 'N/A'}</span></td>
         <td>${order.transactionId !== null && order.transactionId !== undefined ? order.transactionId : 'Chưa có'}</td>
-        <td>${order.createdAt ? new Date(order.createdAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
-        <td>${order.updatedAt ? new Date(order.updatedAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
+        <td>${order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A'}</td>
+        <td>${order.updatedAt ? new Date(order.updatedAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A'}</td>
     `;
     row.appendChild(actionButtons);
-    tbody.prepend(row); // Thêm vào đầu bảng
+    tbody.prepend(row);
 
-    // Cập nhật số lượng giao dịch
     const transactionCount = document.getElementById('transactionCount');
     if (transactionCount) {
         const currentCount = parseInt(transactionCount.textContent.match(/\d+/)?.[0] || 0) || 0;
-        transactionCount.textContent = `Tổng số hóa đơn: ${currentCount + 1} (Trạng thái: ${filters.status}, Phương thức: ${filters.method}, Giá: ${filters.priceRange ? `${filters.priceRange[0]} - ${filters.priceRange[1]} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? `${filters.sort}` : 'Mặc định'})`;
+        transactionCount.textContent = `Tổng số hóa đơn: ${currentCount + 1} (Trạng thái: ${filters.status === 'all' ? 'Tất cả' : filters.status === 'UNPAID' ? 'Chưa thanh toán' : filters.status}, Phương thức: ${filters.method === 'all' ? 'Tất cả' : filters.method}, Giá: ${filters.priceRange ? `${filters.priceRange[0].toLocaleString('vi-VN')} - ${filters.priceRange[1].toLocaleString('vi-VN')} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? (filters.sort === 'asc' ? 'Tăng dần' : 'Giảm dần') : 'Mặc định'})`;
     }
 
-    // Hiển thị bảng nếu chưa hiển thị
     const table = document.getElementById('transactionsTable');
     if (table) table.style.display = 'table';
     document.getElementById('filterContainer').style.display = 'block';
     document.getElementById('searchContainer').style.display = 'block';
 }
-
 
 // Gọi hàm kiểm tra định kỳ
 setInterval(checkNewOrders, 30000);
@@ -184,144 +170,139 @@ async function reloadSearch() {
 
 //==================================================================================//==================================================================================
 // Hàm làm mới giao dịch với phân trang
-// Hàm làm mới giao dịch với phân trang
 async function refreshTransactions(status = null) {
     try {
         const params = new URLSearchParams();
+        params.append('period', 'today');
         if (status && status !== 'all') params.append('status', status);
-        const data = await apiFetch(`${API_BASE_URL}/payments/todays-transactions?${params.toString()}`);
-
-        let transactions = data.result || [];
-        console.log('Raw transactions from API:', transactions);
-
-        // Áp dụng bộ lọc
-        if (filters.status !== 'all') {
-            transactions = transactions.filter(tx => tx.status === filters.status);
-        }
-        if (filters.method !== 'all') {
-            transactions = transactions.filter(tx => tx.paymentMethod === filters.method);
-        }
+        params.append('paymentMethod', 'CASH'); // Cố định CASH
         if (filters.priceRange) {
-            const [min, max] = filters.priceRange;
-            transactions = transactions.filter(tx => (tx.amount || 0) >= min && (tx.amount || 0) <= max);
+            params.append('minPrice', filters.priceRange[0]);
+            params.append('maxPrice', filters.priceRange[1]);
         }
-        if (filters.sort === 'asc') {
-            transactions.sort((a, b) => (a.amount || 0) - (b.amount || 0));
-        } else if (filters.sort === 'desc') {
-            transactions.sort((a, b) => (b.amount || 0) - (a.amount || 0));
-        }
+        params.append('page', currentPage - 1);
+        params.append('size', itemsPerPage);
+        params.append('orderBy', filters.orderBy);
+        params.append('sort', filters.sort || 'ASC');
+        console.log('API request params:', params.toString());
 
-        // Phân trang
-        const totalItems = transactions.length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        console.log('Total items:', totalItems, 'Total pages:', totalPages, 'Current page:', currentPage);
-
-        // Điều chỉnh currentPage nếu vượt quá tổng số trang
-        if (currentPage > totalPages) {
-            currentPage = totalPages > 0 ? totalPages : 1;
-            console.log('Adjusted currentPage to:', currentPage);
-        }
-
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-        const paginatedTransactions = transactions.slice(startIndex, endIndex);
-        console.log('Paginated transactions:', paginatedTransactions);
+        const data = await apiFetch(`${API_BASE_URL}/payments/list?${params.toString()}`);
+        console.log('API response from /payments/list:', data);
 
         const tbody = document.getElementById("transactionsBody");
-        tbody.innerHTML = "";
         const transactionCount = document.getElementById("transactionCount");
         const paginationDiv = document.getElementById("pagination") || createPaginationDiv();
 
-        if (paginatedTransactions.length > 0) {
-            document.getElementById("transactionsTable").style.display = "table";
-            document.getElementById("filterContainer").style.display = "block";
-            document.getElementById("searchContainer").style.display = "block";
+        if (!tbody) {
+            console.error("Element 'transactionsBody' not found in DOM");
+            showError("error", "❌ Không tìm thấy bảng giao dịch trong giao diện.");
+            return;
+        }
 
-            paginatedTransactions.forEach(tx => {
-                const row = document.createElement("tr");
-                row.className = 'transaction-row';
-                let actionButtons = document.createElement('td');
-                actionButtons.className = 'action-buttons';
+        if (data.code === 0 && data.result && data.result.content) {
+            const transactions = data.result.content;
+            const totalPages = data.result.totalPages;
+            const totalItems = data.result.totalElements;
 
-                const detailBtn = document.createElement('button');
-                detailBtn.className = 'details-btn';
-                detailBtn.textContent = 'Xem chi tiết';
-                detailBtn.setAttribute('onclick', `showOrderDetails(${tx.orderId}, this)`);
+            if (transactions.length > 0) {
+                document.getElementById("transactionsTable").style.display = "table";
+                document.getElementById("filterContainer").style.display = "block";
+                document.getElementById("searchContainer").style.display = "block";
 
-                let processBtn = null, cancelBtn = null, invoiceBtn = null;
-                if (tx.status === "PENDING") {
-                    processBtn = document.createElement('button');
-                    processBtn.className = 'action-btn process-btn';
-                    processBtn.textContent = 'Process';
-                    processBtn.setAttribute('onclick', `showPaymentMethodPopup(${tx.orderId}, this)`);
+                tbody.innerHTML = "";
+                transactions.forEach(tx => {
+                    const row = document.createElement("tr");
+                    row.className = 'transaction-row';
+                    let actionButtons = document.createElement('td');
+                    actionButtons.className = 'action-buttons';
 
-                    cancelBtn = document.createElement('button');
-                    cancelBtn.className = 'action-btn cancel-btn';
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.setAttribute('onclick', `cancelOrRefund(${tx.orderId})`);
-                } else if (tx.status === "PAID") {
-                    invoiceBtn = document.createElement('button');
-                    invoiceBtn.className = 'btn btn-outline-primary';
-                    invoiceBtn.textContent = '🖨️ Tải Hóa Đơn';
-                    invoiceBtn.setAttribute('onclick', `viewInvoicePdf(${tx.orderId})`);
-                }
+                    const detailBtn = document.createElement('button');
+                    detailBtn.className = 'details-btn';
+                    detailBtn.textContent = 'Xem chi tiết';
+                    detailBtn.setAttribute('onclick', `showOrderDetails(${tx.orderId}, this)`);
 
-                actionButtons.appendChild(detailBtn);
-                if (processBtn) actionButtons.appendChild(processBtn);
-                if (cancelBtn) actionButtons.appendChild(cancelBtn);
-                if (invoiceBtn) actionButtons.appendChild(invoiceBtn);
+                    let processBtn = null, cancelBtn = null, invoiceBtn = null;
+                    if (tx.status === "UNPAID") {
+                        processBtn = document.createElement('button');
+                        processBtn.className = 'action-btn process-btn';
+                        processBtn.textContent = 'Process';
+                        processBtn.setAttribute('onclick', `processPayment(${tx.orderId}, 'CASH', this)`); // Gọi trực tiếp processPayment
 
-                // Thêm tooltip
-                const buttons = actionButtons.querySelectorAll('button');
-                buttons.forEach(button => {
-                    const tooltip = document.createElement('span');
-                    tooltip.className = 'tooltip';
-                    let tooltipText = '';
-                    if (button.classList.contains('details-btn')) tooltipText = 'Xem đơn';
-                    else if (button.classList.contains('process-btn')) tooltipText = 'Xử lý thanh toán';
-                    else if (button.classList.contains('cancel-btn')) tooltipText = 'Hủy đơn hàng';
-                    else if (button.classList.contains('btn-outline-primary')) tooltipText = 'Tải hóa đơn';
-                    tooltip.textContent = tooltipText;
+                        cancelBtn = document.createElement('button');
+                        cancelBtn.className = 'action-btn cancel-btn';
+                        cancelBtn.textContent = 'Cancel';
+                        cancelBtn.setAttribute('onclick', `cancelOrRefund(${tx.orderId})`);
+                    } else if (tx.status === "PAID") {
+                        invoiceBtn = document.createElement('button');
+                        invoiceBtn.className = 'btn btn-outline-primary';
+                        invoiceBtn.textContent = '🖨️ Tải Hóa Đơn';
+                        invoiceBtn.setAttribute('onclick', `viewInvoicePdf(${tx.orderId})`);
+                    }
 
-                    button.appendChild(tooltip);
-                    button.addEventListener('mouseover', () => {
-                        tooltip.style.visibility = 'visible';
-                        tooltip.style.opacity = '1';
+                    actionButtons.appendChild(detailBtn);
+                    if (processBtn) actionButtons.appendChild(processBtn);
+                    if (cancelBtn) actionButtons.appendChild(cancelBtn);
+                    if (invoiceBtn) actionButtons.appendChild(invoiceBtn);
+
+                    const buttons = actionButtons.querySelectorAll('button');
+                    buttons.forEach(button => {
+                        const tooltip = document.createElement('span');
+                        tooltip.className = 'tooltip';
+                        let tooltipText = '';
+                        if (button.classList.contains('details-btn')) tooltipText = 'Xem đơn';
+                        else if (button.classList.contains('process-btn')) tooltipText = 'Xử lý thanh toán';
+                        else if (button.classList.contains('cancel-btn')) tooltipText = 'Hủy đơn hàng';
+                        else if (button.classList.contains('btn-outline-primary')) tooltipText = 'Tải hóa đơn';
+                        tooltip.textContent = tooltipText;
+
+                        button.appendChild(tooltip);
+                        button.addEventListener('mouseover', () => {
+                            tooltip.style.visibility = 'visible';
+                            tooltip.style.opacity = '1';
+                        });
+                        button.addEventListener('mouseout', () => {
+                            tooltip.style.visibility = 'hidden';
+                            tooltip.style.opacity = '0';
+                        });
                     });
-                    button.addEventListener('mouseout', () => {
-                        tooltip.style.visibility = 'hidden';
-                        tooltip.style.opacity = '0';
-                    });
+
+                    row.innerHTML = `
+                        <td>${tx.orderId || 'N/A'}</td>
+                        <td>${(tx.amount || 0).toLocaleString('vi-VN')}₫</td>
+                        <td>${tx.status === 'PAID' ? 'CASH' : 'N/A'}</td> <!-- Chỉ hiển thị CASH khi PAID -->
+                        <td><span style="color: ${tx.status === 'PAID' ? '#2ed573' : tx.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${tx.status === 'UNPAID' ? 'Chưa thanh toán' : tx.status === 'PAID' ? 'Đã thanh toán' : tx.status === 'CANCELLED' ? 'Đã hủy' : 'N/A'}</span></td>
+                        <td>${tx.transactionId || tx.transaction_id || 'N/A'}</td>
+                        <td>${tx.createdAt ? new Date(tx.createdAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
+                        <td>${tx.updatedAt ? new Date(tx.updatedAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
+                    `;
+                    row.appendChild(actionButtons);
+                    tbody.appendChild(row);
                 });
 
-                row.innerHTML = `
-                    <td>${tx.orderId || 'N/A'}</td>
-                    <td>${(tx.amount || 0).toLocaleString('vi-VN')}₫</td>
-                    <td>${tx.paymentMethod || 'N/A'}</td>
-                    <td><span style="color: ${tx.status === 'PAID' ? '#2ed573' : tx.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${tx.status || 'N/A'}</span></td>
-                    <td>${tx.transactionId || tx.transaction_id || 'N/A'}</td>
-                    <td>${tx.createdAt ? new Date(tx.createdAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
-                    <td>${tx.updatedAt ? new Date(tx.updatedAt).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}</td>
-                `;
-                row.appendChild(actionButtons);
-                tbody.appendChild(row);
-            });
-
-            transactionCount.textContent = `Tổng số hóa đơn: ${totalItems} (Trang ${currentPage}/${totalPages}, Trạng thái: ${filters.status}, Phương thức: ${filters.method}, Giá: ${filters.priceRange ? `${filters.priceRange[0]} - ${filters.priceRange[1]} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? `${filters.sort}` : 'Mặc định'})`;
-            updatePagination(totalPages);
+                transactionCount.textContent = `Tổng số hóa đơn: ${totalItems} (Trang ${currentPage}/${totalPages}, Trạng thái: ${filters.status === 'all' ? 'Tất cả' : filters.status === 'UNPAID' ? 'Chưa thanh toán' : filters.status}, Phương thức: CASH, Giá: ${filters.priceRange ? `${filters.priceRange[0].toLocaleString('vi-VN')} - ${filters.priceRange[1].toLocaleString('vi-VN')} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? (filters.sort === 'asc' ? 'Tăng dần' : 'Giảm dần') : 'Mặc định'})`;
+                updatePagination(totalPages);
+            } else {
+                document.getElementById("transactionsTable").style.display = "none";
+                document.getElementById("filterContainer").style.display = "block";
+                document.getElementById("searchContainer").style.display = "none";
+                transactionCount.textContent = `Không có hóa đơn nào với các bộ lọc: Trạng thái ${filters.status === 'all' ? 'Tất cả' : filters.status === 'UNPAID' ? 'Chưa thanh toán' : filters.status}, Phương thức: CASH, Giá: ${filters.priceRange ? `${filters.priceRange[0].toLocaleString('vi-VN')} - ${filters.priceRange[1].toLocaleString('vi-VN')} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? (filters.sort === 'asc' ? 'Tăng dần' : 'Giảm dần') : 'Mặc định'}.`;
+                paginationDiv.style.display = 'none';
+            }
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
         } else {
-            document.getElementById("transactionsTable").style.display = "none";
-            document.getElementById("filterContainer").style.display = "block";
-            document.getElementById("searchContainer").style.display = "none";
-            transactionCount.textContent = `Không có hóa đơn nào với các bộ lọc: Trạng thái ${filters.status}, Phương thức ${filters.method}, Giá: ${filters.priceRange ? `${filters.priceRange[0]} - ${filters.priceRange[1]} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? `${filters.sort}` : 'Mặc định'}.`;
-            paginationDiv.style.display = 'none';
+            throw new Error(data.message || "Không thể tải giao dịch.");
         }
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
     } catch (error) {
         console.error("Error fetching transactions:", error);
         showError("error", `❌ ${error.message || "Không thể tải giao dịch."}`);
+        document.getElementById("transactionsTable").style.display = "none";
+        if (tbody) tbody.innerHTML = "";
+        if (transactionCount) transactionCount.textContent = "";
+        if (paginationDiv) paginationDiv.style.display = 'none';
     }
 }
+
+
 
 // Hàm tạo và cập nhật phần phân trang
 function createPaginationDiv() {
@@ -475,11 +456,14 @@ function showFilterMenu(type) {
 // Áp dụng sắp xếp
 function applySortFilter(type, order) {
     console.log(`applySortFilter called with type: ${type}, order: ${order}`);
-    filters.sort = order === null ? null : order;
-    // Không reset currentPage, giữ nguyên trang hiện tại
-    const sortPriceBtn = document.getElementById('sortPriceBtn');
-    sortPriceBtn.textContent = order === null ? 'Sắp xếp Theo Giá' : `Sắp xếp Theo Giá: ${order === 'asc' ? 'Tăng dần' : 'Giảm dần'}`;
-    document.getElementById('sortPriceFilterMenu').style.display = 'none';
+    if (type === 'sortPrice') {
+        filters.sort = order === null ? null : order;
+        filters.orderBy = order === null ? 'createdAt' : 'amount'; // Đặt orderBy thành amount khi lọc giá
+        const sortPriceBtn = document.getElementById('sortPriceBtn');
+        sortPriceBtn.textContent = order === null ? 'Sắp xếp Theo Giá' : `Sắp xếp Theo Giá: ${order === 'asc' ? 'Tăng dần' : 'Giảm dần'}`;
+        document.getElementById('sortPriceFilterMenu').style.display = 'none';
+        console.log('Updated filters:', filters);
+    }
     refreshTransactions();
 }
 
@@ -518,20 +502,23 @@ function applyPriceFilter(range) {
     hidePriceFilter();
 }
 
-// Áp dụng filter trạng thái hoặc phương thức
 function applyFilter(type, value) {
     console.log(`applyFilter called with type: ${type}, value: ${value}`);
-    if (type === 'status' || type === 'method') {
-        filters[type] = value === null ? 'all' : value;
-        // Không reset currentPage, giữ nguyên trang hiện tại
+    if (type === 'status') {
+        filters.status = value === null ? 'all' : value;
+        currentPage = 1;
         const btn = document.getElementById(`${type}FilterBtn`);
-        btn.textContent = value === null ? `Lọc Theo ${type === 'status' ? 'Trạng Thái' : 'Phương Thức'}` : `${type === 'status' ? 'Trạng thái' : 'Phương thức'}: ${value || 'Tất cả'}`;
+        btn.textContent = value === null ? 'Lọc Theo Trạng Thái' : 
+            `Trạng thái: ${
+                value === 'UNPAID' ? 'Chưa thanh toán' : 
+                value === 'PAID' ? 'Đã thanh toán' : 
+                value === 'CANCELLED' ? 'Đã hủy' : 
+                'Tất cả'
+            }`;
     }
     document.getElementById(`${type}FilterMenu`).style.display = 'none';
-    refreshTransactions();
+    refreshTransactions(filters.status);
 }
-
-
 
 // Cập nhật khi tải trang hoặc chuyển section cái này cho lọc vs refresh transaction
 document.addEventListener("DOMContentLoaded", () => {
@@ -542,149 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
 //====================================================================================
 //====================================================================================
 
-// Hàm tìm kiếm giao dịch
-async function searchTransactions(event) {
-    if (event) event.preventDefault();
-    console.log('searchTransactions called');
-
-    const searchInput = document.getElementById('searchTransactionInput');
-    const query = searchInput?.value.trim();
-    const tbody = document.getElementById('transactionsBody');
-    const transactionCount = document.getElementById('transactionCount');
-    const searchButton = document.getElementById('searchTransactionBtn');
-    const errorElement = document.getElementById('error');
-
-    console.log('Query input:', query);
-
-    // Nếu query rỗng, chỉ tải lại danh sách giao dịch mà không hiển thị lỗi
-    if (!query) {
-        await refreshTransactions();
-        return;
-    }
-
-    // Kiểm tra định dạng query
-    if (!/^[a-zA-Z0-9-]+$/.test(query)) {
-        if (errorElement) {
-            errorElement.textContent = 'Order ID hoặc Transaction ID không hợp lệ!';
-            errorElement.style.display = 'block';
-            setTimeout(() => errorElement.style.display = 'none', 5000);
-        }
-        await refreshTransactions();
-        return;
-    }
-
-    if (searchButton) {
-        searchButton.disabled = true;
-        searchButton.innerHTML = 'Đang tìm... <span class="loading"></span>';
-    }
-
-    try {
-        const params = new URLSearchParams({ query });
-        console.log('API URL:', `${API_BASE_URL}/payments/search-transactions?${params.toString()}`);
-        const data = await apiFetch(`${API_BASE_URL}/payments/search-transactions?${params.toString()}`);
-
-        console.log('Search API response data:', data);
-
-        if (data.code === 1000) {
-            const transactions = data.result || [];
-            console.log('Transactions found:', transactions);
-
-            if (tbody) tbody.innerHTML = '';
-
-            if (transactions.length > 0) {
-                if (searchInput) {
-                    searchInput.value = query; // Giữ nguyên query ban đầu
-                }
-
-                let filteredTransactions = transactions;
-                if (query && !isNaN(query)) {
-                    filteredTransactions = transactions.filter(tx => tx.orderId === parseInt(query));
-                    if (filteredTransactions.length === 0) {
-                        if (errorElement) {
-                            errorElement.textContent = `Không tìm thấy hóa đơn với Order ID ${query}.`;
-                            errorElement.style.display = 'block';
-                            setTimeout(() => errorElement.style.display = 'none', 5000);
-                        }
-                        return;
-                    }
-                }
-
-                const table = document.getElementById('transactionsTable');
-                const filterContainer = document.getElementById('filterContainer');
-                const searchContainer = document.getElementById('searchContainer');
-
-                if (table) table.style.display = 'table';
-                if (filterContainer) filterContainer.style.display = 'block';
-                if (searchContainer) searchContainer.style.display = 'block';
-
-                filteredTransactions.forEach(tx => {
-                    const row = document.createElement('tr');
-                    row.className = 'transaction-row';
-                    let actionButtons = `
-                        <button class="details-btn" onclick="showOrderDetails(${tx.orderId}, this)">Xem chi tiết</button>
-                    `;
-                    if (tx.status === 'PENDING') {
-                        actionButtons += `
-                            <button class="action-btn process-btn" onclick="showPaymentMethodPopup(${tx.orderId}, this)">Process</button>
-                            <button class="action-btn cancel-btn" onclick="cancelOrRefund(${tx.orderId})">Cancel</button>
-                        `;
-                    } else if (tx.status === 'PAID') {
-                        actionButtons += `
-                            <button class="btn btn-outline-primary" onclick="viewInvoicePdf(${tx.orderId})">🖨️ Xem Hóa Đơn</button>
-                        `;
-                    }
-                    row.innerHTML = `
-                        <td>${tx.orderId || 'N/A'}</td>
-                        <td>${(tx.amount || 0).toLocaleString('vi-VN')}₫</td>
-                        <td>${tx.paymentMethod || 'N/A'}</td>
-                        <td><span style="color: ${tx.status === 'PAID' ? '#2ed573' : tx.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${tx.status || 'N/A'}</span></td>
-                        <td>${tx.transaction_id || 'N/A'}</td>
-                        <td>${tx.createdAt ? new Date(tx.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A'}</td>
-                        <td>${tx.updatedAt ? new Date(tx.updatedAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A'}</td>
-                        <td class="action-buttons">${actionButtons}</td>
-                    `;
-                    if (tbody) tbody.appendChild(row);
-                });
-
-                if (transactionCount) {
-                    transactionCount.textContent = `Tìm thấy ${filteredTransactions.length} hóa đơn cho "${query}"`;
-                }
-            } else {
-                const table = document.getElementById('transactionsTable');
-                if (table) table.style.display = 'none';
-                if (transactionCount) {
-                    transactionCount.textContent = `Không tìm thấy hóa đơn nào cho "${query}".`;
-                }
-            }
-        } else {
-            if (errorElement) {
-                errorElement.textContent = `❌ ${data.message || 'Không thể tìm kiếm giao dịch.'}`;
-                errorElement.style.display = 'block';
-                setTimeout(() => errorElement.style.display = 'none', 5000);
-            }
-            if (tbody) tbody.innerHTML = '';
-            if (transactionCount) transactionCount.textContent = '';
-            const table = document.getElementById('transactionsTable');
-            if (table) table.style.display = 'none';
-        }
-    } catch (error) {
-        console.error('Search error:', error);
-        if (errorElement) {
-            errorElement.textContent = `❌ ${error.message || 'Lỗi kết nối hệ thống, vui lòng thử lại sau.'}`;
-            errorElement.style.display = 'block';
-            setTimeout(() => errorElement.style.display = 'none', 5000);
-        }
-        if (tbody) tbody.innerHTML = '';
-        if (transactionCount) transactionCount.textContent = '';
-        const table = document.getElementById('transactionsTable');
-        if (table) table.style.display = 'none';
-    } finally {
-        if (searchButton) {
-            searchButton.disabled = false;
-            searchButton.innerHTML = 'Tìm Kiếm';
-        }
-    }
-}
 
 // Tích hợp sự kiện DOM
 document.addEventListener('DOMContentLoaded', function() {
@@ -770,16 +614,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+// ============================================================================
+
+// ============================================================================
+
 // Tìm kiếm gợi ý
 async function fetchSuggestions() {
-    const query = document.getElementById('searchTransactionInput')?.value.trim() || '';
+    const searchInput = document.getElementById('searchTransactionInput');
     const suggestionBox = document.getElementById('suggestionBox');
-
-    if (!suggestionBox) {
-        console.error('suggestionBox not found in DOM');
+    
+    if (!searchInput || !suggestionBox) {
+        console.error('Không tìm thấy searchTransactionInput hoặc suggestionBox trong DOM');
         return;
     }
 
+    const query = searchInput.value.trim();
     if (query.length < 1) {
         suggestionBox.style.display = 'none';
         await refreshTransactions();
@@ -787,30 +637,39 @@ async function fetchSuggestions() {
     }
 
     try {
-        console.log(`Fetching suggestions for query: ${query}`);
-        const data = await apiFetch(`${API_BASE_URL}/payments/suggestions?query=${encodeURIComponent(query)}`);
-
-        console.log('API Response Details:', data);
-        console.log('Suggestions Array:', data.result);
+        const params = new URLSearchParams({ period: 'today' });
+        params.append('query', encodeURIComponent(query));
+        const data = await apiFetch(`${API_BASE_URL}/payments/suggestions?${params.toString()}`);
+        
+        if (data.code !== 1000) {
+            throw new Error(data.message || 'Không thể lấy gợi ý');
+        }
 
         const suggestions = data.result || [];
         suggestionBox.innerHTML = '';
-        if (suggestions.length > 0) {
-            suggestions.forEach(suggestion => {
+        
+        // Lọc thủ công theo ngày hôm nay (20/07/2025)
+        const today = new Date('2025-07-20').setHours(0, 0, 0, 0); // Đặt thời gian bắt đầu ngày
+        const todayEnd = new Date('2025-07-20').setHours(23, 59, 59, 999); // Đặt thời gian kết thúc ngày
+        
+        const filteredSuggestions = suggestions.filter(suggestion => {
+            const orderId = suggestion.split(' - ')[0];
+            // Giả sử cần gọi API để lấy createdAt, hoặc nếu suggestion chứa thông tin ngày
+            // Dưới đây là ví dụ giả định, bạn cần điều chỉnh nếu API trả về dữ liệu khác
+            return true; // Placeholder, cần tích hợp với API thực tế
+        });
+
+        if (filteredSuggestions.length > 0) {
+            filteredSuggestions.forEach(suggestion => {
                 const div = document.createElement('div');
                 div.className = 'suggestion-item';
-                div.textContent = suggestion; 
-                // Lấy orderId từ đầu chuỗi (phần số)
-                const orderId = suggestion.match(/^\d+/)[0]; // Trích xuất số đầu tiên (ví dụ: "2")
-                div.dataset.suggestionValue = orderId; // Lưu chỉ orderId (ví dụ: "2")
+                div.textContent = suggestion;
+                const orderId = suggestion.split(' - ')[0];
+                div.dataset.suggestionValue = orderId;
                 div.addEventListener('click', () => {
-                    const searchInput = document.getElementById('searchTransactionInput');
-                    if (searchInput) {
-                        // Cập nhật ô input với chỉ orderId
-                        searchInput.value = div.dataset.suggestionValue; // Sử dụng "2" thay vì toàn bộ chuỗi
-                    }
+                    searchInput.value = orderId;
                     suggestionBox.style.display = 'none';
-                    searchTransactions({ preventDefault: () => {} }); // Tìm kiếm với orderId
+                    searchTransactions({ preventDefault: () => {} });
                 });
                 suggestionBox.appendChild(div);
             });
@@ -820,10 +679,167 @@ async function fetchSuggestions() {
         }
     } catch (error) {
         console.error('Lỗi khi lấy gợi ý:', error);
-        showError('error', `❌ ${error.message || 'Lỗi khi tải gợi ý, vui lòng thử lại.'}`);
+        showError('error', `❌ ${error.message || 'Không thể tải gợi ý, vui lòng thử lại.'}`);
         suggestionBox.style.display = 'none';
     }
 }
+
+
+// =============================phần search===========================================================================================================================
+
+async function searchTransactions(event) {
+    if (event) event.preventDefault();
+
+    const searchInput = document.getElementById('searchTransactionInput');
+    const tbody = document.getElementById('transactionsBody');
+    const transactionCount = document.getElementById('transactionCount');
+    const searchButton = document.getElementById('searchTransactionBtn');
+    const errorElement = document.getElementById('error');
+
+    if (!searchInput || !tbody) {
+        console.error('Không tìm thấy searchTransactionInput hoặc transactionsBody trong DOM');
+        return;
+    }
+
+    const query = searchInput.value.trim();
+
+    if (!query) {
+        await refreshTransactions();
+        return;
+    }
+
+    if (!/^[a-zA-Z0-9-]+$/.test(query)) {
+        showError('error', 'Order ID hoặc Transaction ID không hợp lệ!');
+        await refreshTransactions();
+        return;
+    }
+
+    if (searchButton) {
+        searchButton.disabled = true;
+        searchButton.innerHTML = 'Đang tìm... <span class="loading"></span>';
+    }
+
+    try {
+        const params = new URLSearchParams({ period: 'today', query });
+        const data = await apiFetch(`${API_BASE_URL}/payments/search-transactions?${params.toString()}`);
+
+        if (data.code !== 1000) {
+            throw new Error(data.message || 'Không thể tìm kiếm giao dịch');
+        }
+
+        const transactions = data.result || [];
+        tbody.innerHTML = '';
+
+        if (transactions.length > 0) {
+            const table = document.getElementById('transactionsTable');
+            const filterContainer = document.getElementById('filterContainer');
+            const searchContainer = document.getElementById('searchContainer');
+
+            if (table) table.style.display = 'table';
+            if (filterContainer) filterContainer.style.display = 'block';
+            if (searchContainer) searchContainer.style.display = 'block';
+
+            transactions.forEach(tx => {
+                const row = document.createElement('tr');
+                row.className = 'transaction-row';
+
+                const createdAt = tx.createdAt 
+                    ? new Date(new Date(tx.createdAt).getTime() - 7 * 60 * 60 * 1000).toLocaleString('vi-VN', { 
+                        timeZone: 'Asia/Ho_Chi_Minh',
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit' 
+                    }) 
+                    : 'N/A';
+                const updatedAt = tx.updatedAt 
+                    ? new Date(new Date(tx.updatedAt).getTime() - 7 * 60 * 60 * 1000).toLocaleString('vi-VN', { 
+                        timeZone: 'Asia/Ho_Chi_Minh',
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit' 
+                    }) 
+                    : 'N/A';
+
+                let actionButtons = `
+                    <button class="details-btn" onclick="showOrderDetails(${tx.orderId}, this)">Xem chi tiết</button>
+                `;
+                if (tx.status === 'UNPAID') {
+                    actionButtons += `
+                        <button class="action-btn process-btn" onclick="processPayment(${tx.orderId}, 'CASH', this)">Process</button>
+                        <button class="action-btn cancel-btn" onclick="cancelOrRefund(${tx.orderId})">Cancel</button>
+                    `;
+                } else if (tx.status === 'PAID') {
+                    actionButtons += `
+                        <button class="btn btn-outline-primary" onclick="viewInvoicePdf(${tx.orderId})">🖨️ Xem Hóa Đơn</button>
+                    `;
+                }
+
+                row.innerHTML = `
+                    <td>${tx.orderId || 'N/A'}</td>
+                    <td>${(tx.amount || 0).toLocaleString('vi-VN')}₫</td>
+                    <td>${tx.status === 'PAID' ? 'CASH' : 'N/A'}</td> <!-- Chỉ hiển thị CASH khi PAID -->
+                    <td><span style="color: ${tx.status === 'PAID' ? '#2ed573' : tx.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${tx.status === 'UNPAID' ? 'Chưa thanh toán' : tx.status === 'PAID' ? 'Đã thanh toán' : tx.status === 'CANCELLED' ? 'Đã hủy' : 'N/A'}</span></td>
+                    <td>${tx.transactionId || 'N/A'}</td>
+                    <td>${createdAt}</td>
+                    <td>${updatedAt}</td>
+                    <td class="action-buttons">${actionButtons}</td>
+                `;
+                tbody.appendChild(row);
+
+                const buttons = row.querySelectorAll('.action-buttons button');
+                buttons.forEach(button => {
+                    const tooltip = document.createElement('span');
+                    tooltip.className = 'tooltip';
+                    let tooltipText = '';
+                    if (button.classList.contains('details-btn')) tooltipText = 'Xem đơn';
+                    else if (button.classList.contains('process-btn')) tooltipText = 'Xử lý thanh toán';
+                    else if (button.classList.contains('cancel-btn')) tooltipText = 'Hủy đơn hàng';
+                    else if (button.classList.contains('btn-outline-primary')) tooltipText = 'Tải hóa đơn';
+                    tooltip.textContent = tooltipText;
+
+                    button.appendChild(tooltip);
+                    button.addEventListener('mouseover', () => {
+                        tooltip.style.visibility = 'visible';
+                        tooltip.style.opacity = '1';
+                    });
+                    button.addEventListener('mouseout', () => {
+                        tooltip.style.visibility = 'hidden';
+                        tooltip.style.opacity = '0';
+                    });
+                });
+            });
+
+            if (transactionCount) {
+                transactionCount.textContent = `Tìm thấy ${transactions.length} hóa đơn cho "${query}" trong ngày hôm nay`;
+            }
+        } else {
+            const table = document.getElementById('transactionsTable');
+            if (table) table.style.display = 'none';
+            if (transactionCount) {
+                transactionCount.textContent = `Không tìm thấy hóa đơn nào cho "${query}" trong ngày hôm nay`;
+            }
+        }
+    } catch (error) {
+        console.error('Lỗi tìm kiếm:', error);
+        showError('error', `❌ ${error.message || 'Lỗi kết nối hệ thống, vui lòng thử lại.'}`);
+        tbody.innerHTML = '';
+        if (transactionCount) transactionCount.textContent = '';
+        const table = document.getElementById('transactionsTable');
+        if (table) table.style.display = 'none';
+    } finally {
+        if (searchButton) {
+            searchButton.disabled = false;
+            searchButton.innerHTML = 'Tìm Kiếm';
+        }
+    }
+}
+
 
 // Áp dụng debounce cho input
 const debouncedFetchSuggestions = (function debounce(func, wait) {
@@ -910,39 +926,68 @@ async function closeCurrentDetails() {
   });
 }
 
+
+
+
 async function openOrderDetails(orderId, row, button) {
     if (isProcessing) return;
 
     isProcessing = true;
 
-    // Set loading state
     button.textContent = 'Đang tải...';
     button.classList.add('loading-btn');
 
     try {
         const data = await apiFetch(`${API_BASE_URL}/payments/invoice/${orderId}`);
+        console.log('API Response from /payments/invoice:', {
+            orderId,
+            paymentDate: data.result?.paymentDate,
+            formattedPaymentDate: data.result?.formattedPaymentDate
+        });
+        console.log('Browser TimeZone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
         if (data.result) {
-            // Tạo hàng chi tiết với styling đẹp
             const detailsRow = document.createElement('tr');
             detailsRow.className = 'order-details-row';
 
             const totalAmount = data.result.orderItems.reduce((sum, item) =>
                 sum + ((item.quantity || 0) * (item.price || 0)), 0);
 
-            // Dịch trạng thái sang tiếng Việt
             const statusText = {
                 'PENDING': 'Đang chờ',
+                'UNPAID': 'Chưa thanh toán',
                 'PAID': 'Đã thanh toán',
                 'CANCELLED': 'Đã hủy'
             }[data.result.status] || data.result.status || 'N/A';
 
-            // Màu sắc cho trạng thái
             const statusColor = {
+                'PENDING': '#ff9800',
+                'UNPAID': '#ff9800',
                 'PAID': '#2ed573',
-                'CANCELLED': '#ff4757',
-                'PENDING': '#ff9800'
+                'CANCELLED': '#ff4757'
             }[data.result.status] || '#000000';
+
+            // Xử lý thời gian từ paymentDate
+            let displayTime = 'N/A';
+            if (data.result.paymentDate) {
+                // Parse paymentDate từ chuỗi ISO (UTC)
+                const date = new Date(data.result.paymentDate);
+                console.log('Parsed paymentDate (UTC):', date);
+                // Trừ 7 tiếng để bù lại lỗi lệch 14 tiếng
+                const adjustedDate = new Date(date.getTime() - 7 * 60 * 60 * 1000);
+                console.log('Adjusted Date (UTC-7):', adjustedDate);
+                // Định dạng thủ công thành dd/MM/yyyy HH:mm:ss
+                const day = String(adjustedDate.getDate()).padStart(2, '0');
+                const month = String(adjustedDate.getMonth() + 1).padStart(2, '0');
+                const year = adjustedDate.getFullYear();
+                const hours = String(adjustedDate.getHours()).padStart(2, '0');
+                const minutes = String(adjustedDate.getMinutes()).padStart(2, '0');
+                const seconds = String(adjustedDate.getSeconds()).padStart(2, '0');
+                displayTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                console.log('Final displayTime:', displayTime);
+            } else {
+                console.log('No paymentDate available, using N/A');
+            }
 
             detailsRow.innerHTML = `
                 <td colspan="8">
@@ -950,7 +995,7 @@ async function openOrderDetails(orderId, row, button) {
                         <div class="order-header">
                             <h4>Chi tiết đơn hàng #${orderId}</h4>
                             <div class="order-info">
-                                <span class="order-time">${data.result.formattedPaymentDate || (data.result.paymentDate ? new Date(data.result.paymentDate).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A')}</span>
+                                <span class="order-time">${displayTime}</span>
                                 <span class="order-status" style="color: ${statusColor}">${statusText}</span>
                                 <span class="order-total">${totalAmount.toLocaleString('vi-VN')}₫</span>
                             </div>
@@ -993,21 +1038,16 @@ async function openOrderDetails(orderId, row, button) {
                 </td>
             `;
 
-            // Chèn hàng chi tiết
             row.after(detailsRow);
-
-            // Update states
             currentDetailsRow = detailsRow;
             currentActiveRow = row;
             currentButton = button;
 
-            // Set active states
             row.classList.add('active-row');
             button.classList.remove('loading-btn');
             button.textContent = '✕ Đóng';
             button.classList.add('close-btn');
 
-            // Trigger animation
             requestAnimationFrame(() => {
                 detailsRow.classList.add('details-open');
                 isProcessing = false;
@@ -1018,13 +1058,12 @@ async function openOrderDetails(orderId, row, button) {
     } catch (error) {
         console.error("Error fetching order details:", error);
         showError("error", `❌ ${error.message || "Lỗi kết nối, vui lòng thử lại."}`);
-
-        // Reset states on error
         button.classList.remove('loading-btn');
         button.textContent = 'Xem chi tiết';
         isProcessing = false;
     }
 }
+
 
 //==========================phần liên quan đến popup nút transaction========================================================
 
@@ -1087,55 +1126,185 @@ async function confirmPayment(event, button) {
         showError("error", "❌ Lỗi hệ thống, không thể xử lý thanh toán.");
     }
 } 
-//==================================================================================//==================================================================================
 
-   // Xử lý thanh toán đơn hàng
-   async function processPayment(orderId, paymentMethod, button) {
+
+
+
+
+function updateTransactionRow(orderId, transactionData) {
+    const tbody = document.getElementById('transactionsBody');
+    if (!tbody) {
+        console.error('Không tìm thấy transactionsBody trong DOM');
+        return;
+    }
+
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+    const row = rows.find(r => r.cells[0].textContent === orderId.toString());
+    if (!row) {
+        console.error(`Không tìm thấy hàng với orderId: ${orderId}`);
+        return;
+    }
+
+    console.log('updateTransactionRow - Input Data:', {
+        orderId,
+        paymentDate: transactionData.paymentDate
+    });
+    console.log('Browser TimeZone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+    let createdAt = row.cells[5]?.textContent || 'N/A';
+    if (createdAt === 'N/A') {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        createdAt = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+    console.log('Existing createdAt:', createdAt);
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    let updatedAt = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    console.log('Client Time for updatedAt:', updatedAt);
+
+    if (transactionData.paymentDate) {
+        const date = new Date(transactionData.paymentDate);
+        console.log('Parsed paymentDate (UTC):', date);
+        const adjustedDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+        console.log('Adjusted paymentDate (UTC+7):', adjustedDate);
+    }
+
+    const statusText = {
+        'UNPAID': 'Chưa thanh toán',
+        'PAID': 'Đã thanh toán',
+        'CANCELLED': 'Đã hủy'
+    }[transactionData.status] || 'N/A';
+    const statusColor = {
+        'UNPAID': '#ff9800',
+        'PAID': '#2ed573',
+        'CANCELLED': '#ff4757'
+    }[transactionData.status] || '#000000';
+
+    let actionButtons = `
+        <button class="details-btn" onclick="showOrderDetails(${transactionData.orderId}, this)">Xem chi tiết</button>
+    `;
+    if (transactionData.status === 'PAID') {
+        actionButtons += `
+            <button class="btn btn-outline-primary" onclick="viewInvoicePdf(${transactionData.orderId})">🖨️ Xem Hóa Đơn</button>
+        `;
+    } else if (transactionData.status === 'UNPAID') {
+        actionButtons += `
+            <button class="action-btn process-btn" onclick="processPayment(${transactionData.orderId}, 'CASH', this)">Process</button>
+            <button class="action-btn cancel-btn" onclick="cancelOrRefund(${transactionData.orderId})">Cancel</button>
+        `;
+    }
+
+    row.innerHTML = `
+        <td>${transactionData.orderId || 'N/A'}</td>
+        <td>${(transactionData.amount || 0).toLocaleString('vi-VN')}₫</td>
+        <td>${transactionData.status === 'PAID' ? 'CASH' : 'N/A'}</td> <!-- Chỉ hiển thị CASH khi PAID -->
+        <td><span style="color: ${statusColor}">${statusText}</span></td>
+        <td>${transactionData.transactionId || 'N/A'}</td>
+        <td>${createdAt}</td>
+        <td>${updatedAt}</td>
+        <td class="action-buttons">${actionButtons}</td>
+    `;
+
+    const buttons = row.querySelectorAll('.action-buttons button');
+    buttons.forEach(button => {
+        const tooltip = document.createElement('span');
+        tooltip.className = 'tooltip';
+        let tooltipText = '';
+        if (button.classList.contains('details-btn')) tooltipText = 'Xem đơn';
+        else if (button.classList.contains('process-btn')) tooltipText = 'Xử lý thanh toán';
+        else if (button.classList.contains('cancel-btn')) tooltipText = 'Hủy đơn hàng';
+        else if (button.classList.contains('btn-outline-primary')) tooltipText = 'Tải hóa đơn';
+        tooltip.textContent = tooltipText;
+
+        button.appendChild(tooltip);
+        button.addEventListener('mouseover', () => {
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
+        });
+        button.addEventListener('mouseout', () => {
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.opacity = '0';
+        });
+    });
+}
+
+
+
+//==================================================================================//==================================================================================
+async function processPayment(orderId, paymentMethod, button) {
+    // Hiển thị thông báo xác nhận
+    if (!confirm('Bạn có muốn xử lý đơn hàng này?')) {
+        return; // Thoát hàm nếu người dùng nhấn Cancel
+    }
+
     clearMessages();
-    const originalText = button.textContent || 'Thanh toán';
+
+    const originalText = button.textContent || 'Process';
     button.textContent = originalText + ' <span class="loading"></span>';
     button.disabled = true;
 
     try {
         const data = await apiFetch(`${API_BASE_URL}/payments/payment2`, {
             method: "POST",
-            body: JSON.stringify({ orderId, paymentMethod })
+            body: JSON.stringify({ orderId, paymentMethod: 'CASH' }) // Cố định CASH
         });
 
-        console.log('API Response:', data);
+        console.log('API Response from /payment2:', data);
 
-        if (data.code === 0) {
-            document.getElementById('message').textContent = "🎉 Thanh toán thành công!";
-            document.getElementById('message').style.display = 'block';
-            setTimeout(() => document.getElementById('message').style.display = 'none', 3000);
-
+        if (data.code === 0 && data.result) {
             showSuccessNotification();
 
+            // Cập nhật paymentList để đồng bộ với calculateDailySummary
+            const index = paymentList.findIndex(tx => tx.orderId === data.result.orderId);
+            if (index !== -1) {
+                paymentList[index] = { ...paymentList[index], ...data.result };
+            } else {
+                paymentList.push(data.result);
+            }
+
+            updateTransactionRow(orderId, {
+                orderId: data.result.orderId,
+                amount: data.result.amount,
+                paymentMethod: 'CASH', // Cố định CASH
+                status: data.result.status,
+                transactionId: data.result.transactionId,
+                paymentDate: data.result.updatedAt
+            });
+
             const invoiceData = await apiFetch(`${API_BASE_URL}/payments/invoice/${orderId}`);
+            console.log('Invoice Data:', invoiceData);
+
             if (invoiceData.code === 0 && invoiceData.result) {
-                displayInvoice(invoiceData);
+                updateTransactionRow(orderId, invoiceData.result);
+                displayInvoice(invoiceData.result);
 
                 const invoiceSection = document.getElementById('invoice');
-if (invoiceSection) {
-  invoiceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+                if (invoiceSection) {
+                    invoiceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
 
                 if (invoiceData.result.customerEmail) {
                     const emailData = await apiFetch(`${API_BASE_URL}/payments/send-invoice-email`, {
                         method: 'POST',
                         body: JSON.stringify({ customerEmail: invoiceData.result.customerEmail, orderId })
                     });
-                    if (emailData.code === 0) {
-                        document.getElementById('message').textContent += " Hóa đơn đã được gửi qua email!";
-                    } else {
-                        showError("error", `❌ Lỗi gửi email: ${emailData.message || 'Không thể gửi email'}`);
-                    }
                 }
-            } else {
-                showError("error", `❌ Lỗi lấy hóa đơn: ${invoiceData.message || 'Dữ liệu hóa đơn không hợp lệ.'}`);
             }
 
-            await refreshTransactions();
+            // Cập nhật tổng số đơn sau khi xử lý thanh toán
+            await calculateDailySummary();
         } else {
             showError("error", `❌ ${data.message || "Thanh toán thất bại."}`);
         }
@@ -1147,10 +1316,95 @@ if (invoiceSection) {
         button.disabled = false;
     }
 }
+//==========================================//==========================================//==========================================
 
 
+function updateTransactionTable(order) {
+                                                                            const tbody = document.getElementById('transactionsBody');
+    if (!tbody) return;
+
+                                                                            const existingRow = Array.from(tbody.getElementsByTagName('tr')).find(row =>
+            row.cells[0].textContent === order.orderId.toString()
+    );
+    if (existingRow) return;
+
+                                                                            const row = document.createElement('tr');
+    row.className = 'transaction-row';
+    let actionButtons = document.createElement('td');
+    actionButtons.className = 'action-buttons';
+
+                                                                            const detailBtn = document.createElement('button');
+    detailBtn.className = 'details-btn';
+    detailBtn.textContent = 'Xem chi tiết';
+    detailBtn.setAttribute('onclick', `showOrderDetails(${order.orderId}, this)`);
+
+    let processBtn = null, cancelBtn = null;
+    if (order.status === 'UNPAID') {
+        processBtn = document.createElement('button');
+        processBtn.className = 'action-btn process-btn';
+        processBtn.textContent = 'Process';
+        processBtn.setAttribute('onclick', `processPayment(${order.orderId}, 'CASH', this)`); // Gọi trực tiếp processPayment
+
+        cancelBtn = document.createElement('button');
+        cancelBtn.className = 'action-btn cancel-btn';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.setAttribute('onclick', `cancelOrRefund(${order.orderId})`);
+    }
+
+    actionButtons.appendChild(detailBtn);
+    if (processBtn) actionButtons.appendChild(processBtn);
+    if (cancelBtn) actionButtons.appendChild(cancelBtn);
+
+                                                                            const buttons = [detailBtn, processBtn, cancelBtn].filter(btn => btn);
+    buttons.forEach(button => {
+                                                                                const tooltip = document.createElement('span');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = button.classList.contains('details-btn') ? 'Xem đơn' :
+            button.classList.contains('process-btn') ? 'Xử lý thanh toán' :
+                    'Hủy đơn hàng';
+    button.appendChild(tooltip);
+
+    button.addEventListener('mouseover', () => {
+            tooltip.style.visibility = 'visible';
+    tooltip.style.opacity = '1';
+                                                                                });
+    button.addEventListener('mouseout', () => {
+            tooltip.style.visibility = 'hidden';
+    tooltip.style.opacity = '0';
+                                                                                });
+                                                                            });
+
+    row.innerHTML = `
+                                                                                <td>${order.orderId || 'N/A'}</td>
+            <td>${(order.amount || 0).toLocaleString('vi-VN')}₫</td>
+            <td>${order.status === 'PAID' ? 'CASH' : 'N/A'}</td> <!-- Chỉ hiển thị CASH khi PAID -->
+            <td><span style="color: ${order.status === 'PAID' ? '#2ed573' : order.status === 'CANCELLED' ? '#ff4757' : '#ff9800'}">${order.status === 'UNPAID' ? 'Chưa thanh toán' : order.status === 'PAID' ? 'Đã thanh toán' : order.status === 'CANCELLED' ? 'Đã hủy' : 'N/A'}</span></td>
+            <td>${order.transactionId !== null && order.transactionId !== undefined ? order.transactionId : 'Chưa có'}</td>
+            <td>${order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A'}</td>
+            <td>${order.updatedAt ? new Date(order.updatedAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'N/A'}</td>
+                                                                            `;
+    row.appendChild(actionButtons);
+    tbody.prepend(row);
+
+                                                                            const transactionCount = document.getElementById('transactionCount');
+    if (transactionCount) {
+                                                                                const currentCount = parseInt(transactionCount.textContent.match(/\d+/)?.[0] || 0) || 0;
+        transactionCount.textContent = `Tổng số hóa đơn: ${currentCount + 1} (Trạng thái: ${filters.status === 'all' ? 'Tất cả' : filters.status === 'UNPAID' ? 'Chưa thanh toán' : filters.status}, Phương thức: CASH, Giá: ${filters.priceRange ? `${filters.priceRange[0].toLocaleString('vi-VN')} - ${filters.priceRange[1].toLocaleString('vi-VN')} VNĐ` : 'Tất cả'}, Sắp xếp: ${filters.sort ? (filters.sort === 'asc' ? 'Tăng dần' : 'Giảm dần') : 'Mặc định'})`;
+    }
+
+                                                                            const table = document.getElementById('transactionsTable');
+    if (table) table.style.display = 'table';
+    document.getElementById('filterContainer').style.display = 'block';
+    document.getElementById('searchContainer').style.display = 'block';
+}
+
+//==========================================//==========================================//==========================================
 //==================================================================================//==================================================================================
       async function cancelOrRefund(orderId) {
+
+        
+
+
     if (!confirm('Bạn có chắc muốn hủy giao dịch này?')) return;
 
     clearMessages();
@@ -1171,9 +1425,6 @@ if (invoiceSection) {
 
         // Kiểm tra trạng thái thành công dựa trên code
         if (data.code === 0) {
-            document.getElementById('message').textContent = "✅ Đơn hàng đã được hủy thành công!";
-            document.getElementById('message').style.display = 'block';
-            setTimeout(() => document.getElementById('message').style.display = 'none', 3000);
 
 showDeleteSuccessNotification();
 
@@ -1211,63 +1462,197 @@ showDeleteSuccessNotification();
 }
 
 
+//==========================================
+
 //=====================HÓa đơn=============================================================
 
 
+function displayInvoice(invoiceData) {
+    if (!invoiceData) {
+        console.error('No invoice data available');
+        showError("error", "❌ Không có dữ liệu hóa đơn.");
+        return;
+    }
 
-      // Hiển thị chi tiết hóa đơn từ dữ liệu API
-      function displayInvoice(invoiceData) {
-          const data = invoiceData.result || invoiceData;
-          if (!data) {
-              console.error('No invoice data available');
-              return;
-          }
+    // Log để debug
+    console.log('displayInvoice - Input Data:', {
+        orderId: invoiceData.orderId,
+        paymentDate: invoiceData.paymentDate,
+        formattedPaymentDate: invoiceData.formattedPaymentDate
+    });
 
-          document.getElementById('invoiceId').textContent = `#${data.orderId || 'N/A'}`;
-          const paymentTime = data.formattedPaymentDate ||
-              (data.paymentDate
-                  ? new Date(data.paymentDate).toLocaleString('vi-VN', {
-                      timeZone: 'Asia/Ho_Chi_Minh',
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false
-                  })
-                  : 'N/A');
-          document.getElementById('paymentDate').textContent = paymentTime;
-          document.getElementById('tableNumber').textContent = data.tableNumber || 'N/A';
-          document.getElementById('customerName').textContent = data.customerName || 'N/A';
-          document.getElementById('displayCustomerEmail').textContent = data.customerEmail || 'N/A';
-          document.getElementById('totalAmount').textContent = (data.amount || 0).toLocaleString('vi-VN') + '₫';
-          document.getElementById('paymentMethodDisplay').textContent = data.paymentMethod || 'N/A';
-          document.getElementById('status').textContent = data.status || 'N/A';
-          document.getElementById('transactionId').textContent = data.transactionId || data.transaction_id || 'N/A';
+    // Xử lý thời gian hiển thị
+    let displayPaymentDate = invoiceData.formattedPaymentDate || 'N/A';
+    if (displayPaymentDate !== 'N/A') {
+        const [day, month, year, hour, minute, second] = displayPaymentDate.split(/[/ :]/).map(Number);
+        const parsedDate = new Date(year, month - 1, day, hour, minute, second);
+        
+        const currentTime = new Date();
+        const timeDiffHours = (parsedDate.getTime() - currentTime.getTime()) / (1000 * 3600);
+        
+        if (Math.abs(timeDiffHours - 14) < 1) {
+            const adjustedDate = new Date(parsedDate.getTime() - 14 * 60 * 60 * 1000);
+            displayPaymentDate = adjustedDate.toLocaleString('vi-VN', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/,/, '');
+        } else if (Math.abs(timeDiffHours + 14) < 1) {
+            const adjustedDate = new Date(parsedDate.getTime() + 14 * 60 * 60 * 1000);
+            displayPaymentDate = adjustedDate.toLocaleString('vi-VN', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/,/, '');
+        }
+    } else {
+        const now = new Date();
+        displayPaymentDate = now.toLocaleString('vi-VN', {
+            timeZone: 'Asia/Ho_Chi_Minh',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).replace(/,/, '');
+    }
 
-          const tbody = document.getElementById('invoiceItems');
-          tbody.innerHTML = '';
-          (data.orderItems || []).forEach(item => {
-              const row = document.createElement('tr');
-              row.innerHTML = `
-                  <td>${item.itemName || 'N/A'}</td>
-                  <td>${item.quantity || 0}</td>
-                  <td>${(item.price || 0).toLocaleString('vi-VN')}₫</td>
-                  <td>${((item.quantity || 0) * (item.price || 0)).toLocaleString('vi-VN')}₫</td>
-              `;
-              tbody.appendChild(row);
-          });
+    // Cập nhật thông tin hóa đơn
+    document.getElementById('invoiceId').textContent = `#${invoiceData.orderId || 'N/A'}`;
+    document.getElementById('paymentDate').textContent = displayPaymentDate;
+    document.getElementById('tableNumber').textContent = invoiceData.tableNumber || 'N/A';
+    document.getElementById('customerName').textContent = invoiceData.customerName || 'N/A';
+    document.getElementById('displayCustomerEmail').textContent = invoiceData.customerEmail || 'N/A';
+    document.getElementById('totalAmount').textContent = (invoiceData.amount || 0).toLocaleString('vi-VN') + '₫';
+    document.getElementById('paymentMethodDisplay').textContent = invoiceData.paymentMethod || 'N/A';
+    document.getElementById('status').textContent = {
+        'PENDING': 'Đang chờ',
+        'UNPAID': 'Chưa thanh toán',
+        'PAID': 'Đã thanh toán',
+        'CANCELLED': 'Đã hủy'
+    }[invoiceData.status] || invoiceData.status || 'N/A';
 
-          document.getElementById('invoice').style.display = 'block';
-          setTimeout(() => {
-              document.getElementById('invoice').style.display = 'none';
-          }, 5000);
-      }
+    // Cập nhật danh sách món
+    const tbody = document.getElementById('invoiceItems');
+    tbody.innerHTML = '';
+    (invoiceData.orderItems || []).forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.itemName || 'N/A'}</td>
+            <td>${item.quantity || 0}</td>
+            <td>${(item.price || 0).toLocaleString('vi-VN')}₫</td>
+            <td>${((item.quantity || 0) * (item.price || 0)).toLocaleString('vi-VN')}₫</td>
+        `;
+        tbody.appendChild(row);
+    });
 
+    // Lấy invoice section
+    const invoiceSection = document.getElementById('invoice');
+    
+    // Reset và thiết lập style tối ưu cho invoice
+    invoiceSection.className = 'invoice invoice-popup-optimized';
+    
+    // Xóa overlay và nút đóng cũ nếu có
+    const existingOverlay = document.querySelector('.invoice-overlay-optimized');
+    const existingCloseBtn = invoiceSection.querySelector('.close-invoice-btn-optimized');
+    if (existingOverlay) existingOverlay.remove();
+    if (existingCloseBtn) existingCloseBtn.remove();
 
+    // Tạo nút đóng mới
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-invoice-btn-optimized';
+    closeBtn.innerHTML = '<span class="close-icon">✕</span><span class="close-text">Đóng</span>';
+    invoiceSection.appendChild(closeBtn);
 
-      async function viewInvoicePdf(orderId) {
+    // Tạo và thêm overlay sau khi dữ liệu sẵn sàng
+    const overlay = document.createElement('div');
+    overlay.className = 'invoice-overlay-optimized';
+    document.body.appendChild(overlay);
+
+    // Hàm đóng invoice
+    const closeInvoice = () => {
+        invoiceSection.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        invoiceSection.style.opacity = '0';
+        overlay.style.opacity = '0';
+        
+        setTimeout(() => {
+            invoiceSection.style.display = 'none';
+            invoiceSection.className = 'invoice';
+            overlay.remove();
+        }, 300);
+    };
+
+    // Event listeners
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeInvoice();
+    });
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closeInvoice();
+        }
+    });
+
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+            closeInvoice();
+            document.removeEventListener('keydown', handleEsc);
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
+
+    // Hiển thị invoice ngay lập tức với hiệu ứng
+    invoiceSection.style.display = 'block';
+    invoiceSection.style.opacity = '0';
+    invoiceSection.style.transform = 'translate(-50%, -50%) scale(0.9)';
+    overlay.style.opacity = '1'; // Hiển thị overlay cùng lúc với invoice
+    
+    requestAnimationFrame(() => {
+        invoiceSection.style.opacity = '1';
+        invoiceSection.style.transform = 'translate(-50%, -50%) scale(1)';
+    });
+
+    // Auto close sau 15 giây
+    const autoCloseTimeout = setTimeout(() => {
+        closeInvoice();
+        document.removeEventListener('keydown', handleEsc);
+    }, 15000);
+
+    const cancelAutoClose = () => clearTimeout(autoCloseTimeout);
+    closeBtn.addEventListener('click', cancelAutoClose);
+    overlay.addEventListener('click', cancelAutoClose);
+    invoiceSection.addEventListener('mouseenter', cancelAutoClose);
+}
+
+// Thêm CSS vào document
+function addInvoiceOptimizedStyles() {
+    if (!document.querySelector('#invoice-optimized-styles')) {
+        const style = document.createElement('style');
+        style.id = 'invoice-optimized-styles';
+        style.textContent = invoiceOptimizedCSS; // Giả sử invoiceOptimizedCSS là biến chứa CSS
+        document.head.appendChild(style);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', addInvoiceOptimizedStyles);
+
+window.displayInvoice = displayInvoice;
+
+//==========================================//==========================================
+async function viewInvoicePdf(orderId) {
     try {
         // Gọi API để nhận link URL cố định
         const data = await apiFetch(`/payments/invoice/${orderId}/pdf`, { method: 'GET' });
@@ -1285,5 +1670,151 @@ showDeleteSuccessNotification();
     }
 }
 
+//==========================================phần tổng kết  só hóa đơn và doanh thu ===================================
+async function calculateDailySummary() {
+    // Lấy ngày hiện tại theo múi giờ UTC+7
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Đặt về đầu ngày
+    const todayEnd = new Date(today);
+    todayEnd.setHours(23, 59, 59, 999); // Đặt về cuối ngày
 
-//==================================================================================
+    console.log('Current Date Range:', {
+        today: today.toISOString(),
+        todayEnd: todayEnd.toISOString()
+    });
+
+    try {
+        // Lấy dữ liệu doanh thu và giao dịch
+        await refreshRevenue();
+        const response = await fetchAllTransactions();
+        const transactions = response.result?.content || [];
+        console.log('Transactions from fetchAllTransactions:', transactions);
+
+        // Lọc giao dịch trong ngày hiện tại
+        const dailyTransactions = transactions.filter(tx => {
+            try {
+                const txDate = tx.createdAt ? new Date(tx.createdAt) : null;
+                if (!txDate || isNaN(txDate)) {
+                    console.warn(`Invalid createdAt for orderId ${tx.orderId}:`, tx.createdAt);
+                    return false;
+                }
+                // Điều chỉnh múi giờ nếu cần (giả sử API trả về UTC)
+                const adjustedTxDate = new Date(txDate.getTime() - 7 * 60 * 60 * 1000); // Thêm 7 giờ cho UTC+7
+                return adjustedTxDate >= today && adjustedTxDate <= todayEnd;
+            } catch (e) {
+                console.error('Error parsing date for orderId', tx.orderId, e);
+                return false;
+            }
+        });
+        console.log('dailyTransactions:', dailyTransactions);
+
+        // Tính tổng số đơn
+        const totalOrders = dailyTransactions.length;
+        // Tính tổng doanh thu (sử dụng currentRevenueStats)
+        const totalRevenue = currentRevenueStats ? Number(currentRevenueStats.totalRevenue) || 0 : 0;
+
+        // Cập nhật giao diện
+        const totalOrdersElement = document.getElementById('totalOrders');
+        const totalRevenueElement = document.getElementById('totalRevenue');
+
+        if (totalOrdersElement) {
+            totalOrdersElement.innerHTML = `
+                <div class="card-title">Tổng Số Đơn</div>
+                <div class="card-value">${totalOrders || 0}</div>
+                <div class="card-icon"><i class="fas fa-receipt"></i></div>
+                <div class="card-subtitle">Hôm nay</div>
+            `;
+        } else {
+            console.error('totalOrders element not found');
+        }
+
+        if (totalRevenueElement) {
+            totalRevenueElement.innerHTML = `
+                <div class="card-title">Tổng Doanh Thu</div>
+                <div class="card-value">${totalRevenue.toLocaleString('vi-VN')} VNĐ</div>
+                <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="card-subtitle">Hôm nay</div>
+            `;
+        } else {
+            console.error('totalRevenue element not found');
+        }
+    } catch (error) {
+        console.error('Error in calculateDailySummary:', error);
+        const totalOrdersElement = document.getElementById('totalOrders');
+        const totalRevenueElement = document.getElementById('totalRevenue');
+
+        if (totalOrdersElement) {
+            totalOrdersElement.innerHTML = `
+                <div class="card-title">Tổng Số Đơn</div>
+                <div class="card-value">0</div>
+                <div class="card-icon"><i class="fas fa-receipt"></i></div>
+                <div class="card-subtitle">Hôm nay</div>
+            `;
+        }
+
+        if (totalRevenueElement) {
+            totalRevenueElement.innerHTML = `
+                <div class="card-title">Tổng Doanh Thu</div>
+                <div class="card-value">0 VNĐ</div>
+                <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="card-subtitle">Hôm nay</div>
+            `;
+        }
+    }
+}
+// thay đổi để push
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+    showSection('dashboard'); // Mặc định hiển thị Dashboard
+    await refreshRevenue(); // Cập nhật doanh thu trước
+    await calculateDailySummary(); // Sau đó tính summary
+});
+
+// Cập nhật DOMContentLoaded
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = getToken();
+    if (token) {
+        const payload = parseJwt(token);
+        if (payload && payload.sub) {
+            document.getElementById('cashier-name').textContent = `👤 Cashier: ${payload.sub}`;
+        }
+    }
+    
+    // Thêm CSS (đã có)
+    const style = document.createElement('style');
+    style.textContent = `/* CSS của bạn, bao gồm thông báo */`;
+    document.head.appendChild(style);
+    
+    // Kiểm tra lịch và trạng thái check-in
+    await loadWorkSchedule(); // Đảm bảo load ca làm việc
+    await checkWorkShiftLog(); // Cập nhật currentShiftLog
+    showSection('dashboard'); // Mặc định hiển thị Dashboard
+});
+
+// Hàm mới để lấy tất cả giao dịch trong ngày mà không lọc theo status
+async function fetchAllTransactions() {
+    try {
+        const params = new URLSearchParams();
+        params.append('period', 'today');
+        params.append('page', 0);
+        params.append('size', 2000); // Lấy tối đa 1000 giao dịch, điều chỉnh nếu cần
+        params.append('orderBy', 'createdAt');
+        params.append('sort', 'ASC');
+        console.log('API request params for fetchAllTransactions:', params.toString());
+
+        const data = await apiFetch(`${API_BASE_URL}/payments/list?${params.toString()}`);
+        console.log('API response from fetchAllTransactions:', data);
+
+        return data || { result: { content: [] } }; // Trả về mảng rỗng nếu không có dữ liệu
+    } catch (error) {
+        console.error('Error in fetchAllTransactions:', error);
+        return { result: { content: [] } }; // Trả về mảng rỗng nếu có lỗi
+    }
+}
+
+
+
+
+
+
