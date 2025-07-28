@@ -41,7 +41,8 @@ let currentOrderData = null;
         // Function to format date
         function formatDateTime(dateString) {
             try {
-                const date = new Date(dateString);
+                const corrected = dateString.replace(/Z$/, '');
+                const date = new Date(corrected);
                 return date.toLocaleString('vi-VN', {
                     year: 'numeric',
                     month: '2-digit',
@@ -53,6 +54,7 @@ let currentOrderData = null;
                 return dateString;
             }
         }
+
 
         // Function to get status display text and class
         function getStatusInfo(status) {

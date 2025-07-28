@@ -254,6 +254,7 @@
                 transform: translateY(-50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -433,11 +434,17 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .success-message, .error-message {
+        .success-message,
+        .error-message {
             padding: 1rem;
             border-radius: 10px;
             margin-bottom: 1rem;
@@ -698,12 +705,12 @@
                 width: 300px;
                 height: 400px;
             }
-            
+
             .chat-widget {
                 bottom: 15px;
                 right: 15px;
             }
-            
+
             .payment-popup {
                 margin: 0.5rem;
                 max-width: calc(100% - 1rem);
@@ -718,14 +725,14 @@
             .restaurant-details h5 {
                 font-size: 1.1rem;
             }
-            
+
             .chat-popup {
                 width: calc(100vw - 30px);
                 height: 70vh;
                 bottom: 90px;
                 right: -10px;
             }
-            
+
             .payment-buttons {
                 flex-direction: column;
             }
@@ -825,7 +832,7 @@
             <i class="fas fa-comments"></i>
             <span class="notification-badge" id="chatNotification">0</span>
         </button>
-        
+
         <div class="chat-popup" id="chatPopup">
             <div class="chat-header">
                 <h6>
@@ -836,20 +843,19 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="connection-status" id="connectionStatus">
                 <i class="fas fa-wifi me-1"></i>
                 Đang kết nối...
             </div>
-            
+
             <div class="chat-messages" id="chatMessages">
                 <!-- Messages will be populated here -->
             </div>
 
-            
+
             <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." 
-                       onkeypress="handleKeyPress(event)">
+                <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." onkeypress="handleKeyPress(event)">
                 <button class="chat-send" onclick="sendMessage()" id="sendButton">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -865,11 +871,36 @@
     <script>
         // Khởi tạo dữ liệu từ localStorage
         function initializeData() {
+            handleTableNumberRedirect();
             const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
             document.getElementById('tableNumber').textContent = String(tableNumber);
             const customerName = localStorage.getItem('customerName') || 'Khách hàng';
             document.getElementById('customerName').textContent = customerName;
         }
+        function handleTableNumberRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let tableNumber = urlParams.get('tableNumber');
+
+            // Nếu không có trên URL, nhưng có trong localStorage
+            if (!tableNumber) {
+                tableNumber = localStorage.getItem("tableNumber");
+
+                if (tableNumber) {
+                    // Thêm tableNumber vào URL và redirect
+                    urlParams.set('tableNumber', tableNumber);
+                    const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+                    window.location.replace(newUrl);
+                } else {
+                    // Không có cả URL và localStorage => xử lý lỗi
+                    alert("Không tìm thấy số bàn (tableNumber)!");
+                }
+            } else {
+                // Có trên URL => lưu vào localStorage để tái sử dụng
+                localStorage.setItem("tableNumber", tableNumber);
+            }
+        }
+
+    
 
         // Chuyển đến trang menu
         function goToMenu() {
@@ -891,9 +922,7 @@
         // Gọi thanh toán
         function callPayment() {
             const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
-            // const sessionData = JSON.parse(localStorage.getItem('qrSession'));
-            // const orderId = sessionData.orderId;
-            // console.log('Calling payment for table:', tableNumber, 'Order ID:', orderId);
+
             window.location.href = `payment.html?tableNumber=${tableNumber}`;
         }
 
@@ -901,7 +930,7 @@
         function toggleChat() {
             const popup = document.getElementById('chatPopup');
             const isVisible = popup.style.display === 'flex';
-            
+
             if (isVisible) {
                 popup.style.display = 'none';
             } else {
@@ -922,7 +951,7 @@
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
-            
+
             if (message && window.chatManager) {
                 window.chatManager.sendMessage(message);
                 input.value = '';
@@ -938,7 +967,7 @@
         // Khởi tạo khi trang load
         document.addEventListener('DOMContentLoaded', function () {
             initializeData();
-            
+
             // Initialize chat
             const tableNumber = new URLSearchParams(window.location.search).get('tableNumber');
             if (tableNumber && window.ChatManager) {

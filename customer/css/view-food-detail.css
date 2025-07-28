@@ -70,7 +70,7 @@ body {
 /* Food Image */
 .food-image-container {
     position: relative;
-    height: 300px;
+    height: auto;
     overflow: hidden;
     background: var(--light-gray);
 }

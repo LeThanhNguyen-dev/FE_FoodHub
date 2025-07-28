@@ -10,6 +10,7 @@
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="css/order-style.css" rel="stylesheet">
+  
 </head>
 
 <body>
@@ -56,7 +57,9 @@
                 Sắp xếp theo
               </label>
               <select class="form-select" id="sortByOrderFilter" onchange="applyOrderFilters()">
+                <option value="updatedOrCreatedAt">Mặc định</option>
                 <option value="createdAt">Thời gian tạo</option>
+                <option value="updatedAt">Thời Cập nhật</option>
                 <option value="totalAmount">Tổng tiền</option>
                 <option value="id">Mã đơn hàng</option>
                 <option value="status">Trạng thái</option>
@@ -86,21 +89,21 @@
                     <i class="fas fa-plus me-1"></i>
                     Nhận đơn mới
                   </button>
-                  <button class="btn btn-outline-success" onclick="refreshOrders()">
-                    <i class="fas fa-sync-alt me-1"></i>
-                    Làm mới
+                  <button class="btn btn-primary" onclick="applyOrderFilters()">
+                    <i class="fas fa-search me-1"></i>
+                    Áp dụng
                   </button>
                 </div>
 
                 <!-- Filter Buttons -->
                 <div class="d-flex gap-2">
+                  <button class="btn btn-outline-success" onclick="refreshOrders()">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Làm mới
+                  </button>
                   <button class="btn btn-outline-secondary" onclick="clearFilters()">
                     <i class="fas fa-times me-1"></i>
                     Xóa bộ lọc
-                  </button>
-                  <button class="btn btn-primary" onclick="applyOrderFilters()">
-                    <i class="fas fa-search me-1"></i>
-                    Áp dụng
                   </button>
                 </div>
               </div>
@@ -150,22 +153,46 @@
       </div>
 
       <!-- Enhanced Pagination -->
-      <div class="pagination-container mt-3">
+      <div class="order-pagination-wrapper mt-3">
+        <!-- Pagination Info -->
+        <div class="order-pagination-info">
+          Hiển thị 1 - 20 của 44 món ăn
+        </div>
+
+        <!-- Pagination Controls -->
         <div class="d-flex justify-content-center">
-          <div class="pagination-controls">
+          <div class="order-pagination-controls">
             <nav aria-label="Phân trang đơn hàng">
-              <ul class="pagination mb-0" id="paginationList">
-                <!-- Pagination buttons will be generated here -->
+              <ul class="order-pagination mb-0" id="orderPaginationList">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">‹</span>
+                  </a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">›</span>
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>
         </div>
 
         <!-- Quick Jump (only show when total pages > 10) -->
-        <div class="pagination-jump mt-2" id="paginationJump" style="display: none;">
-          <div class="d-flex justify-content-center align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-primary" onclick="jumpToOrderPage()">
-              <i class="fas fa-arrow-right"></i>
+        <div class="order-pagination-jump mt-2" id="orderPaginationJump">
+          <div class="jump-controls">
+            <button class="jump-btn" onclick="jumpToOrderPage()">
+              <i class="fas fa-arrow-right"></i> Chuyển trang
             </button>
           </div>
         </div>
@@ -376,9 +403,9 @@
             <label for="newStatus"><strong>Trạng thái mới:</strong></label>
             <select id="newStatus" class="form-control">
               <option value="">-- Chọn trạng thái --</option>
-              <option value="PENDING">Chờ xác nhận</option>
+              <!-- <option value="PENDING">Chờ xác nhận</option> -->
               <option value="CONFIRMED">Đã xác nhận</option>
-              <option value="COMPLETED">Hoàn thành</option>
+              <!-- <option value="COMPLETED">Hoàn thành</option> -->
               <option value="CANCELLED">Đã hủy</option>
             </select>
           </div>
