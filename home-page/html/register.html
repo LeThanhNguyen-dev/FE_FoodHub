@@ -1,1093 +1,717 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodHub - Register</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #0F172B;
-            --secondary-color: #1E293B;
-            --accent-color: #FEA116;
-            --accent-hover: #E6910E;
-            --accent-light: #FFF7E6;
-            --success-color: #48bb78;
-            --warning-color: #ed8936;
-            --danger-color: #f56565;
-            --light-bg: #f7fafc;
-            --white: #ffffff;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --border-radius: 12px;
-            --border-radius-lg: 16px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--light-bg) 0%, var(--accent-light) 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-            color: var(--gray-700);
-            overflow-x: hidden;
-        }
-
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            min-height: calc(100vh - 40px);
-        }
-
-        .brand-section {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-        }
-
-        .brand-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(254, 161, 22, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-        }
-
-        .logo-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-color);
-            font-size: 24px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .logo-text {
-            font-family: 'Pacifico', cursive;
-            font-size: 80px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 0;
-        }
-
-        .brand-content h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 24px;
-            line-height: 1.2;
-        }
-
-        .brand-content p {
-            font-size: 18px;
-            color: var(--gray-600);
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        .features-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .features-list li {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: var(--gray-600);
-        }
-
-        .features-list .icon {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .register-section {
-            background: var(--white);
-            padding: 48px;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-xl);
-            position: relative;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .register-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-        }
-
-        .section-title {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--primary-color);
-            font-size: 32px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 12px;
-            line-height: 1.2;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            color: var(--gray-500);
-            font-size: 16px;
-            margin-bottom: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--gray-700);
-            font-size: 14px;
-            letter-spacing: 0.025em;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 16px 20px;
-            padding-left: 50px;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            background-color: var(--gray-50);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background-color: var(--white);
-            box-shadow: 0 0 0 4px rgba(254, 161, 22, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .form-control.is-invalid {
-            border-color: var(--danger-color);
-            background-color: #fef2f2;
-        }
-
-        .form-control.is-valid {
-            border-color: var(--success-color);
-            background-color: #f0fff4;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-            font-size: 18px;
-            pointer-events: none;
-            transition: color 0.3s ease;
-        }
-
-        .form-control:focus + .input-icon {
-            color: var(--accent-color);
-        }
-
-        .invalid-feedback,
-        .valid-feedback {
-            display: none;
-            width: 100%;
-            margin-top: 8px;
-            font-size: 14px;
-            padding-left: 4px;
-        }
-
-        .invalid-feedback {
-            color: var(--danger-color);
-        }
-
-        .valid-feedback {
-            color: var(--success-color);
-        }
-
-        .btn-register {
-            width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--accent-color);
-            border: 2px solid transparent;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-register:hover {
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            color: var(--white);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--accent-color);
-        }
-
-        .btn-register:active {
-            transform: translateY(0);
-        }
-
-        .btn-register:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-register::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-register:hover::after {
-            left: 100%;
-        }
-
-        .btn-link {
-            background: none;
-            border: none;
-            color: var(--accent-color);
-            text-decoration: none;
-            padding: 8px 0;
-            font-size: 14px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-            margin-top: 16px;
-            display: block;
-            text-align: center;
-        }
-
-        .btn-link:hover {
-            color: var(--accent-hover);
-            text-decoration: underline;
-        }
-
-        .alert {
-            padding: 16px 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 24px;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            position: relative;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background-color: var(--accent-light);
-            color: var(--accent-hover);
-            border-left: 4px solid var(--accent-color);
-        }
-
-        .alert-danger {
-            background-color: #fef2f2;
-            color: #c53030;
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .alert-warning {
-            background-color: #fffbeb;
-            color: #c05621;
-            border-left: 4px solid var(--warning-color);
-        }
-
-        .progress-steps {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 32px;
-            gap: 12px;
-        }
-
-        .step {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: var(--gray-200);
-            transition: all 0.3s ease;
-        }
-
-        .step.active {
-            background-color: var(--accent-color);
-            transform: scale(1.2);
-        }
-
-        .step.completed {
-            background-color: var(--accent-color);
-        }
-
-        .otp-timer {
-            text-align: center;
-            margin-top: 16px;
-            padding: 12px;
-            background-color: var(--gray-50);
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            color: var(--gray-600);
-            border: 1px solid var(--gray-200);
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .d-none {
-            display: none !important;
-        }
-
-        .d-block {
-            display: block !important;
-        }
-
-        /* Autocomplete Styles */
-        .autocomplete-suggestion {
-            padding: 12px 16px;
-            font-size: 14px;
-            color: var(--gray-700);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .autocomplete-suggestion:hover {
-            background-color: var(--gray-50);
-        }
-
-        .autocomplete-suggestion.active {
-            background-color: var(--accent-light);
-            color: var(--accent-color);
-        }
-
-        .autocomplete-suggestion .icon {
-            color: var(--accent-color);
-            font-size: 16px;
-        }
-
-        #address-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            z-index: 1000;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 4px;
-            display: none;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .main-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                max-width: 600px;
-            }
-
-            .brand-section {
-                text-align: center;
-                padding: 20px;
-            }
-
-            .brand-content h1 {
-                font-size: 32px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .register-section {
-                padding: 32px 24px;
-            }
-
-            .section-title {
-                font-size: 26px;
-            }
-
-            .brand-content h1 {
-                font-size: 28px;
-            }
-
-            .logo-text {
-                font-size: 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .register-section {
-                padding: 24px 20px;
-            }
-
-            .form-control {
-                padding: 14px 18px;
-                padding-left: 45px;
-                font-size: 16px;
-            }
-
-            .btn-register {
-                padding: 14px 20px;
-            }
-        }
-
-        /* Animation for form transitions */
-        .form-transition {
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý tài khoản</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #FEA116;
+    }
+
+    /* Thanh bên */
+    .sidebar {
+      background-color: #0F172B;
+      border-right: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      color: #ffffff;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .sidebar-link:hover {
+      background-color: #FEA116;
+      color: #334155;
+    }
+
+    .sidebar-link.active {
+      background-color: #FEA116;
+      color: white;
+    }
+
+    .sidebar-link.active:hover {
+      background-color: #FEA116;
+    }
+
+    .sidebar-link i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Nội dung chính */
+    .main-content {
+      background-color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    .content-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Thành phần biểu mẫu */
+    .form-label {
+      display: block;
+      color: #374151;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      color: #1f2937;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input:disabled {
+      background-color: #f9fafb;
+      color: #6b7280;
+    }
+
+    /* Nút */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    /* Thông báo */
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border: 1px solid;
+    }
+
+    .message-success {
+      background-color: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .message-error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    /* Tiêu đề phần */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h2 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .section-header h3 {
+      color: #374151;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-header i {
+      margin-right: 12px;
+      color: #3b82f6;
+    }
+
+    /* Nhóm biểu mẫu */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    /* Bố cục lưới */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    /* Phản hồi */
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .content-card {
+        margin: 16px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
+    /* Trạng thái tải */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Ô nhập có biểu tượng */
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .input-with-icon .form-input {
+      padding-left: 40px;
+    }
+
+    /* Chỉ báo độ mạnh mật khẩu */
+    .password-strength {
+      margin-top: 8px;
+    }
+
+    .strength-bar {
+      width: 100%;
+      height: 4px;
+      background-color: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .strength-text {
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+  </style>
 </head>
 
-<body>
-    <div class="main-container">
-        <!-- Phần thương hiệu -->
-        <div class="brand-section">
-            <div class="logo">
-                <h2 class="logo-text">FoodHub</h2>
-            </div>
-            <div class="brand-content">
-                <h1>FoodHub – Nhà hàng ẩm thực hiện đại & tinh tế</h1>
-                <p>Khám phá những món ngon đặc sắc, phục vụ trong không gian ấm cúng và đậm chất riêng.</p>
-                <ul class="features-list">
-                    <li>
-                        <span class="icon"><i class="bi bi-check"></i></span>
-                        Giao hàng nhanh chóng
-                    </li>
-                    <li>
-                        <span class="icon"><i class="bi bi-check"></i></span>
-                        Hỗ trợ khách hàng 24/7
-                    </li>
-                </ul>
-            </div>
-        </div>
+<body class="flex">
+  <!-- Nút menu di động -->
+  <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
+    <i class="fas fa-bars text-gray-600"></i>
+  </button>
 
-        <!-- Form đăng ký -->
-        <div class="register-section">
-            <div class="progress-steps">
-                <div class="step active" id="step-1"></div>
-                <div class="step" id="step-2"></div>
-            </div>
-
-            <h2 class="section-title" id="form-title">Tạo tài khoản mới</h2>
-            <p class="section-subtitle" id="form-subtitle">Vui lòng nhập đầy đủ thông tin để bắt đầu</p>
-            
-            <div id="alert-message"></div>
-
-            <form id="register-form" class="d-block form-transition" novalidate>
-                <div class="form-group">
-                    <label for="username" class="form-label">Họ và tên</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-control" id="username" name="username"
-                            placeholder="Nhập tên đăng nhập" required minlength="5" maxlength="255">
-                        <i class="bi bi-person input-icon"></i>
-                    </div>
-                    <div class="invalid-feedback">Tên đăng nhập phải từ 5 đến 255 ký tự.</div>
-                    <div class="valid-feedback">Tên đăng nhập hợp lệ!</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password" class="form-label">Mật khẩu</label>
-                    <div class="input-wrapper">
-                        <input type="password" class="form-control" id="password" name="password"
-                            placeholder="Nhập mật khẩu" required minlength="8" maxlength="255">
-                        <i class="bi bi-lock input-icon"></i>
-                    </div>
-                    <div class="invalid-feedback">Mật khẩu phải từ 8 ký tự trở lên.</div>
-                    <div class="valid-feedback">Mật khẩu đủ mạnh!</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="email" class="form-label">Địa chỉ Email</label>
-                    <div class="input-wrapper">
-                        <input type="email" class="form-control" id="email" name="email"
-                            placeholder="Nhập địa chỉ email" required maxlength="255">
-                        <i class="bi bi-envelope input-icon"></i>
-                    </div>
-                    <div class="invalid-feedback">Vui lòng nhập địa chỉ email hợp lệ.</div>
-                    <div class="valid-feedback">Email hợp lệ!</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone" class="form-label">Số điện thoại</label>
-                    <div class="input-wrapper">
-                        <input type="tel" class="form-control" id="phone" name="phone"
-                            placeholder="Nhập số điện thoại (10 chữ số)" required pattern="[0-9]{10}">
-                        <i class="bi bi-telephone input-icon"></i>
-                    </div>
-                    <div class="invalid-feedback">Số điện thoại phải đủ 10 chữ số.</div>
-                    <div class="valid-feedback">Số điện thoại hợp lệ!</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="address" class="form-label">Địa chỉ</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-control" id="address" name="address" 
-                            placeholder="Nhập địa chỉ (ví dụ: Đường Láng, Hà Nội)" required maxlength="255">
-                        <i class="bi bi-geo-alt input-icon"></i>
-                    </div>
-                    <div id="address-suggestions"></div>
-                    <div class="invalid-feedback">Vui lòng nhập địa chỉ hợp lệ.</div>
-                    <div class="valid-feedback">Địa chỉ hợp lệ!</div>
-                </div>
-
-                <input type="hidden" id="roleName" name="roleName" value="CUSTOMER">
-
-                <button type="submit" class="btn btn-register" id="register-btn">
-                    <span class="btn-text">Gửi mã xác thực</span>
-                </button>
-            </form>
-
-            <form id="otp-form" class="d-none form-transition" novalidate>
-                <div class="form-group">
-                    <label for="otp" class="form-label">Mã xác thực</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-control" id="otp" name="otp" 
-                            placeholder="Nhập mã xác thực gồm 6 chữ số" required minlength="6" maxlength="6"
-                            style="text-align: center; font-size: 20px; font-weight: 600; letter-spacing: 4px;">
-                        <i class="bi bi-shield-check input-icon"></i>
-                    </div>
-                    <div class="invalid-feedback">Mã OTP phải gồm 6 chữ số.</div>
-                    <div class="valid-feedback">Định dạng OTP hợp lệ!</div>
-                </div>
-
-                <button type="submit" class="btn btn-register" id="verify-btn">
-                    <span class="btn-text">Xác nhận & Tạo tài khoản</span>
-                </button>
-                
-                <button type="button" class="btn btn-link" onclick="resendOtp()">
-                    <i class="bi bi-arrow-clockwise"></i> Gửi lại mã xác thực
-                </button>
-
-                <div id="otp-timer" class="otp-timer"></div>
-            </form>
-        </div>
+  <!-- Thanh bên -->
+  <aside class="sidebar w-80 flex flex-col justify-between">
+    <div>
+      <div class="sidebar-header p-6">
+        <h2 class="text-xl font-semibold">Quản lý tài khoản</h2>
+        <p id="username-greeting" class="text-sm mt-1">Chào mừng trở lại!</p>
+      </div>
+      <nav class="mt-2 px-3">
+        <a href="profile.html" id="profile-link" class="sidebar-link active">
+          <i class="fas fa-user"></i> Chỉnh Sửa Hồ Sơ
+        </a>
+        <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
+          <i class="fas fa-truck"></i> Theo Dõi Đơn Hàng
+        </a>
+        <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
+          <i class="fas fa-history"></i> Lịch Sử Đơn Hàng
+        </a>
+        <a href="home.html" id="home-link" class="sidebar-link">
+          <i class="fas fa-home"></i> Trở Về Trang Chủ
+        </a>
+      </nav>
     </div>
+    <div class="p-6">
+      <button id="logout-button" class="w-full btn btn-danger">
+        <i class="fas fa-sign-out-alt mr-2"></i> Đăng Xuất
+      </button>
+    </div>
+  </aside>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const API_BASE_URL = 'http://localhost:8080';
-        let otpTimer;
+  <!-- Nội dung chính -->
+  <main class="main-content flex-1 p-6 overflow-auto">
+    <div class="max-w-6xl mx-auto">
+      <!-- Phần hồ sơ -->
+      <div class="content-card p-6">
+        <div class="section-header">
+          <h2><i class="fas fa-user-edit"></i>Chỉnh Sửa Hồ Sơ</h2>
+        </div>
 
-        // API Fetch Utility
-        async function apiFetch(url, options = {}) {
-            const response = await fetch(`${API_BASE_URL}${url}`, {
-                ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return await response.json();
-        }
+        <!-- Thông báo -->
+        <div id="error-message" class="hidden message message-error"></div>
+        <div id="success-message" class="hidden message message-success"></div>
+        <div id="password-error-message" class="hidden message message-error"></div>
+        <div id="password-success-message" class="hidden message message-success"></div>
 
-        // Address Autocomplete
-        function setupAddressAutocomplete() {
-            const addressInput = document.getElementById('address');
-            const suggestionsContainer = document.getElementById('address-suggestions');
-            let debounceTimeout;
-
-            addressInput.addEventListener('input', () => {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(async () => {
-                    const input = addressInput.value.trim();
-                    if (input.length < 3) {
-                        suggestionsContainer.style.display = 'none';
-                        return;
-                    }
-
-                    try {
-                        const response = await apiFetch(`/api/goong/autocomplete?input=${encodeURIComponent(input)}`, {
-                            method: 'GET'
-                        });
-                        suggestionsContainer.innerHTML = '';
-                        if (response.predictions && response.predictions.length > 0) {
-                            response.predictions.forEach(prediction => {
-                                const suggestion = document.createElement('div');
-                                suggestion.className = 'autocomplete-suggestion';
-                                suggestion.innerHTML = `<i class="bi bi-geo-alt icon"></i> ${prediction.description}`;
-                                suggestion.addEventListener('click', () => {
-                                    addressInput.value = prediction.description;
-                                    suggestionsContainer.style.display = 'none';
-                                    validateField(addressInput);
-                                });
-                                suggestionsContainer.appendChild(suggestion);
-                            });
-                            suggestionsContainer.style.display = 'block';
-                        } else {
-                            suggestionsContainer.style.display = 'none';
-                        }
-                    } catch (error) {
-                        console.error('Lỗi khi lấy gợi ý địa chỉ:', error);
-                        showNotification('danger', 'Không thể tải gợi ý địa chỉ. Vui lòng nhập thủ công.');
-                        suggestionsContainer.style.display = 'none';
-                    }
-                }, 300);
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!addressInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-                    suggestionsContainer.style.display = 'none';
-                }
-            });
-        }
-
-        // Real-time validation
-        document.querySelectorAll('.form-control').forEach(input => {
-            input.addEventListener('input', function() {
-                validateField(this);
-            });
+        <div class="form-grid">
+          <!-- Thông tin hồ sơ -->
+          <div>
+            <div class="section-header">
+              <h3><i class="fas fa-user"></i>Thông Tin Hồ Sơ</h3>
+            </div>
             
-            input.addEventListener('blur', function() {
-                validateField(this);
-            });
-        });
+            <div class="form-group">
+              <label for="username" class="form-label">Tên Người Dùng</label>
+              <input type="text" id="username" class="form-input" readonly>
+            </div>
 
-        function validateField(field) {
-            const formGroup = field.closest('.form-group');
-            const validFeedback = formGroup.querySelector('.valid-feedback');
-            const invalidFeedback = formGroup.querySelector('.invalid-feedback');
-            const value = field.value.trim();
+            <div class="form-group">
+              <label for="email" class="form-label">Địa Chỉ Email</label>
+              <input type="email" id="email" class="form-input" placeholder="Nhập địa chỉ email của bạn">
+            </div>
 
-            // Reset class & hide feedback
-            field.classList.remove('is-valid', 'is-invalid');
-            validFeedback.style.display = 'none';
-            invalidFeedback.style.display = 'none';
+            <div class="form-group">
+              <label for="phone" class="form-label">Số Điện Thoại</label>
+              <input type="tel" id="phone" class="form-input" placeholder="Nhập số điện thoại của bạn">
+            </div>
 
-            // If empty, show no feedback
-            if (value === '') {
-                return;
-            }
+            <div class="form-group">
+              <label for="address" class="form-label">Địa Chỉ</label>
+              <input type="text" id="address" class="form-input" placeholder="Nhập địa chỉ của bạn">
+            </div>
 
-            // If valid
-            if (field.checkValidity()) {
-                field.classList.add('is-valid');
-                validFeedback.style.display = 'block';
-            } else {
-                field.classList.add('is-invalid');
-                invalidFeedback.style.display = 'block';
-            }
-        }
+            <button id="save-button" class="btn btn-primary w-full">
+              <i class="fas fa-save mr-2"></i> Lưu Thay Đổi
+            </button>
+          </div>
 
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const submitBtn = document.getElementById('register-btn');
+          <!-- Đổi mật khẩu -->
+          <div>
+            <div class="section-header">
+              <h3><i class="fas fa-lock"></i>Đổi Mật Khẩu</h3>
+            </div>
             
-            // Validate all fields
-            let isFormValid = true;
-            form.querySelectorAll('.form-control').forEach(field => {
-                validateField(field);
-                if (!field.checkValidity()) {
-                    isFormValid = false;
-                }
-            });
+            <div class="form-group">
+              <label for="old-password" class="form-label">Mật Khẩu Hiện Tại</label>
+              <input type="password" id="old-password" class="form-input" placeholder="Nhập mật khẩu hiện tại">
+            </div>
 
-            if (!isFormValid) return;
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<div class="loading-spinner"></div><span class="btn-text">Sending OTP...</span>';
-
-            const formData = new FormData(form);
-            const data = {
-                username: formData.get('username'),
-                password: formData.get('password'),
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                address: formData.get('address'),
-                roleName: formData.get('roleName')
-            };
-
-            try {
-                const response = await apiFetch('/auth/send-otp', {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-
-                showNotification('success', response.message || 'Verification code sent to your email!');
-                
-                // Update progress
-                document.getElementById('step-1').classList.add('completed');
-                document.getElementById('step-1').classList.remove('active');
-                document.getElementById('step-2').classList.add('active');
-                
-                // Switch forms
-                form.classList.add('d-none');
-                document.getElementById('otp-form').classList.remove('d-none');
-                document.getElementById('form-title').textContent = 'Verify Your Email';
-                document.getElementById('form-subtitle').textContent = 'Enter the 6-digit code sent to your email';
-                
-                startOtpTimer();
-                
-                // Focus on OTP input
-                setTimeout(() => {
-                    document.getElementById('otp').focus();
-                }, 300);
-                
-            } catch (error) {
-                const errorMessage =
-                    error.message.includes('USER_EXISTED') ? 'Username already exists. Please choose a different one.' :
-                    error.message.includes('EMAIL_EXISTS') ? 'Email already exists. Please use a different email.' :
-                    error.message.includes('INVALID_ROLE') ? 'Invalid role selected.' :
-                    error.message || 'Something went wrong. Please try again.';
-                showNotification('danger', errorMessage);
-            } finally {
-                // Reset button state
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span class="btn-text">Send OTP Code</span>';
-            }
-        });
-
-        document.getElementById('otp-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const submitBtn = document.getElementById('verify-btn');
-            
-            validateField(document.getElementById('otp'));
-            if (!form.checkValidity()) return;
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<div class="loading-spinner"></div><span class="btn-text">Verifying...</span>';
-
-            const formData = new FormData(form);
-            const data = {
-                email: document.getElementById('email').value,
-                otp: formData.get('otp')
-            };
-
-            try {
-                const response = await apiFetch('/auth/verify-otp', {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-
-                // Update progress
-                document.getElementById('step-2').classList.add('completed');
-                
-                showNotification('success', 'Account created successfully! Redirecting to login...');
-                
-                // Clear timer
-                if (otpTimer) clearInterval(otpTimer);
-                
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
-                
-            } catch (error) {
-                const errorMessage =
-                    error.message.includes('INVALID_OTP') ? 'Invalid verification code. Please check and try again.' :
-                    error.message.includes('OTP_EXPIRED') ? 'Verification code has expired. Please request a new one.' :
-                    error.message.includes('OTP_NOT_FOUND') ? 'Verification code not found. Please request a new one.' :
-                    error.message || 'Verification failed. Please try again.';
-                showNotification('danger', errorMessage);
-            } finally {
-                // Reset button state
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span class="btn-text">Verify & Create Account</span>';
-            }
-        });
-
-        async function resendOtp() {
-            const email = document.getElementById('email').value;
-            const resendBtn = event.target;
-            
-            resendBtn.disabled = true;
-            resendBtn.innerHTML = '<div class="loading-spinner"></div> Sending...';
-            
-            try {
-                const response = await apiFetch('/auth/send-otp', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        email,
-                        username: document.getElementById('username').value,
-                        password: document.getElementById('password').value,
-                        phone: document.getElementById('phone').value,
-                        address: document.getElementById('address').value,
-                        roleName: document.getElementById('roleName').value
-                    })
-                });
-                
-                showNotification('success', 'New verification code sent to your email!');
-                startOtpTimer();
-                
-            } catch (error) {
-                showNotification('danger', 'Failed to resend verification code. Please try again.');
-            } finally {
-                resendBtn.disabled = false;
-                resendBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Resend verification code';
-            }
-        }
-
-        function startOtpTimer() {
-            if (otpTimer) clearInterval(otpTimer);
-            
-            let timeLeft = 300; // 5 minutes
-            const timerDisplay = document.getElementById('otp-timer');
-            
-            const updateTimer = () => {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerDisplay.innerHTML = `
-                    <i class="bi bi-clock"></i> 
-                    Code expires in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}
-                `;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(otpTimer);
-                    timerDisplay.innerHTML = `
-                        <i class="bi bi-exclamation-triangle text-warning"></i> 
-                        Code expired. Please request a new one.
-                    `;
-                    timerDisplay.style.borderColor = 'var(--warning-color)';
-                    timerDisplay.style.backgroundColor = '#fffbeb';
-                    return;
-                }
-                
-                timeLeft--;
-            };
-            
-            updateTimer();
-            otpTimer = setInterval(updateTimer, 1000);
-        }
-
-        function showNotification(type, message) {
-            const alertMessage = document.getElementById('alert-message');
-            const iconMap = {
-                success: 'bi-check-circle-fill',
-                danger: 'bi-exclamation-triangle-fill',
-                warning: 'bi-info-circle-fill'
-            };
-            
-            alertMessage.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    <i class="${iconMap[type]} me-2"></i>
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="form-group">
+              <label for="new-password" class="form-label">Mật Khẩu Mới</label>
+              <input type="password" id="new-password" class="form-input" placeholder="Nhập mật khẩu mới">
+              <div id="password-strength-container" class="password-strength hidden">
+                <div class="strength-bar">
+                  <div id="strength-fill" class="strength-fill"></div>
                 </div>
-            `;
-            
-            // Auto dismiss after 5 seconds
-            setTimeout(() => {
-                const alert = alertMessage.querySelector('.alert');
-                if (alert) {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                }
-            }, 5000);
-            
-            // Scroll to top to show notification
-            alertMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+                <div id="strength-text" class="strength-text"></div>
+              </div>
+            </div>
 
-        // Format phone number input
-        document.getElementById('phone').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 10) {
-                value = value.slice(0, 10);
-            }
-            e.target.value = value;
+            <button id="change-password-button" class="btn btn-primary w-full">
+              <i class="fas fa-key mr-2"></i> Đổi Mật Khẩu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080';
+
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error("Mã thông báo không hợp lệ:", e);
+        return null;
+      }
+    }
+
+    function isLoggedIn() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return false;
+      const payload = parseJwt(token);
+      return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
+    }
+
+    function getHomePageByRole(scope) {
+      // Lấy vai trò từ scope (giá trị đầu tiên bắt đầu bằng ROLE_)
+      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+
+      switch (role) {
+        case 'ROLE_WAITER':
+          return '../../waiter/index.html';
+        case 'ROLE_CHEF':
+          return '../../chef/index.html';
+        case 'ROLE_CASHIER':
+          return '../../cashier/index.html';
+        case 'ROLE_ADMIN':
+          return '../../adminDashboard/adminDashboard.html';
+        case 'ROLE_CUSTOMER':
+        default:
+          return 'home.html';
+      }
+    }
+
+    function updateSidebarByRole(scope) {
+      const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
+      // Lấy vai trò từ scope (giá trị đầu tiên bắt đầu bằng ROLE_)
+      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
+      const isStaff = staffRoles.includes(role);
+
+      const workScheduleLink = document.getElementById('work-schedule-link');
+      const attendanceLink = document.getElementById('attendance-link');
+      const orderTrackLink = document.getElementById('order-track-link');
+      const orderHistoryLink = document.getElementById('order-history-link');
+      const homeLink = document.getElementById('home-link');
+
+      // Cập nhật href cho liên kết trang chủ dựa trên vai trò
+      homeLink.href = getHomePageByRole(scope);
+
+      if (isStaff) {
+        workScheduleLink.classList.remove('hidden');
+        attendanceLink.classList.remove('hidden');
+        orderTrackLink.classList.add('hidden');
+        orderHistoryLink.classList.add('hidden');
+      } else if (role === 'ROLE_CUSTOMER') {
+        workScheduleLink.classList.add('hidden');
+        attendanceLink.classList.add('hidden');
+        orderTrackLink.classList.remove('hidden');
+        orderHistoryLink.classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('cart');
+      window.location.href = 'login.html';
+    }
+
+    function showError(message, section = 'profile') {
+      const errorDiv = document.getElementById(section === 'password' ? 'password-error-message' : 'error-message');
+      errorDiv.textContent = message;
+      document.getElementById(section === 'password' ? 'password-success-message' : 'success-message').classList.add('hidden');
+    }
+
+    function showSuccess(message, section = 'profile') {
+      const successDiv = document.getElementById(section === 'password' ? 'password-success-message' : 'success-message');
+      successDiv.textContent = message;
+      document.getElementById(section === 'password' ? 'password-error-message' : 'error-message').classList.add('hidden');
+    }
+
+    async function fetchUserInfo() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const payload = parseJwt(token);
+        const userId = payload.id;
+
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!response.ok) throw new Error('Không thể tải thông tin người dùng');
+        const data = await response.json();
+        const user = data.result;
+        document.getElementById('username').value = user.username || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.phone || '';
+        document.getElementById('address').value = user.address || '';
+        document.getElementById('username-greeting').textContent = `Chào, ${user.username || 'Người Dùng'}!`;
+
+        // Cập nhật thanh bên dựa trên vai trò người dùng
+        updateSidebarByRole(payload.scope);
+        console.log("Vai trò: ", payload.scope);
+      } catch (error) {
+        showError('Lỗi khi tải thông tin: ' + error.message);
+      }
+    }
+
+    async function saveUserInfo() {
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập để lưu thay đổi!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const saveBtn = document.getElementById('save-button');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<div class="loading mr-2"></div> Đang lưu...';
+      saveBtn.disabled = true;
+
+      const token = localStorage.getItem('accessToken');
+      const payload = parseJwt(token);
+      const userId = payload.id;
+
+      const request = {
+        email: document.getElementById('email').value,
+        phoneNumber: document.getElementById('phone').value,
+        address: document.getElementById('address').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/cus/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(request)
+        });
+        if (!response.ok) throw new Error('Không thể cập nhật thông tin');
+        const data = await response.json();
+        showSuccess(data.message || 'Cập nhật hồ sơ thành công!');
+      } catch (error) {
+        showError('Lỗi khi cập nhật: ' + error.message);
+      } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+      }
+    }
+
+    async function changePassword() {
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập!', 'password');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const request = {
+        oldPassword: document.getElementById('old-password').value,
+        newPassword: document.getElementById('new-password').value
+      };
+
+      if (!request.oldPassword || !request.newPassword) {
+        showError('Vui lòng nhập cả mật khẩu cũ và mới.', 'password');
+        return;
+      }
+
+      const changeBtn = document.getElementById('change-password-button');
+      const originalText = changeBtn.innerHTML;
+      changeBtn.innerHTML = '<div class="loading mr-2"></div> Đang thay đổi...';
+      changeBtn.disabled = true;
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_BASE_URL}/users/change-password`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(request)
         });
 
-        // OTP input formatting
-        document.getElementById('otp').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 6) {
-                value = value.slice(0, 6);
-            }
-            e.target.value = value;
-        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Đổi mật khẩu thất bại');
+        showSuccess(data.message || 'Đổi mật khẩu thành công!', 'password');
+        document.getElementById('old-password').value = '';
+        document.getElementById('new-password').value = '';
+      } catch (error) {
+        showError('Lỗi khi đổi mật khẩu: ' + error.message, 'password');
+      } finally {
+        changeBtn.innerHTML = originalText;
+        changeBtn.disabled = false;
+      }
+    }
 
-        // Auto-submit OTP when 6 digits are entered
-        document.getElementById('otp').addEventListener('input', function(e) {
-            if (e.target.value.length === 6) {
-                setTimeout(() => {
-                    document.getElementById('otp-form').dispatchEvent(new Event('submit'));
-                }, 500);
-            }
-        });
+    function updateUI() {
+      if (!isLoggedIn()) {
+        showError('Vui lòng đăng nhập để truy cập bảng điều khiển!');
+        window.location.href = 'login.html';
+        return;
+      }
+      fetchUserInfo();
+    }
 
-        // Enhanced password strength indicator
-        document.getElementById('password').addEventListener('input', function(e) {
-            const password = e.target.value;
-            const strengthIndicator = document.createElement('div');
-            strengthIndicator.className = 'password-strength mt-2';
-            
-            // Remove existing indicator
-            const existing = e.target.parentNode.parentNode.querySelector('.password-strength');
-            if (existing) existing.remove();
-            
-            if (password.length > 0) {
-                let strength = 0;
-                const checks = [
-                    password.length >= 8,
-                    /[a-z]/.test(password),
-                    /[A-Z]/.test(password),
-                    /[0-9]/.test(password),
-                    /[^A-Za-z0-9]/.test(password)
-                ];
-                
-                strength = checks.filter(Boolean).length;
-                
-                const levels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-                const colors = ['#f56565', '#ed8936', '#ecc94b', '#48bb78', '#38a169'];
-                
-                strengthIndicator.innerHTML = `
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="flex-grow-1" style="height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
-                            <div style="width: ${(strength / 5) * 100}%; height: 100%; background: ${colors[strength - 1] || colors[0]}; transition: all 0.3s ease;"></div>
-                        </div>
-                        <small style="color: ${colors[strength - 1] || colors[0]}; font-weight: 500;">
-                            ${levels[strength - 1] || levels[0]}
-                        </small>
-                    </div>
-                `;
-                
-                e.target.parentNode.parentNode.appendChild(strengthIndicator);
-            }
-        });
+    // Kiểm tra độ mạnh mật khẩu
+    function calculatePasswordStrength(password) {
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+      return Math.min(score, 4);
+    }
 
-        // Initialize autocomplete
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scroll behavior
-            document.documentElement.style.scrollBehavior = 'smooth';
-            
-            // Add form animation on load
-            setTimeout(() => {
-                document.querySelector('.register-section').style.animation = 'fadeIn 0.6s ease';
-            }, 100);
+    function updatePasswordStrength(password) {
+      const container = document.getElementById('password-strength-container');
+      const fill = document.getElementById('strength-fill');
+      const text = document.getElementById('strength-text');
 
-            // Setup address autocomplete
-            setupAddressAutocomplete();
-        });
-    </script>
+      if (!password) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      const strength = calculatePasswordStrength(password);
+      const percentage = (strength / 4) * 100;
+
+      fill.style.width = percentage + '%';
+
+      switch (strength) {
+        case 0:
+        case 1:
+          fill.style.backgroundColor = '#ef4444';
+          text.textContent = 'Yếu';
+          text.style.color = '#ef4444';
+          break;
+        case 2:
+          fill.style.backgroundColor = '#f59e0b';
+          text.textContent = 'Khá';
+          text.style.color = '#f59e0b';
+          break;
+        case 3:
+          fill.style.backgroundColor = '#3b82f6';
+          text.textContent = 'Tốt';
+          text.style.color = '#3b82f6';
+          break;
+        case 4:
+          fill.style.backgroundColor = '#10b981';
+          text.textContent = 'Mạnh';
+          text.style.color = '#10b981';
+          break;
+      }
+    }
+
+    // Chuyển đổi menu di động
+    function toggleMobileMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    // Thêm sự kiện
+    document.getElementById('save-button').addEventListener('click', saveUserInfo);
+    document.getElementById('change-password-button').addEventListener('click', changePassword);
+    document.getElementById('logout-button').addEventListener('click', logout);
+    document.getElementById('new-password').addEventListener('input', (e) => {
+      updatePasswordStrength(e.target.value);
+    });
+    document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+    // Đóng menu di động khi nhấp ra ngoài
+    document.addEventListener('click', (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target) && 
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    // Khởi tạo khi trang tải
+    document.addEventListener('DOMContentLoaded', updateUI);
+  </script>
 </body>
 
 </html>

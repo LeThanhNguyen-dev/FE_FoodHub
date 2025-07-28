@@ -316,27 +316,27 @@
   <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
       <div class="sidebar-header p-6">
-        <h2 class="text-xl font-semibold">Dashboard User</h2>
-        <p id="username-greeting" class="text-sm mt-1">Welcome back!</p>
+        <h2 class="text-xl font-semibold">Quản lý tài khoản</h2>
+        <p id="username-greeting" class="text-sm mt-1">Chào mừng!</p>
       </div>
       <nav class="mt-2 px-3">
         <a href="profile.html" id="profile-link" class="sidebar-link active">
-          <i class="fas fa-user"></i> Edit Profile
+          <i class="fas fa-user"></i> Chỉnh sửa thông tin
         </a>
         <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
-          <i class="fas fa-truck"></i> Order Tracking
+          <i class="fas fa-truck"></i> Theo dõi đơn hàng
         </a>
         <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
-          <i class="fas fa-history"></i> Order History
+          <i class="fas fa-history"></i> Lịch sử đơn hàng
         </a>
         <a href="home.html" id="home-link" class="sidebar-link">
-          <i class="fas fa-home"></i> Back to Home
+          <i class="fas fa-home"></i> Trở về trang chủ
         </a>
       </nav>
     </div>
     <div class="p-6">
       <button id="logout-button" class="w-full btn btn-danger">
-        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
       </button>
     </div>
   </aside>
@@ -347,7 +347,7 @@
       <!-- Profile Section -->
       <div class="content-card p-6">
         <div class="section-header">
-          <h2><i class="fas fa-user-edit"></i>Edit Profile</h2>
+          <h2><i class="fas fa-user-edit"></i>Chỉnh sửa thông tin</h2>
         </div>
 
         <!-- Messages -->
@@ -360,48 +360,48 @@
           <!-- Profile Information -->
           <div>
             <div class="section-header">
-              <h3><i class="fas fa-user"></i>Profile Information</h3>
+              <h3><i class="fas fa-user"></i>Thông tin</h3>
             </div>
             
             <div class="form-group">
-              <label for="username" class="form-label">Username</label>
+              <label for="username" class="form-label">Họ và tên</label>
               <input type="text" id="username" class="form-input" readonly>
             </div>
 
             <div class="form-group">
-              <label for="email" class="form-label">Email Address</label>
+              <label for="email" class="form-label">Email</label>
               <input type="email" id="email" class="form-input" placeholder="Enter your email">
             </div>
 
             <div class="form-group">
-              <label for="phone" class="form-label">Phone Number</label>
-              <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+              <label for="phone" class="form-label">Số điện thoại</label>
+              <input type="tel" id="phone" class="form-input" placeholder="Nhập số điện thoại">
             </div>
 
             <div class="form-group">
-              <label for="address" class="form-label">Address</label>
-              <input type="text" id="address" class="form-input" placeholder="Enter your address">
+              <label for="address" class="form-label">Địa chỉ</label>
+              <input type="text" id="address" class="form-input" placeholder="Nhập địa chỉ">
             </div>
 
             <button id="save-button" class="btn btn-primary w-full">
-              <i class="fas fa-save mr-2"></i> Save Changes
+              <i class="fas fa-save mr-2"></i> Lưu
             </button>
           </div>
 
           <!-- Change Password -->
           <div>
             <div class="section-header">
-              <h3><i class="fas fa-lock"></i>Change Password</h3>
+              <h3><i class="fas fa-lock"></i>Đổi mật khẩu</h3>
             </div>
             
             <div class="form-group">
-              <label for="old-password" class="form-label">Current Password</label>
-              <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
+              <label for="old-password" class="form-label">Mật khẩu hiện tại</label>
+              <input type="password" id="old-password" class="form-input" placeholder="Nhập mật khẩu hiện tại">
             </div>
 
             <div class="form-group">
-              <label for="new-password" class="form-label">New Password</label>
-              <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+              <label for="new-password" class="form-label">Mật khẩu mới</label>
+              <input type="password" id="new-password" class="form-input" placeholder="Nhập mật khẩu mới">
               <div id="password-strength-container" class="password-strength hidden">
                 <div class="strength-bar">
                   <div id="strength-fill" class="strength-fill"></div>
@@ -411,7 +411,7 @@
             </div>
 
             <button id="change-password-button" class="btn btn-primary w-full">
-              <i class="fas fa-key mr-2"></i> Change Password
+              <i class="fas fa-key mr-2"></i> Đổi mật khẩu
             </button>
           </div>
         </div>
@@ -441,53 +441,6 @@
       const payload = parseJwt(token);
       return payload && payload.exp * 1000 > Date.now() && payload.scope === 'ROLE_CUSTOMER';
     }
-
-    function getHomePageByRole(scope) {
-      // Extract the role from scope (first value starting with ROLE_)
-      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
-
-      switch (role) {
-        case 'ROLE_WAITER':
-          return '../../waiter/index.html';
-        case 'ROLE_CHEF':
-          return '../../chef/index.html';
-        case 'ROLE_CASHIER':
-          return '../../cashier/index.html';
-        case 'ROLE_ADMIN':
-          return '../../adminDashboard/adminDashboard.html';
-        case 'ROLE_CUSTOMER':
-        default:
-          return 'home.html';
-      }
-    }
-    function updateSidebarByRole(scope) {
-      const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
-      // Extract the role from scope (first value starting with ROLE_)
-      const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
-      const isStaff = staffRoles.includes(role);
-
-      const workScheduleLink = document.getElementById('work-schedule-link');
-      const attendanceLink = document.getElementById('attendance-link');
-      const orderTrackLink = document.getElementById('order-track-link');
-      const orderHistoryLink = document.getElementById('order-history-link');
-      const homeLink = document.getElementById('home-link');
-
-      // Cập nhật href cho home link dựa trên role
-      homeLink.href = getHomePageByRole(scope);
-
-      if (isStaff) {
-        workScheduleLink.classList.remove('hidden');
-        attendanceLink.classList.remove('hidden');
-        orderTrackLink.classList.add('hidden');
-        orderHistoryLink.classList.add('hidden');
-      } else if (role === 'ROLE_CUSTOMER') {
-        workScheduleLink.classList.add('hidden');
-        attendanceLink.classList.add('hidden');
-        orderTrackLink.classList.remove('hidden');
-        orderHistoryLink.classList.remove('hidden');
-      }
-    }
-
 
     function logout() {
       localStorage.removeItem('accessToken');
@@ -526,10 +479,6 @@
         document.getElementById('phone').value = user.phone || '';
         document.getElementById('address').value = user.address || '';
         document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
-
-        // Update sidebar based on user role (bao gồm cả việc cập nhật home link)
-        updateSidebarByRole(payload.scope);
-        console.log("role: ", payload.scope);
       } catch (error) {
         showError('Error fetching info: ' + error.message);
       }

@@ -412,27 +412,27 @@
   <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
       <div class="sidebar-header p-6">
-        <h2 class="text-xl font-semibold">Dashboard</h2>
-        <p id="username-greeting" class="text-sm mt-1">Welcome, User!</p>
+        <h2 class="text-xl font-semibold">Quản lý tài khoản</h2>
+        <p id="username-greeting" class="text-sm mt-1">Chào, User!</p>
       </div>
       <nav class="mt-2 px-3">
         <a href="profile.html" id="profile-link" class="sidebar-link">
-          <i class="fas fa-user"></i> Edit Profile
+          <i class="fas fa-user"></i> Chỉnh sửa thông tin
         </a>
         <a href="ordertrack.html" id="order-track-link" class="sidebar-link active">
-          <i class="fas fa-truck"></i> Order Tracking
+          <i class="fas fa-truck"></i> Theo dõi đơn hàng
         </a>
         <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
-          <i class="fas fa-history"></i> Order History
+          <i class="fas fa-history"></i> Lịch sử đơn hàng
         </a>
         <a href="home.html" id="home-link" class="sidebar-link">
-          <i class="fas fa-home"></i> Back to Home
+          <i class="fas fa-home"></i> Trở về trang chủ
         </a>
       </nav>
     </div>
     <div class="p-6">
       <button id="logout-button" class="w-full btn btn-logout">
-        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
       </button>
     </div>
   </aside>
@@ -441,15 +441,15 @@
     <div id="content-area" class="max-w-5xl mx-auto space-y-8">
       <div id="order-tracking-section" class="content-card p-6">
         <div class="section-header">
-          <h2><i class="fas fa-truck"></i> Order Tracking</h2>
+          <h2><i class="fas fa-truck"></i> Theo dõi đơn hàng</h2>
         </div>
         <div id="error-message" class="hidden message message-error"></div>
         <div id="success-message" class="hidden message message-success"></div>
 
         <div class="mb-6">
-          <label for="order-select" class="form-label">Select an order to track</label>
+          <label for="order-select" class="form-label">Chọn đơn hàng để theo dõi</label>
           <select id="order-select" class="w-full">
-            <option value="">Select an order</option>
+            <option value="">Chọn đơn hàng</option>
           </select>
         </div>
 
@@ -471,45 +471,45 @@
           <p id="order-note" class="text-gray-600 mb-2 hidden"></p>
 
           <div class="timeline">
-            <div class="timeline-item" data-status="PENDING">
-              <div class="timeline-content">
-                <p class="font-medium">Order Placed</p>
-                <p class="text-sm text-gray-500">Your order has been placed.</p>
-              </div>
-            </div>
-            <div class="timeline-item" data-status="CONFIRMED">
-              <div class="timeline-content">
-                <p class="font-medium">Confirmed</p>
-                <p class="text-sm text-gray-500">Order confirmed by the restaurant.</p>
-              </div>
-            </div>
-            <div class="timeline-item" data-status="PREPARING">
-              <div class="timeline-content">
-                <p class="font-medium">Preparing</p>
-                <p class="text-sm text-gray-500">Order is being prepared.</p>
-              </div>
-            </div>
-            <div class="timeline-item" data-status="READY">
-              <div class="timeline-content">
-                <p class="font-medium">Ready</p>
-                <p class="text-sm text-gray-500">Order is ready for pickup or delivery.</p>
-              </div>
-            </div>
-            <div class="timeline-item" data-status="DELIVERING">
-              <div class="timeline-content">
-                <p class="font-medium">Delivering</p>
-                <p class="text-sm text-gray-500">Order is on the way.</p>
-              </div>
-            </div>
-            <div class="timeline-item" data-status="COMPLETED">
-              <div class="timeline-content">
-                <p class="font-medium">Delivered</p>
-                <p class="text-sm text-gray-500">Order has been delivered.</p>
-              </div>
-            </div>
-          </div>
+  <div class="timeline-item" data-status="PENDING">
+    <div class="timeline-content">
+      <p class="font-medium">Đã đặt hàng</p>
+      <p class="text-sm text-gray-500">Chúng tôi đã nhận được đơn hàng của bạn.</p>
+    </div>
+  </div>
+  <div class="timeline-item" data-status="CONFIRMED">
+    <div class="timeline-content">
+      <p class="font-medium">Đã xác nhận</p>
+      <p class="text-sm text-gray-500">Nhà hàng đã xác nhận đơn hàng của bạn.</p>
+    </div>
+  </div>
+  <div class="timeline-item" data-status="PREPARING">
+    <div class="timeline-content">
+      <p class="font-medium">Đang chuẩn bị</p>
+      <p class="text-sm text-gray-500">Đơn hàng của bạn đang được chuẩn bị.</p>
+    </div>
+  </div>
+  <div class="timeline-item" data-status="READY">
+    <div class="timeline-content">
+      <p class="font-medium">Sẵn sàng</p>
+      <p class="text-sm text-gray-500">Đơn hàng của bạn đã sẵn sàng để lấy hoặc giao.</p>
+    </div>
+  </div>
+  <div class="timeline-item" data-status="DELIVERING">
+    <div class="timeline-content">
+      <p class="font-medium">Đang giao hàng</p>
+      <p class="text-sm text-gray-500">Đơn hàng đang trên đường đến bạn.</p>
+    </div>
+  </div>
+  <div class="timeline-item" data-status="COMPLETED">
+    <div class="timeline-content">
+      <p class="font-medium">Đã giao</p>
+      <p class="text-sm text-gray-500">Đơn hàng đã được giao thành công.</p>
+    </div>
+  </div>
+</div>
 
-          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Items</h4>
+          <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Món ăn</h4>
           <div id="order-items" class="space-y-4"></div>
         </div>
       </div>
@@ -586,7 +586,7 @@
       const usernameGreeting = document.getElementById('username-greeting');
       if (isLoggedIn() && usernameGreeting) {
         const username = await fetchUserInfo();
-        usernameGreeting.textContent = `Welcome, ${username}!`;
+        usernameGreeting.textContent = `Chào, ${username}!`;
         console.log("Updated UI with username:", username);
       } else if (usernameGreeting) {
         usernameGreeting.textContent = 'Welcome, User!';
@@ -713,7 +713,7 @@
         console.error("Order select element not found");
         return;
       }
-      orderSelect.innerHTML = '<option value="">Select an order</option>';
+      orderSelect.innerHTML = '<option value="">Chọn đơn hàng</option>';
       orders.forEach(order => {
         const option = document.createElement('option');
         option.value = order.id;

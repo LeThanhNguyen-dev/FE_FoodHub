@@ -545,8 +545,9 @@
                                 <span id="username-display"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
-                                <li><a class="dropdown-item" href="orderHistory.html">Xem Đơn Hàng</a></li>
+                               <li><a class="dropdown-item" href="profile.html#profile">Chỉnh Sửa Thông Tin</a></li>
+                                <li><a class="dropdown-item" href="orderTrack.html">Trạng Thái Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="orderHistory.html">Lịch Sử Đơn Hàng</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="try { logout(); } catch(e) { console.error('Error logging out:', e); showNotification('Lỗi khi đăng xuất: ' + e.message); }">Đăng Xuất</a></li>
                             </ul>
                         </div>
@@ -753,9 +754,9 @@
                     loginPrompt.style.display = 'none';
                     const token = localStorage.getItem('accessToken');
                     const payload = parseJwt(token);
-                    if (payload && payload.sub) {
-                        usernameInput.value = payload.sub || 'Customer';
-                        emailInput.value = payload.email || 'customer@foodhub.com';
+                    if (payload) {
+                        usernameInput.value = payload.username || 'Customer';
+                        emailInput.value = payload.sub || 'customer@foodhub.com';
                     }
                 } else {
                     contactForm.style.display = 'none';

@@ -415,7 +415,18 @@ function createOrderActionButtons(order) {
 
     // Nút hoàn thành cho đơn hàng READY
     if (order.status === 'READY') {
-        buttons += `
+        console.log("id: ", order.id, "order type: ", order.orderType);
+        if (order.orderType === 'DELIVERY' || order.orderType === 'TAKEAWAY') {
+            buttons += `
+            <button class="action-btn btn-complete" 
+                    data-order='${JSON.stringify(order)}'
+                    onclick="event.stopPropagation(); completeOrder(${order.id})"
+                    title="Hoàn thành đơn hàng">
+                <i class="fas fa-check-double me-1"></i>
+            </button>
+        `;
+        } else {
+            buttons += `
             <button class="action-btn btn-checkout" 
                     data-order='${JSON.stringify(order)}'
                     onclick="event.stopPropagation(); handleCheckoutClick(this)"
@@ -423,10 +434,12 @@ function createOrderActionButtons(order) {
                 <i class="fas fa-money-bill"></i>
             </button>
         `;
+        }
+
     }
 
-    // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
-    // if (order.status === 'COMPLETED') {
+    // // Nút thanh toán cho đơn hàng COMPLETED - Sử dụng data attributes
+    // if (order.status === 'COMPLETED' && (order.orderType === 'DELIVERY' || order.orderType === 'TAKEAWAY')) {
     //     buttons += `
     //         <button class="action-btn btn-checkout" 
     //                 data-order='${JSON.stringify(order)}'
@@ -671,11 +684,11 @@ function showOrderDetailsAndPaymentModal(order) {
 
 async function openCancelModal(orderId) {
     currentOrderId = orderId;
-    
+
     try {
         // Nếu modal chưa tồn tại, load từ template
         let modal = document.getElementById('cancelOrderModal');
-        
+
         if (!modal) {
             const response = await fetch('/waiter/order.html');
             if (!response.ok) {
@@ -708,10 +721,10 @@ async function openCancelModal(orderId) {
                 link.href = 'css/modal-style.css';
                 document.head.appendChild(link);
             }
-            
+
             modal = document.getElementById('cancelOrderModal');
         }
-        
+
         if (!modal) {
             throw new Error('Không thể tạo modal');
         }
@@ -731,7 +744,7 @@ async function openCancelModal(orderId) {
         // Hiển thị modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Ngăn scroll trang chính
-        
+
     } catch (error) {
         console.error('Error opening cancel modal:', error);
         showNotification('Có lỗi khi mở modal hủy đơn hàng: ' + error.message, 'error');
@@ -798,7 +811,7 @@ async function confirmCancelOrder() {
             };
 
             const response = await apiFetch(`/orders/status/${currentOrderId}?status=CANCELLED&note=${reason}`, {
-                method: 'PUT',  
+                method: 'PUT',
             });
 
             if (response && response.code === 0) {

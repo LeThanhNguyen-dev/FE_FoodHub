@@ -440,19 +440,19 @@ let shiftsHtml = '';
             }
 
          if (shiftDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
-    if (shiftType === 'MORNING' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 40))) {
+    if (shiftType === 'MORNING' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 45))) {
         showAlert('Không thể thêm ca sáng vì đã qua giờ bắt đầu (08:30).', 'Lỗi', 'error');
         return;
     }
-    if (shiftType === 'AFTERNOON' && (currentHours > 12 || (currentHours === 12 && currentMinutes >= 40))) {
+    if (shiftType === 'AFTERNOON' && (currentHours > 12 || (currentHours === 12 && currentMinutes >= 45))) {
         showAlert('Không thể thêm ca chiều vì đã qua giờ bắt đầu (12:30).', 'Lỗi', 'error');
         return;
     }
-    if (shiftType === 'EVENING' && (currentHours > 17 || (currentHours === 17 && currentMinutes >= 40))) {
+    if (shiftType === 'EVENING' && (currentHours > 17 || (currentHours === 17 && currentMinutes >= 45))) {
         showAlert('Không thể thêm ca tối vì đã qua giờ bắt đầu (17:30).', 'Lỗi', 'error');
         return;
     }
-    if (shiftType === 'FULL_DAY' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 40))) {
+    if (shiftType === 'FULL_DAY' && (currentHours > 8 || (currentHours === 8 && currentMinutes >= 45))) {
         showAlert('Không thể thêm ca cả ngày vì đã qua giờ bắt đầu .', 'Lỗi', 'error');
         return;
     }
