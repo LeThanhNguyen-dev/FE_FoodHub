@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Dashboard</title>
+  <title>Quản lý tài khoản</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
@@ -14,15 +14,13 @@
       box-sizing: border-box;
     }
 
-
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #f8fafc;
       color: #FEA116;
     }
 
-    /* Sidebar */
+    /* Thanh bên */
     .sidebar {
       background-color: #0F172B;
       border-right: 1px solid #e2e8f0;
@@ -65,7 +63,7 @@
       text-align: center;
     }
 
-    /* Main Content */
+    /* Nội dung chính */
     .main-content {
       background-color: #f8fafc;
       min-height: 100vh;
@@ -78,7 +76,7 @@
       border: 1px solid #e2e8f0;
     }
 
-    /* Form Elements */
+    /* Thành phần biểu mẫu */
     .form-label {
       display: block;
       color: #374151;
@@ -109,7 +107,7 @@
       color: #6b7280;
     }
 
-    /* Buttons */
+    /* Nút */
     .btn {
       padding: 12px 24px;
       border-radius: 8px;
@@ -131,6 +129,7 @@
 
     .btn-primary:hover {
       background-color: #2563eb;
+      color: white;
     }
 
     .btn-primary:disabled {
@@ -147,7 +146,7 @@
       background-color: #dc2626;
     }
 
-    /* Messages */
+    /* Thông báo */
     .message {
       padding: 12px 16px;
       border-radius: 8px;
@@ -168,7 +167,7 @@
       border-color: #fecaca;
     }
 
-    /* Section Headers */
+    /* Tiêu đề phần */
     .section-header {
       display: flex;
       align-items: center;
@@ -194,19 +193,19 @@
       color: #3b82f6;
     }
 
-    /* Form Groups */
+    /* Nhóm biểu mẫu */
     .form-group {
       margin-bottom: 20px;
     }
 
-    /* Grid Layout */
+    /* Bố cục lưới */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 32px;
     }
 
-    /* Responsive */
+    /* Phản hồi */
     @media (max-width: 768px) {
       .form-grid {
         grid-template-columns: 1fr;
@@ -246,7 +245,7 @@
       }
     }
 
-    /* Loading state */
+    /* Trạng thái tải */
     .loading {
       display: inline-block;
       width: 16px;
@@ -261,7 +260,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Input with icon */
+    /* Ô nhập có biểu tượng */
     .input-with-icon {
       position: relative;
     }
@@ -279,7 +278,7 @@
       padding-left: 40px;
     }
 
-    /* Password strength indicator */
+    /* Chỉ báo độ mạnh mật khẩu */
     .password-strength {
       margin-top: 8px;
     }
@@ -307,101 +306,101 @@
 </head>
 
 <body class="flex">
-  <!-- Mobile menu button -->
+  <!-- Nút menu di động -->
   <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 md:hidden">
     <i class="fas fa-bars text-gray-600"></i>
   </button>
 
-  <!-- Sidebar -->
+  <!-- Thanh bên -->
   <aside class="sidebar w-80 flex flex-col justify-between">
     <div>
       <div class="sidebar-header p-6">
-        <h2 class="text-xl font-semibold">Dashboard User</h2>
-        <p id="username-greeting" class="text-sm mt-1">Welcome back!</p>
+        <h2 class="text-xl font-semibold">Quản lý tài khoản</h2>
+        <p id="username-greeting" class="text-sm mt-1">Chào mừng trở lại!</p>
       </div>
       <nav class="mt-2 px-3">
         <a href="profile.html" id="profile-link" class="sidebar-link active">
-          <i class="fas fa-user"></i> Edit Profile
+          <i class="fas fa-user"></i> Chỉnh Sửa Hồ Sơ
         </a>
         <a href="ordertrack.html" id="order-track-link" class="sidebar-link">
-          <i class="fas fa-truck"></i> Order Tracking
+          <i class="fas fa-truck"></i> Theo Dõi Đơn Hàng
         </a>
         <a href="orderHistory.html" id="order-history-link" class="sidebar-link">
-          <i class="fas fa-history"></i> Order History
+          <i class="fas fa-history"></i> Lịch Sử Đơn Hàng
         </a>
         <a href="home.html" id="home-link" class="sidebar-link">
-          <i class="fas fa-home"></i> Back to Home
+          <i class="fas fa-home"></i> Trở Về Trang Chủ
         </a>
       </nav>
     </div>
     <div class="p-6">
       <button id="logout-button" class="w-full btn btn-danger">
-        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        <i class="fas fa-sign-out-alt mr-2"></i> Đăng Xuất
       </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- Nội dung chính -->
   <main class="main-content flex-1 p-6 overflow-auto">
     <div class="max-w-6xl mx-auto">
-      <!-- Profile Section -->
+      <!-- Phần hồ sơ -->
       <div class="content-card p-6">
         <div class="section-header">
-          <h2><i class="fas fa-user-edit"></i>Edit Profile</h2>
+          <h2><i class="fas fa-user-edit"></i>Chỉnh Sửa Hồ Sơ</h2>
         </div>
 
-        <!-- Messages -->
+        <!-- Thông báo -->
         <div id="error-message" class="hidden message message-error"></div>
         <div id="success-message" class="hidden message message-success"></div>
         <div id="password-error-message" class="hidden message message-error"></div>
         <div id="password-success-message" class="hidden message message-success"></div>
 
         <div class="form-grid">
-          <!-- Profile Information -->
+          <!-- Thông tin hồ sơ -->
           <div>
             <div class="section-header">
-              <h3><i class="fas fa-user"></i>Profile Information</h3>
+              <h3><i class="fas fa-user"></i>Thông Tin Hồ Sơ</h3>
             </div>
             
             <div class="form-group">
-              <label for="username" class="form-label">Username</label>
+              <label for="username" class="form-label">Tên Người Dùng</label>
               <input type="text" id="username" class="form-input" readonly>
             </div>
 
             <div class="form-group">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" id="email" class="form-input" placeholder="Enter your email">
+              <label for="email" class="form-label">Địa Chỉ Email</label>
+              <input type="email" id="email" class="form-input" placeholder="Nhập địa chỉ email của bạn">
             </div>
 
             <div class="form-group">
-              <label for="phone" class="form-label">Phone Number</label>
-              <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+              <label for="phone" class="form-label">Số Điện Thoại</label>
+              <input type="tel" id="phone" class="form-input" placeholder="Nhập số điện thoại của bạn">
             </div>
 
             <div class="form-group">
-              <label for="address" class="form-label">Address</label>
-              <input type="text" id="address" class="form-input" placeholder="Enter your address">
+              <label for="address" class="form-label">Địa Chỉ</label>
+              <input type="text" id="address" class="form-input" placeholder="Nhập địa chỉ của bạn">
             </div>
 
             <button id="save-button" class="btn btn-primary w-full">
-              <i class="fas fa-save mr-2"></i> Save Changes
+              <i class="fas fa-save mr-2"></i> Lưu Thay Đổi
             </button>
           </div>
 
-          <!-- Change Password -->
+          <!-- Đổi mật khẩu -->
           <div>
             <div class="section-header">
-              <h3><i class="fas fa-lock"></i>Change Password</h3>
+              <h3><i class="fas fa-lock"></i>Đổi Mật Khẩu</h3>
             </div>
             
             <div class="form-group">
-              <label for="old-password" class="form-label">Current Password</label>
-              <input type="password" id="old-password" class="form-input" placeholder="Enter current password">
+              <label for="old-password" class="form-label">Mật Khẩu Hiện Tại</label>
+              <input type="password" id="old-password" class="form-input" placeholder="Nhập mật khẩu hiện tại">
             </div>
 
             <div class="form-group">
-              <label for="new-password" class="form-label">New Password</label>
-              <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+              <label for="new-password" class="form-label">Mật Khẩu Mới</label>
+              <input type="password" id="new-password" class="form-input" placeholder="Nhập mật khẩu mới">
               <div id="password-strength-container" class="password-strength hidden">
                 <div class="strength-bar">
                   <div id="strength-fill" class="strength-fill"></div>
@@ -411,7 +410,7 @@
             </div>
 
             <button id="change-password-button" class="btn btn-primary w-full">
-              <i class="fas fa-key mr-2"></i> Change Password
+              <i class="fas fa-key mr-2"></i> Đổi Mật Khẩu
             </button>
           </div>
         </div>
@@ -430,7 +429,7 @@
           '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         return JSON.parse(jsonPayload);
       } catch (e) {
-        console.error("Invalid token:", e);
+        console.error("Mã thông báo không hợp lệ:", e);
         return null;
       }
     }
@@ -443,7 +442,7 @@
     }
 
     function getHomePageByRole(scope) {
-      // Extract the role from scope (first value starting with ROLE_)
+      // Lấy vai trò từ scope (giá trị đầu tiên bắt đầu bằng ROLE_)
       const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
 
       switch (role) {
@@ -460,9 +459,10 @@
           return 'home.html';
       }
     }
+
     function updateSidebarByRole(scope) {
       const staffRoles = ['ROLE_WAITER', 'ROLE_CHEF', 'ROLE_CASHIER'];
-      // Extract the role from scope (first value starting with ROLE_)
+      // Lấy vai trò từ scope (giá trị đầu tiên bắt đầu bằng ROLE_)
       const role = scope.split(' ').find(s => s.startsWith('ROLE_')) || '';
       const isStaff = staffRoles.includes(role);
 
@@ -472,7 +472,7 @@
       const orderHistoryLink = document.getElementById('order-history-link');
       const homeLink = document.getElementById('home-link');
 
-      // Cập nhật href cho home link dựa trên role
+      // Cập nhật href cho liên kết trang chủ dựa trên vai trò
       homeLink.href = getHomePageByRole(scope);
 
       if (isStaff) {
@@ -488,7 +488,6 @@
       }
     }
 
-
     function logout() {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('cart');
@@ -498,14 +497,12 @@
     function showError(message, section = 'profile') {
       const errorDiv = document.getElementById(section === 'password' ? 'password-error-message' : 'error-message');
       errorDiv.textContent = message;
-      errorDiv.classList.remove('hidden');
       document.getElementById(section === 'password' ? 'password-success-message' : 'success-message').classList.add('hidden');
     }
 
     function showSuccess(message, section = 'profile') {
       const successDiv = document.getElementById(section === 'password' ? 'password-success-message' : 'success-message');
       successDiv.textContent = message;
-      successDiv.classList.remove('hidden');
       document.getElementById(section === 'password' ? 'password-error-message' : 'error-message').classList.add('hidden');
     }
 
@@ -518,33 +515,33 @@
         const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        if (!response.ok) throw new Error('Failed to fetch user info');
+        if (!response.ok) throw new Error('Không thể tải thông tin người dùng');
         const data = await response.json();
         const user = data.result;
         document.getElementById('username').value = user.username || '';
         document.getElementById('email').value = user.email || '';
         document.getElementById('phone').value = user.phone || '';
         document.getElementById('address').value = user.address || '';
-        document.getElementById('username-greeting').textContent = `Welcome, ${user.username || 'User'}!`;
+        document.getElementById('username-greeting').textContent = `Chào, ${user.username || 'Người Dùng'}!`;
 
-        // Update sidebar based on user role (bao gồm cả việc cập nhật home link)
+        // Cập nhật thanh bên dựa trên vai trò người dùng
         updateSidebarByRole(payload.scope);
-        console.log("role: ", payload.scope);
+        console.log("Vai trò: ", payload.scope);
       } catch (error) {
-        showError('Error fetching info: ' + error.message);
+        showError('Lỗi khi tải thông tin: ' + error.message);
       }
     }
 
     async function saveUserInfo() {
       if (!isLoggedIn()) {
-        showError('Please login to save changes!');
+        showError('Vui lòng đăng nhập để lưu thay đổi!');
         window.location.href = 'login.html';
         return;
       }
 
       const saveBtn = document.getElementById('save-button');
       const originalText = saveBtn.innerHTML;
-      saveBtn.innerHTML = '<div class="loading mr-2"></div> Saving...';
+      saveBtn.innerHTML = '<div class="loading mr-2"></div> Đang lưu...';
       saveBtn.disabled = true;
 
       const token = localStorage.getItem('accessToken');
@@ -566,11 +563,11 @@
           },
           body: JSON.stringify(request)
         });
-        if (!response.ok) throw new Error('Failed to update info');
+        if (!response.ok) throw new Error('Không thể cập nhật thông tin');
         const data = await response.json();
-        showSuccess(data.message || 'Profile updated successfully!');
+        showSuccess(data.message || 'Cập nhật hồ sơ thành công!');
       } catch (error) {
-        showError('Error updating: ' + error.message);
+        showError('Lỗi khi cập nhật: ' + error.message);
       } finally {
         saveBtn.innerHTML = originalText;
         saveBtn.disabled = false;
@@ -579,7 +576,7 @@
 
     async function changePassword() {
       if (!isLoggedIn()) {
-        showError('Please login!', 'password');
+        showError('Vui lòng đăng nhập!', 'password');
         window.location.href = 'login.html';
         return;
       }
@@ -590,13 +587,13 @@
       };
 
       if (!request.oldPassword || !request.newPassword) {
-        showError('Please enter both old and new passwords.', 'password');
+        showError('Vui lòng nhập cả mật khẩu cũ và mới.', 'password');
         return;
       }
 
       const changeBtn = document.getElementById('change-password-button');
       const originalText = changeBtn.innerHTML;
-      changeBtn.innerHTML = '<div class="loading mr-2"></div> Changing...';
+      changeBtn.innerHTML = '<div class="loading mr-2"></div> Đang thay đổi...';
       changeBtn.disabled = true;
 
       try {
@@ -611,12 +608,12 @@
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Password change failed');
-        showSuccess(data.message || 'Password changed successfully!', 'password');
+        if (!response.ok) throw new Error(data.message || 'Đổi mật khẩu thất bại');
+        showSuccess(data.message || 'Đổi mật khẩu thành công!', 'password');
         document.getElementById('old-password').value = '';
         document.getElementById('new-password').value = '';
       } catch (error) {
-        showError('Error changing password: ' + error.message, 'password');
+        showError('Lỗi khi đổi mật khẩu: ' + error.message, 'password');
       } finally {
         changeBtn.innerHTML = originalText;
         changeBtn.disabled = false;
@@ -625,14 +622,14 @@
 
     function updateUI() {
       if (!isLoggedIn()) {
-        showError('Please login to access dashboard!');
+        showError('Vui lòng đăng nhập để truy cập bảng điều khiển!');
         window.location.href = 'login.html';
         return;
       }
       fetchUserInfo();
     }
 
-    // Password strength checker
+    // Kiểm tra độ mạnh mật khẩu
     function calculatePasswordStrength(password) {
       let score = 0;
       if (password.length >= 8) score++;
@@ -663,34 +660,34 @@
         case 0:
         case 1:
           fill.style.backgroundColor = '#ef4444';
-          text.textContent = 'Weak';
+          text.textContent = 'Yếu';
           text.style.color = '#ef4444';
           break;
         case 2:
           fill.style.backgroundColor = '#f59e0b';
-          text.textContent = 'Fair';
+          text.textContent = 'Khá';
           text.style.color = '#f59e0b';
           break;
         case 3:
           fill.style.backgroundColor = '#3b82f6';
-          text.textContent = 'Good';
+          text.textContent = 'Tốt';
           text.style.color = '#3b82f6';
           break;
         case 4:
           fill.style.backgroundColor = '#10b981';
-          text.textContent = 'Strong';
+          text.textContent = 'Mạnh';
           text.style.color = '#10b981';
           break;
       }
     }
 
-    // Mobile menu toggle
+    // Chuyển đổi menu di động
     function toggleMobileMenu() {
       const sidebar = document.querySelector('.sidebar');
       sidebar.classList.toggle('open');
     }
 
-    // Event Listeners
+    // Thêm sự kiện
     document.getElementById('save-button').addEventListener('click', saveUserInfo);
     document.getElementById('change-password-button').addEventListener('click', changePassword);
     document.getElementById('logout-button').addEventListener('click', logout);
@@ -699,7 +696,7 @@
     });
     document.querySelector('.mobile-menu-btn').addEventListener('click', toggleMobileMenu);
 
-    // Close mobile menu when clicking outside
+    // Đóng menu di động khi nhấp ra ngoài
     document.addEventListener('click', (e) => {
       const sidebar = document.querySelector('.sidebar');
       const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -712,7 +709,7 @@
       }
     });
 
-    // Initialize on page load
+    // Khởi tạo khi trang tải
     document.addEventListener('DOMContentLoaded', updateUI);
   </script>
 </body>
